@@ -1,0 +1,112 @@
+we have to create a health Insurance selling application. 
+
+Fow now for a backend we will use multiple json files. 
+below are the list of functionalities we should have. 
+
+--Development thoughts 
+For now we dont have db so lets hava json and have data in that for example when a lead is created lets have one json file as lead.json and save it there. 
+I want cursor to create some sample lookup data first then we wil alter them individually to fit our requirement. 
+we should use tailwind css , react and vite 
+we should have seperate service file which access the database json 
+Application should accomodate various designs such as mobile , desktop and tablet mode 
+Lets have light and darkmode toggle for application . 
+
+
+-- Admin Functionalites 
+There will be one super admin who can access admin functionality 
+Able to create user / agents 
+Able to create multiple Departments 
+Under the department we should alow user to be get tagged
+there should be a role based access management system. 
+There will be different modules 
+
+Home Screen 
+    -> should have tile based navigation system for all the modules. 
+    -> lets show insights on the enrollments done by users 
+
+
+-- Modules in the application 
+Lead
+    -> Lead data is the centralized data for this application to which agent will sell insurance to 
+    -> For create lead we should show form will below list of values FirstName, LastName, DOB, Age (AutoCalculate), Gener(Male/Female), Email , Address1 , Address2 , ZipCode, State, County, City, Phone, Ethnicity, Race, Medicare nUmber , medicarid, part A date, part B date, lead status , permission to contact, existing aetna member, tobacco usage. 
+    -> to lead we will have multiple data first thing is personal information then we should allow user to tag SOA , EKIT, Pharmacy and Drug data, plan recommendation  for that lead. 
+    -> Lead SHould have create, Listing and View individual lead information with multiple tabs to show other lead associated modules. 
+
+Plan Listing 
+    -> Plans are what we are going to sell to the users. 
+    -> we should have a page where we list different type of plan 
+    -> inside the plan listing we should show individual plan with benefits plan, rating plan 
+    -> Plan will be of few categories so different tabs for plans. Medicare Advantage, PDP, Medsup and ANC. 
+    -> Every plans will be hidden and shown based on Leads age, zip and agents access level 
+    -> Premium should get affected based on meicaid and lis level if the lead is eligible  
+    -> Plan Listing / Plan information / PLan Compare screens. 
+
+Pharmacy
+    -> user shoudl be able to tag pharmacy to the lead 
+    -> pharmacy are based on zip code , state and county 
+    -> we should allow user to search pharmacy on a google map while entering zip state county in lead and tag data. 
+    -> pharmacy listing should have ggogle map pinned locations based on zip. 
+    -> only three pharmacy can be tagged. 
+
+Drug 
+    -> Drugs also should be tagged to the lead. 
+    -> Add or tag drug should have search option when user types a drug it should auto complete 
+    -> drug should be of dosage quantitiese and frequesncy 
+    -> any number of drug can be added to the lead. 
+
+YOY Plan 
+    -> YOY plan should be showing plan information and comparing plans from previous year.  
+
+Medicaid 
+    -> show a form with below list of information 
+    -> Firstname, lastname, dob, gender, medicare number, medicaid, ssn, medicaid state
+    -> based on sample dat we show eligiblity for medicaid. 
+    -> Medicaid sould be a individual page as well as in plan listing page so that user can do eligibity check there and change premoium 
+
+LIS 
+    -> show a form with below list of information 
+    -> Firstname, lastname, dob, gender, medicare number 
+    -> based on sample dat we show eligiblity for medicaid. 
+    -> LIS sould be a individual page as well as in plan listing page so that user can do eligibity check there and change premoium 
+
+SOA
+    -> SOA is a module which is called scope of appointment. 
+    -> when lead doesnt want to enroll directly without appointment lets use page to schedule appointment.  
+    -> in soa we should show users products to discuss , meeting summary and timinging. 
+
+EKIT
+    -> EKIT is a module where we envite with plan information 
+    -> EKIT is send via email. 
+
+Recommendation 
+    -> based on users existing plan we should show leads better plan. 
+
+
+-- we will create this feature later. 
+Create a Request 
+multiple user -> multiple user types 
+Flow One Create request - Multiple requestor 
+1,2,3,4 
+1-2, 2-4 , 3 
+Approve and Request 
+
+
+
+
+DB JSONS
+Lead
+SampleMedicaid
+SmapleLIS
+Enrollment data 
+
+Lookup DB JSON 
+ZipCode
+STATE 
+COUNTY 
+Plan information
+Benefits associated with plan
+pricing for plan  
+Star rating for plan 
+Drug data
+pharmacy data 
+plan recommendation plan mapping 
