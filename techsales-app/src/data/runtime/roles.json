@@ -1,0 +1,65 @@
+[
+  {
+    "roleId": "ROLE-001",
+    "roleName": "Super Admin",
+    "description": "Full system access with all permissions",
+    "permissions": [
+      { "module": "dashboard", "actions": ["view", "create", "edit", "delete", "export"] },
+      { "module": "leads", "actions": ["view", "create", "edit", "delete", "export"] },
+      { "module": "plans", "actions": ["view", "create", "edit", "delete", "export"] },
+      { "module": "pharmacy", "actions": ["view", "create", "edit", "delete", "export"] },
+      { "module": "drugs", "actions": ["view", "create", "edit", "delete", "export"] },
+      { "module": "pba", "actions": ["view", "create", "edit", "delete", "export"] },
+      { "module": "pbkit", "actions": ["view", "create", "edit", "delete", "export"] },
+      { "module": "stateAssistance", "actions": ["view", "create", "edit", "delete", "export"] },
+      { "module": "planSubsidy", "actions": ["view", "create", "edit", "delete", "export"] },
+      { "module": "recommendations", "actions": ["view", "create", "edit", "delete", "export"] },
+      { "module": "yoy", "actions": ["view", "create", "edit", "delete", "export"] },
+      { "module": "enrollments", "actions": ["view", "create", "edit", "delete", "export"] },
+      { "module": "admin", "actions": ["view", "create", "edit", "delete", "export"] },
+      { "module": "users", "actions": ["view", "create", "edit", "delete", "export"] },
+      { "module": "departments", "actions": ["view", "create", "edit", "delete", "export"] },
+      { "module": "roles", "actions": ["view", "create", "edit", "delete", "export"] },
+      { "module": "reports", "actions": ["view", "create", "edit", "delete", "export"] }
+    ],
+    "isActive": true,
+    "createdAt": "2025-01-01T00:00:00Z"
+  },
+  {
+    "roleId": "ROLE-002",
+    "roleName": "Sales Agent",
+    "description": "Sales and enrollment capabilities",
+    "permissions": [
+      { "module": "dashboard", "actions": ["view"] },
+      { "module": "leads", "actions": ["view", "create", "edit"] },
+      { "module": "plans", "actions": ["view"] },
+      { "module": "pharmacy", "actions": ["view"] },
+      { "module": "drugs", "actions": ["view"] },
+      { "module": "pba", "actions": ["view", "create", "edit"] },
+      { "module": "pbkit", "actions": ["view", "create"] },
+      { "module": "stateAssistance", "actions": ["view"] },
+      { "module": "planSubsidy", "actions": ["view"] },
+      { "module": "recommendations", "actions": ["view"] },
+      { "module": "yoy", "actions": ["view"] },
+      { "module": "enrollments", "actions": ["view", "create", "edit"] },
+      { "module": "reports", "actions": ["view"] }
+    ],
+    "isActive": true,
+    "createdAt": "2025-01-01T00:00:00Z"
+  },
+  {
+    "roleId": "ROLE-003",
+    "roleName": "Customer Service Rep",
+    "description": "View-only access for support",
+    "permissions": [
+      { "module": "dashboard", "actions": ["view"] },
+      { "module": "leads", "actions": ["view"] },
+      { "module": "plans", "actions": ["view"] },
+      { "module": "pharmacy", "actions": ["view"] },
+      { "module": "drugs", "actions": ["view"] },
+      { "module": "enrollments", "actions": ["view"] }
+    ],
+    "isActive": true,
+    "createdAt": "2025-01-01T00:00:00Z"
+  }
+]

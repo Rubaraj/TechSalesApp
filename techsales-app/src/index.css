@@ -1,0 +1,161 @@
+@import "tailwindcss";
+
+/* Import Inter font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* Custom theme variables - Orange Theme */
+@theme {
+  /* Primary - Orange */
+  --color-primary-50: #fff7ed;
+  --color-primary-100: #ffedd5;
+  --color-primary-200: #fed7aa;
+  --color-primary-300: #fdba74;
+  --color-primary-400: #fb923c;
+  --color-primary-500: #f97316;
+  --color-primary-600: #ea580c;
+  --color-primary-700: #c2410c;
+  --color-primary-800: #9a3412;
+  --color-primary-900: #7c2d12;
+  --color-primary-950: #431407;
+
+  /* Secondary - Warm Gray */
+  --color-secondary-50: #fafaf9;
+  --color-secondary-100: #f5f5f4;
+  --color-secondary-200: #e7e5e4;
+  --color-secondary-300: #d6d3d1;
+  --color-secondary-400: #a8a29e;
+  --color-secondary-500: #78716c;
+  --color-secondary-600: #57534e;
+  --color-secondary-700: #44403c;
+  --color-secondary-800: #292524;
+  --color-secondary-900: #1c1917;
+  --color-secondary-950: #0c0a09;
+
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+/* Dark mode selector */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Custom base styles */
+@layer base {
+  html {
+    font-family: var(--font-sans);
+  }
+  
+  body {
+    @apply bg-gray-50 text-gray-900;
+    @apply transition-colors duration-200;
+  }
+  
+  .dark body,
+  body:where(.dark *) {
+    @apply bg-gray-900 text-gray-100;
+  }
+}
+
+/* Custom component styles */
+@layer components {
+  .btn-primary {
+    @apply bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg;
+    @apply transition-colors duration-200;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .btn-secondary {
+    @apply bg-secondary-200 hover:bg-secondary-300 text-secondary-800 font-medium py-2 px-4 rounded-lg;
+    @apply dark:bg-secondary-700 dark:hover:bg-secondary-600 dark:text-secondary-100;
+    @apply transition-colors duration-200;
+    @apply focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2;
+  }
+  
+  .input-field {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-lg;
+    @apply dark:border-gray-600 dark:bg-gray-800;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+    @apply transition-colors duration-200;
+  }
+  
+  .card {
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700;
+    @apply p-6;
+  }
+  
+  .tile {
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700;
+    @apply p-6 hover:shadow-md transition-shadow duration-200 cursor-pointer;
+    @apply flex flex-col items-center justify-center gap-3;
+  }
+  
+  /* Orange gradient utilities */
+  .gradient-orange {
+    @apply bg-gradient-to-r from-orange-500 via-orange-600 to-amber-600;
+  }
+  
+  .gradient-orange-light {
+    @apply bg-gradient-to-r from-orange-400 to-amber-500;
+  }
+  
+  .gradient-orange-dark {
+    @apply bg-gradient-to-r from-orange-600 via-orange-700 to-amber-700;
+  }
+}
+
+/* Custom utility styles */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Date input styling */
+input[type="date"] {
+  position: relative;
+  font-family: inherit;
+}
+
+input[type="date"]::-webkit-datetime-edit {
+  padding: 0;
+}
+
+input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+  padding: 0;
+}
+
+input[type="date"]::-webkit-datetime-edit-text {
+  color: #9ca3af;
+  padding: 0 0.25rem;
+}
+
+input[type="date"]::-webkit-datetime-edit-month-field,
+input[type="date"]::-webkit-datetime-edit-day-field,
+input[type="date"]::-webkit-datetime-edit-year-field {
+  padding: 0.125rem;
+  border-radius: 0.25rem;
+}
+
+input[type="date"]::-webkit-datetime-edit-month-field:focus,
+input[type="date"]::-webkit-datetime-edit-day-field:focus,
+input[type="date"]::-webkit-datetime-edit-year-field:focus {
+  background: #fed7aa;
+  outline: none;
+}
+
+.dark input[type="date"]::-webkit-datetime-edit-month-field:focus,
+.dark input[type="date"]::-webkit-datetime-edit-day-field:focus,
+.dark input[type="date"]::-webkit-datetime-edit-year-field:focus {
+  background: #c2410c;
+  color: white;
+}
+
+/* Firefox date input */
+input[type="date"]::-moz-focus-inner {
+  border: 0;
+}
+
+/* Hide native calendar icon - we use custom one */
+input[type="date"]::-webkit-inner-spin-button,
+input[type="date"]::-webkit-clear-button {
+  display: none;
+}
