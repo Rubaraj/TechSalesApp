@@ -18,6 +18,7 @@ import { EmptyState } from '../../components/common/EmptyState';
 import type { PlanCategory } from '../../types';
 import { searchPlans, type PlanFilters, type PlanWithPremium } from '../../services/planService';
 import { autoPopulateFromZip } from '../../services/zipService';
+import { useTheme } from '../../context/ThemeContext';
 
 const productOptions = [
   { value: '', label: 'All Products' },
@@ -43,6 +44,16 @@ const categoryOptions = [
   { value: 'dual', label: 'Dual Eligible' },
 ];
 
+const carrierOptions = [
+  { value: '', label: 'All Carriers' },
+  { value: 'Aetna', label: 'Aetna' },
+  { value: 'UnitedHealthcare', label: 'UnitedHealthcare' },
+  { value: 'Humana', label: 'Humana' },
+  { value: 'Blue Cross Blue Shield', label: 'Blue Cross Blue Shield' },
+  { value: 'Cigna', label: 'Cigna' },
+  { value: 'WellCare', label: 'WellCare' },
+];
+
 const yearOptions = [
   { value: '2025', label: '2025' },
   { value: '2024', label: '2024' },
@@ -50,6 +61,7 @@ const yearOptions = [
 
 export function PlanList() {
   const navigate = useNavigate();
+  const { colorTheme } = useTheme();
   const [plans, setPlans] = useState<PlanWithPremium[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -70,6 +82,23 @@ export function PlanList() {
 
   // Check if a string is a valid 5-digit zip code pattern
   const isZipCode = (value: string) => /^\d{5}$/.test(value.trim());
+
+  // Lock carrier filter based on theme
+  useEffect(() => {
+    if (colorTheme === 'aetna') {
+      // Lock to Aetna
+      setFilters(prev => ({ ...prev, carrier: 'Aetna' }));
+    } else if (colorTheme === 'humana') {
+      // Lock to Humana
+      setFilters(prev => ({ ...prev, carrier: 'Humana' }));
+    } else {
+      // Default theme: unlock and clear carrier filter
+      setFilters(prev => {
+        const { carrier, ...rest } = prev;
+        return rest;
+      });
+    }
+  }, [colorTheme]);
 
   // Handle search input change - supports both text search and zip code
   const handleSearchChange = async (value: string) => {
@@ -146,6 +175,7 @@ export function PlanList() {
       filters,
       page: pagination.page,
       pageSize: pagination.pageSize,
+      colorTheme, // Pass theme for automatic carrier filtering
     });
 
     if (result.success && result.data) {
@@ -158,7 +188,7 @@ export function PlanList() {
       });
     }
     setIsLoading(false);
-  }, [searchTerm, filters, pagination.page, pagination.pageSize]);
+  }, [searchTerm, filters, pagination.page, pagination.pageSize, colorTheme]);
 
   useEffect(() => {
     loadPlans();
@@ -340,6 +370,22 @@ export function PlanList() {
               onChange={(e) => setFilters({ ...filters, category: e.target.value as PlanCategory || undefined })}
             />
           </div>
+          <div className="w-48">
+            <Select
+              label="Insurance Carrier"
+              options={carrierOptions}
+              value={filters.carrier || ''}
+              onChange={(e) => setFilters({ ...filters, carrier: e.target.value || undefined })}
+              disabled={colorTheme === 'aetna' || colorTheme === 'humana'}
+              helperText={
+                colorTheme === 'aetna' 
+                  ? 'Locked to Aetna based on selected theme'
+                  : colorTheme === 'humana'
+                  ? 'Locked to Humana based on selected theme'
+                  : undefined
+              }
+            />
+          </div>
         </div>
       )}
 
@@ -403,8 +449,11 @@ export function PlanList() {
               <h3 className="font-semibold text-gray-900 dark:text-white mb-1 line-clamp-2 group-hover:text-orange-600 dark:group-hover:text-orange-400">
                 {plan.planName}
               </h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
                 {plan.contractNumber}-{plan.pbp}
+              </p>
+              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-3">
+                {plan.marketingName}
               </p>
 
               {/* Star Rating */}
@@ -454,6 +503,9 @@ export function PlanList() {
                 <div className="flex items-center gap-4 text-sm">
                   <span className="text-gray-500 dark:text-gray-400">
                     {plan.contractNumber}-{plan.pbp}
+                  </span>
+                  <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                    {plan.marketingName}
                   </span>
                   {renderStars(plan.starRating || 0)}
                 </div>

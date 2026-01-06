@@ -13,8 +13,9 @@ import {
 } from 'lucide-react';
 import { Button, Select, Badge, Modal, Input } from '../../components/common';
 import { SearchInput } from '../../components/common/SearchInput';
+import { LeadAutocomplete } from '../../components/common/LeadAutocomplete';
 import { EmptyState } from '../../components/common/EmptyState';
-import type { PBKit, PBKitStatus } from '../../types';
+import type { PBKit, PBKitStatus, Lead } from '../../types';
 
 // Mock PBKit data
 const mockPBKits: PBKit[] = [
@@ -338,7 +339,14 @@ export function PBKitList() {
         }
       >
         <div className="space-y-4">
-          <Input label="Lead/Beneficiary" placeholder="Select a lead..." />
+          <LeadAutocomplete
+            label="Lead/Beneficiary"
+            value=""
+            onChange={(leadId, lead) => {
+              // Handle lead selection
+            }}
+            placeholder="Type to search for a lead..."
+          />
           <Input label="Email Address" type="email" placeholder="recipient@email.com" />
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

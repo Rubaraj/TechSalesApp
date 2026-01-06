@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
   Search,
   CheckCircle,
@@ -7,11 +7,14 @@ import {
   User,
   Calendar,
   FileCheck,
-  HelpCircle
+  HelpCircle,
+  Loader2
 } from 'lucide-react';
 import { Button, Input, Badge, Modal } from '../../components/common';
 import { EmptyState } from '../../components/common/EmptyState';
-import type { StateAssistanceEligibility } from '../../types';
+import type { StateAssistanceEligibility, Lead } from '../../types';
+import { autocompleteLeads, getLeadById } from '../../services/leadService';
+import { getUserById } from '../../services/userService';
 
 // Mock eligibility records
 const mockRecords: StateAssistanceEligibility[] = [
@@ -78,6 +81,14 @@ export function StateAssistanceCheckPage() {
     isEligible: boolean;
     type?: string;
   } | null>(null);
+  
+  // Lead search state
+  const [leadSearchTerm, setLeadSearchTerm] = useState('');
+  const [leadSuggestions, setLeadSuggestions] = useState<Lead[]>([]);
+  const [isSearchingLeads, setIsSearchingLeads] = useState(false);
+  const [showLeadSuggestions, setShowLeadSuggestions] = useState(false);
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [agentInfo, setAgentInfo] = useState<{ name: string; email: string } | null>(null);
 
   useEffect(() => {
     setIsLoading(true);
@@ -86,6 +97,53 @@ export function StateAssistanceCheckPage() {
       setIsLoading(false);
     }, 300);
   }, []);
+
+  // Search leads for autocomplete
+  const searchLeads = useCallback(async () => {
+    if (!leadSearchTerm || leadSearchTerm.length < 2) {
+      setLeadSuggestions([]);
+      return;
+    }
+
+    setIsSearchingLeads(true);
+    const result = await autocompleteLeads(leadSearchTerm);
+    if (result.success && result.data) {
+      setLeadSuggestions(result.data);
+      setShowLeadSuggestions(true);
+    }
+    setIsSearchingLeads(false);
+  }, [leadSearchTerm]);
+
+  useEffect(() => {
+    const timer = setTimeout(searchLeads, 300);
+    return () => clearTimeout(timer);
+  }, [searchLeads]);
+
+  // Handle lead selection
+  const handleLeadSelect = async (lead: Lead) => {
+    setSelectedLead(lead);
+    setLeadSearchTerm(`${lead.firstName} ${lead.lastName}`);
+    setShowLeadSuggestions(false);
+    
+    // Auto-fill form with lead information
+    setCheckForm({
+      leadName: `${lead.firstName} ${lead.lastName}`,
+      stateAssistanceNumber: lead.medicaidId || '',
+      state: lead.state,
+      dateOfBirth: lead.dob,
+    });
+
+    // Load agent information
+    if (lead.createdBy) {
+      const agentResult = await getUserById(lead.createdBy);
+      if (agentResult.success && agentResult.data) {
+        setAgentInfo({
+          name: `${agentResult.data.firstName} ${agentResult.data.lastName}`,
+          email: agentResult.data.email,
+        });
+      }
+    }
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -134,6 +192,10 @@ export function StateAssistanceCheckPage() {
         <Button onClick={() => {
           setCheckResult(null);
           setCheckForm({ leadName: '', stateAssistanceNumber: '', state: '', dateOfBirth: '' });
+          setLeadSearchTerm('');
+          setSelectedLead(null);
+          setAgentInfo(null);
+          setShowLeadSuggestions(false);
           setIsCheckModalOpen(true);
         }}>
           <Search className="w-4 h-4" />
@@ -247,15 +309,39 @@ export function StateAssistanceCheckPage() {
       {/* Check Eligibility Modal */}
       <Modal
         isOpen={isCheckModalOpen}
-        onClose={() => setIsCheckModalOpen(false)}
+        onClose={() => {
+          setIsCheckModalOpen(false);
+          setCheckResult(null);
+          setCheckForm({ leadName: '', stateAssistanceNumber: '', state: '', dateOfBirth: '' });
+          setLeadSearchTerm('');
+          setSelectedLead(null);
+          setAgentInfo(null);
+          setShowLeadSuggestions(false);
+        }}
         title="Check State Assistance Eligibility"
         size="md"
         footer={
           checkResult?.checked ? (
-            <Button onClick={() => setIsCheckModalOpen(false)}>Done</Button>
+            <Button onClick={() => {
+              setIsCheckModalOpen(false);
+              setCheckResult(null);
+              setCheckForm({ leadName: '', stateAssistanceNumber: '', state: '', dateOfBirth: '' });
+              setLeadSearchTerm('');
+              setSelectedLead(null);
+              setAgentInfo(null);
+              setShowLeadSuggestions(false);
+            }}>Done</Button>
           ) : (
             <>
-              <Button variant="outline" onClick={() => setIsCheckModalOpen(false)}>Cancel</Button>
+              <Button variant="outline" onClick={() => {
+                setIsCheckModalOpen(false);
+                setCheckResult(null);
+                setCheckForm({ leadName: '', stateAssistanceNumber: '', state: '', dateOfBirth: '' });
+                setLeadSearchTerm('');
+                setSelectedLead(null);
+                setAgentInfo(null);
+                setShowLeadSuggestions(false);
+              }}>Cancel</Button>
               <Button onClick={handleCheck}>Check Eligibility</Button>
             </>
           )
@@ -286,17 +372,96 @@ export function StateAssistanceCheckPage() {
           </div>
         ) : (
           <div className="space-y-4">
+            {/* Lead Search with Autocomplete */}
+            <div className="relative">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Beneficiary Name (Search from Leads)
+              </label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  value={leadSearchTerm}
+                  onChange={(e) => {
+                    setLeadSearchTerm(e.target.value);
+                    setShowLeadSuggestions(true);
+                    if (!e.target.value) {
+                      setSelectedLead(null);
+                      setAgentInfo(null);
+                      setCheckForm({ leadName: '', stateAssistanceNumber: '', state: '', dateOfBirth: '' });
+                    }
+                  }}
+                  onFocus={() => {
+                    if (leadSuggestions.length > 0) {
+                      setShowLeadSuggestions(true);
+                    }
+                  }}
+                  placeholder="Type lead name to search and auto-fill..."
+                  className="w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                />
+                {isSearchingLeads && (
+                  <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 animate-spin" />
+                )}
+              </div>
+
+              {/* Lead Suggestions Dropdown */}
+              {showLeadSuggestions && leadSuggestions.length > 0 && (
+                <>
+                  <div className="absolute z-20 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-64 overflow-y-auto">
+                    {leadSuggestions.map((lead) => (
+                      <button
+                        key={lead.leadId}
+                        type="button"
+                        onClick={() => handleLeadSelect(lead)}
+                        className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-3 border-b border-gray-100 dark:border-gray-700 last:border-0"
+                      >
+                        <User className="w-5 h-5 text-orange-500" />
+                        <div className="flex-1">
+                          <p className="font-medium text-gray-900 dark:text-white">
+                            {lead.firstName} {lead.lastName}
+                          </p>
+                          <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400 mt-1">
+                            <span>{lead.city}, {lead.state}</span>
+                            <span>•</span>
+                            <span>DOB: {new Date(lead.dob).toLocaleDateString()}</span>
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                  {/* Click outside to close */}
+                  <div
+                    className="fixed inset-0 z-10"
+                    onClick={() => setShowLeadSuggestions(false)}
+                  />
+                </>
+              )}
+            </div>
+
+            {/* Agent Information Display */}
+            {agentInfo && selectedLead && (
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+                <p className="text-sm text-blue-900 dark:text-blue-100">
+                  <span className="font-medium">Agent:</span> {agentInfo.name} ({agentInfo.email})
+                </p>
+                <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
+                  Lead ID: {selectedLead.leadId} • Created: {new Date(selectedLead.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+            )}
+
             <Input
               label="Beneficiary Name"
               value={checkForm.leadName}
               onChange={(e) => setCheckForm({ ...checkForm, leadName: e.target.value })}
-              placeholder="Enter full name"
+              placeholder="Enter full name or select from leads above"
+              disabled={!!selectedLead}
             />
             <Input
               label="State Assistance Number"
               value={checkForm.stateAssistanceNumber}
               onChange={(e) => setCheckForm({ ...checkForm, stateAssistanceNumber: e.target.value })}
-              placeholder="SA-12345678"
+              placeholder="SA-12345678 or Medicaid ID"
             />
             <div className="grid grid-cols-2 gap-4">
               <Input

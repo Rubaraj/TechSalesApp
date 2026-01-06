@@ -22,19 +22,19 @@ export function Tabs({ tabs, activeTab, onChange, variant = 'default' }: TabsPro
       case 'pills':
         return `${base} rounded-lg ${
           isActive
-            ? 'bg-orange-600 text-white'
+            ? 'bg-primary-600 text-white'
             : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
         }`;
       case 'underline':
         return `${base} border-b-2 -mb-px ${
           isActive
-            ? 'border-orange-600 text-orange-600 dark:text-orange-400'
+            ? 'border-primary-600 text-primary-600 dark:text-primary-400'
             : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
         }`;
       default:
         return `${base} rounded-t-lg border-b-2 ${
           isActive
-            ? 'border-orange-600 bg-white dark:bg-gray-800 text-orange-600 dark:text-orange-400'
+            ? 'border-primary-600 bg-white dark:bg-gray-800 text-primary-600 dark:text-primary-400'
             : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
         }`;
     }

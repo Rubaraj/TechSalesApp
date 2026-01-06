@@ -1,3 +1,11 @@
+export interface PlanDocument {
+  documentId: string;
+  documentName: string;
+  documentType: 'Summary of Benefits' | 'Evidence of Coverage' | 'Formulary' | 'Provider Directory' | 'Annual Notice of Change' | 'Other';
+  documentUrl: string;
+  documentDate?: string;
+}
+
 export interface Plan {
   planId: string;
   contractYear: number;
@@ -17,6 +25,7 @@ export interface Plan {
   minAge?: number;
   maxAge?: number;
   snpType?: 'DSNP' | 'CSNP' | 'ISNP' | null;
+  documents?: PlanDocument[];
   isDeleted: boolean;
 }
 
@@ -49,6 +58,7 @@ export interface Benefit {
   categoryData: string;
   categoryGroup: string;
   categoryOrder: number;
+  isAvailable?: boolean; // Whether this benefit is available (defaults to true if not specified)
   isDeleted: boolean;
 }
 

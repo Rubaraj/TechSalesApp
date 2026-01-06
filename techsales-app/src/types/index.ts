@@ -28,6 +28,9 @@ export * from './pbkit';
 // Enrollment types
 export * from './enrollment';
 
+// Member types
+export * from './member';
+
 // Common types
 export interface ApiResponse<T> {
   success: boolean;

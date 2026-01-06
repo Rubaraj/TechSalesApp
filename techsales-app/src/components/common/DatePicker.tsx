@@ -33,7 +33,11 @@ export function DatePicker({
 }: DatePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [viewDate, setViewDate] = useState(() => {
-    if (value) return new Date(value);
+    if (value) {
+      // Parse YYYY-MM-DD as local date to avoid timezone issues
+      const [year, month, day] = value.split('-').map(Number);
+      return new Date(year, month - 1, day);
+    }
     return new Date();
   });
   const containerRef = useRef<HTMLDivElement>(null);
@@ -52,13 +56,17 @@ export function DatePicker({
   // Update view date when value changes
   useEffect(() => {
     if (value) {
-      setViewDate(new Date(value));
+      // Parse YYYY-MM-DD as local date to avoid timezone issues
+      const [year, month, day] = value.split('-').map(Number);
+      setViewDate(new Date(year, month - 1, day));
     }
   }, [value]);
 
   const formatDisplayDate = (dateStr: string) => {
     if (!dateStr) return '';
-    const date = new Date(dateStr);
+    // Parse YYYY-MM-DD as local date to avoid timezone issues
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
     return date.toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
@@ -107,7 +115,11 @@ export function DatePicker({
 
   const handleDateSelect = (day: number) => {
     const selectedDate = new Date(viewDate.getFullYear(), viewDate.getMonth(), day);
-    const dateStr = selectedDate.toISOString().split('T')[0];
+    // Format as YYYY-MM-DD using local time to avoid timezone issues
+    const year = selectedDate.getFullYear();
+    const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+    const dayStr = String(selectedDate.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${dayStr}`;
     
     // Check min/max constraints
     if (minDate && dateStr < minDate) return;
@@ -119,7 +131,9 @@ export function DatePicker({
 
   const isSelectedDate = (day: number) => {
     if (!value) return false;
-    const selectedDate = new Date(value);
+    // Parse YYYY-MM-DD as local date to avoid timezone issues
+    const [year, month, dayValue] = value.split('-').map(Number);
+    const selectedDate = new Date(year, month - 1, dayValue);
     return (
       selectedDate.getDate() === day &&
       selectedDate.getMonth() === viewDate.getMonth() &&
@@ -137,9 +151,12 @@ export function DatePicker({
   };
 
   const isDisabledDate = (day: number) => {
-    const dateStr = new Date(viewDate.getFullYear(), viewDate.getMonth(), day)
-      .toISOString()
-      .split('T')[0];
+    // Format as YYYY-MM-DD using local time to avoid timezone issues
+    const date = new Date(viewDate.getFullYear(), viewDate.getMonth(), day);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const dayStr = String(date.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${dayStr}`;
     if (minDate && dateStr < minDate) return true;
     if (maxDate && dateStr > maxDate) return true;
     return false;
@@ -166,22 +183,22 @@ export function DatePicker({
           type="button"
           onClick={() => !disabled && setIsOpen(!isOpen)}
           disabled={disabled}
-          className={`
+            className={`
             w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border text-left
             transition-all duration-200
             ${disabled
               ? 'bg-gray-100 dark:bg-gray-700/50 cursor-not-allowed text-gray-500 dark:text-gray-400'
-              : 'bg-white dark:bg-gray-800 cursor-pointer hover:border-orange-400 dark:hover:border-orange-500'
+              : 'bg-white dark:bg-gray-800 cursor-pointer hover:border-primary-400 dark:hover:border-primary-500'
             }
             ${error
               ? 'border-red-500 focus:ring-red-500'
               : isOpen
-                ? 'border-orange-500 ring-2 ring-orange-500/20'
+                ? 'border-primary-500 ring-2 ring-primary-500/20'
                 : 'border-gray-300 dark:border-gray-600'
             }
           `}
         >
-          <Calendar className={`w-5 h-5 flex-shrink-0 ${value ? 'text-orange-500' : 'text-gray-400'}`} />
+          <Calendar className={`w-5 h-5 flex-shrink-0 ${value ? 'text-primary-500' : 'text-gray-400'}`} />
           <span className={value ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-500'}>
             {value ? formatDisplayDate(value) : placeholder}
           </span>
@@ -203,7 +220,7 @@ export function DatePicker({
         {isOpen && (
           <div className="absolute z-50 mt-2 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
             {/* Header */}
-            <div className="bg-gradient-to-r from-orange-500 to-amber-500 p-4">
+            <div className="bg-gradient-to-r from-primary-500 to-primary-600 p-4">
               <div className="flex items-center justify-between">
                 <button
                   type="button"
@@ -274,9 +291,9 @@ export function DatePicker({
                         w-full h-full rounded-lg text-sm font-medium
                         transition-all duration-150
                         ${isSelectedDate(day)
-                          ? 'bg-orange-500 text-white shadow-md scale-105'
+                          ? 'bg-primary-500 text-white shadow-md scale-105'
                           : isToday(day)
-                            ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 font-bold'
+                            ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 font-bold'
                             : isDisabledDate(day)
                               ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
                               : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
@@ -295,11 +312,15 @@ export function DatePicker({
               <button
                 type="button"
                 onClick={() => {
-                  const today = new Date().toISOString().split('T')[0];
-                  onChange(today);
+                  // Format today as YYYY-MM-DD using local time
+                  const today = new Date();
+                  const year = today.getFullYear();
+                  const month = String(today.getMonth() + 1).padStart(2, '0');
+                  const day = String(today.getDate()).padStart(2, '0');
+                  onChange(`${year}-${month}-${day}`);
                   setIsOpen(false);
                 }}
-                className="text-sm text-orange-600 dark:text-orange-400 font-medium hover:underline"
+                className="text-sm text-primary-600 dark:text-primary-400 font-medium hover:underline"
               >
                 Today
               </button>

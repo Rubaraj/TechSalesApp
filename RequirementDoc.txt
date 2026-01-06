@@ -1,112 +1,269 @@
-we have to create a health Insurance selling application. 
+# TechSales App - Requirements Document
 
-Fow now for a backend we will use multiple json files. 
-below are the list of functionalities we should have. 
+## Project Overview
+Health Insurance selling application for managing leads, plans, enrollments, and sales operations.
 
---Development thoughts 
-For now we dont have db so lets hava json and have data in that for example when a lead is created lets have one json file as lead.json and save it there. 
-I want cursor to create some sample lookup data first then we wil alter them individually to fit our requirement. 
-we should use tailwind css , react and vite 
-we should have seperate service file which access the database json 
-Application should accomodate various designs such as mobile , desktop and tablet mode 
-Lets have light and darkmode toggle for application . 
+## Development Architecture
 
+### Technology Stack
+- **Frontend**: React 19 with TypeScript
+- **Build Tool**: Vite 7
+- **Styling**: Tailwind CSS v4 with custom theme system
+- **Routing**: React Router DOM v7
+- **State Management**: React Context API
+- **Data Storage**: JSON files (simulating backend - will be replaced with real backend later)
 
--- Admin Functionalites 
-There will be one super admin who can access admin functionality 
-Able to create user / agents 
-Able to create multiple Departments 
-Under the department we should alow user to be get tagged
-there should be a role based access management system. 
-There will be different modules 
+### Design Requirements
+- Responsive design: Mobile, tablet, and desktop support
+- Light and dark mode toggle
+- Multi-theme support: Default (Orange), Aetna (Purple), Humana (Green)
+- Service layer pattern: Separate service files for data access
+- Component-based architecture with reusable UI components
 
-Home Screen 
-    -> should have tile based navigation system for all the modules. 
-    -> lets show insights on the enrollments done by users 
+## Admin Functionalities
 
+### User Management
+- Super admin can access all admin functionality
+- Create/edit/delete users (agents)
+- Assign users to departments
+- Role-based access control (RBAC) system
+- Permission management per module and action
 
--- Modules in the application 
-Lead
-    -> Lead data is the centralized data for this application to which agent will sell insurance to 
-    -> For create lead we should show form will below list of values FirstName, LastName, DOB, Age (AutoCalculate), Gener(Male/Female), Email , Address1 , Address2 , ZipCode, State, County, City, Phone, Ethnicity, Race, Medicare nUmber , medicarid, part A date, part B date, lead status , permission to contact, existing aetna member, tobacco usage. 
-    -> to lead we will have multiple data first thing is personal information then we should allow user to tag SOA , EKIT, Pharmacy and Drug data, plan recommendation  for that lead. 
-    -> Lead SHould have create, Listing and View individual lead information with multiple tabs to show other lead associated modules. 
+### Department Management
+- Create multiple departments
+- Tag users to departments
+- Department-based access control
 
-Plan Listing 
-    -> Plans are what we are going to sell to the users. 
-    -> we should have a page where we list different type of plan 
-    -> inside the plan listing we should show individual plan with benefits plan, rating plan 
-    -> Plan will be of few categories so different tabs for plans. Medicare Advantage, PDP, Medsup and ANC. 
-    -> Every plans will be hidden and shown based on Leads age, zip and agents access level 
-    -> Premium should get affected based on meicaid and lis level if the lead is eligible  
-    -> Plan Listing / Plan information / PLan Compare screens. 
+### System Settings
+- Theme selection (Default, Aetna, Humana)
+- Light/Dark mode toggle
+- System configuration
 
-Pharmacy
-    -> user shoudl be able to tag pharmacy to the lead 
-    -> pharmacy are based on zip code , state and county 
-    -> we should allow user to search pharmacy on a google map while entering zip state county in lead and tag data. 
-    -> pharmacy listing should have ggogle map pinned locations based on zip. 
-    -> only three pharmacy can be tagged. 
+### Dashboard
+- Tile-based navigation system for all modules
+- Insights on enrollments done by users
+- Lead lifecycle overview (progress bar and charts)
+- Agent performance metrics
+- Productivity dashboard for admins
 
-Drug 
-    -> Drugs also should be tagged to the lead. 
-    -> Add or tag drug should have search option when user types a drug it should auto complete 
-    -> drug should be of dosage quantitiese and frequesncy 
-    -> any number of drug can be added to the lead. 
+## Modules in the Application
 
-YOY Plan 
-    -> YOY plan should be showing plan information and comparing plans from previous year.  
+### Lead Management
+**Status**: ✅ Implemented
 
-Medicaid 
-    -> show a form with below list of information 
-    -> Firstname, lastname, dob, gender, medicare number, medicaid, ssn, medicaid state
-    -> based on sample dat we show eligiblity for medicaid. 
-    -> Medicaid sould be a individual page as well as in plan listing page so that user can do eligibity check there and change premoium 
+**Lead Data Fields**:
+- Personal Information: FirstName, LastName, DOB, Age (Auto-calculated), Gender (Male/Female), Email, Address1, Address2, ZipCode, State, County, City, Phone
+- Demographics: Ethnicity, Race
+- Medicare Information: Medicare Number, Medicaid ID, Part A Date, Part B Date
+- Lead Status: New Lead → Contacted Lead → Appointment Schedule → Enrollment in progress → Enrolled → Dropped / Lost lead
+- **Source** (Required): Web, Call, Event, Referral, Vendor
+- Flags: Permission to Contact, Existing Aetna Member, Tobacco Usage
 
-LIS 
-    -> show a form with below list of information 
-    -> Firstname, lastname, dob, gender, medicare number 
-    -> based on sample dat we show eligiblity for medicaid. 
-    -> LIS sould be a individual page as well as in plan listing page so that user can do eligibity check there and change premoium 
+**Lead Lifecycle**:
+- Visual timeline in Lead Detail page (horizontal layout)
+- Progress tracking through stages
+- Lifecycle charts in Dashboard
 
-SOA
-    -> SOA is a module which is called scope of appointment. 
-    -> when lead doesnt want to enroll directly without appointment lets use page to schedule appointment.  
-    -> in soa we should show users products to discuss , meeting summary and timinging. 
+**Lead Features**:
+- Create, List, View individual lead information
+- Multiple tabs: Overview, Pharmacies, Drugs, Documents, Activity
+- Tag SOA (PBA), EKIT (PBKit), Pharmacy, Drug data, Plan recommendations
+- Lead autocomplete component for quick selection
 
-EKIT
-    -> EKIT is a module where we envite with plan information 
-    -> EKIT is send via email. 
+### Plan Listing
+**Status**: ✅ Implemented
 
-Recommendation 
-    -> based on users existing plan we should show leads better plan. 
+**Plan Features**:
+- List different types of plans
+- Filter by carrier (Aetna, Humana, UnitedHealthcare, Cigna, Blue Cross Blue Shield, etc.)
+- Filter by product type (MAPD, MA, PDP, Medsup, ANC)
+- Filter by plan type (HMO, PPO, DSNP, CSNP, etc.)
+- Filter by category (Medicare Advantage, PDP, Medsup, ANC)
+- Contract year selector
 
+**Plan Information**:
+- Individual plan detail page with tabs:
+  - Overview: Plan details, cost summary
+  - Benefits: Grouped by category with availability indicators (tick/cross)
+  - Premiums: Regional premium breakdown with Medicaid/LIS adjustments
+  - Documents: Summary of Benefits, Evidence of Coverage, Formulary, Provider Directory, Annual Notice of Change
+- Star ratings display
+- Plan comparison capability
 
--- we will create this feature later. 
-Create a Request 
-multiple user -> multiple user types 
-Flow One Create request - Multiple requestor 
-1,2,3,4 
-1-2, 2-4 , 3 
-Approve and Request 
+**Plan Visibility Rules** (To be implemented):
+- Plans hidden/shown based on Lead age, zip code, and agent access level
+- Premium adjusted based on Medicaid and LIS eligibility
 
+### Pharmacy
+**Status**: ✅ Implemented
 
+**Features**:
+- Search pharmacies by name
+- Filter by zip code, state, county
+- Tag pharmacy to lead (maximum 3 pharmacies per lead)
+- Pharmacy detail modal with contact information and services
+- Grid and list view modes
 
+**Future Enhancement**:
+- Google Maps integration for visual location display
+- Map-based pharmacy selection
 
-DB JSONS
-Lead
-SampleMedicaid
-SmapleLIS
-Enrollment data 
+### Drug
+**Status**: ✅ Implemented
 
-Lookup DB JSON 
-ZipCode
-STATE 
-COUNTY 
-Plan information
-Benefits associated with plan
-pricing for plan  
-Star rating for plan 
-Drug data
-pharmacy data 
-plan recommendation plan mapping 
+**Features**:
+- Search drugs by brand or generic name
+- Auto-complete while typing
+- Tag drugs to lead (unlimited number)
+- Drug details: dosage, quantity, frequency
+- Drug detail modal with formulary information, tier, restrictions
+- Grid and list view modes
+
+### YOY (Year-Over-Year) Plan Comparison
+**Status**: ✅ Implemented
+
+**Features**:
+- Compare plans from previous year (2024 vs 2025)
+- Side-by-side comparison view
+- Summary cards for premium, star rating, and total changes
+- Detailed comparison table with change highlighting
+- Impact badges (Improved, Increased Cost, Changed)
+
+### Medicaid Eligibility (State Assistance Check)
+**Status**: ✅ Implemented
+
+**Features**:
+- Eligibility check form: FirstName, LastName, DOB, Gender, Medicare Number, Medicaid ID, SSN, Medicaid State
+- Eligibility verification result display (Eligible/Not Eligible)
+- Eligibility type indicator (Full, QMB, SLMB, QI)
+- Records list with verification dates and expiration
+- Stats cards (Total, Eligible, Not Eligible, Expiring Soon)
+- Available as individual page and integrated in plan listing
+
+### LIS Eligibility (Plan Subsidy Check)
+**Status**: ✅ Implemented
+
+**Features**:
+- Low Income Subsidy eligibility check
+- Form: FirstName, LastName, DOB, Gender, Medicare Number
+- LIS level determination (1-4)
+- Copay level display
+- Records list with level badges
+- Stats cards (Total, Eligible, Full Subsidy, Partial Subsidy)
+- Available as individual page and integrated in plan listing
+
+### SOA (Scope of Appointment) → PBA (Plan Briefing Appointment)
+**Status**: ✅ Implemented (Renamed to PBA)
+
+**Features**:
+- Schedule appointments when lead doesn't want to enroll directly
+- Lead selection with autocomplete
+- Products to discuss selection
+- Meeting summary and timing
+- Status tracking: Pending, Sent, Completed, Expired
+- Send to beneficiary functionality
+- Download PDF capability
+
+### EKIT (Email Kit) → PBKit (Plan Bundle Kit)
+**Status**: ✅ Implemented (Renamed to PBKit)
+
+**Features**:
+- Send plan information via email
+- Lead selection with autocomplete
+- Plan selection for kit
+- Tracking status: Pending, Sent, Opened, Clicked
+- Resend functionality
+- Plan count badges
+
+### Plan Recommendations
+**Status**: ✅ Implemented
+
+**Features**:
+- AI-powered plan recommendations based on beneficiary profile
+- Lead selection with Medicaid/LIS status display
+- Filter by plan type, max premium, minimum stars
+- Match score calculation (0-100%)
+- Drug coverage and pharmacy network percentages
+- Estimated annual cost calculations
+- Plan highlight badges (premium, coverage, benefits)
+- Expandable plan cards with detailed information
+
+## Data Storage Structure
+
+### Runtime Data (src/data/runtime/)
+- `leads.json` - Lead records
+- `users.json` - User/Agent accounts
+- `roles.json` - Role definitions with permissions
+- `departments.json` - Department information
+- `enrollments.json` - Enrollment records
+- `pba.json` - Plan Briefing Appointment records
+- `pbkit.json` - Plan Bundle Kit records
+- `medicaidEligibility.json` - Medicaid eligibility records
+- `lisEligibility.json` - LIS eligibility records
+- `members.json` - Member accounts
+- `memberAppointments.json` - Member appointments
+
+### Lookup Data (src/data/lookup/)
+- `planInformation.json` - Plan details (80+ plans from multiple carriers)
+- `premiumInformation.json` - Plan pricing with Medicaid/LIS adjustments
+- `benefitData.json` - Plan benefits with availability indicators
+- `starRatings.json` - Plan quality star ratings
+- `drugData.json` - Drug formulary catalog
+- `pharmacyData.json` - Pharmacy locations
+- `zipStateCounty.json` - US geographic data (Zip, State, County mapping)
+- `planreccdata.json` - Plan recommendation mappings
+
+## Future Enhancements
+
+### Request Management System
+- Create requests with multiple requestors
+- Multi-user approval workflows
+- Request tracking and status management
+
+### Additional Features
+- Google Maps integration for pharmacy locations
+- Real-time notifications
+- Email integration for PBKit sending
+- PDF generation for documents
+- Advanced reporting and analytics
+- Integration with actual backend API
+- Member portal enhancements
+
+## Implementation Status
+
+✅ **Completed Modules**:
+- Lead Management (with lifecycle tracking)
+- Plan Listing (multi-carrier support)
+- Pharmacy Search and Tagging
+- Drug Search and Tagging
+- YOY Plan Comparison
+- State Assistance Check (Medicaid)
+- Plan Subsidy Check (LIS)
+- Plan Briefing Appointments (PBA)
+- Plan Bundle Kits (PBKit)
+- Plan Recommendations
+- Admin Module (User, Role, Department Management)
+- Dashboard (Agent and Admin views)
+- Theme System (Multi-theme support)
+- Member Portal (Basic)
+
+🔄 **In Progress**:
+- Plan visibility rules based on age/zip/access level
+- Premium adjustment based on eligibility
+
+📋 **Planned**:
+- Request Management System
+- Google Maps integration
+- Email integration
+- PDF generation
+- Advanced reporting
+
+## Notes for Developers
+
+- All components use `primary-*` CSS classes for theme-aware colors
+- Never use hardcoded color classes (e.g., `bg-orange-500`)
+- Service layer pattern: All data access through service files
+- TypeScript strict mode enabled
+- Follow component patterns in `DEVELOPER_GUIDE.md`
+- See `README.md` for setup instructions
+- See `CHANGELOG.md` for version history

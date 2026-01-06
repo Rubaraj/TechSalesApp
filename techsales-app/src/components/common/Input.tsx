@@ -35,7 +35,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           
           {/* Calendar icon for date inputs */}
           {isDateInput && !leftIcon && (
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-500 pointer-events-none z-10">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-primary-500 pointer-events-none z-10">
               <Calendar className="w-4 h-4" />
             </div>
           )}
@@ -49,7 +49,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               text-gray-900 dark:text-gray-100
               placeholder-gray-400 dark:placeholder-gray-500
               transition-all duration-200
-              focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent
+              focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent
               disabled:cursor-not-allowed disabled:bg-gray-100 disabled:dark:bg-gray-700/50 disabled:text-gray-500 disabled:dark:text-gray-400
               ${props.disabled ? 'bg-gray-100 dark:bg-gray-700/50' : 'bg-white dark:bg-gray-800'}
               ${leftIcon || isDateInput ? 'pl-10' : ''}

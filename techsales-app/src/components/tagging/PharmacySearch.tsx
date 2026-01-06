@@ -68,7 +68,20 @@ export function PharmacySearch({
   };
 
   return (
-    <div className="space-y-4">
+    <div 
+      className="space-y-4"
+      onKeyDown={(e) => {
+        // Prevent any keyboard events from bubbling to parent form
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }}
+      onClick={(e) => {
+        // Prevent click events from bubbling to form
+        e.stopPropagation();
+      }}
+    >
       {/* Selected Pharmacies */}
       {selectedPharmacies.length > 0 && (
         <div className="flex flex-wrap gap-2">
@@ -100,12 +113,36 @@ export function PharmacySearch({
             type="text"
             value={searchTerm}
             onChange={(e) => {
+              e.stopPropagation();
               setSearchTerm(e.target.value);
               setShowResults(true);
             }}
-            onFocus={() => setShowResults(true)}
+            onFocus={(e) => {
+              e.stopPropagation();
+              setShowResults(true);
+            }}
+            onKeyDown={(e) => {
+              // Prevent form submission for Enter key
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+              }
+              // Stop propagation for all keys to prevent any form interaction
+              e.stopPropagation();
+            }}
+            onKeyPress={(e) => {
+              // Prevent form submission from any key press
+              e.stopPropagation();
+            }}
+            onKeyUp={(e) => {
+              // Prevent form submission from any key release
+              e.stopPropagation();
+            }}
             placeholder="Search pharmacies by name, city, or zip..."
             className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            formNoValidate
+            autoComplete="off"
           />
           {isLoading && (
             <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 animate-spin" />
@@ -122,7 +159,10 @@ export function PharmacySearch({
               return (
                 <button
                   key={pharmacy.pharmacyId}
-                  onClick={() => {
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     togglePharmacy(pharmacy.pharmacyId);
                   }}
                   disabled={!isSelected && !canSelect}
@@ -182,7 +222,10 @@ export function PharmacySearch({
       {showResults && (
         <div
           className="fixed inset-0 z-10"
-          onClick={() => setShowResults(false)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowResults(false);
+          }}
         />
       )}
     </div>

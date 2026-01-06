@@ -4,18 +4,26 @@ import { ArrowLeft, Save, Loader2, MapPin, Search, Building2, Pill, ChevronDown 
 import { Button, Input, Select, Badge, DatePicker } from '../../components/common';
 import { PharmacySearch, DrugSearch } from '../../components/tagging';
 import { useAuth } from '../../context/AuthContext';
-import type { Lead, LeadStatus, ZipStateCounty, TaggedDrug } from '../../types';
+import type { Lead, LeadStatus, LeadSource, ZipStateCounty, TaggedDrug } from '../../types';
 import { getLeadById, createLead, updateLead } from '../../services/leadService';
 import { getLocationByZip, getCountiesByState } from '../../services/zipService';
 import { calculateAge } from '../../utils/dateUtils';
 
 const statusOptions = [
-  { value: 'New', label: 'New' },
-  { value: 'Contacted', label: 'Contacted' },
-  { value: 'Qualified', label: 'Qualified' },
-  { value: 'Proposal', label: 'Proposal' },
+  { value: 'New Lead', label: 'New Lead' },
+  { value: 'Contacted Lead', label: 'Contacted Lead' },
+  { value: 'Appointment Schedule', label: 'Appointment Schedule' },
+  { value: 'Enrollment in progress', label: 'Enrollment in progress' },
   { value: 'Enrolled', label: 'Enrolled' },
-  { value: 'Lost', label: 'Lost' },
+  { value: 'Dropped / Lost lead', label: 'Dropped / Lost lead' },
+];
+
+const sourceOptions = [
+  { value: 'Web', label: 'Web' },
+  { value: 'Call', label: 'Call' },
+  { value: 'Event', label: 'Event' },
+  { value: 'Referral', label: 'Referral' },
+  { value: 'Vendor', label: 'Vendor' },
 ];
 
 interface FormData {
@@ -36,6 +44,7 @@ interface FormData {
   isLISEligible: boolean;
   medicaidNumber: string;
   status: LeadStatus;
+  source: LeadSource;
   notes: string;
 }
 
@@ -56,7 +65,8 @@ const initialFormData: FormData = {
   isDualEligible: false,
   isLISEligible: false,
   medicaidNumber: '',
-  status: 'New',
+  status: 'New Lead',
+  source: 'Web',
   notes: '',
 };
 
@@ -77,6 +87,7 @@ export function LeadForm() {
   const [isMultiCountyZip, setIsMultiCountyZip] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
   const [submitError, setSubmitError] = useState('');
+  const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
 
   // Load existing lead data if editing
   useEffect(() => {
@@ -90,20 +101,21 @@ export function LeadForm() {
             lastName: lead.lastName,
             email: lead.email,
             phone: lead.phone,
-            dateOfBirth: lead.dateOfBirth,
-            address: lead.address,
+            dateOfBirth: lead.dob,
+            address: lead.address1,
             city: lead.city,
             state: lead.state,
             county: lead.county,
             zipCode: lead.zipCode,
-            mbi: lead.mbi || '',
-            partAEffectiveDate: lead.partAEffectiveDate || '',
-            partBEffectiveDate: lead.partBEffectiveDate || '',
-            isDualEligible: lead.isDualEligible,
-            isLISEligible: lead.isLISEligible,
-            medicaidNumber: lead.medicaidNumber || '',
+            mbi: lead.medicareNumber || '',
+            partAEffectiveDate: lead.partADate || '',
+            partBEffectiveDate: lead.partBDate || '',
+            isDualEligible: Boolean(lead.medicaidId),
+            isLISEligible: false, // This field doesn't exist in Lead, will need to be added if needed
+            medicaidNumber: lead.medicaidId || '',
             status: lead.leadStatus,
-            notes: lead.notes || '',
+            source: lead.source || 'Web',
+            notes: '', // Notes field doesn't exist in Lead interface
           });
           // Load tagged pharmacies and drugs
           setTaggedPharmacies(lead.taggedPharmacies || []);
@@ -194,52 +206,110 @@ export function LeadForm() {
     loadCounties();
   }, [formData.state]);
 
-  // Validation
-  const validate = (): boolean => {
-    const newErrors: Partial<Record<keyof FormData, string>> = {};
 
-    if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
-    if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
-    if (!formData.email.trim()) {
+  // Validation - returns [isValid, firstErrorKey]
+  // Only sets error for the FIRST invalid field to avoid showing all errors at once
+  const validate = (): [boolean, string | null] => {
+    const newErrors: Partial<Record<keyof FormData, string>> = {};
+    let firstErrorKey: string | null = null;
+
+    // Check fields in order and only set the first error
+    if (!firstErrorKey && !formData.firstName.trim()) {
+      newErrors.firstName = 'First name is required';
+      firstErrorKey = 'firstName';
+    } else if (!firstErrorKey && !formData.lastName.trim()) {
+      newErrors.lastName = 'Last name is required';
+      firstErrorKey = 'lastName';
+    } else if (!firstErrorKey && !formData.email.trim()) {
       newErrors.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      firstErrorKey = 'email';
+    } else if (!firstErrorKey && formData.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Invalid email format';
-    }
-    if (!formData.phone.trim()) {
+      firstErrorKey = 'email';
+    } else if (!firstErrorKey && !formData.phone.trim()) {
       newErrors.phone = 'Phone is required';
-    } else if (formData.phone.length !== 10) {
+      firstErrorKey = 'phone';
+    } else if (!firstErrorKey && formData.phone.trim() && formData.phone.length !== 10) {
       newErrors.phone = 'Phone must be exactly 10 digits';
-    }
-    if (!formData.dateOfBirth) newErrors.dateOfBirth = 'Date of birth is required';
-    if (!formData.address.trim()) newErrors.address = 'Address is required';
-    if (!formData.city.trim()) newErrors.city = 'City is required';
-    if (!formData.state.trim()) newErrors.state = 'State is required';
-    if (!formData.zipCode.trim()) {
+      firstErrorKey = 'phone';
+    } else if (!firstErrorKey && !formData.dateOfBirth) {
+      newErrors.dateOfBirth = 'Date of birth is required';
+      firstErrorKey = 'dateOfBirth';
+    } else if (!firstErrorKey && !formData.address.trim()) {
+      newErrors.address = 'Address is required';
+      firstErrorKey = 'address';
+    } else if (!firstErrorKey && !formData.city.trim()) {
+      newErrors.city = 'City is required';
+      firstErrorKey = 'city';
+    } else if (!firstErrorKey && !formData.state.trim()) {
+      newErrors.state = 'State is required';
+      firstErrorKey = 'state';
+    } else if (!firstErrorKey && !formData.zipCode.trim()) {
       newErrors.zipCode = 'Zip code is required';
-    } else if (!/^\d{5}$/.test(formData.zipCode)) {
+      firstErrorKey = 'zipCode';
+    } else if (!firstErrorKey && formData.zipCode.trim() && !/^\d{5}$/.test(formData.zipCode)) {
       newErrors.zipCode = 'Zip code must be 5 digits';
+      firstErrorKey = 'zipCode';
+    } else if (!firstErrorKey && !formData.source) {
+      newErrors.source = 'Source is required';
+      firstErrorKey = 'source';
     }
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return [firstErrorKey === null, firstErrorKey];
   };
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setSubmitError('');
+    setHasAttemptedSubmit(true);
 
-    if (!validate()) return;
+    const [isValid, firstErrorKey] = validate();
+    
+    if (!isValid && firstErrorKey) {
+      // Scroll to first error field smoothly after state update
+      setTimeout(() => {
+        // Convert camelCase to kebab-case for ID matching (e.g., firstName -> first-name)
+        const idFromKey = firstErrorKey.replace(/([A-Z])/g, '-$1').toLowerCase();
+        const element = document.getElementById(idFromKey);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          // Focus the input element specifically
+          const input = element.querySelector('input') || element;
+          if (input && input instanceof HTMLElement) {
+            input.focus();
+          }
+        }
+      }, 100);
+      return;
+    }
 
     setIsSaving(true);
 
     const leadData = {
-      ...formData,
-      mbi: formData.mbi || undefined,
-      partAEffectiveDate: formData.partAEffectiveDate || undefined,
-      partBEffectiveDate: formData.partBEffectiveDate || undefined,
-      medicaidNumber: formData.medicaidNumber || undefined,
-      notes: formData.notes || undefined,
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      dob: formData.dateOfBirth,
+      gender: 'Male' as const, // Default, should be added to form
+      email: formData.email,
+      phone: formData.phone,
+      address1: formData.address,
+      address2: undefined,
+      zipCode: formData.zipCode,
+      state: formData.state,
+      county: formData.county,
+      city: formData.city,
+      medicareNumber: formData.mbi || undefined,
+      medicaidId: formData.medicaidNumber || undefined,
+      partADate: formData.partAEffectiveDate || undefined,
+      partBDate: formData.partBEffectiveDate || undefined,
+      leadStatus: formData.status,
+      source: formData.source,
+      permissionToContact: true, // Default, should be added to form
+      existingAetnaMember: false, // Default, should be added to form
+      tobaccoUsage: false, // Default, should be added to form
       taggedPharmacies,
       taggedDrugs,
     };
@@ -263,8 +333,9 @@ export function LeadForm() {
   // Handle input changes
   const handleChange = (field: keyof FormData, value: string | boolean) => {
     setFormData({ ...formData, [field]: value });
+    // Clear all errors when user starts typing to provide fresh validation on next submit
     if (errors[field]) {
-      setErrors({ ...errors, [field]: undefined });
+      setErrors({});
     }
   };
 
@@ -304,7 +375,25 @@ export function LeadForm() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-8">
+      <form 
+        onSubmit={(e) => {
+          const submitter = (e.nativeEvent as SubmitEvent)?.submitter;
+          
+          // ONLY allow form submission from the actual submit button
+          const isFromSubmitButton = submitter?.getAttribute('data-submit-source') === 'button';
+          const isFromFormNoValidate = submitter?.getAttribute('formNoValidate') !== null;
+          
+          if (!isFromSubmitButton || isFromFormNoValidate) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+          }
+          
+          handleSubmit(e);
+        }} 
+        className="space-y-8" 
+        noValidate
+      >
         {/* Personal Information */}
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
@@ -315,7 +404,7 @@ export function LeadForm() {
               label="First Name"
               value={formData.firstName}
               onChange={(e) => handleChange('firstName', e.target.value)}
-              error={errors.firstName}
+              error={hasAttemptedSubmit ? errors.firstName : undefined}
               maxLength={15}
               required
             />
@@ -323,7 +412,7 @@ export function LeadForm() {
               label="Last Name"
               value={formData.lastName}
               onChange={(e) => handleChange('lastName', e.target.value)}
-              error={errors.lastName}
+              error={hasAttemptedSubmit ? errors.lastName : undefined}
               maxLength={15}
               required
             />
@@ -332,7 +421,7 @@ export function LeadForm() {
               type="email"
               value={formData.email}
               onChange={(e) => handleChange('email', e.target.value)}
-              error={errors.email}
+              error={hasAttemptedSubmit ? errors.email : undefined}
               required
             />
             <Input
@@ -344,7 +433,7 @@ export function LeadForm() {
                 const digits = e.target.value.replace(/\D/g, '').slice(0, 10);
                 handleChange('phone', digits);
               }}
-              error={errors.phone}
+              error={hasAttemptedSubmit ? errors.phone : undefined}
               placeholder="5555555555"
               maxLength={10}
               required
@@ -353,7 +442,7 @@ export function LeadForm() {
               label="Date of Birth"
               value={formData.dateOfBirth}
               onChange={(date) => handleChange('dateOfBirth', date)}
-              error={errors.dateOfBirth}
+              error={hasAttemptedSubmit ? errors.dateOfBirth : undefined}
               required
               maxDate={new Date().toISOString().split('T')[0]}
             />
@@ -370,6 +459,14 @@ export function LeadForm() {
               options={statusOptions}
               value={formData.status}
               onChange={(e) => handleChange('status', e.target.value)}
+            />
+            <Select
+              label="Source"
+              options={sourceOptions}
+              value={formData.source}
+              onChange={(e) => handleChange('source', e.target.value)}
+              error={hasAttemptedSubmit ? errors.source : undefined}
+              required
             />
           </div>
         </div>
@@ -388,7 +485,7 @@ export function LeadForm() {
                 label="Street Address"
                 value={formData.address}
                 onChange={(e) => handleChange('address', e.target.value)}
-                error={errors.address}
+                error={hasAttemptedSubmit ? errors.address : undefined}
                 required
               />
             </div>
@@ -401,7 +498,7 @@ export function LeadForm() {
                   const value = e.target.value.replace(/\D/g, '').slice(0, 5);
                   handleChange('zipCode', value);
                 }}
-                error={errors.zipCode}
+                error={hasAttemptedSubmit ? errors.zipCode : undefined}
                 placeholder="12345"
                 required
                 rightIcon={isLookingUpZip ? <Loader2 className="w-4 h-4 animate-spin text-orange-500" /> : <Search className="w-4 h-4" />}
@@ -432,7 +529,7 @@ export function LeadForm() {
               label="City"
               value={formData.city}
               onChange={(e) => handleChange('city', e.target.value)}
-              error={errors.city}
+              error={hasAttemptedSubmit ? errors.city : undefined}
               required
             />
             <div className="relative">
@@ -440,7 +537,7 @@ export function LeadForm() {
                 label="State"
                 value={formData.state}
                 onChange={(e) => handleChange('state', e.target.value.toUpperCase().slice(0, 2))}
-                error={errors.state}
+                error={hasAttemptedSubmit ? errors.state : undefined}
                 placeholder="e.g. NY, CA, TX"
                 required
               />
@@ -595,7 +692,14 @@ export function LeadForm() {
           <Button type="button" variant="outline" onClick={() => navigate('/leads')}>
             Cancel
           </Button>
-          <Button type="submit" isLoading={isSaving}>
+          <Button 
+            type="submit" 
+            isLoading={isSaving}
+            onClick={(e) => {
+              // Mark that submission is from the actual submit button
+              (e.currentTarget as HTMLButtonElement).setAttribute('data-submit-source', 'button');
+            }}
+          >
             <Save className="w-4 h-4" />
             {isEditing ? 'Update Lead' : 'Create Lead'}
           </Button>

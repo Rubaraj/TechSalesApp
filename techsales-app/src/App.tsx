@@ -2,13 +2,14 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Layout } from './components/layout/Layout';
-import { Dashboard, Login, NotFound } from './pages';
+import { Dashboard, Login, MemberLogin, NotFound, MemberDashboard, MemberPlanDetail } from './pages';
 import {
   AdminLayout,
   UserManagement,
   RoleManagement,
   DepartmentManagement,
   SystemSettings,
+  ProductivityDashboard,
 } from './pages/admin';
 import { LeadList, LeadDetail, LeadForm } from './pages/leads';
 import { PlanList, PlanDetail } from './pages/plans';
@@ -62,6 +63,44 @@ function PublicRoute({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
+// Member route wrapper (checks for member auth)
+function MemberRoute({ children }: { children: ReactNode }) {
+  const { member, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="w-12 h-12 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!member) {
+    return <Navigate to="/member/login" replace />;
+  }
+
+  return <>{children}</>;
+}
+
+// Member public route (for login page)
+function MemberPublicRoute({ children }: { children: ReactNode }) {
+  const { member, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="w-12 h-12 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (member) {
+    return <Navigate to="/member/dashboard" replace />;
+  }
+
+  return <>{children}</>;
+}
+
 function AppRoutes() {
   return (
     <Routes>
@@ -72,6 +111,32 @@ function AppRoutes() {
           <PublicRoute>
             <Login />
           </PublicRoute>
+        }
+      />
+
+      {/* Member routes */}
+      <Route
+        path="/member/login"
+        element={
+          <MemberPublicRoute>
+            <MemberLogin />
+          </MemberPublicRoute>
+        }
+      />
+      <Route
+        path="/member/dashboard"
+        element={
+          <MemberRoute>
+            <MemberDashboard />
+          </MemberRoute>
+        }
+      />
+      <Route
+        path="/member/plan/:id"
+        element={
+          <MemberRoute>
+            <MemberPlanDetail />
+          </MemberRoute>
         }
       />
 

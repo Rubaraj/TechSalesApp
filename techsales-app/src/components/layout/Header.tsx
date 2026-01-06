@@ -1,7 +1,8 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Sun, Moon, LogOut, User, Bell, LayoutDashboard, ShoppingBag } from 'lucide-react';
+import { Sun, Moon, LogOut, User, Bell, LayoutDashboard, ShoppingBag, Settings } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
+import { getLogoByTheme } from '../../utils/logoUtils';
 
 // Routes that should highlight the Sales tab
 const SALES_ROUTES = [
@@ -21,7 +22,7 @@ const SALES_ROUTES = [
 
 export function Header() {
   const location = useLocation();
-  const { resolvedTheme, toggleTheme } = useTheme();
+  const { resolvedTheme, toggleTheme, colorTheme } = useTheme();
   const { user, logout } = useAuth();
 
   // Check if current path matches any sales routes
@@ -31,11 +32,20 @@ export function Header() {
 
   const isInsightsActive = location.pathname === '/insights' || location.pathname === '/';
   const isSalesActive = isSalesRoute;
+  const isAdminActive = location.pathname.startsWith('/admin');
+  const isAdmin = user?.accessLevel === 'admin' || user?.isSuperAdmin;
 
-  const navItems = [
-    { path: '/insights', label: 'Insights', icon: LayoutDashboard, active: isInsightsActive && !isSalesActive },
-    { path: '/sales', label: 'Sales', icon: ShoppingBag, active: isSalesActive },
-  ];
+  // Admin users see Insights and Admin tabs only
+  // Non-admin users see Insights and Sales tabs
+  const navItems = isAdmin
+    ? [
+        { path: '/insights', label: 'Insights', icon: LayoutDashboard, active: isInsightsActive && !isAdminActive },
+        { path: '/admin', label: 'Admin', icon: Settings, active: isAdminActive },
+      ]
+    : [
+        { path: '/insights', label: 'Insights', icon: LayoutDashboard, active: isInsightsActive && !isSalesActive },
+        { path: '/sales', label: 'Sales', icon: ShoppingBag, active: isSalesActive },
+      ];
 
   return (
     <header className="sticky top-0 z-40 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
@@ -44,13 +54,13 @@ export function Header() {
         <div className="flex items-center gap-6">
           <Link to="/insights" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
             <img 
-              src="https://www.exlservice.com/themes/exl_service/exl_logo_rgb_orange_pos_94.png" 
-              alt="EXL"
+              src={getLogoByTheme(colorTheme)} 
+              alt={colorTheme === 'aetna' ? 'Aetna' : colorTheme === 'humana' ? 'Humana' : 'EXL'}
               className="h-8 w-auto"
             />
             <div className="hidden sm:block">
               <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Med Hub
+                Medicare Hub
               </h1>
               <p className="text-xs text-gray-500 dark:text-gray-400 -mt-0.5">
                 Built for agents. Trusted by seniors
@@ -69,7 +79,7 @@ export function Header() {
                   className={`
                     flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all
                     ${item.active
-                      ? 'bg-orange-600 text-white shadow-sm'
+                      ? 'bg-primary-600 text-white shadow-sm'
                       : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                     }
                   `}
@@ -117,8 +127,8 @@ export function Header() {
               </p>
             </div>
             
-            <div className="w-9 h-9 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center">
-              <User className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+            <div className="w-9 h-9 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center">
+              <User className="w-5 h-5 text-primary-600 dark:text-primary-400" />
             </div>
 
             <button

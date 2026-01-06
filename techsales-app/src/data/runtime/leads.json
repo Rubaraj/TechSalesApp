@@ -20,16 +20,24 @@
     "medicaidId": null,
     "partADate": "2020-03-01",
     "partBDate": "2020-03-01",
-    "leadStatus": "New",
+    "leadStatus": "New Lead",
     "permissionToContact": true,
     "existingAetnaMember": false,
     "tobaccoUsage": false,
-    "taggedPharmacies": ["PHARM-001"],
+    "taggedPharmacies": [
+      "PHARM-001"
+    ],
     "taggedDrugs": [
-      { "drugId": "DRUG-006", "dosage": "500mg", "quantity": 60, "frequency": "Twice daily" }
+      {
+        "drugId": "DRUG-006",
+        "dosage": "500mg",
+        "quantity": 60,
+        "frequency": "Twice daily"
+      }
     ],
     "createdAt": "2025-12-24T10:00:00Z",
-    "createdBy": "USER-001"
+    "createdBy": "USER-001",
+    "source": "Call"
   },
   {
     "leadId": "LEAD-002",
@@ -52,17 +60,31 @@
     "medicaidId": "FL123456789",
     "partADate": "2017-07-01",
     "partBDate": "2017-07-01",
-    "leadStatus": "Qualified",
+    "leadStatus": "Appointment Schedule",
     "permissionToContact": true,
     "existingAetnaMember": true,
     "tobaccoUsage": false,
-    "taggedPharmacies": ["PHARM-007", "PHARM-008"],
+    "taggedPharmacies": [
+      "PHARM-007",
+      "PHARM-008"
+    ],
     "taggedDrugs": [
-      { "drugId": "DRUG-009", "dosage": "10mg", "quantity": 30, "frequency": "Once daily" },
-      { "drugId": "DRUG-012", "dosage": "5mg", "quantity": 30, "frequency": "Once daily" }
+      {
+        "drugId": "DRUG-009",
+        "dosage": "10mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-012",
+        "dosage": "5mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      }
     ],
     "createdAt": "2025-12-23T14:30:00Z",
-    "createdBy": "USER-002"
+    "createdBy": "USER-002",
+    "source": "Web"
   },
   {
     "leadId": "LEAD-003",
@@ -85,14 +107,17 @@
     "medicaidId": null,
     "partADate": "2023-11-01",
     "partBDate": "2023-11-01",
-    "leadStatus": "Contacted",
+    "leadStatus": "Contacted Lead",
     "permissionToContact": true,
     "existingAetnaMember": false,
     "tobaccoUsage": true,
-    "taggedPharmacies": ["PHARM-004"],
+    "taggedPharmacies": [
+      "PHARM-004"
+    ],
     "taggedDrugs": [],
     "createdAt": "2025-12-22T09:15:00Z",
-    "createdBy": "USER-001"
+    "createdBy": "USER-001",
+    "source": "Event"
   },
   {
     "leadId": "LEAD-004",
@@ -115,18 +140,38 @@
     "medicaidId": null,
     "partADate": "2015-05-01",
     "partBDate": "2015-05-01",
-    "leadStatus": "Enrolled",
+    "leadStatus": "Enrollment in progress",
     "permissionToContact": true,
     "existingAetnaMember": true,
     "tobaccoUsage": false,
-    "taggedPharmacies": ["PHARM-010", "PHARM-011", "PHARM-012"],
+    "taggedPharmacies": [
+      "PHARM-010",
+      "PHARM-011",
+      "PHARM-012"
+    ],
     "taggedDrugs": [
-      { "drugId": "DRUG-003", "dosage": "10mg", "quantity": 30, "frequency": "Once daily" },
-      { "drugId": "DRUG-022", "dosage": "75mcg", "quantity": 30, "frequency": "Once daily" },
-      { "drugId": "DRUG-047", "dosage": "81mg", "quantity": 90, "frequency": "Once daily" }
+      {
+        "drugId": "DRUG-003",
+        "dosage": "10mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-022",
+        "dosage": "75mcg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-047",
+        "dosage": "81mg",
+        "quantity": 90,
+        "frequency": "Once daily"
+      }
     ],
     "createdAt": "2025-12-20T11:45:00Z",
-    "createdBy": "USER-002"
+    "createdBy": "USER-002",
+    "source": "Web"
   },
   {
     "leadId": "LEAD-005",
@@ -149,16 +194,24 @@
     "medicaidId": null,
     "partADate": "2021-09-01",
     "partBDate": "2021-09-01",
-    "leadStatus": "Proposal",
+    "leadStatus": "Enrollment in progress",
     "permissionToContact": true,
     "existingAetnaMember": false,
     "tobaccoUsage": false,
-    "taggedPharmacies": ["PHARM-013"],
+    "taggedPharmacies": [
+      "PHARM-013"
+    ],
     "taggedDrugs": [
-      { "drugId": "DRUG-029", "dosage": "90mcg", "quantity": 1, "frequency": "As needed" }
+      {
+        "drugId": "DRUG-029",
+        "dosage": "90mcg",
+        "quantity": 1,
+        "frequency": "As needed"
+      }
     ],
     "createdAt": "2025-12-19T16:20:00Z",
-    "createdBy": "USER-003"
+    "createdBy": "USER-003",
+    "source": "Web"
   },
   {
     "leadId": "LEAD-006",
@@ -181,17 +234,31 @@
     "medicaidId": null,
     "partADate": "2019-02-01",
     "partBDate": "2019-02-01",
-    "leadStatus": "Follow-up",
+    "leadStatus": "Contacted Lead",
     "permissionToContact": true,
     "existingAetnaMember": true,
     "tobaccoUsage": false,
-    "taggedPharmacies": ["PHARM-016", "PHARM-017"],
+    "taggedPharmacies": [
+      "PHARM-016",
+      "PHARM-017"
+    ],
     "taggedDrugs": [
-      { "drugId": "DRUG-031", "dosage": "5mg", "quantity": 60, "frequency": "Twice daily" },
-      { "drugId": "DRUG-041", "dosage": "10mg", "quantity": 30, "frequency": "Once daily" }
+      {
+        "drugId": "DRUG-031",
+        "dosage": "5mg",
+        "quantity": 60,
+        "frequency": "Twice daily"
+      },
+      {
+        "drugId": "DRUG-041",
+        "dosage": "10mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      }
     ],
     "createdAt": "2025-12-18T08:30:00Z",
-    "createdBy": "USER-001"
+    "createdBy": "USER-001",
+    "source": "Referral"
   },
   {
     "leadId": "LEAD-007",
@@ -214,14 +281,15 @@
     "medicaidId": null,
     "partADate": "2024-06-01",
     "partBDate": "2024-06-01",
-    "leadStatus": "New",
+    "leadStatus": "New Lead",
     "permissionToContact": true,
     "existingAetnaMember": false,
     "tobaccoUsage": false,
     "taggedPharmacies": [],
     "taggedDrugs": [],
     "createdAt": "2025-12-24T07:00:00Z",
-    "createdBy": "USER-002"
+    "createdBy": "USER-002",
+    "source": "Call"
   },
   {
     "leadId": "LEAD-008",
@@ -244,17 +312,30 @@
     "medicaidId": "PA987654321",
     "partADate": "2016-12-01",
     "partBDate": "2016-12-01",
-    "leadStatus": "Qualified",
+    "leadStatus": "Appointment Schedule",
     "permissionToContact": true,
     "existingAetnaMember": false,
     "tobaccoUsage": false,
-    "taggedPharmacies": ["PHARM-022"],
+    "taggedPharmacies": [
+      "PHARM-022"
+    ],
     "taggedDrugs": [
-      { "drugId": "DRUG-014", "dosage": "20mg", "quantity": 30, "frequency": "Once daily" },
-      { "drugId": "DRUG-045", "dosage": "50mg", "quantity": 30, "frequency": "Once daily" }
+      {
+        "drugId": "DRUG-014",
+        "dosage": "20mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-045",
+        "dosage": "50mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      }
     ],
     "createdAt": "2025-12-21T13:00:00Z",
-    "createdBy": "USER-003"
+    "createdBy": "USER-003",
+    "source": "Event"
   },
   {
     "leadId": "LEAD-009",
@@ -277,14 +358,17 @@
     "medicaidId": null,
     "partADate": "2022-08-01",
     "partBDate": "2022-08-01",
-    "leadStatus": "Lost",
+    "leadStatus": "Dropped / Lost lead",
     "permissionToContact": false,
     "existingAetnaMember": false,
     "tobaccoUsage": true,
-    "taggedPharmacies": ["PHARM-025"],
+    "taggedPharmacies": [
+      "PHARM-025"
+    ],
     "taggedDrugs": [],
     "createdAt": "2025-12-15T10:30:00Z",
-    "createdBy": "USER-001"
+    "createdBy": "USER-001",
+    "source": "Vendor"
   },
   {
     "leadId": "LEAD-010",
@@ -307,17 +391,4350 @@
     "medicaidId": null,
     "partADate": "2018-05-01",
     "partBDate": "2018-05-01",
-    "leadStatus": "Contacted",
+    "leadStatus": "Contacted Lead",
     "permissionToContact": true,
     "existingAetnaMember": true,
     "tobaccoUsage": false,
-    "taggedPharmacies": ["PHARM-028", "PHARM-029"],
+    "taggedPharmacies": [
+      "PHARM-028",
+      "PHARM-029"
+    ],
     "taggedDrugs": [
-      { "drugId": "DRUG-036", "dosage": "0.5mg", "quantity": 4, "frequency": "Weekly" },
-      { "drugId": "DRUG-006", "dosage": "1000mg", "quantity": 60, "frequency": "Twice daily" }
+      {
+        "drugId": "DRUG-036",
+        "dosage": "0.5mg",
+        "quantity": 4,
+        "frequency": "Weekly"
+      },
+      {
+        "drugId": "DRUG-006",
+        "dosage": "1000mg",
+        "quantity": 60,
+        "frequency": "Twice daily"
+      }
     ],
     "createdAt": "2025-12-17T15:45:00Z",
-    "createdBy": "USER-002"
+    "createdBy": "USER-002",
+    "source": "Call"
+  },
+  {
+    "leadId": "LEAD-DEMO-SA",
+    "firstName": "Sarah",
+    "lastName": "Mitchell",
+    "dob": "1950-08-15",
+    "age": 74,
+    "gender": "Female",
+    "email": "sarah.mitchell@email.com",
+    "phone": "305-555-9999",
+    "address1": "1234 Biscayne Boulevard",
+    "address2": "Apt 5C",
+    "zipCode": "33132",
+    "state": "FL",
+    "county": "Miami-Dade",
+    "city": "Miami",
+    "ethnicity": "Non-Hispanic",
+    "race": "White",
+    "medicareNumber": "DEMO-MB-12345",
+    "medicaidId": "FL-SA-987654321",
+    "partADate": "2015-08-01",
+    "partBDate": "2015-08-01",
+    "leadStatus": "Appointment Schedule",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-007",
+      "PHARM-008"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-009",
+        "dosage": "10mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-012",
+        "dosage": "5mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      }
+    ],
+    "createdAt": "2025-01-15T10:00:00Z",
+    "createdBy": "USER-001",
+    "source": "Web"
+  },
+  {
+    "leadId": "LEAD-012",
+    "firstName": "Melissa",
+    "lastName": "Lee",
+    "dob": "1949-02-06",
+    "gender": "Female",
+    "email": "melissalee@hotmail.com",
+    "phone": "914-353-8084",
+    "address1": "3204 Oak Circle",
+    "address2": "Floor 13",
+    "zipCode": "10003",
+    "state": "NY",
+    "county": "New York",
+    "city": "New York",
+    "ethnicity": "Non-Hispanic",
+    "race": "Asian",
+    "medicareNumber": "1ZL8-2I5-QPTG",
+    "medicaidId": null,
+    "partADate": "2018-09-01",
+    "partBDate": "2018-09-01",
+    "leadStatus": "Contacted Lead",
+    "permissionToContact": true,
+    "existingAetnaMember": true,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-036",
+      "PHARM-048",
+      "PHARM-022"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-031",
+        "dosage": "5mg",
+        "quantity": 180,
+        "frequency": "Twice daily"
+      },
+      {
+        "drugId": "DRUG-005",
+        "dosage": "40mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-008",
+        "dosage": "1000mg",
+        "quantity": 90,
+        "frequency": "Twice daily"
+      },
+      {
+        "drugId": "DRUG-025",
+        "dosage": "100mcg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      }
+    ],
+    "createdAt": "2025-11-18T20:48:02Z",
+    "createdBy": "USER-001",
+    "source": "Web"
+  },
+  {
+    "leadId": "LEAD-013",
+    "firstName": "Nicholas",
+    "lastName": "Robinson",
+    "dob": "1941-08-26",
+    "gender": "Female",
+    "email": "nicholasr@gmail.com",
+    "phone": "928-453-3086",
+    "address1": "1600 Jefferson Drive",
+    "address2": null,
+    "zipCode": "85003",
+    "state": "AZ",
+    "county": "Maricopa",
+    "city": "Phoenix",
+    "ethnicity": "Non-Hispanic",
+    "race": "Other",
+    "medicareNumber": "50L7-UB3-U948",
+    "medicaidId": "AZ479363964",
+    "partADate": "2019-11-24",
+    "partBDate": "2019-11-24",
+    "leadStatus": "Enrollment in progress",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-041",
+        "dosage": "10mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-006",
+        "dosage": "500mg",
+        "quantity": 90,
+        "frequency": "Twice daily"
+      }
+    ],
+    "createdAt": "2025-12-21T20:48:02Z",
+    "createdBy": "USER-002",
+    "source": "Web"
+  },
+  {
+    "leadId": "LEAD-014",
+    "firstName": "Nancy",
+    "lastName": "Parker",
+    "dob": "1951-12-22",
+    "gender": "Male",
+    "email": "nancy5@aol.com",
+    "phone": "630-909-7360",
+    "address1": "4382 Church Avenue",
+    "address2": null,
+    "zipCode": "60602",
+    "state": "IL",
+    "county": "Cook",
+    "city": "Chicago",
+    "ethnicity": "Non-Hispanic",
+    "race": "Asian",
+    "medicareNumber": "9MN3-IM6-1P2S",
+    "medicaidId": null,
+    "partADate": "2019-11-01",
+    "partBDate": "2019-11-01",
+    "leadStatus": "Enrollment in progress",
+    "permissionToContact": true,
+    "existingAetnaMember": true,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-031",
+      "PHARM-041"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-041",
+        "dosage": "10mg",
+        "quantity": 90,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-050",
+        "dosage": "2000IU",
+        "quantity": 100,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-021",
+        "dosage": "100mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-001",
+        "dosage": "500mg",
+        "quantity": 21,
+        "frequency": "Three times daily"
+      }
+    ],
+    "createdAt": "2025-11-20T20:48:02Z",
+    "createdBy": "USER-003",
+    "source": "Referral"
+  },
+  {
+    "leadId": "LEAD-015",
+    "firstName": "Michelle",
+    "lastName": "Campbell",
+    "dob": "1941-07-04",
+    "gender": "Female",
+    "email": "michellecampbell@hotmail.com",
+    "phone": "555-118-9827",
+    "address1": "6531 Spring Street",
+    "address2": "Unit 88",
+    "zipCode": "40215",
+    "state": "KY",
+    "county": "Jefferson",
+    "city": "Louisville",
+    "ethnicity": "Hispanic",
+    "race": "American Indian",
+    "medicareNumber": "3YK4-OS5-570V",
+    "medicaidId": "KY626165564",
+    "partADate": "2022-02-10",
+    "partBDate": "2022-02-10",
+    "leadStatus": "New Lead",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-021",
+      "PHARM-004",
+      "PHARM-019"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-001",
+        "dosage": "500mg",
+        "quantity": 21,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-003",
+        "dosage": "10mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      }
+    ],
+    "createdAt": "2025-11-15T20:48:02Z",
+    "createdBy": "USER-004",
+    "source": "Referral"
+  },
+  {
+    "leadId": "LEAD-016",
+    "firstName": "Paul",
+    "lastName": "Nelson",
+    "dob": "1959-04-18",
+    "gender": "Female",
+    "email": "paul.nelson@outlook.com",
+    "phone": "561-338-8606",
+    "address1": "376 First Drive",
+    "address2": null,
+    "zipCode": "33102",
+    "state": "FL",
+    "county": "Miami-Dade",
+    "city": "Miami",
+    "ethnicity": "Hispanic",
+    "race": "Pacific Islander",
+    "medicareNumber": "4YL4-AV3-RZ2M",
+    "medicaidId": null,
+    "partADate": "2019-04-05",
+    "partBDate": "2019-04-05",
+    "leadStatus": "Appointment Schedule",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-034",
+      "PHARM-004",
+      "PHARM-029"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-035",
+        "dosage": "10mg",
+        "quantity": 90,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-028",
+        "dosage": "20mg",
+        "quantity": 30,
+        "frequency": "As directed"
+      },
+      {
+        "drugId": "DRUG-044",
+        "dosage": "60mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-023",
+        "dosage": "50mcg",
+        "quantity": 90,
+        "frequency": "Once daily"
+      }
+    ],
+    "createdAt": "2025-11-07T20:48:02Z",
+    "createdBy": "USER-001",
+    "source": "Referral"
+  },
+  {
+    "leadId": "LEAD-017",
+    "firstName": "Kathleen",
+    "lastName": "Johnson",
+    "dob": "1948-05-25",
+    "gender": "Male",
+    "email": "kathleen89@hotmail.com",
+    "phone": "661-738-3558",
+    "address1": "6996 Jefferson Road",
+    "address2": "Suite 236",
+    "zipCode": "90004",
+    "state": "CA",
+    "county": "Los Angeles",
+    "city": "Los Angeles",
+    "ethnicity": "Non-Hispanic",
+    "race": "White",
+    "medicareNumber": "68G9-FN9-D4F3",
+    "medicaidId": null,
+    "partADate": "2020-10-21",
+    "partBDate": "2020-10-21",
+    "leadStatus": "New Lead",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-047",
+        "dosage": "81mg",
+        "quantity": 90,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-028",
+        "dosage": "20mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-034",
+        "dosage": "15mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      }
+    ],
+    "createdAt": "2025-12-01T20:48:02Z",
+    "createdBy": "USER-004",
+    "source": "Call"
+  },
+  {
+    "leadId": "LEAD-018",
+    "firstName": "Scott",
+    "lastName": "Thomas",
+    "dob": "1950-03-03",
+    "gender": "Male",
+    "email": "sthomas@email.com",
+    "phone": "555-788-6165",
+    "address1": "3132 Fifth Court",
+    "address2": "Unit 27",
+    "zipCode": "40216",
+    "state": "KY",
+    "county": "Jefferson",
+    "city": "Louisville",
+    "ethnicity": "Non-Hispanic",
+    "race": "White",
+    "medicareNumber": "2OE6-GH7-LKI2",
+    "medicaidId": "KY180566238",
+    "partADate": "2015-01-21",
+    "partBDate": "2015-01-21",
+    "leadStatus": "Enrollment in progress",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": true,
+    "taggedPharmacies": [
+      "PHARM-031"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-025",
+        "dosage": "100mcg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      }
+    ],
+    "createdAt": "2025-12-30T20:48:02Z",
+    "createdBy": "USER-004",
+    "source": "Web"
+  },
+  {
+    "leadId": "LEAD-019",
+    "firstName": "Joshua",
+    "lastName": "Gomez",
+    "dob": "1941-07-27",
+    "gender": "Male",
+    "email": "joshuag@aol.com",
+    "phone": "469-237-2180",
+    "address1": "1557 Park Way",
+    "address2": "Apt 332",
+    "zipCode": "75010",
+    "state": "TX",
+    "county": "Dallas",
+    "city": "Carrollton",
+    "ethnicity": "Hispanic",
+    "race": "American Indian",
+    "medicareNumber": "18I2-J89-4N3H",
+    "medicaidId": null,
+    "partADate": "2023-12-05",
+    "partBDate": "2023-12-05",
+    "leadStatus": "Contacted Lead",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-006",
+        "dosage": "500mg",
+        "quantity": 180,
+        "frequency": "Once daily"
+      }
+    ],
+    "createdAt": "2025-12-17T20:48:02Z",
+    "createdBy": "USER-001",
+    "source": "Web"
+  },
+  {
+    "leadId": "LEAD-020",
+    "firstName": "Jacob",
+    "lastName": "Lewis",
+    "dob": "1942-11-15",
+    "gender": "Male",
+    "email": "jacob.lewis@hotmail.com",
+    "phone": "267-837-4738",
+    "address1": "6671 Washington Drive",
+    "address2": "Floor 15",
+    "zipCode": "19104",
+    "state": "PA",
+    "county": "Philadelphia",
+    "city": "Philadelphia",
+    "ethnicity": "Hispanic",
+    "race": "Pacific Islander",
+    "medicareNumber": "4RA2-6Q4-S48U",
+    "medicaidId": null,
+    "partADate": "2016-03-04",
+    "partBDate": "2016-03-04",
+    "leadStatus": "New Lead",
+    "permissionToContact": true,
+    "existingAetnaMember": true,
+    "tobaccoUsage": true,
+    "taggedPharmacies": [],
+    "taggedDrugs": [],
+    "createdAt": "2025-12-04T20:48:02Z",
+    "createdBy": "USER-003",
+    "source": "Call"
+  },
+  {
+    "leadId": "LEAD-021",
+    "firstName": "Kenneth",
+    "lastName": "Hernandez",
+    "dob": "1943-01-01",
+    "gender": "Female",
+    "email": "kennethhernandez@email.com",
+    "phone": "555-111-5302",
+    "address1": "6702 Hill Circle",
+    "address2": null,
+    "zipCode": "40213",
+    "state": "KY",
+    "county": "Jefferson",
+    "city": "Louisville",
+    "ethnicity": "Hispanic",
+    "race": "White",
+    "medicareNumber": "40V6-T76-Y349",
+    "medicaidId": null,
+    "partADate": "2017-11-22",
+    "partBDate": "2017-11-22",
+    "leadStatus": "Enrollment in progress",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-018",
+      "PHARM-014",
+      "PHARM-026"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-017",
+        "dosage": "300mg",
+        "quantity": 180,
+        "frequency": "Three times daily"
+      },
+      {
+        "drugId": "DRUG-040",
+        "dosage": "1.5mg",
+        "quantity": 12,
+        "frequency": "Weekly"
+      }
+    ],
+    "createdAt": "2025-12-10T20:48:02Z",
+    "createdBy": "USER-002",
+    "source": "Vendor"
+  },
+  {
+    "leadId": "LEAD-022",
+    "firstName": "Carol",
+    "lastName": "Baker",
+    "dob": "1950-07-11",
+    "gender": "Female",
+    "email": "carolb@gmail.com",
+    "phone": "832-202-2885",
+    "address1": "7711 Summer Avenue",
+    "address2": "Floor 17",
+    "zipCode": "77001",
+    "state": "TX",
+    "county": "Harris",
+    "city": "Houston",
+    "ethnicity": "Hispanic",
+    "race": "Pacific Islander",
+    "medicareNumber": "9LR1-9Y7-9VI1",
+    "medicaidId": null,
+    "partADate": "2015-11-08",
+    "partBDate": "2015-11-08",
+    "leadStatus": "Enrollment in progress",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-039"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-002",
+        "dosage": "250mg",
+        "quantity": 21,
+        "frequency": "Twice daily"
+      }
+    ],
+    "createdAt": "2025-11-13T20:48:02Z",
+    "createdBy": "USER-003",
+    "source": "Web"
+  },
+  {
+    "leadId": "LEAD-023",
+    "firstName": "Cynthia",
+    "lastName": "Harris",
+    "dob": "1945-06-04",
+    "gender": "Female",
+    "email": "cynthiah@gmail.com",
+    "phone": "469-536-7656",
+    "address1": "5728 Jefferson Street",
+    "address2": "Suite 500",
+    "zipCode": "77005",
+    "state": "TX",
+    "county": "Harris",
+    "city": "Houston",
+    "ethnicity": "Hispanic",
+    "race": "Asian",
+    "medicareNumber": "78Q3-RD3-2E6H",
+    "medicaidId": "TX688475389",
+    "partADate": "2017-05-01",
+    "partBDate": "2017-05-01",
+    "leadStatus": "Contacted Lead",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-032"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-037",
+        "dosage": "0.5mg",
+        "quantity": 1,
+        "frequency": "Weekly"
+      },
+      {
+        "drugId": "DRUG-027",
+        "dosage": "10mg",
+        "quantity": 21,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-016",
+        "dosage": "100mg",
+        "quantity": 90,
+        "frequency": "Twice daily"
+      }
+    ],
+    "createdAt": "2025-11-25T20:48:02Z",
+    "createdBy": "USER-003",
+    "source": "Call"
+  },
+  {
+    "leadId": "LEAD-024",
+    "firstName": "Andrew",
+    "lastName": "Thompson",
+    "dob": "1950-06-19",
+    "gender": "Male",
+    "email": "athompson@yahoo.com",
+    "phone": "818-767-9464",
+    "address1": "2565 River Drive",
+    "address2": "Apt 366",
+    "zipCode": "90003",
+    "state": "CA",
+    "county": "Los Angeles",
+    "city": "Los Angeles",
+    "ethnicity": "Hispanic",
+    "race": "Black",
+    "medicareNumber": "6Y78-O66-LUE8",
+    "medicaidId": "CA185790345",
+    "partADate": "2016-02-06",
+    "partBDate": "2016-02-06",
+    "leadStatus": "Contacted Lead",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-009",
+      "PHARM-028"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-040",
+        "dosage": "1.5mg",
+        "quantity": 4,
+        "frequency": "Weekly"
+      }
+    ],
+    "createdAt": "2025-12-24T20:48:02Z",
+    "createdBy": "USER-003",
+    "source": "Web"
+  },
+  {
+    "leadId": "LEAD-025",
+    "firstName": "Melissa",
+    "lastName": "Hall",
+    "dob": "1954-04-24",
+    "gender": "Female",
+    "email": "melissa73@yahoo.com",
+    "phone": "555-951-8057",
+    "address1": "7641 Jackson Circle",
+    "address2": "Unit 1",
+    "zipCode": "40220",
+    "state": "KY",
+    "county": "Jefferson",
+    "city": "Louisville",
+    "ethnicity": "Non-Hispanic",
+    "race": "Other",
+    "medicareNumber": "96S6-FT7-R74Q",
+    "medicaidId": null,
+    "partADate": "2016-12-16",
+    "partBDate": "2016-12-16",
+    "leadStatus": "Contacted Lead",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-019",
+      "PHARM-021",
+      "PHARM-039"
+    ],
+    "taggedDrugs": [],
+    "createdAt": "2025-12-12T20:48:02Z",
+    "createdBy": "USER-003",
+    "source": "Web"
+  },
+  {
+    "leadId": "LEAD-026",
+    "firstName": "Susan",
+    "lastName": "Roberts",
+    "dob": "1942-06-15",
+    "gender": "Male",
+    "email": "susanr@outlook.com",
+    "phone": "480-600-7886",
+    "address1": "6444 Second Circle",
+    "address2": "Unit 64",
+    "zipCode": "85005",
+    "state": "AZ",
+    "county": "Maricopa",
+    "city": "Phoenix",
+    "ethnicity": "Hispanic",
+    "race": "Pacific Islander",
+    "medicareNumber": "2U77-858-7UJM",
+    "medicaidId": null,
+    "partADate": "2021-09-28",
+    "partBDate": "2021-09-28",
+    "leadStatus": "Appointment Schedule",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": true,
+    "taggedPharmacies": [
+      "PHARM-003"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-048",
+        "dosage": "325mg",
+        "quantity": 90,
+        "frequency": "As needed"
+      },
+      {
+        "drugId": "DRUG-030",
+        "dosage": "90mcg",
+        "quantity": 1,
+        "frequency": "As needed"
+      }
+    ],
+    "createdAt": "2025-12-07T20:48:02Z",
+    "createdBy": "USER-001",
+    "source": "Event"
+  },
+  {
+    "leadId": "LEAD-027",
+    "firstName": "Brian",
+    "lastName": "Allen",
+    "dob": "1951-09-14",
+    "gender": "Male",
+    "email": "brian84@aol.com",
+    "phone": "323-216-7595",
+    "address1": "4297 Hill Boulevard",
+    "address2": "Unit 132",
+    "zipCode": "90003",
+    "state": "CA",
+    "county": "Los Angeles",
+    "city": "Los Angeles",
+    "ethnicity": "Non-Hispanic",
+    "race": "White",
+    "medicareNumber": "14Z1-M12-RFM2",
+    "medicaidId": null,
+    "partADate": "2024-01-18",
+    "partBDate": "2024-01-18",
+    "leadStatus": "Enrollment in progress",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": true,
+    "taggedPharmacies": [
+      "PHARM-046",
+      "PHARM-023",
+      "PHARM-043"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-017",
+        "dosage": "300mg",
+        "quantity": 180,
+        "frequency": "Twice daily"
+      },
+      {
+        "drugId": "DRUG-034",
+        "dosage": "15mg",
+        "quantity": 30,
+        "frequency": "Twice daily"
+      },
+      {
+        "drugId": "DRUG-022",
+        "dosage": "25mcg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-005",
+        "dosage": "40mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      }
+    ],
+    "createdAt": "2025-12-26T20:48:02Z",
+    "createdBy": "USER-004",
+    "source": "Vendor"
+  },
+  {
+    "leadId": "LEAD-028",
+    "firstName": "Scott",
+    "lastName": "Miller",
+    "dob": "1950-06-28",
+    "gender": "Male",
+    "email": "scottm@outlook.com",
+    "phone": "555-457-9051",
+    "address1": "6066 Washington Road",
+    "address2": "Apt 330",
+    "zipCode": "40213",
+    "state": "KY",
+    "county": "Jefferson",
+    "city": "Louisville",
+    "ethnicity": "Non-Hispanic",
+    "race": "American Indian",
+    "medicareNumber": "46W7-5I5-MMJ6",
+    "medicaidId": null,
+    "partADate": "2023-05-27",
+    "partBDate": "2023-05-27",
+    "leadStatus": "Contacted Lead",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-019",
+      "PHARM-022"
+    ],
+    "taggedDrugs": [],
+    "createdAt": "2025-12-22T20:48:02Z",
+    "createdBy": "USER-004",
+    "source": "Referral"
+  },
+  {
+    "leadId": "LEAD-029",
+    "firstName": "Donna",
+    "lastName": "Smith",
+    "dob": "1940-11-13",
+    "gender": "Female",
+    "email": "donnasmith@email.com",
+    "phone": "212-436-1665",
+    "address1": "7487 Fourth Lane",
+    "address2": "Unit 106",
+    "zipCode": "10005",
+    "state": "NY",
+    "county": "New York",
+    "city": "New York",
+    "ethnicity": "Hispanic",
+    "race": "White",
+    "medicareNumber": "7RK2-N82-5CD2",
+    "medicaidId": "NY566274968",
+    "partADate": "2015-08-06",
+    "partBDate": "2015-08-06",
+    "leadStatus": "Appointment Schedule",
+    "permissionToContact": false,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-018"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-040",
+        "dosage": "1.5mg",
+        "quantity": 12,
+        "frequency": "Weekly"
+      },
+      {
+        "drugId": "DRUG-013",
+        "dosage": "10mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-036",
+        "dosage": "0.25mg",
+        "quantity": 1,
+        "frequency": "Weekly"
+      },
+      {
+        "drugId": "DRUG-018",
+        "dosage": "400mg",
+        "quantity": 90,
+        "frequency": "Twice daily"
+      }
+    ],
+    "createdAt": "2025-11-11T20:48:02Z",
+    "createdBy": "USER-003",
+    "source": "Web"
+  },
+  {
+    "leadId": "LEAD-030",
+    "firstName": "Jonathan",
+    "lastName": "Johnson",
+    "dob": "1940-02-19",
+    "gender": "Male",
+    "email": "jjohnson@aol.com",
+    "phone": "718-190-8586",
+    "address1": "7604 Monroe Drive",
+    "address2": null,
+    "zipCode": "10001",
+    "state": "NY",
+    "county": "New York",
+    "city": "New York",
+    "ethnicity": "Non-Hispanic",
+    "race": "Black",
+    "medicareNumber": "70O8-Z85-GPB9",
+    "medicaidId": null,
+    "partADate": "2018-08-24",
+    "partBDate": "2018-08-24",
+    "leadStatus": "Enrollment in progress",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-019",
+      "PHARM-046",
+      "PHARM-006"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-048",
+        "dosage": "325mg",
+        "quantity": 30,
+        "frequency": "As needed"
+      },
+      {
+        "drugId": "DRUG-043",
+        "dosage": "30mg",
+        "quantity": 90,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-041",
+        "dosage": "10mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-003",
+        "dosage": "10mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      }
+    ],
+    "createdAt": "2025-12-07T20:48:02Z",
+    "createdBy": "USER-003",
+    "source": "Web"
+  },
+  {
+    "leadId": "LEAD-031",
+    "firstName": "Laura",
+    "lastName": "Campbell",
+    "dob": "1948-09-15",
+    "gender": "Male",
+    "email": "laura.campbell@gmail.com",
+    "phone": "847-961-3229",
+    "address1": "3174 Hill Boulevard",
+    "address2": "Apt 329",
+    "zipCode": "60604",
+    "state": "IL",
+    "county": "Cook",
+    "city": "Chicago",
+    "ethnicity": "Hispanic",
+    "race": "Other",
+    "medicareNumber": "5XE1-7J9-XE8H",
+    "medicaidId": null,
+    "partADate": "2025-03-13",
+    "partBDate": "2025-03-13",
+    "leadStatus": "Enrollment in progress",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": true,
+    "taggedPharmacies": [
+      "PHARM-044",
+      "PHARM-041"
+    ],
+    "taggedDrugs": [],
+    "createdAt": "2025-12-01T20:48:02Z",
+    "createdBy": "USER-001",
+    "source": "Web"
+  },
+  {
+    "leadId": "LEAD-032",
+    "firstName": "Edward",
+    "lastName": "Phillips",
+    "dob": "1947-10-06",
+    "gender": "Male",
+    "email": "ephillips@email.com",
+    "phone": "860-107-4892",
+    "address1": "4842 Summer Road",
+    "address2": "Apt 69",
+    "zipCode": "06610",
+    "state": "CT",
+    "county": "Fairfield",
+    "city": "Bridgeport",
+    "ethnicity": "Hispanic",
+    "race": "Pacific Islander",
+    "medicareNumber": "6K34-T67-9XTY",
+    "medicaidId": null,
+    "partADate": "2020-07-07",
+    "partBDate": "2020-07-07",
+    "leadStatus": "New Lead",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-025",
+      "PHARM-009",
+      "PHARM-013"
+    ],
+    "taggedDrugs": [],
+    "createdAt": "2025-12-05T20:48:02Z",
+    "createdBy": "USER-003",
+    "source": "Referral"
+  },
+  {
+    "leadId": "LEAD-033",
+    "firstName": "Charles",
+    "lastName": "Taylor",
+    "dob": "1945-12-14",
+    "gender": "Male",
+    "email": "charles41@outlook.com",
+    "phone": "203-767-3494",
+    "address1": "5740 Summer Lane",
+    "address2": "Apt 426",
+    "zipCode": "06611",
+    "state": "CT",
+    "county": "Fairfield",
+    "city": "Trumbull",
+    "ethnicity": "Hispanic",
+    "race": "American Indian",
+    "medicareNumber": "8NK2-OB1-RRIL",
+    "medicaidId": null,
+    "partADate": "2023-06-23",
+    "partBDate": "2023-06-23",
+    "leadStatus": "Contacted Lead",
+    "permissionToContact": true,
+    "existingAetnaMember": true,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-019",
+        "dosage": "25mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-048",
+        "dosage": "325mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-023",
+        "dosage": "50mcg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-015",
+        "dosage": "40mg",
+        "quantity": 90,
+        "frequency": "Twice daily"
+      }
+    ],
+    "createdAt": "2025-12-16T20:48:02Z",
+    "createdBy": "USER-003",
+    "source": "Web"
+  },
+  {
+    "leadId": "LEAD-034",
+    "firstName": "Stephanie",
+    "lastName": "Johnson",
+    "dob": "1942-09-18",
+    "gender": "Male",
+    "email": "stephanie.johnson@yahoo.com",
+    "phone": "475-243-6123",
+    "address1": "5305 Winter Road",
+    "address2": "Floor 9",
+    "zipCode": "06610",
+    "state": "CT",
+    "county": "Fairfield",
+    "city": "Bridgeport",
+    "ethnicity": "Non-Hispanic",
+    "race": "White",
+    "medicareNumber": "9X65-CO8-2Y92",
+    "medicaidId": null,
+    "partADate": "2017-09-01",
+    "partBDate": "2017-09-01",
+    "leadStatus": "Contacted Lead",
+    "permissionToContact": true,
+    "existingAetnaMember": true,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-014"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-019",
+        "dosage": "25mg",
+        "quantity": 90,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-034",
+        "dosage": "15mg",
+        "quantity": 90,
+        "frequency": "Twice daily"
+      }
+    ],
+    "createdAt": "2025-11-11T20:48:02Z",
+    "createdBy": "USER-004",
+    "source": "Call"
+  },
+  {
+    "leadId": "LEAD-035",
+    "firstName": "Samantha",
+    "lastName": "Hernandez",
+    "dob": "1946-04-26",
+    "gender": "Male",
+    "email": "samanthahernandez@aol.com",
+    "phone": "678-577-1959",
+    "address1": "7387 Third Court",
+    "address2": "Apt 480",
+    "zipCode": "30305",
+    "state": "GA",
+    "county": "Fulton",
+    "city": "Atlanta",
+    "ethnicity": "Non-Hispanic",
+    "race": "Other",
+    "medicareNumber": "6LQ3-GQ2-XZAW",
+    "medicaidId": "GA445022988",
+    "partADate": "2025-12-22",
+    "partBDate": "2025-12-22",
+    "leadStatus": "Contacted Lead",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-021",
+      "PHARM-029",
+      "PHARM-018"
+    ],
+    "taggedDrugs": [],
+    "createdAt": "2025-12-07T20:48:02Z",
+    "createdBy": "USER-004",
+    "source": "Call"
+  },
+  {
+    "leadId": "LEAD-036",
+    "firstName": "Kevin",
+    "lastName": "Stewart",
+    "dob": "1950-03-22",
+    "gender": "Male",
+    "email": "kevins@aol.com",
+    "phone": "555-975-7004",
+    "address1": "1272 Lake Drive",
+    "address2": null,
+    "zipCode": "40211",
+    "state": "KY",
+    "county": "Jefferson",
+    "city": "Louisville",
+    "ethnicity": "Non-Hispanic",
+    "race": "White",
+    "medicareNumber": "5Q92-228-BDG2",
+    "medicaidId": "KY613296510",
+    "partADate": "2025-05-24",
+    "partBDate": "2025-05-24",
+    "leadStatus": "Contacted Lead",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-040",
+        "dosage": "1.5mg",
+        "quantity": 12,
+        "frequency": "Weekly"
+      },
+      {
+        "drugId": "DRUG-016",
+        "dosage": "100mg",
+        "quantity": 90,
+        "frequency": "Three times daily"
+      },
+      {
+        "drugId": "DRUG-023",
+        "dosage": "50mcg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      }
+    ],
+    "createdAt": "2025-11-12T20:48:02Z",
+    "createdBy": "USER-004",
+    "source": "Web"
+  },
+  {
+    "leadId": "LEAD-037",
+    "firstName": "Nancy",
+    "lastName": "Turner",
+    "dob": "1948-07-03",
+    "gender": "Female",
+    "email": "nancyturner@hotmail.com",
+    "phone": "470-920-3769",
+    "address1": "3734 Lake Road",
+    "address2": "Apt 249",
+    "zipCode": "30301",
+    "state": "GA",
+    "county": "Fulton",
+    "city": "Atlanta",
+    "ethnicity": "Hispanic",
+    "race": "Black",
+    "medicareNumber": "3445-0T4-VGWC",
+    "medicaidId": null,
+    "partADate": "2018-10-14",
+    "partBDate": "2018-10-14",
+    "leadStatus": "Enrollment in progress",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": true,
+    "taggedPharmacies": [],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-021",
+        "dosage": "100mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      }
+    ],
+    "createdAt": "2025-12-11T20:48:02Z",
+    "createdBy": "USER-002",
+    "source": "Web"
+  },
+  {
+    "leadId": "LEAD-038",
+    "firstName": "Helen",
+    "lastName": "Parker",
+    "dob": "1942-03-12",
+    "gender": "Female",
+    "email": "hparker@outlook.com",
+    "phone": "555-993-3753",
+    "address1": "7651 Cedar Court",
+    "address2": "Apt 63",
+    "zipCode": "40204",
+    "state": "KY",
+    "county": "Jefferson",
+    "city": "Louisville",
+    "ethnicity": "Hispanic",
+    "race": "Black",
+    "medicareNumber": "5E91-ET7-049U",
+    "medicaidId": null,
+    "partADate": "2018-06-19",
+    "partBDate": "2018-06-19",
+    "leadStatus": "Enrollment in progress",
+    "permissionToContact": false,
+    "existingAetnaMember": true,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-011",
+      "PHARM-028"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-022",
+        "dosage": "25mcg",
+        "quantity": 90,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-039",
+        "dosage": "0.75mg",
+        "quantity": 12,
+        "frequency": "Weekly"
+      },
+      {
+        "drugId": "DRUG-015",
+        "dosage": "40mg",
+        "quantity": 90,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-002",
+        "dosage": "250mg",
+        "quantity": 30,
+        "frequency": "Three times daily"
+      }
+    ],
+    "createdAt": "2025-12-25T20:48:02Z",
+    "createdBy": "USER-003",
+    "source": "Web"
+  },
+  {
+    "leadId": "LEAD-039",
+    "firstName": "Donald",
+    "lastName": "Evans",
+    "dob": "1954-05-20",
+    "gender": "Female",
+    "email": "donaldevans@aol.com",
+    "phone": "678-426-7255",
+    "address1": "2818 Roosevelt Lane",
+    "address2": "Suite 385",
+    "zipCode": "30303",
+    "state": "GA",
+    "county": "Fulton",
+    "city": "Atlanta",
+    "ethnicity": "Non-Hispanic",
+    "race": "Pacific Islander",
+    "medicareNumber": "2G52-3B8-PW10",
+    "medicaidId": "GA839583417",
+    "partADate": "2016-10-23",
+    "partBDate": "2016-10-23",
+    "leadStatus": "New Lead",
+    "permissionToContact": true,
+    "existingAetnaMember": true,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-030",
+      "PHARM-005"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-015",
+        "dosage": "40mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-016",
+        "dosage": "100mg",
+        "quantity": 90,
+        "frequency": "Once daily"
+      }
+    ],
+    "createdAt": "2025-12-21T20:48:02Z",
+    "createdBy": "USER-004",
+    "source": "Event"
+  },
+  {
+    "leadId": "LEAD-040",
+    "firstName": "Paul",
+    "lastName": "Harris",
+    "dob": "1956-07-22",
+    "gender": "Male",
+    "email": "paulh@gmail.com",
+    "phone": "630-512-4719",
+    "address1": "7526 Jefferson Boulevard",
+    "address2": null,
+    "zipCode": "60602",
+    "state": "IL",
+    "county": "Cook",
+    "city": "Chicago",
+    "ethnicity": "Non-Hispanic",
+    "race": "Pacific Islander",
+    "medicareNumber": "21N4-OV7-HA7U",
+    "medicaidId": "IL907145556",
+    "partADate": "2023-07-13",
+    "partBDate": "2023-07-13",
+    "leadStatus": "Enrollment in progress",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-021"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-006",
+        "dosage": "500mg",
+        "quantity": 60,
+        "frequency": "Twice daily"
+      },
+      {
+        "drugId": "DRUG-045",
+        "dosage": "50mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-003",
+        "dosage": "10mg",
+        "quantity": 90,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-004",
+        "dosage": "20mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      }
+    ],
+    "createdAt": "2025-12-30T20:48:02Z",
+    "createdBy": "USER-001",
+    "source": "Call"
+  },
+  {
+    "leadId": "LEAD-041",
+    "firstName": "Christopher",
+    "lastName": "Clark",
+    "dob": "1957-05-01",
+    "gender": "Male",
+    "email": "christopher84@aol.com",
+    "phone": "480-597-4584",
+    "address1": "5880 Jackson Boulevard",
+    "address2": "Suite 217",
+    "zipCode": "85001",
+    "state": "AZ",
+    "county": "Maricopa",
+    "city": "Phoenix",
+    "ethnicity": "Non-Hispanic",
+    "race": "Black",
+    "medicareNumber": "5757-XG2-DVAN",
+    "medicaidId": null,
+    "partADate": "2017-11-09",
+    "partBDate": "2017-11-09",
+    "leadStatus": "Dropped / Lost lead",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-033",
+      "PHARM-020",
+      "PHARM-005"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-044",
+        "dosage": "60mg",
+        "quantity": 90,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-032",
+        "dosage": "2.5mg",
+        "quantity": 60,
+        "frequency": "Twice daily"
+      },
+      {
+        "drugId": "DRUG-017",
+        "dosage": "300mg",
+        "quantity": 90,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-011",
+        "dosage": "40mg",
+        "quantity": 90,
+        "frequency": "Once daily"
+      }
+    ],
+    "createdAt": "2025-11-24T20:48:02Z",
+    "createdBy": "USER-002",
+    "source": "Web"
+  },
+  {
+    "leadId": "LEAD-042",
+    "firstName": "Michelle",
+    "lastName": "Scott",
+    "dob": "1957-07-02",
+    "gender": "Female",
+    "email": "michelle.scott@aol.com",
+    "phone": "555-455-6041",
+    "address1": "9734 Lake Lane",
+    "address2": "Floor 11",
+    "zipCode": "40210",
+    "state": "KY",
+    "county": "Jefferson",
+    "city": "Louisville",
+    "ethnicity": "Non-Hispanic",
+    "race": "Black",
+    "medicareNumber": "8E55-6A1-Y31I",
+    "medicaidId": null,
+    "partADate": "2024-01-15",
+    "partBDate": "2024-01-15",
+    "leadStatus": "Contacted Lead",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-021",
+      "PHARM-010",
+      "PHARM-031"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-047",
+        "dosage": "81mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-028",
+        "dosage": "20mg",
+        "quantity": 42,
+        "frequency": "Once daily"
+      }
+    ],
+    "createdAt": "2025-12-02T20:48:02Z",
+    "createdBy": "USER-002",
+    "source": "Call"
+  },
+  {
+    "leadId": "LEAD-043",
+    "firstName": "Angela",
+    "lastName": "Ramirez",
+    "dob": "1942-06-22",
+    "gender": "Male",
+    "email": "aramirez@gmail.com",
+    "phone": "475-835-6578",
+    "address1": "2505 Main Way",
+    "address2": "Unit 85",
+    "zipCode": "06604",
+    "state": "CT",
+    "county": "Fairfield",
+    "city": "Bridgeport",
+    "ethnicity": "Hispanic",
+    "race": "Other",
+    "medicareNumber": "3CD3-779-K46S",
+    "medicaidId": null,
+    "partADate": "2019-02-19",
+    "partBDate": "2019-02-19",
+    "leadStatus": "Contacted Lead",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-016",
+        "dosage": "100mg",
+        "quantity": 90,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-008",
+        "dosage": "1000mg",
+        "quantity": 60,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-047",
+        "dosage": "81mg",
+        "quantity": 90,
+        "frequency": "Once daily"
+      }
+    ],
+    "createdAt": "2025-11-27T20:48:02Z",
+    "createdBy": "USER-002",
+    "source": "Web"
+  },
+  {
+    "leadId": "LEAD-044",
+    "firstName": "Kimberly",
+    "lastName": "Nguyen",
+    "dob": "1951-03-05",
+    "gender": "Female",
+    "email": "knguyen@gmail.com",
+    "phone": "352-911-5084",
+    "address1": "7493 Maple Drive",
+    "address2": "Floor 5",
+    "zipCode": "33102",
+    "state": "FL",
+    "county": "Miami-Dade",
+    "city": "Miami",
+    "ethnicity": "Hispanic",
+    "race": "White",
+    "medicareNumber": "3X62-JY5-WKC7",
+    "medicaidId": null,
+    "partADate": "2024-04-21",
+    "partBDate": "2024-04-21",
+    "leadStatus": "Contacted Lead",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-018",
+      "PHARM-022"
+    ],
+    "taggedDrugs": [],
+    "createdAt": "2026-01-01T20:48:02Z",
+    "createdBy": "USER-002",
+    "source": "Web"
+  },
+  {
+    "leadId": "LEAD-045",
+    "firstName": "Brandon",
+    "lastName": "Cruz",
+    "dob": "1947-12-09",
+    "gender": "Female",
+    "email": "brandoncruz@yahoo.com",
+    "phone": "305-351-5304",
+    "address1": "9877 Oak Boulevard",
+    "address2": "Suite 215",
+    "zipCode": "33125",
+    "state": "FL",
+    "county": "Miami-Dade",
+    "city": "Miami",
+    "ethnicity": "Non-Hispanic",
+    "race": "White",
+    "medicareNumber": "5QG7-733-WFCS",
+    "medicaidId": null,
+    "partADate": "2015-03-03",
+    "partBDate": "2015-03-03",
+    "leadStatus": "Contacted Lead",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-001",
+        "dosage": "500mg",
+        "quantity": 30,
+        "frequency": "Twice daily"
+      },
+      {
+        "drugId": "DRUG-042",
+        "dosage": "25mg",
+        "quantity": 90,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-019",
+        "dosage": "25mg",
+        "quantity": 90,
+        "frequency": "Once daily"
+      }
+    ],
+    "createdAt": "2025-12-29T20:48:02Z",
+    "createdBy": "USER-001",
+    "source": "Call"
+  },
+  {
+    "leadId": "LEAD-046",
+    "firstName": "Emma",
+    "lastName": "Johnson",
+    "dob": "1958-10-14",
+    "gender": "Female",
+    "email": "emma61@gmail.com",
+    "phone": "215-706-7722",
+    "address1": "9461 Winter Court",
+    "address2": "Apt 286",
+    "zipCode": "19104",
+    "state": "PA",
+    "county": "Philadelphia",
+    "city": "Philadelphia",
+    "ethnicity": "Hispanic",
+    "race": "Asian",
+    "medicareNumber": "9J93-KL5-HI2A",
+    "medicaidId": "PA157971582",
+    "partADate": "2025-08-18",
+    "partBDate": "2025-08-18",
+    "leadStatus": "New Lead",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-015",
+        "dosage": "40mg",
+        "quantity": 90,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-002",
+        "dosage": "250mg",
+        "quantity": 14,
+        "frequency": "Twice daily"
+      },
+      {
+        "drugId": "DRUG-046",
+        "dosage": "100mg",
+        "quantity": 90,
+        "frequency": "Once daily"
+      }
+    ],
+    "createdAt": "2025-12-29T20:48:02Z",
+    "createdBy": "USER-004",
+    "source": "Referral"
+  },
+  {
+    "leadId": "LEAD-047",
+    "firstName": "Michelle",
+    "lastName": "Evans",
+    "dob": "1944-11-01",
+    "gender": "Female",
+    "email": "michelle.evans@hotmail.com",
+    "phone": "203-245-4455",
+    "address1": "3754 Main Street",
+    "address2": null,
+    "zipCode": "06611",
+    "state": "CT",
+    "county": "Fairfield",
+    "city": "Trumbull",
+    "ethnicity": "Hispanic",
+    "race": "Black",
+    "medicareNumber": "64N9-P48-B7QC",
+    "medicaidId": null,
+    "partADate": "2021-03-18",
+    "partBDate": "2021-03-18",
+    "leadStatus": "Contacted Lead",
+    "permissionToContact": true,
+    "existingAetnaMember": true,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-041",
+      "PHARM-042",
+      "PHARM-050"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-004",
+        "dosage": "20mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-041",
+        "dosage": "10mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-050",
+        "dosage": "2000IU",
+        "quantity": 30,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-049",
+        "dosage": "1000IU",
+        "quantity": 30,
+        "frequency": "Once daily"
+      }
+    ],
+    "createdAt": "2025-11-10T20:48:02Z",
+    "createdBy": "USER-002",
+    "source": "Vendor"
+  },
+  {
+    "leadId": "LEAD-048",
+    "firstName": "Donald",
+    "lastName": "Hall",
+    "dob": "1957-03-25",
+    "gender": "Female",
+    "email": "donald.hall@outlook.com",
+    "phone": "469-301-5214",
+    "address1": "2087 Fifth Drive",
+    "address2": null,
+    "zipCode": "77002",
+    "state": "TX",
+    "county": "Harris",
+    "city": "Houston",
+    "ethnicity": "Non-Hispanic",
+    "race": "American Indian",
+    "medicareNumber": "5D84-WA3-T5UN",
+    "medicaidId": null,
+    "partADate": "2025-08-28",
+    "partBDate": "2025-08-28",
+    "leadStatus": "Contacted Lead",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": true,
+    "taggedPharmacies": [
+      "PHARM-016",
+      "PHARM-029"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-040",
+        "dosage": "1.5mg",
+        "quantity": 12,
+        "frequency": "Weekly"
+      },
+      {
+        "drugId": "DRUG-043",
+        "dosage": "30mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-031",
+        "dosage": "5mg",
+        "quantity": 180,
+        "frequency": "Twice daily"
+      }
+    ],
+    "createdAt": "2025-11-26T20:48:02Z",
+    "createdBy": "USER-004",
+    "source": "Referral"
+  },
+  {
+    "leadId": "LEAD-049",
+    "firstName": "Kenneth",
+    "lastName": "Turner",
+    "dob": "1944-09-03",
+    "gender": "Female",
+    "email": "kenneth.turner@hotmail.com",
+    "phone": "555-415-3601",
+    "address1": "7880 Fifth Avenue",
+    "address2": "Suite 302",
+    "zipCode": "40219",
+    "state": "KY",
+    "county": "Jefferson",
+    "city": "Louisville",
+    "ethnicity": "Hispanic",
+    "race": "Other",
+    "medicareNumber": "1M27-KS9-WRKI",
+    "medicaidId": null,
+    "partADate": "2019-04-13",
+    "partBDate": "2019-04-13",
+    "leadStatus": "Appointment Schedule",
+    "permissionToContact": true,
+    "existingAetnaMember": true,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-049"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-012",
+        "dosage": "5mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-014",
+        "dosage": "20mg",
+        "quantity": 90,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-006",
+        "dosage": "500mg",
+        "quantity": 180,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-002",
+        "dosage": "250mg",
+        "quantity": 14,
+        "frequency": "Twice daily"
+      }
+    ],
+    "createdAt": "2025-12-15T20:48:02Z",
+    "createdBy": "USER-002",
+    "source": "Call"
+  },
+  {
+    "leadId": "LEAD-050",
+    "firstName": "Kenneth",
+    "lastName": "Brown",
+    "dob": "1945-04-07",
+    "gender": "Male",
+    "email": "kennethbrown@yahoo.com",
+    "phone": "718-798-9656",
+    "address1": "1439 Elm Circle",
+    "address2": "Apt 209",
+    "zipCode": "10003",
+    "state": "NY",
+    "county": "New York",
+    "city": "New York",
+    "ethnicity": "Non-Hispanic",
+    "race": "Other",
+    "medicareNumber": "2GC3-8L2-L6JU",
+    "medicaidId": null,
+    "partADate": "2024-11-20",
+    "partBDate": "2024-11-20",
+    "leadStatus": "Contacted Lead",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-005",
+        "dosage": "40mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-025",
+        "dosage": "100mcg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-035",
+        "dosage": "10mg",
+        "quantity": 90,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-009",
+        "dosage": "10mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      }
+    ],
+    "createdAt": "2025-12-11T20:48:02Z",
+    "createdBy": "USER-002",
+    "source": "Event"
+  },
+  {
+    "leadId": "LEAD-051",
+    "firstName": "Emily",
+    "lastName": "Lopez",
+    "dob": "1940-07-16",
+    "gender": "Male",
+    "email": "emilyl@email.com",
+    "phone": "555-443-7686",
+    "address1": "2663 Summer Way",
+    "address2": "Suite 229",
+    "zipCode": "40218",
+    "state": "KY",
+    "county": "Jefferson",
+    "city": "Louisville",
+    "ethnicity": "Non-Hispanic",
+    "race": "Black",
+    "medicareNumber": "6V94-J72-X0SD",
+    "medicaidId": null,
+    "partADate": "2023-03-11",
+    "partBDate": "2023-03-11",
+    "leadStatus": "Contacted Lead",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-003",
+        "dosage": "10mg",
+        "quantity": 90,
+        "frequency": "Once daily"
+      }
+    ],
+    "createdAt": "2025-12-23T20:48:02Z",
+    "createdBy": "USER-002",
+    "source": "Call"
+  },
+  {
+    "leadId": "LEAD-052",
+    "firstName": "Patricia",
+    "lastName": "Nelson",
+    "dob": "1959-11-21",
+    "age": 67,
+    "gender": "Female",
+    "email": "patricia.nelson498@email.com",
+    "phone": "832-154-2143",
+    "address1": "5041 Pine Street",
+    "address2": null,
+    "zipCode": "40212",
+    "state": "KY",
+    "county": "Jefferson",
+    "city": "Louisville",
+    "ethnicity": null,
+    "race": "Black or African American",
+    "medicareNumber": "5ZG5-VV3-HN80",
+    "medicaidId": null,
+    "partADate": null,
+    "partBDate": null,
+    "leadStatus": "Contacted Lead",
+    "source": "Referral",
+    "permissionToContact": false,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-038",
+      "PHARM-029",
+      "PHARM-008"
+    ],
+    "taggedDrugs": [],
+    "createdAt": "2025-11-02T21:15:27Z",
+    "createdBy": "USER-003",
+    "updatedAt": "2025-11-20T21:15:27Z",
+    "updatedBy": "USER-002"
+  },
+  {
+    "leadId": "LEAD-053",
+    "firstName": "Thomas",
+    "lastName": "Adams",
+    "dob": "1960-12-05",
+    "age": 66,
+    "gender": "Female",
+    "email": "thomas.adams288@email.com",
+    "phone": "324-593-2927",
+    "address1": "9403 First Street",
+    "address2": "Apt 1",
+    "zipCode": "19101",
+    "state": "PA",
+    "county": "Philadelphia",
+    "city": "Philadelphia",
+    "ethnicity": "Non-Hispanic",
+    "race": "Black or African American",
+    "medicareNumber": "4XW4-PY9-DK83",
+    "medicaidId": null,
+    "partADate": null,
+    "partBDate": null,
+    "leadStatus": "New Lead",
+    "source": "Web",
+    "permissionToContact": false,
+    "existingAetnaMember": true,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-033",
+      "PHARM-025",
+      "PHARM-043"
+    ],
+    "taggedDrugs": [],
+    "createdAt": "2025-10-27T21:15:27Z",
+    "createdBy": "USER-002",
+    "updatedAt": null,
+    "updatedBy": null
+  },
+  {
+    "leadId": "LEAD-054",
+    "firstName": "Andrew",
+    "lastName": "Gomez",
+    "dob": "1961-05-03",
+    "age": 65,
+    "gender": "Male",
+    "email": "andrew.gomez366@email.com",
+    "phone": "999-382-5522",
+    "address1": "4675 First Street",
+    "address2": "Apt 17",
+    "zipCode": "33126",
+    "state": "FL",
+    "county": "Miami-Dade",
+    "city": "Miami",
+    "ethnicity": "Non-Hispanic",
+    "race": "American Indian or Alaska Native",
+    "medicareNumber": "1GY7-AJ9-ZH19",
+    "medicaidId": null,
+    "partADate": null,
+    "partBDate": null,
+    "leadStatus": "New Lead",
+    "source": "Web",
+    "permissionToContact": false,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-032",
+        "dosage": "500mg",
+        "quantity": 90,
+        "frequency": "As needed"
+      },
+      {
+        "drugId": "DRUG-030",
+        "dosage": "10mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-029",
+        "dosage": "100mg",
+        "quantity": 60,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-019",
+        "dosage": "20mg",
+        "quantity": 90,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-017",
+        "dosage": "20mg",
+        "quantity": 60,
+        "frequency": "Three times daily"
+      }
+    ],
+    "createdAt": "2025-10-23T21:15:27Z",
+    "createdBy": "USER-001",
+    "updatedAt": null,
+    "updatedBy": null
+  },
+  {
+    "leadId": "LEAD-055",
+    "firstName": "James",
+    "lastName": "Martinez",
+    "dob": "1945-07-10",
+    "age": 81,
+    "gender": "Female",
+    "email": "james.martinez866@email.com",
+    "phone": "273-490-2118",
+    "address1": "3135 Maple Street",
+    "address2": "Unit B",
+    "zipCode": "10001",
+    "state": "NY",
+    "county": "New York",
+    "city": "New York",
+    "ethnicity": null,
+    "race": "Native Hawaiian or Other Pacific Islander",
+    "medicareNumber": "5LR3-LF2-MQ89",
+    "medicaidId": null,
+    "partADate": "2023-12-15",
+    "partBDate": "2023-12-15",
+    "leadStatus": "Enrolled",
+    "source": "Call",
+    "permissionToContact": false,
+    "existingAetnaMember": true,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-035",
+      "PHARM-024",
+      "PHARM-015"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-001",
+        "dosage": "250mg",
+        "quantity": 60,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-047",
+        "dosage": "20mg",
+        "quantity": 90,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-013",
+        "dosage": "250mg",
+        "quantity": 60,
+        "frequency": "Once daily"
+      }
+    ],
+    "createdAt": "2025-10-31T21:15:27Z",
+    "createdBy": "USER-004",
+    "updatedAt": "2025-11-27T21:15:27Z",
+    "updatedBy": "USER-004"
+  },
+  {
+    "leadId": "LEAD-056",
+    "firstName": "Emily",
+    "lastName": "Miller",
+    "dob": "1947-12-02",
+    "age": 79,
+    "gender": "Male",
+    "email": "emily.miller542@email.com",
+    "phone": "338-717-5169",
+    "address1": "7404 Third Street",
+    "address2": "Unit B",
+    "zipCode": "10003",
+    "state": "NY",
+    "county": "New York",
+    "city": "New York",
+    "ethnicity": "Non-Hispanic",
+    "race": null,
+    "medicareNumber": "6PC1-BC2-DJ78",
+    "medicaidId": "MD892616",
+    "partADate": null,
+    "partBDate": null,
+    "leadStatus": "Dropped / Lost lead",
+    "source": "Referral",
+    "permissionToContact": false,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-025",
+      "PHARM-043",
+      "PHARM-027"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-044",
+        "dosage": "100mg",
+        "quantity": 90,
+        "frequency": "Three times daily"
+      },
+      {
+        "drugId": "DRUG-049",
+        "dosage": "20mg",
+        "quantity": 90,
+        "frequency": "Three times daily"
+      },
+      {
+        "drugId": "DRUG-041",
+        "dosage": "10mg",
+        "quantity": 30,
+        "frequency": "Three times daily"
+      },
+      {
+        "drugId": "DRUG-034",
+        "dosage": "100mg",
+        "quantity": 60,
+        "frequency": "As needed"
+      },
+      {
+        "drugId": "DRUG-045",
+        "dosage": "500mg",
+        "quantity": 90,
+        "frequency": "Twice daily"
+      }
+    ],
+    "createdAt": "2025-12-26T21:15:27Z",
+    "createdBy": "USER-003",
+    "updatedAt": "2025-12-27T21:15:27Z",
+    "updatedBy": "USER-003"
+  },
+  {
+    "leadId": "LEAD-057",
+    "firstName": "Carol",
+    "lastName": "Phillips",
+    "dob": "1944-03-22",
+    "age": 82,
+    "gender": "Male",
+    "email": "carol.phillips560@email.com",
+    "phone": "353-294-8853",
+    "address1": "4619 First Street",
+    "address2": null,
+    "zipCode": "75010",
+    "state": "TX",
+    "county": "Dallas",
+    "city": "Carrollton",
+    "ethnicity": "Hispanic",
+    "race": "Asian",
+    "medicareNumber": "7PY6-DP7-SV89",
+    "medicaidId": null,
+    "partADate": "2023-02-22",
+    "partBDate": "2023-02-22",
+    "leadStatus": "Enrolled",
+    "source": "Web",
+    "permissionToContact": false,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-010"
+    ],
+    "taggedDrugs": [],
+    "createdAt": "2025-10-09T21:15:27Z",
+    "createdBy": "USER-001",
+    "updatedAt": "2025-11-01T21:15:27Z",
+    "updatedBy": "USER-004"
+  },
+  {
+    "leadId": "LEAD-058",
+    "firstName": "Mary",
+    "lastName": "Torres",
+    "dob": "1955-07-02",
+    "age": 71,
+    "gender": "Female",
+    "email": "mary.torres948@email.com",
+    "phone": "472-804-6257",
+    "address1": "5630 Oak Street",
+    "address2": null,
+    "zipCode": "10002",
+    "state": "NY",
+    "county": "New York",
+    "city": "New York",
+    "ethnicity": "Non-Hispanic",
+    "race": "Native Hawaiian or Other Pacific Islander",
+    "medicareNumber": "1QH5-WQ5-VS44",
+    "medicaidId": null,
+    "partADate": "2022-02-26",
+    "partBDate": "2022-02-26",
+    "leadStatus": "Enrollment in progress",
+    "source": "Web",
+    "permissionToContact": false,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-015",
+      "PHARM-011",
+      "PHARM-019"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-035",
+        "dosage": "50mg",
+        "quantity": 90,
+        "frequency": "Twice daily"
+      }
+    ],
+    "createdAt": "2025-12-02T21:15:27Z",
+    "createdBy": "USER-004",
+    "updatedAt": "2025-12-05T21:15:27Z",
+    "updatedBy": "USER-003"
+  },
+  {
+    "leadId": "LEAD-059",
+    "firstName": "Andrew",
+    "lastName": "Phillips",
+    "dob": "1955-04-17",
+    "age": 71,
+    "gender": "Male",
+    "email": "andrew.phillips753@email.com",
+    "phone": "530-580-2837",
+    "address1": "3304 First Street",
+    "address2": null,
+    "zipCode": "75002",
+    "state": "TX",
+    "county": "Collin",
+    "city": "Allen",
+    "ethnicity": "Non-Hispanic",
+    "race": "American Indian or Alaska Native",
+    "medicareNumber": "2MF5-FM1-VX25",
+    "medicaidId": "MD937134",
+    "partADate": null,
+    "partBDate": null,
+    "leadStatus": "Appointment Schedule",
+    "source": "Vendor",
+    "permissionToContact": false,
+    "existingAetnaMember": true,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-022",
+        "dosage": "20mg",
+        "quantity": 30,
+        "frequency": "Twice daily"
+      },
+      {
+        "drugId": "DRUG-033",
+        "dosage": "250mg",
+        "quantity": 90,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-043",
+        "dosage": "100mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-008",
+        "dosage": "20mg",
+        "quantity": 60,
+        "frequency": "Three times daily"
+      }
+    ],
+    "createdAt": "2025-10-16T21:15:27Z",
+    "createdBy": "USER-003",
+    "updatedAt": "2025-10-21T21:15:27Z",
+    "updatedBy": "USER-004"
+  },
+  {
+    "leadId": "LEAD-060",
+    "firstName": "Edward",
+    "lastName": "Anderson",
+    "dob": "1949-10-17",
+    "age": 77,
+    "gender": "Female",
+    "email": "edward.anderson771@email.com",
+    "phone": "624-427-4627",
+    "address1": "8229 Third Street",
+    "address2": "Unit B",
+    "zipCode": "85004",
+    "state": "AZ",
+    "county": "Maricopa",
+    "city": "Phoenix",
+    "ethnicity": "Hispanic",
+    "race": "Black or African American",
+    "medicareNumber": "6LS3-UV4-CM99",
+    "medicaidId": null,
+    "partADate": null,
+    "partBDate": null,
+    "leadStatus": "New Lead",
+    "source": "Web",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-028",
+      "PHARM-006",
+      "PHARM-026"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-025",
+        "dosage": "10mg",
+        "quantity": 30,
+        "frequency": "Three times daily"
+      }
+    ],
+    "createdAt": "2025-11-15T21:15:27Z",
+    "createdBy": "USER-002",
+    "updatedAt": null,
+    "updatedBy": null
+  },
+  {
+    "leadId": "LEAD-061",
+    "firstName": "Dorothy",
+    "lastName": "Allen",
+    "dob": "1950-11-07",
+    "age": 76,
+    "gender": "Male",
+    "email": "dorothy.allen793@email.com",
+    "phone": "579-568-4747",
+    "address1": "5814 Oak Street",
+    "address2": "Apt 48",
+    "zipCode": "40213",
+    "state": "KY",
+    "county": "Jefferson",
+    "city": "Louisville",
+    "ethnicity": "Non-Hispanic",
+    "race": "White",
+    "medicareNumber": "5EE5-MK7-MM49",
+    "medicaidId": null,
+    "partADate": null,
+    "partBDate": null,
+    "leadStatus": "New Lead",
+    "source": "Call",
+    "permissionToContact": false,
+    "existingAetnaMember": true,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-029",
+        "dosage": "10mg",
+        "quantity": 90,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-007",
+        "dosage": "10mg",
+        "quantity": 60,
+        "frequency": "As needed"
+      }
+    ],
+    "createdAt": "2025-11-08T21:15:27Z",
+    "createdBy": "USER-004",
+    "updatedAt": null,
+    "updatedBy": null
+  },
+  {
+    "leadId": "LEAD-062",
+    "firstName": "Donald",
+    "lastName": "Nelson",
+    "dob": "1948-01-11",
+    "age": 78,
+    "gender": "Female",
+    "email": "donald.nelson487@email.com",
+    "phone": "407-358-3174",
+    "address1": "1613 Elm Street",
+    "address2": "Unit A",
+    "zipCode": "10002",
+    "state": "NY",
+    "county": "New York",
+    "city": "New York",
+    "ethnicity": "Hispanic",
+    "race": "Black or African American",
+    "medicareNumber": "8HK7-RB4-TF39",
+    "medicaidId": null,
+    "partADate": null,
+    "partBDate": null,
+    "leadStatus": "Contacted Lead",
+    "source": "Web",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-006",
+      "PHARM-005"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-008",
+        "dosage": "100mg",
+        "quantity": 90,
+        "frequency": "Three times daily"
+      },
+      {
+        "drugId": "DRUG-043",
+        "dosage": "500mg",
+        "quantity": 90,
+        "frequency": "As needed"
+      },
+      {
+        "drugId": "DRUG-001",
+        "dosage": "500mg",
+        "quantity": 90,
+        "frequency": "Twice daily"
+      }
+    ],
+    "createdAt": "2025-12-02T21:15:27Z",
+    "createdBy": "USER-003",
+    "updatedAt": "2025-12-14T21:15:27Z",
+    "updatedBy": "USER-003"
+  },
+  {
+    "leadId": "LEAD-063",
+    "firstName": "Ashley",
+    "lastName": "Roberts",
+    "dob": "1954-04-20",
+    "age": 72,
+    "gender": "Female",
+    "email": "ashley.roberts47@email.com",
+    "phone": "414-724-7825",
+    "address1": "9974 Maple Street",
+    "address2": null,
+    "zipCode": "33126",
+    "state": "FL",
+    "county": "Miami-Dade",
+    "city": "Miami",
+    "ethnicity": "Non-Hispanic",
+    "race": "White",
+    "medicareNumber": "7VY9-CR8-LN67",
+    "medicaidId": null,
+    "partADate": "2021-02-10",
+    "partBDate": "2021-02-10",
+    "leadStatus": "Enrolled",
+    "source": "Web",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": true,
+    "taggedPharmacies": [],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-014",
+        "dosage": "20mg",
+        "quantity": 90,
+        "frequency": "Three times daily"
+      },
+      {
+        "drugId": "DRUG-001",
+        "dosage": "100mg",
+        "quantity": 90,
+        "frequency": "Three times daily"
+      },
+      {
+        "drugId": "DRUG-026",
+        "dosage": "100mg",
+        "quantity": 30,
+        "frequency": "As needed"
+      }
+    ],
+    "createdAt": "2025-12-10T21:15:27Z",
+    "createdBy": "USER-003",
+    "updatedAt": "2025-12-25T21:15:27Z",
+    "updatedBy": "USER-001"
+  },
+  {
+    "leadId": "LEAD-064",
+    "firstName": "Susan",
+    "lastName": "Roberts",
+    "dob": "1959-09-12",
+    "age": 67,
+    "gender": "Male",
+    "email": "susan.roberts730@email.com",
+    "phone": "972-711-4384",
+    "address1": "5256 Elm Street",
+    "address2": "Apt 30",
+    "zipCode": "85004",
+    "state": "AZ",
+    "county": "Maricopa",
+    "city": "Phoenix",
+    "ethnicity": null,
+    "race": "Black or African American",
+    "medicareNumber": "3VS3-BL9-PM13",
+    "medicaidId": null,
+    "partADate": null,
+    "partBDate": null,
+    "leadStatus": "Contacted Lead",
+    "source": "Call",
+    "permissionToContact": false,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-027"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-037",
+        "dosage": "20mg",
+        "quantity": 30,
+        "frequency": "Twice daily"
+      },
+      {
+        "drugId": "DRUG-003",
+        "dosage": "50mg",
+        "quantity": 30,
+        "frequency": "Twice daily"
+      }
+    ],
+    "createdAt": "2025-11-17T21:15:27Z",
+    "createdBy": "USER-001",
+    "updatedAt": "2025-11-26T21:15:27Z",
+    "updatedBy": "USER-004"
+  },
+  {
+    "leadId": "LEAD-065",
+    "firstName": "Linda",
+    "lastName": "Allen",
+    "dob": "1946-10-06",
+    "age": 80,
+    "gender": "Male",
+    "email": "linda.allen777@email.com",
+    "phone": "261-286-3479",
+    "address1": "8136 Main Street",
+    "address2": "Unit B",
+    "zipCode": "75006",
+    "state": "TX",
+    "county": "Dallas",
+    "city": "Carrollton",
+    "ethnicity": "Hispanic",
+    "race": "Asian",
+    "medicareNumber": "7GU8-MG6-KM80",
+    "medicaidId": null,
+    "partADate": null,
+    "partBDate": null,
+    "leadStatus": "Appointment Schedule",
+    "source": "Referral",
+    "permissionToContact": false,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-002",
+      "PHARM-049",
+      "PHARM-042"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-021",
+        "dosage": "50mg",
+        "quantity": 30,
+        "frequency": "Three times daily"
+      },
+      {
+        "drugId": "DRUG-042",
+        "dosage": "50mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      }
+    ],
+    "createdAt": "2026-01-02T21:15:27Z",
+    "createdBy": "USER-001",
+    "updatedAt": "2026-01-31T21:15:27Z",
+    "updatedBy": "USER-004"
+  },
+  {
+    "leadId": "LEAD-066",
+    "firstName": "Susan",
+    "lastName": "Sanchez",
+    "dob": "1950-08-16",
+    "age": 76,
+    "gender": "Female",
+    "email": "susan.sanchez843@email.com",
+    "phone": "702-476-9147",
+    "address1": "3202 Third Street",
+    "address2": "Unit B",
+    "zipCode": "06604",
+    "state": "CT",
+    "county": "Fairfield",
+    "city": "Bridgeport",
+    "ethnicity": "Hispanic",
+    "race": "White",
+    "medicareNumber": "8FQ1-WB7-QX97",
+    "medicaidId": null,
+    "partADate": null,
+    "partBDate": null,
+    "leadStatus": "Appointment Schedule",
+    "source": "Call",
+    "permissionToContact": false,
+    "existingAetnaMember": true,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-048",
+      "PHARM-022",
+      "PHARM-013"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-019",
+        "dosage": "50mg",
+        "quantity": 60,
+        "frequency": "Three times daily"
+      },
+      {
+        "drugId": "DRUG-030",
+        "dosage": "250mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      }
+    ],
+    "createdAt": "2025-10-19T21:15:27Z",
+    "createdBy": "USER-003",
+    "updatedAt": "2025-11-17T21:15:27Z",
+    "updatedBy": "USER-003"
+  },
+  {
+    "leadId": "LEAD-067",
+    "firstName": "Joshua",
+    "lastName": "Nelson",
+    "dob": "1956-12-03",
+    "age": 70,
+    "gender": "Male",
+    "email": "joshua.nelson386@email.com",
+    "phone": "670-555-3404",
+    "address1": "3540 Maple Street",
+    "address2": "Apt 25",
+    "zipCode": "90005",
+    "state": "CA",
+    "county": "Los Angeles",
+    "city": "Los Angeles",
+    "ethnicity": "Non-Hispanic",
+    "race": "Asian",
+    "medicareNumber": "6TR8-LE6-BY94",
+    "medicaidId": null,
+    "partADate": null,
+    "partBDate": null,
+    "leadStatus": "Contacted Lead",
+    "source": "Event",
+    "permissionToContact": false,
+    "existingAetnaMember": false,
+    "tobaccoUsage": true,
+    "taggedPharmacies": [],
+    "taggedDrugs": [],
+    "createdAt": "2025-11-06T21:15:27Z",
+    "createdBy": "USER-002",
+    "updatedAt": "2025-11-28T21:15:27Z",
+    "updatedBy": "USER-001"
+  },
+  {
+    "leadId": "LEAD-068",
+    "firstName": "Charles",
+    "lastName": "Campbell",
+    "dob": "1945-04-02",
+    "age": 81,
+    "gender": "Male",
+    "email": "charles.campbell509@email.com",
+    "phone": "847-171-5632",
+    "address1": "5275 Third Street",
+    "address2": "Apt 43",
+    "zipCode": "40207",
+    "state": "KY",
+    "county": "Jefferson",
+    "city": "Louisville",
+    "ethnicity": null,
+    "race": "White",
+    "medicareNumber": "1VU5-XN4-HR43",
+    "medicaidId": null,
+    "partADate": null,
+    "partBDate": null,
+    "leadStatus": "Contacted Lead",
+    "source": "Web",
+    "permissionToContact": false,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-013",
+        "dosage": "250mg",
+        "quantity": 30,
+        "frequency": "As needed"
+      },
+      {
+        "drugId": "DRUG-001",
+        "dosage": "10mg",
+        "quantity": 90,
+        "frequency": "Twice daily"
+      }
+    ],
+    "createdAt": "2026-01-02T21:15:27Z",
+    "createdBy": "USER-001",
+    "updatedAt": "2026-01-17T21:15:27Z",
+    "updatedBy": "USER-004"
+  },
+  {
+    "leadId": "LEAD-069",
+    "firstName": "Ashley",
+    "lastName": "Parker",
+    "dob": "1942-09-10",
+    "age": 84,
+    "gender": "Male",
+    "email": "ashley.parker801@email.com",
+    "phone": "730-146-3850",
+    "address1": "8184 Maple Street",
+    "address2": null,
+    "zipCode": "30301",
+    "state": "GA",
+    "county": "Fulton",
+    "city": "Atlanta",
+    "ethnicity": "Hispanic",
+    "race": null,
+    "medicareNumber": "3XD1-CB9-AE48",
+    "medicaidId": "MD561844",
+    "partADate": "2022-08-17",
+    "partBDate": "2022-08-17",
+    "leadStatus": "Enrollment in progress",
+    "source": "Web",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-001",
+      "PHARM-041"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-002",
+        "dosage": "250mg",
+        "quantity": 60,
+        "frequency": "Once daily"
+      }
+    ],
+    "createdAt": "2025-12-27T21:15:27Z",
+    "createdBy": "USER-003",
+    "updatedAt": "2026-01-18T21:15:27Z",
+    "updatedBy": "USER-003"
+  },
+  {
+    "leadId": "LEAD-070",
+    "firstName": "Carol",
+    "lastName": "Young",
+    "dob": "1947-12-10",
+    "age": 79,
+    "gender": "Female",
+    "email": "carol.young891@email.com",
+    "phone": "708-444-6955",
+    "address1": "9277 Cedar Street",
+    "address2": null,
+    "zipCode": "19104",
+    "state": "PA",
+    "county": "Philadelphia",
+    "city": "Philadelphia",
+    "ethnicity": "Hispanic",
+    "race": "American Indian or Alaska Native",
+    "medicareNumber": "2HP9-PK9-ZQ94",
+    "medicaidId": null,
+    "partADate": null,
+    "partBDate": null,
+    "leadStatus": "Appointment Schedule",
+    "source": "Vendor",
+    "permissionToContact": false,
+    "existingAetnaMember": false,
+    "tobaccoUsage": true,
+    "taggedPharmacies": [
+      "PHARM-048",
+      "PHARM-039",
+      "PHARM-014"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-023",
+        "dosage": "20mg",
+        "quantity": 30,
+        "frequency": "Twice daily"
+      },
+      {
+        "drugId": "DRUG-016",
+        "dosage": "250mg",
+        "quantity": 60,
+        "frequency": "Twice daily"
+      },
+      {
+        "drugId": "DRUG-001",
+        "dosage": "500mg",
+        "quantity": 60,
+        "frequency": "As needed"
+      },
+      {
+        "drugId": "DRUG-008",
+        "dosage": "20mg",
+        "quantity": 30,
+        "frequency": "Twice daily"
+      },
+      {
+        "drugId": "DRUG-006",
+        "dosage": "500mg",
+        "quantity": 90,
+        "frequency": "Three times daily"
+      }
+    ],
+    "createdAt": "2025-12-15T21:15:27Z",
+    "createdBy": "USER-004",
+    "updatedAt": "2025-12-17T21:15:27Z",
+    "updatedBy": "USER-004"
+  },
+  {
+    "leadId": "LEAD-071",
+    "firstName": "Barbara",
+    "lastName": "Martinez",
+    "dob": "1958-06-28",
+    "age": 68,
+    "gender": "Male",
+    "email": "barbara.martinez757@email.com",
+    "phone": "212-635-2652",
+    "address1": "3299 Park Street",
+    "address2": "Apt 15",
+    "zipCode": "85004",
+    "state": "AZ",
+    "county": "Maricopa",
+    "city": "Phoenix",
+    "ethnicity": "Hispanic",
+    "race": "White",
+    "medicareNumber": "7KH1-MN7-CW44",
+    "medicaidId": null,
+    "partADate": null,
+    "partBDate": null,
+    "leadStatus": "New Lead",
+    "source": "Web",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-047",
+      "PHARM-041"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-012",
+        "dosage": "100mg",
+        "quantity": 60,
+        "frequency": "As needed"
+      },
+      {
+        "drugId": "DRUG-039",
+        "dosage": "500mg",
+        "quantity": 60,
+        "frequency": "Three times daily"
+      },
+      {
+        "drugId": "DRUG-009",
+        "dosage": "10mg",
+        "quantity": 90,
+        "frequency": "Three times daily"
+      },
+      {
+        "drugId": "DRUG-016",
+        "dosage": "50mg",
+        "quantity": 30,
+        "frequency": "Three times daily"
+      },
+      {
+        "drugId": "DRUG-020",
+        "dosage": "20mg",
+        "quantity": 60,
+        "frequency": "Three times daily"
+      }
+    ],
+    "createdAt": "2025-10-16T21:15:27Z",
+    "createdBy": "USER-001",
+    "updatedAt": null,
+    "updatedBy": null
+  },
+  {
+    "leadId": "LEAD-072",
+    "firstName": "Lisa",
+    "lastName": "Roberts",
+    "dob": "1944-03-22",
+    "age": 82,
+    "gender": "Female",
+    "email": "lisa.roberts809@email.com",
+    "phone": "988-309-3545",
+    "address1": "6909 Elm Street",
+    "address2": "Unit D",
+    "zipCode": "10003",
+    "state": "NY",
+    "county": "New York",
+    "city": "New York",
+    "ethnicity": null,
+    "race": "White",
+    "medicareNumber": "9QD4-TX3-KW30",
+    "medicaidId": null,
+    "partADate": "2021-12-16",
+    "partBDate": "2021-12-16",
+    "leadStatus": "Enrolled",
+    "source": "Event",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-038",
+      "PHARM-039",
+      "PHARM-035"
+    ],
+    "taggedDrugs": [],
+    "createdAt": "2025-10-22T21:15:27Z",
+    "createdBy": "USER-002",
+    "updatedAt": "2025-11-10T21:15:27Z",
+    "updatedBy": "USER-001"
+  },
+  {
+    "leadId": "LEAD-073",
+    "firstName": "Linda",
+    "lastName": "Walker",
+    "dob": "1946-04-20",
+    "age": 80,
+    "gender": "Female",
+    "email": "linda.walker388@email.com",
+    "phone": "679-554-7304",
+    "address1": "6141 Park Street",
+    "address2": null,
+    "zipCode": "60603",
+    "state": "IL",
+    "county": "Cook",
+    "city": "Chicago",
+    "ethnicity": null,
+    "race": "Black or African American",
+    "medicareNumber": "5TS8-MK5-MS10",
+    "medicaidId": null,
+    "partADate": "2021-01-25",
+    "partBDate": "2021-01-25",
+    "leadStatus": "Enrollment in progress",
+    "source": "Call",
+    "permissionToContact": false,
+    "existingAetnaMember": false,
+    "tobaccoUsage": true,
+    "taggedPharmacies": [
+      "PHARM-036",
+      "PHARM-046",
+      "PHARM-032"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-038",
+        "dosage": "250mg",
+        "quantity": 60,
+        "frequency": "Twice daily"
+      },
+      {
+        "drugId": "DRUG-041",
+        "dosage": "100mg",
+        "quantity": 60,
+        "frequency": "Twice daily"
+      },
+      {
+        "drugId": "DRUG-011",
+        "dosage": "100mg",
+        "quantity": 90,
+        "frequency": "Once daily"
+      }
+    ],
+    "createdAt": "2025-10-15T21:15:27Z",
+    "createdBy": "USER-003",
+    "updatedAt": "2025-10-25T21:15:27Z",
+    "updatedBy": "USER-002"
+  },
+  {
+    "leadId": "LEAD-074",
+    "firstName": "Charles",
+    "lastName": "King",
+    "dob": "1947-12-01",
+    "age": 79,
+    "gender": "Male",
+    "email": "charles.king354@email.com",
+    "phone": "539-130-4099",
+    "address1": "4118 Main Street",
+    "address2": null,
+    "zipCode": "90001",
+    "state": "CA",
+    "county": "Los Angeles",
+    "city": "Los Angeles",
+    "ethnicity": "Non-Hispanic",
+    "race": "Asian",
+    "medicareNumber": "1SY8-SN3-HY74",
+    "medicaidId": "MD447283",
+    "partADate": null,
+    "partBDate": null,
+    "leadStatus": "Contacted Lead",
+    "source": "Call",
+    "permissionToContact": true,
+    "existingAetnaMember": true,
+    "tobaccoUsage": true,
+    "taggedPharmacies": [],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-039",
+        "dosage": "50mg",
+        "quantity": 60,
+        "frequency": "Twice daily"
+      },
+      {
+        "drugId": "DRUG-044",
+        "dosage": "500mg",
+        "quantity": 90,
+        "frequency": "Three times daily"
+      },
+      {
+        "drugId": "DRUG-018",
+        "dosage": "100mg",
+        "quantity": 60,
+        "frequency": "Three times daily"
+      },
+      {
+        "drugId": "DRUG-015",
+        "dosage": "50mg",
+        "quantity": 30,
+        "frequency": "Twice daily"
+      },
+      {
+        "drugId": "DRUG-010",
+        "dosage": "50mg",
+        "quantity": 90,
+        "frequency": "Once daily"
+      }
+    ],
+    "createdAt": "2025-12-21T21:15:27Z",
+    "createdBy": "USER-004",
+    "updatedAt": "2025-12-23T21:15:27Z",
+    "updatedBy": "USER-003"
+  },
+  {
+    "leadId": "LEAD-075",
+    "firstName": "Kevin",
+    "lastName": "Robinson",
+    "dob": "1949-09-25",
+    "age": 77,
+    "gender": "Male",
+    "email": "kevin.robinson93@email.com",
+    "phone": "278-148-1167",
+    "address1": "5423 Third Street",
+    "address2": null,
+    "zipCode": "60603",
+    "state": "IL",
+    "county": "Cook",
+    "city": "Chicago",
+    "ethnicity": null,
+    "race": null,
+    "medicareNumber": "2YW5-CT9-MR18",
+    "medicaidId": null,
+    "partADate": null,
+    "partBDate": null,
+    "leadStatus": "Appointment Schedule",
+    "source": "Event",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-007",
+      "PHARM-008",
+      "PHARM-046"
+    ],
+    "taggedDrugs": [],
+    "createdAt": "2025-11-15T21:15:27Z",
+    "createdBy": "USER-004",
+    "updatedAt": "2025-12-05T21:15:27Z",
+    "updatedBy": "USER-001"
+  },
+  {
+    "leadId": "LEAD-076",
+    "firstName": "Michael",
+    "lastName": "Evans",
+    "dob": "1956-03-02",
+    "age": 70,
+    "gender": "Male",
+    "email": "michael.evans756@email.com",
+    "phone": "887-980-1108",
+    "address1": "8931 Cedar Street",
+    "address2": null,
+    "zipCode": "06605",
+    "state": "CT",
+    "county": "Fairfield",
+    "city": "Bridgeport",
+    "ethnicity": "Non-Hispanic",
+    "race": "White",
+    "medicareNumber": "7TK9-TP5-AZ78",
+    "medicaidId": null,
+    "partADate": null,
+    "partBDate": null,
+    "leadStatus": "Appointment Schedule",
+    "source": "Referral",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": true,
+    "taggedPharmacies": [
+      "PHARM-017"
+    ],
+    "taggedDrugs": [],
+    "createdAt": "2025-10-07T21:15:27Z",
+    "createdBy": "USER-004",
+    "updatedAt": "2025-11-06T21:15:27Z",
+    "updatedBy": "USER-004"
+  },
+  {
+    "leadId": "LEAD-077",
+    "firstName": "Margaret",
+    "lastName": "Walker",
+    "dob": "1947-12-01",
+    "age": 79,
+    "gender": "Male",
+    "email": "margaret.walker659@email.com",
+    "phone": "685-696-1475",
+    "address1": "7888 Pine Street",
+    "address2": "Unit B",
+    "zipCode": "40220",
+    "state": "KY",
+    "county": "Jefferson",
+    "city": "Louisville",
+    "ethnicity": null,
+    "race": null,
+    "medicareNumber": "7XU8-AW9-AV32",
+    "medicaidId": "MD515118",
+    "partADate": "2022-11-02",
+    "partBDate": "2022-11-02",
+    "leadStatus": "Enrollment in progress",
+    "source": "Call",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-039"
+    ],
+    "taggedDrugs": [],
+    "createdAt": "2025-11-22T21:15:27Z",
+    "createdBy": "USER-002",
+    "updatedAt": "2025-12-05T21:15:27Z",
+    "updatedBy": "USER-002"
+  },
+  {
+    "leadId": "LEAD-078",
+    "firstName": "Joshua",
+    "lastName": "Davis",
+    "dob": "1961-01-09",
+    "age": 65,
+    "gender": "Male",
+    "email": "joshua.davis78@email.com",
+    "phone": "394-105-1732",
+    "address1": "4774 Cedar Street",
+    "address2": "Unit D",
+    "zipCode": "33102",
+    "state": "FL",
+    "county": "Miami-Dade",
+    "city": "Miami",
+    "ethnicity": "Hispanic",
+    "race": "White",
+    "medicareNumber": "1WG5-QR9-WR49",
+    "medicaidId": null,
+    "partADate": null,
+    "partBDate": null,
+    "leadStatus": "New Lead",
+    "source": "Event",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-025",
+        "dosage": "100mg",
+        "quantity": 90,
+        "frequency": "Once daily"
+      }
+    ],
+    "createdAt": "2025-12-27T21:15:27Z",
+    "createdBy": "USER-002",
+    "updatedAt": null,
+    "updatedBy": null
+  },
+  {
+    "leadId": "LEAD-079",
+    "firstName": "Christopher",
+    "lastName": "Johnson",
+    "dob": "1951-06-12",
+    "age": 75,
+    "gender": "Male",
+    "email": "christopher.johnson237@email.com",
+    "phone": "499-795-4724",
+    "address1": "1650 Maple Street",
+    "address2": null,
+    "zipCode": "60603",
+    "state": "IL",
+    "county": "Cook",
+    "city": "Chicago",
+    "ethnicity": null,
+    "race": "Asian",
+    "medicareNumber": "3TJ4-LK1-NF92",
+    "medicaidId": "MD251591",
+    "partADate": "2023-05-25",
+    "partBDate": "2023-05-25",
+    "leadStatus": "Enrollment in progress",
+    "source": "Referral",
+    "permissionToContact": false,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-039",
+      "PHARM-049",
+      "PHARM-017"
+    ],
+    "taggedDrugs": [],
+    "createdAt": "2025-12-13T21:15:27Z",
+    "createdBy": "USER-003",
+    "updatedAt": "2025-12-18T21:15:27Z",
+    "updatedBy": "USER-003"
+  },
+  {
+    "leadId": "LEAD-080",
+    "firstName": "Jessica",
+    "lastName": "Allen",
+    "dob": "1952-09-03",
+    "age": 74,
+    "gender": "Female",
+    "email": "jessica.allen519@email.com",
+    "phone": "726-182-2841",
+    "address1": "5518 Maple Street",
+    "address2": "Apt 22",
+    "zipCode": "40213",
+    "state": "KY",
+    "county": "Jefferson",
+    "city": "Louisville",
+    "ethnicity": null,
+    "race": null,
+    "medicareNumber": "6NU7-BK8-BH69",
+    "medicaidId": null,
+    "partADate": null,
+    "partBDate": null,
+    "leadStatus": "Appointment Schedule",
+    "source": "Vendor",
+    "permissionToContact": false,
+    "existingAetnaMember": false,
+    "tobaccoUsage": true,
+    "taggedPharmacies": [
+      "PHARM-048",
+      "PHARM-019"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-002",
+        "dosage": "250mg",
+        "quantity": 90,
+        "frequency": "Three times daily"
+      }
+    ],
+    "createdAt": "2025-12-12T21:15:27Z",
+    "createdBy": "USER-002",
+    "updatedAt": "2025-12-27T21:15:27Z",
+    "updatedBy": "USER-004"
+  },
+  {
+    "leadId": "LEAD-081",
+    "firstName": "Andrew",
+    "lastName": "Lopez",
+    "dob": "1947-01-13",
+    "age": 79,
+    "gender": "Male",
+    "email": "andrew.lopez194@email.com",
+    "phone": "876-565-6780",
+    "address1": "2300 Cedar Street",
+    "address2": "Unit C",
+    "zipCode": "10003",
+    "state": "NY",
+    "county": "New York",
+    "city": "New York",
+    "ethnicity": "Non-Hispanic",
+    "race": "Asian",
+    "medicareNumber": "7HE2-FS7-BD31",
+    "medicaidId": null,
+    "partADate": "2021-12-21",
+    "partBDate": "2021-12-21",
+    "leadStatus": "Enrolled",
+    "source": "Call",
+    "permissionToContact": false,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-050",
+      "PHARM-022",
+      "PHARM-033"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-048",
+        "dosage": "100mg",
+        "quantity": 30,
+        "frequency": "As needed"
+      },
+      {
+        "drugId": "DRUG-033",
+        "dosage": "50mg",
+        "quantity": 30,
+        "frequency": "Twice daily"
+      },
+      {
+        "drugId": "DRUG-005",
+        "dosage": "250mg",
+        "quantity": 90,
+        "frequency": "Once daily"
+      }
+    ],
+    "createdAt": "2025-12-01T21:15:27Z",
+    "createdBy": "USER-001",
+    "updatedAt": "2025-12-05T21:15:27Z",
+    "updatedBy": "USER-001"
+  },
+  {
+    "leadId": "LEAD-082",
+    "firstName": "Patricia",
+    "lastName": "Johnson",
+    "dob": "1955-04-07",
+    "age": 71,
+    "gender": "Male",
+    "email": "patricia.johnson688@email.com",
+    "phone": "205-503-7108",
+    "address1": "6882 Maple Street",
+    "address2": "Apt 12",
+    "zipCode": "85001",
+    "state": "AZ",
+    "county": "Maricopa",
+    "city": "Phoenix",
+    "ethnicity": "Non-Hispanic",
+    "race": "Black or African American",
+    "medicareNumber": "7GY7-BA4-GH30",
+    "medicaidId": "MD213392",
+    "partADate": null,
+    "partBDate": null,
+    "leadStatus": "Appointment Schedule",
+    "source": "Vendor",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-036",
+      "PHARM-023",
+      "PHARM-038"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-038",
+        "dosage": "500mg",
+        "quantity": 90,
+        "frequency": "As needed"
+      }
+    ],
+    "createdAt": "2025-12-28T21:15:27Z",
+    "createdBy": "USER-001",
+    "updatedAt": "2026-01-22T21:15:27Z",
+    "updatedBy": "USER-001"
+  },
+  {
+    "leadId": "LEAD-083",
+    "firstName": "Donna",
+    "lastName": "Jackson",
+    "dob": "1957-11-01",
+    "age": 69,
+    "gender": "Male",
+    "email": "donna.jackson964@email.com",
+    "phone": "706-258-8647",
+    "address1": "7369 Oak Street",
+    "address2": "Apt 20",
+    "zipCode": "85003",
+    "state": "AZ",
+    "county": "Maricopa",
+    "city": "Phoenix",
+    "ethnicity": null,
+    "race": "Black or African American",
+    "medicareNumber": "5XV7-PQ7-SD79",
+    "medicaidId": null,
+    "partADate": null,
+    "partBDate": null,
+    "leadStatus": "Contacted Lead",
+    "source": "Web",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-026",
+      "PHARM-043",
+      "PHARM-024"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-026",
+        "dosage": "20mg",
+        "quantity": 30,
+        "frequency": "Three times daily"
+      },
+      {
+        "drugId": "DRUG-037",
+        "dosage": "100mg",
+        "quantity": 60,
+        "frequency": "Twice daily"
+      }
+    ],
+    "createdAt": "2025-10-30T21:15:27Z",
+    "createdBy": "USER-001",
+    "updatedAt": "2025-11-01T21:15:27Z",
+    "updatedBy": "USER-003"
+  },
+  {
+    "leadId": "LEAD-084",
+    "firstName": "Kimberly",
+    "lastName": "Rodriguez",
+    "dob": "1950-08-11",
+    "age": 76,
+    "gender": "Male",
+    "email": "kimberly.rodriguez724@email.com",
+    "phone": "884-636-2398",
+    "address1": "9350 First Street",
+    "address2": "Unit C",
+    "zipCode": "40211",
+    "state": "KY",
+    "county": "Jefferson",
+    "city": "Louisville",
+    "ethnicity": null,
+    "race": "American Indian or Alaska Native",
+    "medicareNumber": "1CF9-GC3-YS60",
+    "medicaidId": null,
+    "partADate": null,
+    "partBDate": null,
+    "leadStatus": "Contacted Lead",
+    "source": "Referral",
+    "permissionToContact": false,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-040",
+      "PHARM-009",
+      "PHARM-016"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-002",
+        "dosage": "10mg",
+        "quantity": 90,
+        "frequency": "Three times daily"
+      },
+      {
+        "drugId": "DRUG-046",
+        "dosage": "100mg",
+        "quantity": 90,
+        "frequency": "Three times daily"
+      },
+      {
+        "drugId": "DRUG-048",
+        "dosage": "500mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-033",
+        "dosage": "50mg",
+        "quantity": 90,
+        "frequency": "Twice daily"
+      }
+    ],
+    "createdAt": "2025-11-18T21:15:27Z",
+    "createdBy": "USER-001",
+    "updatedAt": "2025-12-08T21:15:27Z",
+    "updatedBy": "USER-004"
+  },
+  {
+    "leadId": "LEAD-085",
+    "firstName": "Matthew",
+    "lastName": "Walker",
+    "dob": "1953-11-20",
+    "age": 73,
+    "gender": "Male",
+    "email": "matthew.walker402@email.com",
+    "phone": "881-879-8914",
+    "address1": "7306 Pine Street",
+    "address2": "Apt 22",
+    "zipCode": "60604",
+    "state": "IL",
+    "county": "Cook",
+    "city": "Chicago",
+    "ethnicity": "Hispanic",
+    "race": "Black or African American",
+    "medicareNumber": "8DA3-HC5-XK45",
+    "medicaidId": null,
+    "partADate": "2022-10-26",
+    "partBDate": "2022-10-26",
+    "leadStatus": "Enrolled",
+    "source": "Vendor",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-021",
+      "PHARM-015"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-015",
+        "dosage": "10mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-029",
+        "dosage": "500mg",
+        "quantity": 90,
+        "frequency": "Three times daily"
+      },
+      {
+        "drugId": "DRUG-025",
+        "dosage": "250mg",
+        "quantity": 60,
+        "frequency": "As needed"
+      },
+      {
+        "drugId": "DRUG-045",
+        "dosage": "20mg",
+        "quantity": 60,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-040",
+        "dosage": "10mg",
+        "quantity": 90,
+        "frequency": "Once daily"
+      }
+    ],
+    "createdAt": "2025-11-20T21:15:27Z",
+    "createdBy": "USER-002",
+    "updatedAt": "2025-12-11T21:15:27Z",
+    "updatedBy": "USER-003"
+  },
+  {
+    "leadId": "LEAD-086",
+    "firstName": "Sarah",
+    "lastName": "Rodriguez",
+    "dob": "1953-02-21",
+    "age": 73,
+    "gender": "Female",
+    "email": "sarah.rodriguez859@email.com",
+    "phone": "624-142-3332",
+    "address1": "9161 Third Street",
+    "address2": "Unit A",
+    "zipCode": "90002",
+    "state": "CA",
+    "county": "Los Angeles",
+    "city": "Los Angeles",
+    "ethnicity": null,
+    "race": "Black or African American",
+    "medicareNumber": "4GJ2-WZ4-FN23",
+    "medicaidId": null,
+    "partADate": null,
+    "partBDate": null,
+    "leadStatus": "Appointment Schedule",
+    "source": "Web",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": true,
+    "taggedPharmacies": [
+      "PHARM-039"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-045",
+        "dosage": "20mg",
+        "quantity": 90,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-010",
+        "dosage": "500mg",
+        "quantity": 30,
+        "frequency": "As needed"
+      }
+    ],
+    "createdAt": "2025-12-19T21:15:27Z",
+    "createdBy": "USER-003",
+    "updatedAt": "2026-01-14T21:15:27Z",
+    "updatedBy": "USER-002"
+  },
+  {
+    "leadId": "LEAD-087",
+    "firstName": "Jessica",
+    "lastName": "Carter",
+    "dob": "1950-12-18",
+    "age": 76,
+    "gender": "Female",
+    "email": "jessica.carter311@email.com",
+    "phone": "329-471-1425",
+    "address1": "9492 Cedar Street",
+    "address2": "Apt 3",
+    "zipCode": "06606",
+    "state": "CT",
+    "county": "Fairfield",
+    "city": "Bridgeport",
+    "ethnicity": "Hispanic",
+    "race": "American Indian or Alaska Native",
+    "medicareNumber": "2PS8-QX7-VE81",
+    "medicaidId": null,
+    "partADate": null,
+    "partBDate": null,
+    "leadStatus": "Appointment Schedule",
+    "source": "Event",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-039",
+        "dosage": "500mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      }
+    ],
+    "createdAt": "2025-10-17T21:15:27Z",
+    "createdBy": "USER-003",
+    "updatedAt": "2025-11-11T21:15:27Z",
+    "updatedBy": "USER-003"
+  },
+  {
+    "leadId": "LEAD-088",
+    "firstName": "Kimberly",
+    "lastName": "Young",
+    "dob": "1952-02-19",
+    "age": 74,
+    "gender": "Female",
+    "email": "kimberly.young742@email.com",
+    "phone": "626-230-7622",
+    "address1": "3659 Pine Street",
+    "address2": "Unit A",
+    "zipCode": "06606",
+    "state": "CT",
+    "county": "Fairfield",
+    "city": "Bridgeport",
+    "ethnicity": "Non-Hispanic",
+    "race": null,
+    "medicareNumber": "3LD5-FC3-WP55",
+    "medicaidId": null,
+    "partADate": "2023-03-02",
+    "partBDate": "2023-03-02",
+    "leadStatus": "Enrolled",
+    "source": "Call",
+    "permissionToContact": false,
+    "existingAetnaMember": false,
+    "tobaccoUsage": true,
+    "taggedPharmacies": [],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-031",
+        "dosage": "250mg",
+        "quantity": 30,
+        "frequency": "Twice daily"
+      }
+    ],
+    "createdAt": "2025-10-08T21:15:27Z",
+    "createdBy": "USER-002",
+    "updatedAt": "2025-10-15T21:15:27Z",
+    "updatedBy": "USER-004"
+  },
+  {
+    "leadId": "LEAD-089",
+    "firstName": "David",
+    "lastName": "Adams",
+    "dob": "1954-01-17",
+    "age": 72,
+    "gender": "Male",
+    "email": "david.adams832@email.com",
+    "phone": "924-924-3660",
+    "address1": "9739 Elm Street",
+    "address2": "Unit C",
+    "zipCode": "10005",
+    "state": "NY",
+    "county": "New York",
+    "city": "New York",
+    "ethnicity": "Hispanic",
+    "race": "Native Hawaiian or Other Pacific Islander",
+    "medicareNumber": "3YN4-EJ4-HF60",
+    "medicaidId": null,
+    "partADate": null,
+    "partBDate": null,
+    "leadStatus": "New Lead",
+    "source": "Event",
+    "permissionToContact": false,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-030",
+        "dosage": "50mg",
+        "quantity": 90,
+        "frequency": "Twice daily"
+      },
+      {
+        "drugId": "DRUG-032",
+        "dosage": "50mg",
+        "quantity": 60,
+        "frequency": "As needed"
+      }
+    ],
+    "createdAt": "2025-12-18T21:15:27Z",
+    "createdBy": "USER-004",
+    "updatedAt": null,
+    "updatedBy": null
+  },
+  {
+    "leadId": "LEAD-090",
+    "firstName": "Betty",
+    "lastName": "Young",
+    "dob": "1944-11-10",
+    "age": 82,
+    "gender": "Male",
+    "email": "betty.young314@email.com",
+    "phone": "574-965-9501",
+    "address1": "4486 Third Street",
+    "address2": "Unit C",
+    "zipCode": "30301",
+    "state": "GA",
+    "county": "Fulton",
+    "city": "Atlanta",
+    "ethnicity": null,
+    "race": "Black or African American",
+    "medicareNumber": "6WK1-UT4-RC79",
+    "medicaidId": null,
+    "partADate": null,
+    "partBDate": null,
+    "leadStatus": "Dropped / Lost lead",
+    "source": "Vendor",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-035",
+        "dosage": "250mg",
+        "quantity": 90,
+        "frequency": "As needed"
+      },
+      {
+        "drugId": "DRUG-030",
+        "dosage": "250mg",
+        "quantity": 60,
+        "frequency": "Twice daily"
+      },
+      {
+        "drugId": "DRUG-011",
+        "dosage": "100mg",
+        "quantity": 60,
+        "frequency": "Once daily"
+      }
+    ],
+    "createdAt": "2026-01-03T21:15:27Z",
+    "createdBy": "USER-002",
+    "updatedAt": "2026-01-21T21:15:27Z",
+    "updatedBy": "USER-001"
+  },
+  {
+    "leadId": "LEAD-091",
+    "firstName": "Michael",
+    "lastName": "Jackson",
+    "dob": "1955-06-14",
+    "age": 71,
+    "gender": "Male",
+    "email": "michael.jackson474@email.com",
+    "phone": "965-669-4867",
+    "address1": "2789 Second Street",
+    "address2": "Unit A",
+    "zipCode": "85002",
+    "state": "AZ",
+    "county": "Maricopa",
+    "city": "Phoenix",
+    "ethnicity": null,
+    "race": null,
+    "medicareNumber": "8AL4-XV1-PE40",
+    "medicaidId": null,
+    "partADate": "2021-08-30",
+    "partBDate": "2021-08-30",
+    "leadStatus": "Enrollment in progress",
+    "source": "Event",
+    "permissionToContact": false,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-001",
+        "dosage": "50mg",
+        "quantity": 90,
+        "frequency": "Three times daily"
+      }
+    ],
+    "createdAt": "2025-10-29T21:15:27Z",
+    "createdBy": "USER-002",
+    "updatedAt": "2025-11-09T21:15:27Z",
+    "updatedBy": "USER-002"
+  },
+  {
+    "leadId": "LEAD-092",
+    "firstName": "Mary",
+    "lastName": "Robinson",
+    "dob": "1961-09-04",
+    "age": 65,
+    "gender": "Male",
+    "email": "mary.robinson932@email.com",
+    "phone": "447-864-6638",
+    "address1": "3438 Elm Street",
+    "address2": null,
+    "zipCode": "19104",
+    "state": "PA",
+    "county": "Philadelphia",
+    "city": "Philadelphia",
+    "ethnicity": "Hispanic",
+    "race": "Black or African American",
+    "medicareNumber": "3KG2-UK2-MN31",
+    "medicaidId": null,
+    "partADate": null,
+    "partBDate": null,
+    "leadStatus": "Contacted Lead",
+    "source": "Event",
+    "permissionToContact": false,
+    "existingAetnaMember": false,
+    "tobaccoUsage": true,
+    "taggedPharmacies": [
+      "PHARM-021",
+      "PHARM-029",
+      "PHARM-026"
+    ],
+    "taggedDrugs": [],
+    "createdAt": "2025-11-16T21:15:27Z",
+    "createdBy": "USER-003",
+    "updatedAt": "2025-11-26T21:15:27Z",
+    "updatedBy": "USER-004"
+  },
+  {
+    "leadId": "LEAD-093",
+    "firstName": "George",
+    "lastName": "Walker",
+    "dob": "1951-01-26",
+    "age": 75,
+    "gender": "Male",
+    "email": "george.walker608@email.com",
+    "phone": "359-617-4140",
+    "address1": "104 Cedar Street",
+    "address2": null,
+    "zipCode": "19101",
+    "state": "PA",
+    "county": "Philadelphia",
+    "city": "Philadelphia",
+    "ethnicity": "Hispanic",
+    "race": "Native Hawaiian or Other Pacific Islander",
+    "medicareNumber": "7MC7-AJ6-BL57",
+    "medicaidId": "MD824843",
+    "partADate": null,
+    "partBDate": null,
+    "leadStatus": "Dropped / Lost lead",
+    "source": "Web",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-041"
+    ],
+    "taggedDrugs": [],
+    "createdAt": "2025-11-04T21:15:27Z",
+    "createdBy": "USER-003",
+    "updatedAt": "2025-11-07T21:15:27Z",
+    "updatedBy": "USER-003"
+  },
+  {
+    "leadId": "LEAD-094",
+    "firstName": "Jessica",
+    "lastName": "Torres",
+    "dob": "1950-10-23",
+    "age": 76,
+    "gender": "Female",
+    "email": "jessica.torres277@email.com",
+    "phone": "415-168-7850",
+    "address1": "4216 Pine Street",
+    "address2": null,
+    "zipCode": "40202",
+    "state": "KY",
+    "county": "Jefferson",
+    "city": "Louisville",
+    "ethnicity": "Hispanic",
+    "race": "White",
+    "medicareNumber": "2EH8-QN9-MJ46",
+    "medicaidId": "MD373678",
+    "partADate": null,
+    "partBDate": null,
+    "leadStatus": "Contacted Lead",
+    "source": "Event",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-023",
+      "PHARM-048"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-020",
+        "dosage": "500mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      }
+    ],
+    "createdAt": "2025-11-15T21:15:27Z",
+    "createdBy": "USER-001",
+    "updatedAt": "2025-11-26T21:15:27Z",
+    "updatedBy": "USER-002"
+  },
+  {
+    "leadId": "LEAD-095",
+    "firstName": "Jason",
+    "lastName": "White",
+    "dob": "1948-01-09",
+    "age": 78,
+    "gender": "Female",
+    "email": "jason.white615@email.com",
+    "phone": "552-158-5836",
+    "address1": "6841 Elm Street",
+    "address2": null,
+    "zipCode": "40215",
+    "state": "KY",
+    "county": "Jefferson",
+    "city": "Louisville",
+    "ethnicity": "Non-Hispanic",
+    "race": "Asian",
+    "medicareNumber": "9AD7-BT1-AU58",
+    "medicaidId": null,
+    "partADate": null,
+    "partBDate": null,
+    "leadStatus": "Contacted Lead",
+    "source": "Web",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-012",
+        "dosage": "10mg",
+        "quantity": 30,
+        "frequency": "Three times daily"
+      }
+    ],
+    "createdAt": "2025-10-27T21:15:27Z",
+    "createdBy": "USER-001",
+    "updatedAt": "2025-11-14T21:15:27Z",
+    "updatedBy": "USER-002"
+  },
+  {
+    "leadId": "LEAD-096",
+    "firstName": "Andrew",
+    "lastName": "Ramirez",
+    "dob": "1958-07-03",
+    "age": 68,
+    "gender": "Female",
+    "email": "andrew.ramirez371@email.com",
+    "phone": "714-549-2615",
+    "address1": "7797 Cedar Street",
+    "address2": "Apt 33",
+    "zipCode": "40206",
+    "state": "KY",
+    "county": "Jefferson",
+    "city": "Louisville",
+    "ethnicity": null,
+    "race": "Native Hawaiian or Other Pacific Islander",
+    "medicareNumber": "1NR8-PE7-GY15",
+    "medicaidId": null,
+    "partADate": null,
+    "partBDate": null,
+    "leadStatus": "Appointment Schedule",
+    "source": "Event",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [],
+    "taggedDrugs": [],
+    "createdAt": "2025-12-07T21:15:27Z",
+    "createdBy": "USER-004",
+    "updatedAt": "2025-12-29T21:15:27Z",
+    "updatedBy": "USER-002"
+  },
+  {
+    "leadId": "LEAD-097",
+    "firstName": "Dorothy",
+    "lastName": "Ramirez",
+    "dob": "1950-10-28",
+    "age": 76,
+    "gender": "Male",
+    "email": "dorothy.ramirez646@email.com",
+    "phone": "710-458-2491",
+    "address1": "6872 Second Street",
+    "address2": "Apt 2",
+    "zipCode": "60603",
+    "state": "IL",
+    "county": "Cook",
+    "city": "Chicago",
+    "ethnicity": "Hispanic",
+    "race": "White",
+    "medicareNumber": "2JF9-UD1-PG93",
+    "medicaidId": null,
+    "partADate": null,
+    "partBDate": null,
+    "leadStatus": "New Lead",
+    "source": "Web",
+    "permissionToContact": true,
+    "existingAetnaMember": true,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-023",
+      "PHARM-030",
+      "PHARM-013"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-038",
+        "dosage": "10mg",
+        "quantity": 60,
+        "frequency": "As needed"
+      },
+      {
+        "drugId": "DRUG-032",
+        "dosage": "50mg",
+        "quantity": 60,
+        "frequency": "As needed"
+      }
+    ],
+    "createdAt": "2025-11-18T21:15:27Z",
+    "createdBy": "USER-003",
+    "updatedAt": null,
+    "updatedBy": null
+  },
+  {
+    "leadId": "LEAD-098",
+    "firstName": "Joseph",
+    "lastName": "Wilson",
+    "dob": "1960-07-06",
+    "age": 66,
+    "gender": "Male",
+    "email": "joseph.wilson605@email.com",
+    "phone": "722-168-9726",
+    "address1": "896 Park Street",
+    "address2": null,
+    "zipCode": "40201",
+    "state": "KY",
+    "county": "Jefferson",
+    "city": "Louisville",
+    "ethnicity": null,
+    "race": "American Indian or Alaska Native",
+    "medicareNumber": "5TD3-AF3-HF77",
+    "medicaidId": null,
+    "partADate": null,
+    "partBDate": null,
+    "leadStatus": "New Lead",
+    "source": "Call",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-034",
+      "PHARM-033",
+      "PHARM-029"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-021",
+        "dosage": "500mg",
+        "quantity": 90,
+        "frequency": "As needed"
+      },
+      {
+        "drugId": "DRUG-026",
+        "dosage": "20mg",
+        "quantity": 60,
+        "frequency": "Twice daily"
+      },
+      {
+        "drugId": "DRUG-013",
+        "dosage": "50mg",
+        "quantity": 60,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-003",
+        "dosage": "50mg",
+        "quantity": 30,
+        "frequency": "Once daily"
+      }
+    ],
+    "createdAt": "2025-12-21T21:15:27Z",
+    "createdBy": "USER-001",
+    "updatedAt": null,
+    "updatedBy": null
+  },
+  {
+    "leadId": "LEAD-099",
+    "firstName": "Jessica",
+    "lastName": "Gomez",
+    "dob": "1951-04-26",
+    "age": 75,
+    "gender": "Female",
+    "email": "jessica.gomez974@email.com",
+    "phone": "985-124-9428",
+    "address1": "4947 Cedar Street",
+    "address2": "Apt 12",
+    "zipCode": "77003",
+    "state": "TX",
+    "county": "Harris",
+    "city": "Houston",
+    "ethnicity": "Hispanic",
+    "race": "American Indian or Alaska Native",
+    "medicareNumber": "8RK9-HN3-HM76",
+    "medicaidId": null,
+    "partADate": "2023-10-29",
+    "partBDate": "2023-10-29",
+    "leadStatus": "Enrollment in progress",
+    "source": "Web",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-022",
+      "PHARM-042",
+      "PHARM-029"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-032",
+        "dosage": "10mg",
+        "quantity": 60,
+        "frequency": "Three times daily"
+      },
+      {
+        "drugId": "DRUG-015",
+        "dosage": "10mg",
+        "quantity": 90,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-022",
+        "dosage": "10mg",
+        "quantity": 60,
+        "frequency": "As needed"
+      }
+    ],
+    "createdAt": "2025-11-10T21:15:27Z",
+    "createdBy": "USER-002",
+    "updatedAt": "2025-12-07T21:15:27Z",
+    "updatedBy": "USER-002"
+  },
+  {
+    "leadId": "LEAD-100",
+    "firstName": "Brian",
+    "lastName": "Taylor",
+    "dob": "1952-09-26",
+    "age": 74,
+    "gender": "Female",
+    "email": "brian.taylor826@email.com",
+    "phone": "919-917-5486",
+    "address1": "7366 Pine Street",
+    "address2": null,
+    "zipCode": "40201",
+    "state": "KY",
+    "county": "Jefferson",
+    "city": "Louisville",
+    "ethnicity": null,
+    "race": "Black or African American",
+    "medicareNumber": "6ZJ8-CW8-JL72",
+    "medicaidId": null,
+    "partADate": "2024-02-16",
+    "partBDate": "2024-02-16",
+    "leadStatus": "Enrollment in progress",
+    "source": "Web",
+    "permissionToContact": true,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-021"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-033",
+        "dosage": "20mg",
+        "quantity": 60,
+        "frequency": "Three times daily"
+      },
+      {
+        "drugId": "DRUG-047",
+        "dosage": "250mg",
+        "quantity": 60,
+        "frequency": "Once daily"
+      },
+      {
+        "drugId": "DRUG-037",
+        "dosage": "50mg",
+        "quantity": 60,
+        "frequency": "Three times daily"
+      },
+      {
+        "drugId": "DRUG-007",
+        "dosage": "250mg",
+        "quantity": 90,
+        "frequency": "Three times daily"
+      },
+      {
+        "drugId": "DRUG-014",
+        "dosage": "20mg",
+        "quantity": 90,
+        "frequency": "As needed"
+      }
+    ],
+    "createdAt": "2025-12-04T21:15:27Z",
+    "createdBy": "USER-003",
+    "updatedAt": "2025-12-05T21:15:27Z",
+    "updatedBy": "USER-003"
+  },
+  {
+    "leadId": "LEAD-101",
+    "firstName": "Donald",
+    "lastName": "Sanchez",
+    "dob": "1947-08-04",
+    "age": 79,
+    "gender": "Male",
+    "email": "donald.sanchez868@email.com",
+    "phone": "706-183-3657",
+    "address1": "4661 Maple Street",
+    "address2": "Unit B",
+    "zipCode": "75001",
+    "state": "TX",
+    "county": "Dallas",
+    "city": "Addison",
+    "ethnicity": null,
+    "race": "White",
+    "medicareNumber": "5DD4-XA1-LB38",
+    "medicaidId": "MD531931",
+    "partADate": "2022-04-27",
+    "partBDate": "2022-04-27",
+    "leadStatus": "Enrollment in progress",
+    "source": "Event",
+    "permissionToContact": false,
+    "existingAetnaMember": false,
+    "tobaccoUsage": false,
+    "taggedPharmacies": [
+      "PHARM-031"
+    ],
+    "taggedDrugs": [
+      {
+        "drugId": "DRUG-010",
+        "dosage": "50mg",
+        "quantity": 30,
+        "frequency": "As needed"
+      }
+    ],
+    "createdAt": "2025-11-26T21:15:27Z",
+    "createdBy": "USER-001",
+    "updatedAt": "2025-12-12T21:15:27Z",
+    "updatedBy": "USER-004"
   }
 ]
-

@@ -37,9 +37,9 @@ export function Table<T extends object>({
       return <ChevronsUpDown className="w-4 h-4 text-gray-400" />;
     }
     if (sortDirection === 'asc') {
-      return <ChevronUp className="w-4 h-4 text-orange-600" />;
+      return <ChevronUp className="w-4 h-4 text-primary-600" />;
     }
-    return <ChevronDown className="w-4 h-4 text-orange-600" />;
+    return <ChevronDown className="w-4 h-4 text-primary-600" />;
   };
 
   const getCellValue = (item: T, column: Column<T>): ReactNode => {
@@ -57,7 +57,7 @@ export function Table<T extends object>({
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div className="flex items-center justify-center h-64">
           <div className="flex flex-col items-center gap-3">
-            <div className="w-8 h-8 border-3 border-orange-200 border-t-orange-600 rounded-full animate-spin" />
+            <div className="w-8 h-8 border-3 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
             <p className="text-gray-500 dark:text-gray-400">Loading...</p>
           </div>
         </div>
@@ -197,7 +197,7 @@ export function Pagination({
                 className={`
                   w-8 h-8 text-sm font-medium rounded-lg
                   ${pageNum === currentPage
-                    ? 'bg-orange-600 text-white'
+                    ? 'bg-primary-600 text-white'
                     : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                   }
                 `}

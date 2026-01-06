@@ -3,9 +3,9 @@
 /* Import Inter font */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
-/* Custom theme variables - Orange Theme */
+/* Custom theme variables - Default Orange Theme */
 @theme {
-  /* Primary - Orange */
+  /* Primary - Orange (Default) */
   --color-primary-50: #fff7ed;
   --color-primary-100: #ffedd5;
   --color-primary-200: #fed7aa;
@@ -32,6 +32,53 @@
   --color-secondary-950: #0c0a09;
 
   --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+/* Color Theme Overrides - These override the @theme values */
+:root:not(.theme-aetna):not(.theme-humana),
+:root.theme-default {
+  /* Primary - Orange (Default) - same as base theme */
+  --color-primary-50: #fff7ed;
+  --color-primary-100: #ffedd5;
+  --color-primary-200: #fed7aa;
+  --color-primary-300: #fdba74;
+  --color-primary-400: #fb923c;
+  --color-primary-500: #f97316;
+  --color-primary-600: #ea580c;
+  --color-primary-700: #c2410c;
+  --color-primary-800: #9a3412;
+  --color-primary-900: #7c2d12;
+  --color-primary-950: #431407;
+}
+
+:root.theme-aetna {
+  /* Primary - Aetna Purple (#5a2e6f) */
+  --color-primary-50: #f5f0f9;
+  --color-primary-100: #e9ddf2;
+  --color-primary-200: #d4bce5;
+  --color-primary-300: #b890d0;
+  --color-primary-400: #9664b5;
+  --color-primary-500: #7a4698;
+  --color-primary-600: #5a2e6f;
+  --color-primary-700: #482459;
+  --color-primary-800: #3a1d47;
+  --color-primary-900: #2d1636;
+  --color-primary-950: #1c0d22;
+}
+
+:root.theme-humana {
+  /* Primary - Humana Green (#5c9a1b) */
+  --color-primary-50: #f5f9f0;
+  --color-primary-100: #e8f2d9;
+  --color-primary-200: #d1e5b3;
+  --color-primary-300: #afd080;
+  --color-primary-400: #8fb852;
+  --color-primary-500: #6f9e2e;
+  --color-primary-600: #5c9a1b;
+  --color-primary-700: #4a7a16;
+  --color-primary-800: #3d6213;
+  --color-primary-900: #335211;
+  --color-primary-950: #1a2a08;
 }
 
 /* Dark mode selector */
@@ -88,17 +135,17 @@
     @apply flex flex-col items-center justify-center gap-3;
   }
   
-  /* Orange gradient utilities */
-  .gradient-orange {
-    @apply bg-gradient-to-r from-orange-500 via-orange-600 to-amber-600;
+  /* Primary gradient utilities */
+  .gradient-primary {
+    @apply bg-gradient-to-r from-primary-500 via-primary-600 to-primary-700;
   }
   
-  .gradient-orange-light {
-    @apply bg-gradient-to-r from-orange-400 to-amber-500;
+  .gradient-primary-light {
+    @apply bg-gradient-to-r from-primary-400 to-primary-500;
   }
   
-  .gradient-orange-dark {
-    @apply bg-gradient-to-r from-orange-600 via-orange-700 to-amber-700;
+  .gradient-primary-dark {
+    @apply bg-gradient-to-r from-primary-600 via-primary-700 to-primary-800;
   }
 }
 
@@ -138,14 +185,14 @@ input[type="date"]::-webkit-datetime-edit-year-field {
 input[type="date"]::-webkit-datetime-edit-month-field:focus,
 input[type="date"]::-webkit-datetime-edit-day-field:focus,
 input[type="date"]::-webkit-datetime-edit-year-field:focus {
-  background: #fed7aa;
+  background: var(--color-primary-200);
   outline: none;
 }
 
 .dark input[type="date"]::-webkit-datetime-edit-month-field:focus,
 .dark input[type="date"]::-webkit-datetime-edit-day-field:focus,
 .dark input[type="date"]::-webkit-datetime-edit-year-field:focus {
-  background: #c2410c;
+  background: var(--color-primary-700);
   color: white;
 }
 

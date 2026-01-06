@@ -31,10 +31,10 @@ const colorVariants = {
     border: 'hover:border-purple-300 dark:hover:border-purple-700',
   },
   orange: {
-    bg: 'bg-orange-50 dark:bg-orange-900/20',
-    iconBg: 'bg-orange-100 dark:bg-orange-800',
-    icon: 'text-orange-600 dark:text-orange-400',
-    border: 'hover:border-orange-300 dark:hover:border-orange-700',
+    bg: 'bg-primary-50 dark:bg-primary-900/20',
+    iconBg: 'bg-primary-100 dark:bg-primary-800',
+    icon: 'text-primary-600 dark:text-primary-400',
+    border: 'hover:border-primary-300 dark:hover:border-primary-700',
   },
   red: {
     bg: 'bg-red-50 dark:bg-red-900/20',
@@ -85,7 +85,7 @@ export function NavigationTile({
     >
       {/* Badge */}
       {badge && (
-        <span className="absolute top-3 right-3 px-2 py-0.5 text-xs font-medium rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300">
+        <span className="absolute top-3 right-3 px-2 py-0.5 text-xs font-medium rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300">
           {badge}
         </span>
       )}

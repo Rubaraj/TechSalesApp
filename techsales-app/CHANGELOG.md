@@ -7,6 +7,84 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Multi-Theme Support**: Added support for multiple color themes (Default Orange, Aetna Purple, Humana Green)
+  - Theme selection available in Admin System Settings
+  - All components now use `primary-*` CSS variables for theme-aware colors
+  - Theme preference persisted in localStorage
+- **Multi-Carrier Plan Support**: Plans now support multiple insurance carriers
+  - Added `carrier` field to Plan interface
+  - Plans from Aetna, Humana, UnitedHealthcare, Cigna, Blue Cross Blue Shield, and more
+  - Carrier filter added to Plan List page
+  - Expanded plan data to include 80+ plans across multiple carriers
+- **Lead Source Tracking**: All leads now require a source field
+  - Source options: Web, Call, Event, Referral, Vendor
+  - Source displayed as badge in Lead List
+  - Source field mandatory in Lead Form
+- **Enhanced Lead Lifecycle**: Updated lead lifecycle stages
+  - New stages: New Lead → Contacted Lead → Appointment Schedule → Enrollment in progress → Enrolled → Dropped / Lost lead
+  - Visual timeline in Lead Detail page (horizontal layout with icons)
+  - Lifecycle progress bar in Dashboard Insights tab
+  - Multi-line bar chart in Admin Productivity Dashboard
+- **Plan Documents**: Plans now include document links
+  - Document types: Summary of Benefits, Evidence of Coverage, Formulary, Provider Directory, Annual Notice of Change
+  - Documents displayed in Plan Detail page with view/download links
+  - 2-4 sample documents per plan
+- **Benefit Availability Indicators**: Benefits now show availability status
+  - Green checkmark for available benefits
+  - Red cross for unavailable benefits
+  - Simplified benefit display (category title only, no descriptions)
+  - Applied to both Plan Detail and Member Plan Detail pages
+- **Lead Autocomplete Component**: New reusable component for lead selection
+  - Used in PBA and PBKit creation modals
+  - Auto-populates while typing
+  - Search and filter functionality
+- **Enhanced Dashboard**:
+  - Dynamic lead count fetching (replaces hardcoded values)
+  - Lead lifecycle progress bar in Insights tab (agent view)
+  - Lead lifecycle bar chart in Productivity Dashboard (admin view)
+  - Side-by-side layout for Lead Lifecycle Overview and Agent Performance
+  - Removed "Create Target" button from Productivity Dashboard
+- **Expanded Sample Data**:
+  - Added 50+ new leads across all lifecycle stages
+  - Added premium and benefit data for all plans
+  - Added star ratings for all plans
+  - Added sample documents for all plans
+
+### Changed
+- **Theme System Refactoring**: 
+  - Replaced all hardcoded `orange-*` Tailwind classes with `primary-*` CSS variables
+  - Updated all components to use theme-aware colors
+  - Theme changes now apply throughout entire application
+- **Lead Lifecycle Timeline**:
+  - Changed from vertical to horizontal layout in Lead Detail page
+  - Positioned between Lead name and Edit button
+  - Increased size and improved alignment
+  - Current stage shows green circle with white tick (removed separate badge)
+  - Colors match Dashboard lifecycle colors
+- **Plan Benefits Display**:
+  - Simplified to show only category title with tick/cross mark
+  - Removed verbose descriptions
+  - Applied to both agent and member views
+- **Dashboard Layout**:
+  - Lead Lifecycle Overview and Agent Performance now display side-by-side
+  - Reduced width of both sections for better space utilization
+  - Responsive: stacks vertically on smaller screens
+- **Component Updates**:
+  - Updated Button, Badge, Input, Select, Tabs, SearchInput, DatePicker, Table components to use `primary-*` colors
+  - Updated Header, NavigationTile, StatCard to use theme-aware colors
+  - All components now support dynamic theme switching
+
+### Fixed
+- Fixed theme not applying throughout application (hardcoded color classes)
+- Fixed duplicate imports in Dashboard.tsx
+- Fixed dynamic Tailwind class generation issues
+- Fixed lead count discrepancy between dashboard tile and actual leads
+- Fixed alignment issues in lead lifecycle timeline
+- Fixed missing drug name display in Lead Detail (added drug lookup)
+- Fixed TypeScript type exports for ColorTheme
+- Fixed PowerShell command syntax for Windows compatibility
+
 ## [0.9.2] - 2025-12-29
 
 ### Changed

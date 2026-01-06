@@ -5,6 +5,7 @@ export { Badge } from './Badge';
 export { Modal, ConfirmModal } from './Modal';
 export { Table, Pagination } from './Table';
 export { SearchInput } from './SearchInput';
+export { LeadAutocomplete } from './LeadAutocomplete';
 export { Tabs, TabPanel } from './Tabs';
 export { EmptyState } from './EmptyState';
 export { StatusBadge } from './StatusBadge';

@@ -5,6 +5,7 @@ import {
   delay, 
   generateId, 
   formatDate, 
+  calculateAge,
   searchByFields, 
   filterByField, 
   sortByField, 
@@ -274,4 +275,26 @@ export const untagDrug = async (
   
   return { success: true, data: lead, message: 'Drug untagged successfully' };
 };
+
+// Autocomplete lead search by name (returns top 10 matches)
+export async function autocompleteLeads(searchTerm: string): Promise<ServiceResponse<Lead[]>> {
+  await delay(50); // Faster for autocomplete
+  
+  if (!searchTerm || searchTerm.length < 2) {
+    return { success: true, data: [] };
+  }
+  
+  const lowerSearch = searchTerm.toLowerCase();
+  
+  const matches = leads
+    .filter(l => {
+      const fullName = `${l.firstName} ${l.lastName}`.toLowerCase();
+      return fullName.includes(lowerSearch) || 
+             l.firstName.toLowerCase().includes(lowerSearch) ||
+             l.lastName.toLowerCase().includes(lowerSearch);
+    })
+    .slice(0, 10);
+  
+  return { success: true, data: matches };
+}
 

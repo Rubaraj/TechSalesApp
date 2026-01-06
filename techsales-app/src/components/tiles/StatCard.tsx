@@ -24,8 +24,8 @@ const colorVariants = {
     icon: 'text-purple-600 dark:text-purple-400',
   },
   orange: {
-    iconBg: 'bg-orange-100 dark:bg-orange-900/50',
-    icon: 'text-orange-600 dark:text-orange-400',
+    iconBg: 'bg-primary-100 dark:bg-primary-900/50',
+    icon: 'text-primary-600 dark:text-primary-400',
   },
 };
 

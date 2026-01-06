@@ -20,6 +20,7 @@ export interface Lead {
   partADate?: string;
   partBDate?: string;
   leadStatus: LeadStatus;
+  source: LeadSource;
   permissionToContact: boolean;
   existingAetnaMember: boolean;
   tobaccoUsage: boolean;
@@ -39,13 +40,14 @@ export interface TaggedDrug {
 }
 
 export type LeadStatus = 
-  | 'New'
-  | 'Contacted'
-  | 'Qualified'
-  | 'Proposal'
+  | 'New Lead'
+  | 'Contacted Lead'
+  | 'Appointment Schedule'
+  | 'Enrollment in progress'
   | 'Enrolled'
-  | 'Lost'
-  | 'Follow-up';
+  | 'Dropped / Lost lead';
+
+export type LeadSource = 'Web' | 'Call' | 'Event' | 'Referral' | 'Vendor';
 
 export interface LeadFormData extends Omit<Lead, 'leadId' | 'age' | 'createdAt' | 'createdBy' | 'updatedAt' | 'updatedBy'> {}
 

@@ -1,4 +1,5 @@
 import type { Plan, Benefit, Premium, StarRating, PlanCategory } from '../types';
+import type { ColorTheme } from '../context/ThemeContext';
 import type { ServiceResponse } from './baseService';
 import plansData from '../data/lookup/planInformation.json';
 import benefitsData from '../data/lookup/benefitData.json';
@@ -27,6 +28,7 @@ export interface PlanFilters {
   maxAge?: number;
   commissionable?: boolean;
   snpType?: string;
+  carrier?: string; // Filter by insurance company (e.g., "Aetna", "UnitedHealthcare", "Humana")
 }
 
 export interface PlanSearchParams {
@@ -36,6 +38,7 @@ export interface PlanSearchParams {
   sortDirection?: 'asc' | 'desc';
   page?: number;
   pageSize?: number;
+  colorTheme?: ColorTheme; // Theme-based filtering (default shows all, aetna/humana filter by carrier)
 }
 
 export interface PlanWithDetails extends Plan {
@@ -104,10 +107,27 @@ export const searchPlans = async (params: PlanSearchParams): Promise<ServiceResp
   
   let filteredPlans = plans.filter(p => !p.isDeleted);
   
+  // Apply theme-based carrier filtering first (before other filters)
+  // Default theme: show all plans
+  // Aetna theme: show only Aetna plans
+  // Humana theme: show only Humana plans
+  if (params.colorTheme === 'aetna') {
+    filteredPlans = filteredPlans.filter(p => 
+      p.marketingName.toLowerCase().includes('aetna') ||
+      p.legalEntity.toLowerCase().includes('aetna')
+    );
+  } else if (params.colorTheme === 'humana') {
+    filteredPlans = filteredPlans.filter(p => 
+      p.marketingName.toLowerCase().includes('humana') ||
+      p.legalEntity.toLowerCase().includes('humana')
+    );
+  }
+  // Default theme: no filtering (show all plans)
+  
   // Apply search
   if (params.searchTerm) {
     filteredPlans = searchByFields(filteredPlans, params.searchTerm, [
-      'planName', 'contractNumber', 'planType', 'market'
+      'planName', 'contractNumber', 'planType', 'market', 'marketingName', 'legalEntity'
     ]);
   }
   
@@ -130,6 +150,14 @@ export const searchPlans = async (params: PlanSearchParams): Promise<ServiceResp
     }
     if (params.filters.snpType) {
       filteredPlans = filterByField(filteredPlans, 'snpType', params.filters.snpType);
+    }
+    // Carrier filter - check marketingName and legalEntity
+    if (params.filters.carrier) {
+      const carrierLower = params.filters.carrier.toLowerCase();
+      filteredPlans = filteredPlans.filter(p => 
+        p.marketingName.toLowerCase().includes(carrierLower) ||
+        p.legalEntity.toLowerCase().includes(carrierLower)
+      );
     }
     // Age filter
     if (params.filters.minAge !== undefined) {

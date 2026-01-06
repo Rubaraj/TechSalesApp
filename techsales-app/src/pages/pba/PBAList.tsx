@@ -16,9 +16,10 @@ import {
 } from 'lucide-react';
 import { Button, Select, Badge, Pagination, Modal, Input, DatePicker } from '../../components/common';
 import { SearchInput } from '../../components/common/SearchInput';
+import { LeadAutocomplete } from '../../components/common/LeadAutocomplete';
 import { EmptyState } from '../../components/common/EmptyState';
 import { useAuth } from '../../context/AuthContext';
-import type { PBA, PBAStatus } from '../../types';
+import type { PBA, PBAStatus, Lead } from '../../types';
 
 // Mock PBA data
 const mockPBAs: PBA[] = [
@@ -107,6 +108,8 @@ export function PBAList() {
   const [selectedPBA, setSelectedPBA] = useState<PBA | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [selectedLeadId, setSelectedLeadId] = useState<string>('');
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
 
   // Load PBAs
   useEffect(() => {
@@ -365,7 +368,27 @@ export function PBAList() {
         }
       >
         <div className="space-y-4">
-          <Input label="Lead/Beneficiary" placeholder="Select a lead..." />
+          <LeadAutocomplete
+            label="Lead/Beneficiary"
+            value={selectedLeadId}
+            onChange={(leadId, lead) => {
+              setSelectedLeadId(leadId);
+              setSelectedLead(lead);
+            }}
+            placeholder="Type to search for a lead..."
+          />
+          {selectedLead && (
+            <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                <div className="font-medium text-gray-900 dark:text-white">
+                  {selectedLead.firstName} {selectedLead.lastName}
+                </div>
+                <div className="mt-1">
+                  {selectedLead.email} • {selectedLead.phone}
+                </div>
+              </div>
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-4">
             <DatePicker label="Appointment Date" value="" onChange={() => {}} />
             <Input label="Appointment Time" type="time" />

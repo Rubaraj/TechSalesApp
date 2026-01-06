@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { LogIn, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/common/Button';
 import { Input } from '../components/common/Input';
 import { useTheme } from '../context/ThemeContext';
 import { Sun, Moon } from 'lucide-react';
+import { getLogoByTheme } from '../utils/logoUtils';
 
 export function Login() {
   const [username, setUsername] = useState('');
@@ -16,7 +17,7 @@ export function Login() {
   
   const { login } = useAuth();
   const navigate = useNavigate();
-  const { resolvedTheme, toggleTheme } = useTheme();
+  const { resolvedTheme, toggleTheme, colorTheme } = useTheme();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,7 +30,7 @@ export function Login() {
       if (success) {
         navigate('/');
       } else {
-        setError('Invalid username or password. Try: admin, jdoe, jsmith, mwilson, or sjohnson');
+        setError('Invalid username or password. Try: admin, johndoe11, janesmith22, or mikewilson33');
       }
     } catch {
       setError('An error occurred. Please try again.');
@@ -58,12 +59,12 @@ export function Login() {
         {/* Logo */}
         <div className="text-center mb-8">
           <img 
-            src="https://www.exlservice.com/themes/exl_service/exl_logo_rgb_orange_pos_94.png" 
-            alt="EXL"
+            src={getLogoByTheme(colorTheme)} 
+            alt={colorTheme === 'aetna' ? 'Aetna' : colorTheme === 'humana' ? 'Humana' : 'EXL'}
             className="h-16 w-auto mx-auto mb-4"
           />
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Med Hub
+            Medicare Hub
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
             Built for agents. Trusted by seniors
@@ -128,26 +129,12 @@ export function Login() {
               Sign In
             </Button>
           </form>
-
-          {/* Demo credentials */}
-          <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Demo Credentials:
-            </p>
-            <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
-              <p><span className="font-mono bg-gray-200 dark:bg-gray-600 px-1 rounded">admin</span> - Super Admin</p>
-              <p><span className="font-mono bg-gray-200 dark:bg-gray-600 px-1 rounded">jdoe</span> - Sales Agent</p>
-              <p><span className="font-mono bg-gray-200 dark:bg-gray-600 px-1 rounded">mwilson</span> - Customer Service</p>
-            </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-              (Any password works for demo)
-            </p>
-          </div>
         </div>
 
         {/* Footer */}
         <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-6">
-          © 2025 EXL Service | Med Hub - Built for agents. Trusted by seniors
+          © 2026 EXL Service<br />
+          Medicare Hub - Built for agents. Trusted by seniors
         </p>
       </div>
     </div>

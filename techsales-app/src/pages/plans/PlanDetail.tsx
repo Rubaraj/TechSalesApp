@@ -107,7 +107,7 @@ export function PlanDetail() {
     return (
       <div className="flex items-center justify-center h-96">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-3 border-orange-200 border-t-orange-600 rounded-full animate-spin" />
+          <div className="w-8 h-8 border-3 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
           <p className="text-gray-500 dark:text-gray-400">Loading plan details...</p>
         </div>
       </div>
@@ -185,9 +185,9 @@ export function PlanDetail() {
             </div>
 
             {/* Premium Card */}
-            <div className="lg:w-72 bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/30 dark:to-orange-800/20 rounded-xl p-6 border border-orange-200 dark:border-orange-800">
-              <p className="text-sm text-orange-700 dark:text-orange-400 mb-1">Monthly Premium</p>
-              <p className="text-4xl font-bold text-orange-900 dark:text-orange-100 mb-4">
+            <div className="lg:w-72 bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/30 dark:to-primary-800/20 rounded-xl p-6 border border-primary-200 dark:border-primary-800">
+              <p className="text-sm text-primary-700 dark:text-primary-400 mb-1">Monthly Premium</p>
+              <p className="text-4xl font-bold text-primary-900 dark:text-primary-100 mb-4">
                 ${monthlyPremium.toFixed(2)}
               </p>
               
@@ -328,53 +328,27 @@ export function PlanDetail() {
 
           <TabPanel isActive={activeTab === 'benefits'}>
             {Object.keys(benefitsByCategory).length > 0 ? (
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {Object.entries(benefitsByCategory).map(([category, categoryBenefits]) => (
-                  <div key={category}>
-                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                      <Heart className="w-5 h-5 text-orange-600" />
+                  <div
+                    key={category}
+                    className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Heart className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+                      <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
                       {category}
                     </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {categoryBenefits.map((benefit) => (
-                        <div
-                          key={benefit.benefitId}
-                          className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700"
-                        >
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <p className="font-medium text-gray-900 dark:text-white">
-                                {benefit.benefitName}
-                              </p>
-                              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                {benefit.description || 'No description available'}
-                              </p>
-                            </div>
-                            {benefit.isCovered ? (
-                              <Check className="w-5 h-5 text-green-600 shrink-0" />
-                            ) : (
-                              <X className="w-5 h-5 text-gray-400 shrink-0" />
-                            )}
-                          </div>
-                          {benefit.copay !== undefined && (
-                            <p className="mt-2 text-sm">
-                              <span className="text-gray-500 dark:text-gray-400">Copay: </span>
-                              <span className="font-medium text-gray-900 dark:text-white">
-                                ${benefit.copay.toFixed(2)}
-                              </span>
-                            </p>
-                          )}
-                          {benefit.coinsurance !== undefined && (
-                            <p className="text-sm">
-                              <span className="text-gray-500 dark:text-gray-400">Coinsurance: </span>
-                              <span className="font-medium text-gray-900 dark:text-white">
-                                {benefit.coinsurance}%
-                              </span>
-                            </p>
-                          )}
-                        </div>
-                      ))}
                     </div>
+                    {categoryBenefits.length > 0 && categoryBenefits.some(b => {
+                      const hasData = b.categoryData && b.categoryData.trim() !== '';
+                      const isAvailable = b.isAvailable !== false; // Default to true if not specified
+                      return hasData && isAvailable;
+                    }) ? (
+                      <Check className="w-6 h-6 text-green-600 dark:text-green-400 shrink-0" />
+                    ) : (
+                      <X className="w-6 h-6 text-red-500 dark:text-red-400 shrink-0" />
+                    )}
                   </div>
                 ))}
               </div>
@@ -406,7 +380,7 @@ export function PlanDetail() {
                       {premiums.map((premium, index) => (
                         <tr key={index} className="border-b border-gray-100 dark:border-gray-700">
                           <td className="py-3 px-4 text-gray-900 dark:text-white font-medium">{premium.premiumId}</td>
-                          <td className="py-3 px-4 text-right font-bold text-orange-600 dark:text-orange-400">
+                          <td className="py-3 px-4 text-right font-bold text-primary-600 dark:text-primary-400">
                             ${premium.premium?.toFixed(2) || '0.00'}
                           </td>
                           <td className="py-3 px-4 text-right text-gray-900 dark:text-white">
@@ -439,10 +413,53 @@ export function PlanDetail() {
           </TabPanel>
 
           <TabPanel isActive={activeTab === 'documents'}>
+            {plan.documents && plan.documents.length > 0 ? (
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                  Plan Documents
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {plan.documents.map((doc) => (
+                    <div
+                      key={doc.documentId}
+                      className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-primary-300 dark:hover:border-primary-600 transition-colors"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <FileText className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+                            <h4 className="font-medium text-gray-900 dark:text-white">
+                              {doc.documentName}
+                            </h4>
+                          </div>
+                          <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                            <Badge variant="info">{doc.documentType}</Badge>
+                            {doc.documentDate && (
+                              <span>Date: {new Date(doc.documentDate).toLocaleDateString()}</span>
+                            )}
+                          </div>
+                        </div>
+                        <a
+                          href={doc.documentUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="ml-4 text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
+                        >
+                          <Button variant="outline" size="sm">
+                            View
+                          </Button>
+                        </a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
             <div className="text-center py-8 text-gray-500 dark:text-gray-400">
               <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
-              <p>Document management coming soon</p>
+                <p>No documents available for this plan</p>
             </div>
+            )}
           </TabPanel>
         </div>
       </div>

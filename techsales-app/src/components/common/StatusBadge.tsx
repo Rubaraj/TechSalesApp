@@ -6,45 +6,40 @@ interface StatusBadgeProps {
 }
 
 const statusConfig: Record<LeadStatus, { label: string; color: string; bgColor: string }> = {
-  New: {
-    label: 'New',
+  'New Lead': {
+    label: 'New Lead',
     color: 'text-blue-700 dark:text-blue-400',
     bgColor: 'bg-blue-100 dark:bg-blue-900/30',
   },
-  Contacted: {
-    label: 'Contacted',
+  'Contacted Lead': {
+    label: 'Contacted Lead',
     color: 'text-purple-700 dark:text-purple-400',
     bgColor: 'bg-purple-100 dark:bg-purple-900/30',
   },
-  Qualified: {
-    label: 'Qualified',
+  'Appointment Schedule': {
+    label: 'Appointment Schedule',
     color: 'text-cyan-700 dark:text-cyan-400',
     bgColor: 'bg-cyan-100 dark:bg-cyan-900/30',
   },
-  Proposal: {
-    label: 'Proposal',
+  'Enrollment in progress': {
+    label: 'Enrollment in progress',
     color: 'text-amber-700 dark:text-amber-400',
     bgColor: 'bg-amber-100 dark:bg-amber-900/30',
   },
-  Enrolled: {
+  'Enrolled': {
     label: 'Enrolled',
     color: 'text-green-700 dark:text-green-400',
     bgColor: 'bg-green-100 dark:bg-green-900/30',
   },
-  Lost: {
-    label: 'Lost',
+  'Dropped / Lost lead': {
+    label: 'Dropped / Lost lead',
     color: 'text-red-700 dark:text-red-400',
     bgColor: 'bg-red-100 dark:bg-red-900/30',
-  },
-  'Follow-up': {
-    label: 'Follow-up',
-    color: 'text-orange-700 dark:text-orange-400',
-    bgColor: 'bg-orange-100 dark:bg-orange-900/30',
   },
 };
 
 export function StatusBadge({ status, size = 'sm' }: StatusBadgeProps) {
-  const config = statusConfig[status] || statusConfig.New;
+  const config = statusConfig[status] || statusConfig['New Lead'];
   
   return (
     <span

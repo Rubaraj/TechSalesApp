@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Save, RefreshCw, Database, Globe, Bell, Lock, Palette, Trash2 } from 'lucide-react';
 import { Button, Input, Select } from '../../components/common';
-import { useTheme } from '../../context/ThemeContext';
+import { useTheme, type ColorTheme } from '../../context/ThemeContext';
 
 interface SettingSection {
   id: string;
@@ -19,13 +19,21 @@ const settingSections: SettingSection[] = [
 ];
 
 export function SystemSettings() {
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, colorTheme, setColorTheme } = useTheme();
   const [activeSection, setActiveSection] = useState('general');
   const [isSaving, setIsSaving] = useState(false);
+  
+  // Preview state for color theme (only applies when saved)
+  const [previewColorTheme, setPreviewColorTheme] = useState<ColorTheme>(colorTheme);
+
+  // Sync preview with actual theme when it changes externally
+  useEffect(() => {
+    setPreviewColorTheme(colorTheme);
+  }, [colorTheme]);
 
   // Form states
   const [generalSettings, setGeneralSettings] = useState({
-    appName: 'Med Hub',
+    appName: 'Medicare Hub',
     contactEmail: 'support@exlservice.com',
     defaultMarket: 'All Markets',
     sessionTimeout: '30',
@@ -49,6 +57,8 @@ export function SystemSettings() {
 
   const handleSave = async () => {
     setIsSaving(true);
+    // Apply the preview color theme
+    setColorTheme(previewColorTheme);
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000));
     setIsSaving(false);
@@ -124,7 +134,7 @@ export function SystemSettings() {
                 onClick={toggleTheme}
                 className={`
                   relative inline-flex h-6 w-11 items-center rounded-full transition-colors
-                  ${theme === 'dark' ? 'bg-orange-600' : 'bg-gray-300'}
+                  ${theme === 'dark' ? 'bg-primary-600' : 'bg-gray-300'}
                 `}
               >
                 <span
@@ -137,19 +147,64 @@ export function SystemSettings() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-4 border-2 border-orange-500 rounded-lg cursor-pointer bg-white">
+              <button
+                onClick={() => setPreviewColorTheme('default')}
+                className={`p-4 border-2 rounded-lg cursor-pointer bg-white transition-all ${
+                  previewColorTheme === 'default' 
+                    ? 'border-orange-500 shadow-lg scale-105' 
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
                 <div className="h-20 bg-gradient-to-br from-orange-500 to-orange-700 rounded mb-2" />
                 <p className="text-center text-sm font-medium text-gray-900">Default Theme</p>
-              </div>
-              <div className="p-4 border-2 border-gray-200 rounded-lg cursor-pointer bg-white opacity-50">
-                <div className="h-20 bg-gradient-to-br from-teal-500 to-cyan-700 rounded mb-2" />
-                <p className="text-center text-sm font-medium text-gray-900">Ocean (Coming Soon)</p>
-              </div>
-              <div className="p-4 border-2 border-gray-200 rounded-lg cursor-pointer bg-white opacity-50">
-                <div className="h-20 bg-gradient-to-br from-amber-500 to-orange-700 rounded mb-2" />
-                <p className="text-center text-sm font-medium text-gray-900">Sunset (Coming Soon)</p>
-              </div>
+                {previewColorTheme === 'default' && (
+                  <p className="text-center text-xs text-orange-600 mt-1 font-semibold">
+                    {previewColorTheme !== colorTheme ? 'Selected' : 'Active'}
+                  </p>
+                )}
+              </button>
+              <button
+                onClick={() => setPreviewColorTheme('aetna')}
+                className={`p-4 border-2 rounded-lg cursor-pointer bg-white transition-all ${
+                  previewColorTheme === 'aetna' 
+                    ? 'border-[#5a2e6f] shadow-lg scale-105' 
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <div className="h-20 bg-gradient-to-br from-[#5a2e6f] to-[#482459] rounded mb-2" />
+                <p className="text-center text-sm font-medium text-gray-900">Aetna Theme</p>
+                {previewColorTheme === 'aetna' && (
+                  <p className="text-center text-xs text-[#5a2e6f] mt-1 font-semibold">
+                    {previewColorTheme !== colorTheme ? 'Selected' : 'Active'}
+                  </p>
+                )}
+              </button>
+              <button
+                onClick={() => setPreviewColorTheme('humana')}
+                className={`p-4 border-2 rounded-lg cursor-pointer bg-white transition-all ${
+                  previewColorTheme === 'humana' 
+                    ? 'border-[#5c9a1b] shadow-lg scale-105' 
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <div className="h-20 bg-gradient-to-br from-[#5c9a1b] to-[#4a7a16] rounded mb-2" />
+                <p className="text-center text-sm font-medium text-gray-900">Humana Theme</p>
+                {previewColorTheme === 'humana' && (
+                  <p className="text-center text-xs text-[#5c9a1b] mt-1 font-semibold">
+                    {previewColorTheme !== colorTheme ? 'Selected' : 'Active'}
+                  </p>
+                )}
+              </button>
             </div>
+            
+            {previewColorTheme !== colorTheme && (
+              <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <p className="text-sm text-blue-700 dark:text-blue-300">
+                  <strong>Note:</strong> Theme selection will be applied when you click "Save Changes". 
+                  Current active theme: <strong>{colorTheme === 'default' ? 'Default (Orange)' : colorTheme === 'aetna' ? 'Aetna (Purple)' : 'Humana (Green)'}</strong>
+                </p>
+              </div>
+            )}
           </div>
         );
 
@@ -175,7 +230,7 @@ export function SystemSettings() {
                   })}
                   className={`
                     relative inline-flex h-6 w-11 items-center rounded-full transition-colors
-                    ${notificationSettings[item.key as keyof typeof notificationSettings] ? 'bg-orange-600' : 'bg-gray-300'}
+                    ${notificationSettings[item.key as keyof typeof notificationSettings] ? 'bg-primary-600' : 'bg-gray-300'}
                   `}
                 >
                   <span
@@ -204,7 +259,7 @@ export function SystemSettings() {
                 onClick={() => setSecuritySettings({ ...securitySettings, twoFactorAuth: !securitySettings.twoFactorAuth })}
                 className={`
                   relative inline-flex h-6 w-11 items-center rounded-full transition-colors
-                  ${securitySettings.twoFactorAuth ? 'bg-orange-600' : 'bg-gray-300'}
+                  ${securitySettings.twoFactorAuth ? 'bg-primary-600' : 'bg-gray-300'}
                 `}
               >
                 <span
@@ -320,7 +375,7 @@ export function SystemSettings() {
               className={`
                 w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors
                 ${activeSection === section.id
-                  ? 'bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400'
+                  ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400'
                   : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                 }
               `}

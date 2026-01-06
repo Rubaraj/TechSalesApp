@@ -1,53 +1,3501 @@
 [
-  { "planId": "PLAN-001", "contractYear": 2026, "contractNumber": "H5521", "pbp": "001", "segmentId": "H5521001", "planName": "Aetna Medicare Value (PPO)", "product": "MAPD", "planType": "PPO", "category": "Medicare Advantage", "commissionable": true, "planStatus": "Active", "market": "Northeast", "region": "New England", "legalEntity": "Aetna Life Insurance Company", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-002", "contractYear": 2026, "contractNumber": "H5521", "pbp": "002", "segmentId": "H5521002", "planName": "Aetna Medicare Premier (PPO)", "product": "MAPD", "planType": "PPO", "category": "Medicare Advantage", "commissionable": true, "planStatus": "Active", "market": "Northeast", "region": "New England", "legalEntity": "Aetna Life Insurance Company", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-003", "contractYear": 2026, "contractNumber": "H5521", "pbp": "003", "segmentId": "H5521003", "planName": "Aetna Medicare Elite (PPO)", "product": "MAPD", "planType": "PPO", "category": "Medicare Advantage", "commissionable": true, "planStatus": "Active", "market": "Northeast", "region": "New York", "legalEntity": "Aetna Life Insurance Company", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-004", "contractYear": 2026, "contractNumber": "H1609", "pbp": "001", "segmentId": "H1609001", "planName": "Aetna Medicare Select (HMO)", "product": "MAPD", "planType": "HMO", "category": "Medicare Advantage", "commissionable": true, "planStatus": "Active", "market": "Southeast", "region": "Florida", "legalEntity": "Aetna Health Inc. (FL)", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-005", "contractYear": 2026, "contractNumber": "H1609", "pbp": "002", "segmentId": "H1609002", "planName": "Aetna Medicare Premier (HMO)", "product": "MAPD", "planType": "HMO", "category": "Medicare Advantage", "commissionable": true, "planStatus": "Active", "market": "Southeast", "region": "Florida", "legalEntity": "Aetna Health Inc. (FL)", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-006", "contractYear": 2026, "contractNumber": "H3931", "pbp": "001", "segmentId": "H3931001", "planName": "Aetna Medicare Value (HMO)", "product": "MAPD", "planType": "HMO", "category": "Medicare Advantage", "commissionable": true, "planStatus": "Active", "market": "Northeast", "region": "Keystone", "legalEntity": "Aetna Health Inc. (PA)", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-007", "contractYear": 2026, "contractNumber": "H3931", "pbp": "002", "segmentId": "H3931002", "planName": "Aetna Medicare Premier Plus (HMO)", "product": "MAPD", "planType": "HMO", "category": "Medicare Advantage", "commissionable": true, "planStatus": "Active", "market": "Northeast", "region": "Keystone", "legalEntity": "Aetna Health Inc. (PA)", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-008", "contractYear": 2026, "contractNumber": "H2663", "pbp": "001", "segmentId": "H2663001", "planName": "Aetna Medicare Value (HMO)", "product": "MAPD", "planType": "HMO", "category": "Medicare Advantage", "commissionable": true, "planStatus": "Active", "market": "Midwest", "region": "Heartland", "legalEntity": "Coventry Health Care of Missouri", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-009", "contractYear": 2026, "contractNumber": "H2663", "pbp": "002", "segmentId": "H2663002", "planName": "Aetna Medicare Premier (HMO)", "product": "MAPD", "planType": "HMO", "category": "Medicare Advantage", "commissionable": true, "planStatus": "Active", "market": "Midwest", "region": "Heartland", "legalEntity": "Coventry Health Care of Missouri", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-010", "contractYear": 2026, "contractNumber": "H3288", "pbp": "001", "segmentId": "H3288001", "planName": "Aetna Medicare Value Plus (PPO)", "product": "MAPD", "planType": "PPO", "category": "Medicare Advantage", "commissionable": true, "planStatus": "Active", "market": "Southwest", "region": "South Central", "legalEntity": "Aetna Health and Life Insurance Company", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-011", "contractYear": 2026, "contractNumber": "H4523", "pbp": "001", "segmentId": "H4523001", "planName": "Aetna Medicare Dual Complete (HMO D-SNP)", "product": "MAPD", "planType": "DSNP", "category": "Medicare Advantage", "commissionable": true, "planStatus": "Active", "market": "Southwest", "region": "South Central", "legalEntity": "Aetna Health Inc. (TX)", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": "DSNP", "isDeleted": false },
-  { "planId": "PLAN-012", "contractYear": 2026, "contractNumber": "H4523", "pbp": "002", "segmentId": "H4523002", "planName": "Aetna Medicare Dual Extra Care (HMO D-SNP)", "product": "MAPD", "planType": "DSNP", "category": "Medicare Advantage", "commissionable": true, "planStatus": "Active", "market": "Southwest", "region": "South Central", "legalEntity": "Aetna Health Inc. (TX)", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": "DSNP", "isDeleted": false },
-  { "planId": "PLAN-013", "contractYear": 2026, "contractNumber": "H1609", "pbp": "010", "segmentId": "H1609010", "planName": "Aetna Medicare Chronic Care (HMO C-SNP)", "product": "MAPD", "planType": "CSNP", "category": "Medicare Advantage", "commissionable": true, "planStatus": "Active", "market": "Southeast", "region": "Florida", "legalEntity": "Aetna Health Inc. (FL)", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": "CSNP", "isDeleted": false },
-  { "planId": "PLAN-014", "contractYear": 2026, "contractNumber": "H3312", "pbp": "001", "segmentId": "H3312001", "planName": "Aetna Medicare Value (HMO)", "product": "MAPD", "planType": "HMO", "category": "Medicare Advantage", "commissionable": true, "planStatus": "Active", "market": "Northeast", "region": "New York", "legalEntity": "Aetna Health Inc. (NY)", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-015", "contractYear": 2026, "contractNumber": "H3312", "pbp": "002", "segmentId": "H3312002", "planName": "Aetna Medicare Premier (HMO)", "product": "MAPD", "planType": "HMO", "category": "Medicare Advantage", "commissionable": true, "planStatus": "Active", "market": "Northeast", "region": "New York", "legalEntity": "Aetna Health Inc. (NY)", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-016", "contractYear": 2026, "contractNumber": "H5522", "pbp": "001", "segmentId": "H5522001", "planName": "Aetna Medicare Advantra (PPO)", "product": "MAPD", "planType": "PPO", "category": "Medicare Advantage", "commissionable": true, "planStatus": "Active", "market": "Northeast", "region": "Keystone", "legalEntity": "Aetna Life Insurance Company", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-017", "contractYear": 2026, "contractNumber": "H3959", "pbp": "001", "segmentId": "H3959001", "planName": "Aetna Medicare Dual Complete (HMO D-SNP)", "product": "MAPD", "planType": "DSNP", "category": "Medicare Advantage", "commissionable": true, "planStatus": "Active", "market": "West", "region": "California", "legalEntity": "Aetna Better Health of California", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": "DSNP", "isDeleted": false },
-  { "planId": "PLAN-018", "contractYear": 2026, "contractNumber": "H7149", "pbp": "001", "segmentId": "H7149001", "planName": "Aetna Medicare Select (HMO)", "product": "MAPD", "planType": "HMO", "category": "Medicare Advantage", "commissionable": true, "planStatus": "Active", "market": "West", "region": "Arizona", "legalEntity": "Aetna Health of Arizona", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-019", "contractYear": 2026, "contractNumber": "H7149", "pbp": "002", "segmentId": "H7149002", "planName": "Aetna Medicare Premier (HMO)", "product": "MAPD", "planType": "HMO", "category": "Medicare Advantage", "commissionable": true, "planStatus": "Active", "market": "West", "region": "Arizona", "legalEntity": "Aetna Health of Arizona", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-020", "contractYear": 2026, "contractNumber": "H0628", "pbp": "001", "segmentId": "H0628001", "planName": "Aetna Medicare Value (HMO)", "product": "MAPD", "planType": "HMO", "category": "Medicare Advantage", "commissionable": true, "planStatus": "Active", "market": "Midwest", "region": "Great Lakes", "legalEntity": "Aetna Health Inc.", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-021", "contractYear": 2026, "contractNumber": "H0523", "pbp": "001", "segmentId": "H0523001", "planName": "Aetna Medicare Premier (HMO)", "product": "MAPD", "planType": "HMO", "category": "Medicare Advantage", "commissionable": true, "planStatus": "Active", "market": "Midwest", "region": "Great Lakes", "legalEntity": "Aetna Health Inc.", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-022", "contractYear": 2026, "contractNumber": "H1692", "pbp": "001", "segmentId": "H1692001", "planName": "Aetna Medicare Signature (HMO)", "product": "MAPD", "planType": "HMO", "category": "Medicare Advantage", "commissionable": false, "planStatus": "Active", "market": "Northeast", "region": "Keystone", "legalEntity": "Coventry Health Care of West Virginia", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-023", "contractYear": 2026, "contractNumber": "H3146", "pbp": "001", "segmentId": "H3146001", "planName": "Aetna Medicare Enhanced (PPO)", "product": "MAPD", "planType": "PPO", "category": "Medicare Advantage", "commissionable": true, "planStatus": "Active", "market": "Southeast", "region": "Georgia/Gulf States", "legalEntity": "Aetna Life Insurance Company", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-024", "contractYear": 2026, "contractNumber": "H3192", "pbp": "001", "segmentId": "H3192001", "planName": "Aetna Medicare Value (PPO)", "product": "MAPD", "planType": "PPO", "category": "Medicare Advantage", "commissionable": true, "planStatus": "Active", "market": "Midwest", "region": "Ohio/Kentucky", "legalEntity": "Aetna Life Insurance Company", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-025", "contractYear": 2026, "contractNumber": "H3219", "pbp": "001", "segmentId": "H3219001", "planName": "Aetna Medicare Premier (PPO)", "product": "MAPD", "planType": "PPO", "category": "Medicare Advantage", "commissionable": true, "planStatus": "Active", "market": "Southeast", "region": "Mid South", "legalEntity": "Aetna Life Insurance Company", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-026", "contractYear": 2026, "contractNumber": "S5601", "pbp": "048", "segmentId": "S5601048", "planName": "SilverScript Choice (PDP)", "product": "PDP", "planType": "PDP", "category": "PDP", "commissionable": true, "planStatus": "Active", "market": "National", "region": "PDP", "legalEntity": "SilverScript Insurance Company", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-027", "contractYear": 2026, "contractNumber": "S5601", "pbp": "196", "segmentId": "S5601196", "planName": "SilverScript SmartRx (PDP)", "product": "PDP", "planType": "PDP", "category": "PDP", "commissionable": true, "planStatus": "Active", "market": "National", "region": "PDP", "legalEntity": "SilverScript Insurance Company", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-028", "contractYear": 2026, "contractNumber": "S5601", "pbp": "203", "segmentId": "S5601203", "planName": "SilverScript SmartSaver (PDP)", "product": "PDP", "planType": "PDP", "category": "PDP", "commissionable": false, "planStatus": "Active", "market": "National", "region": "PDP", "legalEntity": "SilverScript Insurance Company", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-029", "contractYear": 2026, "contractNumber": "S5601", "pbp": "208", "segmentId": "S5601208", "planName": "SilverScript Plus (PDP)", "product": "PDP", "planType": "PDP", "category": "PDP", "commissionable": true, "planStatus": "Active", "market": "National", "region": "PDP", "legalEntity": "SilverScript Insurance Company", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-030", "contractYear": 2026, "contractNumber": "S5601", "pbp": "210", "segmentId": "S5601210", "planName": "SilverScript Allure (PDP)", "product": "PDP", "planType": "PDP", "category": "PDP", "commissionable": true, "planStatus": "Active", "market": "National", "region": "PDP", "legalEntity": "SilverScript Insurance Company", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-031", "contractYear": 2026, "contractNumber": "MEDSUP", "pbp": "A", "segmentId": "MEDSUPA", "planName": "Aetna Medicare Supplement Plan A", "product": "Medsup", "planType": "Medigap", "category": "Medsup", "commissionable": true, "planStatus": "Active", "market": "National", "region": "National", "legalEntity": "Aetna Life Insurance Company", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-032", "contractYear": 2026, "contractNumber": "MEDSUP", "pbp": "B", "segmentId": "MEDSUPB", "planName": "Aetna Medicare Supplement Plan B", "product": "Medsup", "planType": "Medigap", "category": "Medsup", "commissionable": true, "planStatus": "Active", "market": "National", "region": "National", "legalEntity": "Aetna Life Insurance Company", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-033", "contractYear": 2026, "contractNumber": "MEDSUP", "pbp": "C", "segmentId": "MEDSUPC", "planName": "Aetna Medicare Supplement Plan C", "product": "Medsup", "planType": "Medigap", "category": "Medsup", "commissionable": true, "planStatus": "Active", "market": "National", "region": "National", "legalEntity": "Aetna Life Insurance Company", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-034", "contractYear": 2026, "contractNumber": "MEDSUP", "pbp": "F", "segmentId": "MEDSUPF", "planName": "Aetna Medicare Supplement Plan F", "product": "Medsup", "planType": "Medigap", "category": "Medsup", "commissionable": true, "planStatus": "Active", "market": "National", "region": "National", "legalEntity": "Aetna Life Insurance Company", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-035", "contractYear": 2026, "contractNumber": "MEDSUP", "pbp": "G", "segmentId": "MEDSUPG", "planName": "Aetna Medicare Supplement Plan G", "product": "Medsup", "planType": "Medigap", "category": "Medsup", "commissionable": true, "planStatus": "Active", "market": "National", "region": "National", "legalEntity": "Aetna Life Insurance Company", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-036", "contractYear": 2026, "contractNumber": "MEDSUP", "pbp": "N", "segmentId": "MEDSUPN", "planName": "Aetna Medicare Supplement Plan N", "product": "Medsup", "planType": "Medigap", "category": "Medsup", "commissionable": true, "planStatus": "Active", "market": "National", "region": "National", "legalEntity": "Aetna Life Insurance Company", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-037", "contractYear": 2026, "contractNumber": "ANC", "pbp": "DEN001", "segmentId": "ANCDEN001", "planName": "Aetna Dental PPO", "product": "ANC", "planType": "PPO", "category": "ANC", "commissionable": true, "planStatus": "Active", "market": "National", "region": "National", "legalEntity": "Aetna Life Insurance Company", "marketingName": "Aetna Ancillary", "minAge": null, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-038", "contractYear": 2026, "contractNumber": "ANC", "pbp": "DEN002", "segmentId": "ANCDEN002", "planName": "Aetna Dental Plus", "product": "ANC", "planType": "PPO", "category": "ANC", "commissionable": true, "planStatus": "Active", "market": "National", "region": "National", "legalEntity": "Aetna Life Insurance Company", "marketingName": "Aetna Ancillary", "minAge": null, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-039", "contractYear": 2026, "contractNumber": "ANC", "pbp": "VIS001", "segmentId": "ANCVIS001", "planName": "Aetna Vision PPO", "product": "ANC", "planType": "PPO", "category": "ANC", "commissionable": true, "planStatus": "Active", "market": "National", "region": "National", "legalEntity": "Aetna Life Insurance Company", "marketingName": "Aetna Ancillary", "minAge": null, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-040", "contractYear": 2026, "contractNumber": "ANC", "pbp": "VIS002", "segmentId": "ANCVIS002", "planName": "Aetna Vision Plus", "product": "ANC", "planType": "PPO", "category": "ANC", "commissionable": true, "planStatus": "Active", "market": "National", "region": "National", "legalEntity": "Aetna Life Insurance Company", "marketingName": "Aetna Ancillary", "minAge": null, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-041", "contractYear": 2026, "contractNumber": "ANC", "pbp": "HRG001", "segmentId": "ANCHRG001", "planName": "Aetna Hearing Discount", "product": "ANC", "planType": "PPO", "category": "ANC", "commissionable": true, "planStatus": "Active", "market": "National", "region": "National", "legalEntity": "Aetna Life Insurance Company", "marketingName": "Aetna Ancillary", "minAge": null, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-042", "contractYear": 2026, "contractNumber": "R6694", "pbp": "001", "segmentId": "R6694001", "planName": "Aetna Medicare Premier (Regional PPO)", "product": "MAPD", "planType": "RPPO", "category": "Medicare Advantage", "commissionable": true, "planStatus": "Active", "market": "Midwest", "region": "Ohio/Kentucky", "legalEntity": "Aetna Life Insurance Company", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-043", "contractYear": 2026, "contractNumber": "H2293", "pbp": "001", "segmentId": "H2293001", "planName": "Aetna Medicare Dual Signature (PPO D-SNP)", "product": "MAPD", "planType": "DSNP", "category": "Medicare Advantage", "commissionable": true, "planStatus": "Active", "market": "Southeast", "region": "Georgia/Gulf States", "legalEntity": "SilverScript Insurance Company", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": "DSNP", "isDeleted": false },
-  { "planId": "PLAN-044", "contractYear": 2026, "contractNumber": "H5593", "pbp": "001", "segmentId": "H5593001", "planName": "Aetna Medicare Value (HMO-POS)", "product": "MAPD", "planType": "POS", "category": "Medicare Advantage", "commissionable": true, "planStatus": "Active", "market": "West", "region": "Northwest", "legalEntity": "Aetna Life Insurance Company", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-045", "contractYear": 2026, "contractNumber": "H4711", "pbp": "001", "segmentId": "H4711001", "planName": "Aetna Medicare Select (HMO)", "product": "MAPD", "planType": "HMO", "category": "Medicare Advantage", "commissionable": true, "planStatus": "Active", "market": "West", "region": "Mountain", "legalEntity": "Aetna Health Inc.", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-046", "contractYear": 2026, "contractNumber": "H4835", "pbp": "001", "segmentId": "H4835001", "planName": "Aetna Medicare Premier (HMO)", "product": "MAPD", "planType": "HMO", "category": "Medicare Advantage", "commissionable": true, "planStatus": "Active", "market": "West", "region": "California", "legalEntity": "Aetna Health of California", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-047", "contractYear": 2026, "contractNumber": "H9314", "pbp": "001", "segmentId": "H9314001", "planName": "Aetna Medicare Value (HMO)", "product": "MAPD", "planType": "HMO", "category": "Medicare Advantage", "commissionable": true, "planStatus": "Active", "market": "Northeast", "region": "New Jersey", "legalEntity": "Aetna Health Inc. (NJ)", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-048", "contractYear": 2026, "contractNumber": "H9431", "pbp": "001", "segmentId": "H9431001", "planName": "Aetna Medicare Explorer (PPO)", "product": "MAPD", "planType": "PPO", "category": "Medicare Advantage", "commissionable": true, "planStatus": "Active", "market": "Northeast", "region": "New England", "legalEntity": "First Health Life & Health Insurance", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-049", "contractYear": 2026, "contractNumber": "H5325", "pbp": "001", "segmentId": "H5325001", "planName": "Aetna Medicare Eagle (HMO)", "product": "MAPD", "planType": "HMO", "category": "Medicare Advantage", "commissionable": true, "planStatus": "Active", "market": "Midwest", "region": "Great Lakes", "legalEntity": "Aetna Life Insurance Company", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false },
-  { "planId": "PLAN-050", "contractYear": 2026, "contractNumber": "H1206", "pbp": "001", "segmentId": "H1206001", "planName": "Aetna Medicare Flex (PPO)", "product": "MAPD", "planType": "PPO", "category": "Medicare Advantage", "commissionable": true, "planStatus": "Active", "market": "Northeast", "region": "Capitol", "legalEntity": "Aetna Life Insurance Company", "marketingName": "Aetna Medicare", "minAge": 65, "maxAge": null, "snpType": null, "isDeleted": false }
+  {
+    "planId": "PLAN-001",
+    "contractYear": 2026,
+    "contractNumber": "H5521",
+    "pbp": "001",
+    "segmentId": "H5521001",
+    "planName": "Aetna Medicare Value (PPO)",
+    "product": "MAPD",
+    "planType": "PPO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Northeast",
+    "region": "New England",
+    "legalEntity": "Aetna Life Insurance Company",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-001-01",
+        "documentName": "Annual Notice of Change - Aetna Medicare Value (PPO)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-001/annual-notice-of-change.pdf",
+        "documentDate": "2026-02-04"
+      },
+      {
+        "documentId": "DOC-PLAN-001-02",
+        "documentName": "Evidence of Coverage - Aetna Medicare Value (PPO)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-001/evidence-of-coverage.pdf",
+        "documentDate": "2026-12-01"
+      },
+      {
+        "documentId": "DOC-PLAN-001-03",
+        "documentName": "Formulary - Aetna Medicare Value (PPO)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-001/formulary.pdf",
+        "documentDate": "2026-02-27"
+      },
+      {
+        "documentId": "DOC-PLAN-001-04",
+        "documentName": "Summary of Benefits - Aetna Medicare Value (PPO)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-001/summary-of-benefits.pdf",
+        "documentDate": "2026-07-19"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-002",
+    "contractYear": 2026,
+    "contractNumber": "H5521",
+    "pbp": "002",
+    "segmentId": "H5521002",
+    "planName": "Aetna Medicare Premier (PPO)",
+    "product": "MAPD",
+    "planType": "PPO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Northeast",
+    "region": "New England",
+    "legalEntity": "Aetna Life Insurance Company",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-002-01",
+        "documentName": "Evidence of Coverage - Aetna Medicare Premier (PPO)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-002/evidence-of-coverage.pdf",
+        "documentDate": "2026-11-12"
+      },
+      {
+        "documentId": "DOC-PLAN-002-02",
+        "documentName": "Summary of Benefits - Aetna Medicare Premier (PPO)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-002/summary-of-benefits.pdf",
+        "documentDate": "2026-07-12"
+      },
+      {
+        "documentId": "DOC-PLAN-002-03",
+        "documentName": "Annual Notice of Change - Aetna Medicare Premier (PPO)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-002/annual-notice-of-change.pdf",
+        "documentDate": "2026-01-14"
+      },
+      {
+        "documentId": "DOC-PLAN-002-04",
+        "documentName": "Formulary - Aetna Medicare Premier (PPO)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-002/formulary.pdf",
+        "documentDate": "2026-10-02"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-003",
+    "contractYear": 2026,
+    "contractNumber": "H5521",
+    "pbp": "003",
+    "segmentId": "H5521003",
+    "planName": "Aetna Medicare Elite (PPO)",
+    "product": "MAPD",
+    "planType": "PPO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Northeast",
+    "region": "New York",
+    "legalEntity": "Aetna Life Insurance Company",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-003-01",
+        "documentName": "Evidence of Coverage - Aetna Medicare Elite (PPO)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-003/evidence-of-coverage.pdf",
+        "documentDate": "2026-08-05"
+      },
+      {
+        "documentId": "DOC-PLAN-003-02",
+        "documentName": "Summary of Benefits - Aetna Medicare Elite (PPO)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-003/summary-of-benefits.pdf",
+        "documentDate": "2026-08-16"
+      },
+      {
+        "documentId": "DOC-PLAN-003-03",
+        "documentName": "Formulary - Aetna Medicare Elite (PPO)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-003/formulary.pdf",
+        "documentDate": "2026-09-12"
+      },
+      {
+        "documentId": "DOC-PLAN-003-04",
+        "documentName": "Annual Notice of Change - Aetna Medicare Elite (PPO)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-003/annual-notice-of-change.pdf",
+        "documentDate": "2026-01-08"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-004",
+    "contractYear": 2026,
+    "contractNumber": "H1609",
+    "pbp": "001",
+    "segmentId": "H1609001",
+    "planName": "Aetna Medicare Select (HMO)",
+    "product": "MAPD",
+    "planType": "HMO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Southeast",
+    "region": "Florida",
+    "legalEntity": "Aetna Health Inc. (FL)",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-004-01",
+        "documentName": "Evidence of Coverage - Aetna Medicare Select (HMO)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-004/evidence-of-coverage.pdf",
+        "documentDate": "2026-11-29"
+      },
+      {
+        "documentId": "DOC-PLAN-004-02",
+        "documentName": "Summary of Benefits - Aetna Medicare Select (HMO)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-004/summary-of-benefits.pdf",
+        "documentDate": "2026-10-29"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-005",
+    "contractYear": 2026,
+    "contractNumber": "H1609",
+    "pbp": "002",
+    "segmentId": "H1609002",
+    "planName": "Aetna Medicare Premier (HMO)",
+    "product": "MAPD",
+    "planType": "HMO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Southeast",
+    "region": "Florida",
+    "legalEntity": "Aetna Health Inc. (FL)",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-005-01",
+        "documentName": "Annual Notice of Change - Aetna Medicare Premier (HMO)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-005/annual-notice-of-change.pdf",
+        "documentDate": "2026-01-22"
+      },
+      {
+        "documentId": "DOC-PLAN-005-02",
+        "documentName": "Formulary - Aetna Medicare Premier (HMO)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-005/formulary.pdf",
+        "documentDate": "2026-12-10"
+      },
+      {
+        "documentId": "DOC-PLAN-005-03",
+        "documentName": "Provider Directory - Aetna Medicare Premier (HMO)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-005/provider-directory.pdf",
+        "documentDate": "2026-07-27"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-006",
+    "contractYear": 2026,
+    "contractNumber": "H3931",
+    "pbp": "001",
+    "segmentId": "H3931001",
+    "planName": "Aetna Medicare Value (HMO)",
+    "product": "MAPD",
+    "planType": "HMO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Northeast",
+    "region": "Keystone",
+    "legalEntity": "Aetna Health Inc. (PA)",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-006-01",
+        "documentName": "Formulary - Aetna Medicare Value (HMO)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-006/formulary.pdf",
+        "documentDate": "2026-12-21"
+      },
+      {
+        "documentId": "DOC-PLAN-006-02",
+        "documentName": "Evidence of Coverage - Aetna Medicare Value (HMO)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-006/evidence-of-coverage.pdf",
+        "documentDate": "2026-07-20"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-007",
+    "contractYear": 2026,
+    "contractNumber": "H3931",
+    "pbp": "002",
+    "segmentId": "H3931002",
+    "planName": "Aetna Medicare Premier Plus (HMO)",
+    "product": "MAPD",
+    "planType": "HMO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Northeast",
+    "region": "Keystone",
+    "legalEntity": "Aetna Health Inc. (PA)",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-007-01",
+        "documentName": "Provider Directory - Aetna Medicare Premier Plus (HMO)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-007/provider-directory.pdf",
+        "documentDate": "2026-07-07"
+      },
+      {
+        "documentId": "DOC-PLAN-007-02",
+        "documentName": "Annual Notice of Change - Aetna Medicare Premier Plus (HMO)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-007/annual-notice-of-change.pdf",
+        "documentDate": "2026-04-11"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-008",
+    "contractYear": 2026,
+    "contractNumber": "H2663",
+    "pbp": "001",
+    "segmentId": "H2663001",
+    "planName": "Aetna Medicare Value (HMO)",
+    "product": "MAPD",
+    "planType": "HMO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Midwest",
+    "region": "Heartland",
+    "legalEntity": "Coventry Health Care of Missouri",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-008-01",
+        "documentName": "Summary of Benefits - Aetna Medicare Value (HMO)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-008/summary-of-benefits.pdf",
+        "documentDate": "2026-09-23"
+      },
+      {
+        "documentId": "DOC-PLAN-008-02",
+        "documentName": "Annual Notice of Change - Aetna Medicare Value (HMO)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-008/annual-notice-of-change.pdf",
+        "documentDate": "2026-05-01"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-009",
+    "contractYear": 2026,
+    "contractNumber": "H2663",
+    "pbp": "002",
+    "segmentId": "H2663002",
+    "planName": "Aetna Medicare Premier (HMO)",
+    "product": "MAPD",
+    "planType": "HMO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Midwest",
+    "region": "Heartland",
+    "legalEntity": "Coventry Health Care of Missouri",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-009-01",
+        "documentName": "Formulary - Aetna Medicare Premier (HMO)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-009/formulary.pdf",
+        "documentDate": "2026-01-20"
+      },
+      {
+        "documentId": "DOC-PLAN-009-02",
+        "documentName": "Provider Directory - Aetna Medicare Premier (HMO)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-009/provider-directory.pdf",
+        "documentDate": "2026-05-23"
+      },
+      {
+        "documentId": "DOC-PLAN-009-03",
+        "documentName": "Annual Notice of Change - Aetna Medicare Premier (HMO)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-009/annual-notice-of-change.pdf",
+        "documentDate": "2026-06-24"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-010",
+    "contractYear": 2026,
+    "contractNumber": "H3288",
+    "pbp": "001",
+    "segmentId": "H3288001",
+    "planName": "Aetna Medicare Value Plus (PPO)",
+    "product": "MAPD",
+    "planType": "PPO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Southwest",
+    "region": "South Central",
+    "legalEntity": "Aetna Health and Life Insurance Company",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-010-01",
+        "documentName": "Summary of Benefits - Aetna Medicare Value Plus (PPO)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-010/summary-of-benefits.pdf",
+        "documentDate": "2026-05-27"
+      },
+      {
+        "documentId": "DOC-PLAN-010-02",
+        "documentName": "Evidence of Coverage - Aetna Medicare Value Plus (PPO)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-010/evidence-of-coverage.pdf",
+        "documentDate": "2026-06-22"
+      },
+      {
+        "documentId": "DOC-PLAN-010-03",
+        "documentName": "Formulary - Aetna Medicare Value Plus (PPO)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-010/formulary.pdf",
+        "documentDate": "2026-06-01"
+      },
+      {
+        "documentId": "DOC-PLAN-010-04",
+        "documentName": "Provider Directory - Aetna Medicare Value Plus (PPO)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-010/provider-directory.pdf",
+        "documentDate": "2026-05-31"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-011",
+    "contractYear": 2026,
+    "contractNumber": "H4523",
+    "pbp": "001",
+    "segmentId": "H4523001",
+    "planName": "Aetna Medicare Dual Complete (HMO D-SNP)",
+    "product": "MAPD",
+    "planType": "DSNP",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Southwest",
+    "region": "South Central",
+    "legalEntity": "Aetna Health Inc. (TX)",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": "DSNP",
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-011-01",
+        "documentName": "Annual Notice of Change - Aetna Medicare Dual Complete (HMO D-SNP)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-011/annual-notice-of-change.pdf",
+        "documentDate": "2026-01-06"
+      },
+      {
+        "documentId": "DOC-PLAN-011-02",
+        "documentName": "Evidence of Coverage - Aetna Medicare Dual Complete (HMO D-SNP)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-011/evidence-of-coverage.pdf",
+        "documentDate": "2026-10-20"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-012",
+    "contractYear": 2026,
+    "contractNumber": "H4523",
+    "pbp": "002",
+    "segmentId": "H4523002",
+    "planName": "Aetna Medicare Dual Extra Care (HMO D-SNP)",
+    "product": "MAPD",
+    "planType": "DSNP",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Southwest",
+    "region": "South Central",
+    "legalEntity": "Aetna Health Inc. (TX)",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": "DSNP",
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-012-01",
+        "documentName": "Formulary - Aetna Medicare Dual Extra Care (HMO D-SNP)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-012/formulary.pdf",
+        "documentDate": "2026-06-19"
+      },
+      {
+        "documentId": "DOC-PLAN-012-02",
+        "documentName": "Summary of Benefits - Aetna Medicare Dual Extra Care (HMO D-SNP)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-012/summary-of-benefits.pdf",
+        "documentDate": "2026-05-17"
+      },
+      {
+        "documentId": "DOC-PLAN-012-03",
+        "documentName": "Evidence of Coverage - Aetna Medicare Dual Extra Care (HMO D-SNP)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-012/evidence-of-coverage.pdf",
+        "documentDate": "2026-07-19"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-013",
+    "contractYear": 2026,
+    "contractNumber": "H1609",
+    "pbp": "010",
+    "segmentId": "H1609010",
+    "planName": "Aetna Medicare Chronic Care (HMO C-SNP)",
+    "product": "MAPD",
+    "planType": "CSNP",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Southeast",
+    "region": "Florida",
+    "legalEntity": "Aetna Health Inc. (FL)",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": "CSNP",
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-013-01",
+        "documentName": "Evidence of Coverage - Aetna Medicare Chronic Care (HMO C-SNP)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-013/evidence-of-coverage.pdf",
+        "documentDate": "2026-11-11"
+      },
+      {
+        "documentId": "DOC-PLAN-013-02",
+        "documentName": "Formulary - Aetna Medicare Chronic Care (HMO C-SNP)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-013/formulary.pdf",
+        "documentDate": "2026-10-01"
+      },
+      {
+        "documentId": "DOC-PLAN-013-03",
+        "documentName": "Annual Notice of Change - Aetna Medicare Chronic Care (HMO C-SNP)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-013/annual-notice-of-change.pdf",
+        "documentDate": "2026-09-29"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-014",
+    "contractYear": 2026,
+    "contractNumber": "H3312",
+    "pbp": "001",
+    "segmentId": "H3312001",
+    "planName": "Aetna Medicare Value (HMO)",
+    "product": "MAPD",
+    "planType": "HMO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Northeast",
+    "region": "New York",
+    "legalEntity": "Aetna Health Inc. (NY)",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-014-01",
+        "documentName": "Formulary - Aetna Medicare Value (HMO)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-014/formulary.pdf",
+        "documentDate": "2026-12-19"
+      },
+      {
+        "documentId": "DOC-PLAN-014-02",
+        "documentName": "Evidence of Coverage - Aetna Medicare Value (HMO)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-014/evidence-of-coverage.pdf",
+        "documentDate": "2026-02-08"
+      },
+      {
+        "documentId": "DOC-PLAN-014-03",
+        "documentName": "Provider Directory - Aetna Medicare Value (HMO)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-014/provider-directory.pdf",
+        "documentDate": "2026-06-28"
+      },
+      {
+        "documentId": "DOC-PLAN-014-04",
+        "documentName": "Summary of Benefits - Aetna Medicare Value (HMO)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-014/summary-of-benefits.pdf",
+        "documentDate": "2026-09-30"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-015",
+    "contractYear": 2026,
+    "contractNumber": "H3312",
+    "pbp": "002",
+    "segmentId": "H3312002",
+    "planName": "Aetna Medicare Premier (HMO)",
+    "product": "MAPD",
+    "planType": "HMO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Northeast",
+    "region": "New York",
+    "legalEntity": "Aetna Health Inc. (NY)",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-015-01",
+        "documentName": "Annual Notice of Change - Aetna Medicare Premier (HMO)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-015/annual-notice-of-change.pdf",
+        "documentDate": "2026-01-26"
+      },
+      {
+        "documentId": "DOC-PLAN-015-02",
+        "documentName": "Provider Directory - Aetna Medicare Premier (HMO)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-015/provider-directory.pdf",
+        "documentDate": "2026-03-03"
+      },
+      {
+        "documentId": "DOC-PLAN-015-03",
+        "documentName": "Summary of Benefits - Aetna Medicare Premier (HMO)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-015/summary-of-benefits.pdf",
+        "documentDate": "2026-11-10"
+      },
+      {
+        "documentId": "DOC-PLAN-015-04",
+        "documentName": "Formulary - Aetna Medicare Premier (HMO)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-015/formulary.pdf",
+        "documentDate": "2026-10-18"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-016",
+    "contractYear": 2026,
+    "contractNumber": "H5522",
+    "pbp": "001",
+    "segmentId": "H5522001",
+    "planName": "Aetna Medicare Advantra (PPO)",
+    "product": "MAPD",
+    "planType": "PPO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Northeast",
+    "region": "Keystone",
+    "legalEntity": "Aetna Life Insurance Company",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-016-01",
+        "documentName": "Annual Notice of Change - Aetna Medicare Advantra (PPO)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-016/annual-notice-of-change.pdf",
+        "documentDate": "2026-05-19"
+      },
+      {
+        "documentId": "DOC-PLAN-016-02",
+        "documentName": "Summary of Benefits - Aetna Medicare Advantra (PPO)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-016/summary-of-benefits.pdf",
+        "documentDate": "2026-07-02"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-017",
+    "contractYear": 2026,
+    "contractNumber": "H3959",
+    "pbp": "001",
+    "segmentId": "H3959001",
+    "planName": "Aetna Medicare Dual Complete (HMO D-SNP)",
+    "product": "MAPD",
+    "planType": "DSNP",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "West",
+    "region": "California",
+    "legalEntity": "Aetna Better Health of California",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": "DSNP",
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-017-01",
+        "documentName": "Annual Notice of Change - Aetna Medicare Dual Complete (HMO D-SNP)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-017/annual-notice-of-change.pdf",
+        "documentDate": "2026-01-24"
+      },
+      {
+        "documentId": "DOC-PLAN-017-02",
+        "documentName": "Provider Directory - Aetna Medicare Dual Complete (HMO D-SNP)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-017/provider-directory.pdf",
+        "documentDate": "2026-08-21"
+      },
+      {
+        "documentId": "DOC-PLAN-017-03",
+        "documentName": "Formulary - Aetna Medicare Dual Complete (HMO D-SNP)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-017/formulary.pdf",
+        "documentDate": "2026-02-21"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-018",
+    "contractYear": 2026,
+    "contractNumber": "H7149",
+    "pbp": "001",
+    "segmentId": "H7149001",
+    "planName": "Aetna Medicare Select (HMO)",
+    "product": "MAPD",
+    "planType": "HMO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "West",
+    "region": "Arizona",
+    "legalEntity": "Aetna Health of Arizona",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-018-01",
+        "documentName": "Evidence of Coverage - Aetna Medicare Select (HMO)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-018/evidence-of-coverage.pdf",
+        "documentDate": "2026-01-24"
+      },
+      {
+        "documentId": "DOC-PLAN-018-02",
+        "documentName": "Formulary - Aetna Medicare Select (HMO)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-018/formulary.pdf",
+        "documentDate": "2026-12-13"
+      },
+      {
+        "documentId": "DOC-PLAN-018-03",
+        "documentName": "Provider Directory - Aetna Medicare Select (HMO)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-018/provider-directory.pdf",
+        "documentDate": "2026-10-05"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-019",
+    "contractYear": 2026,
+    "contractNumber": "H7149",
+    "pbp": "002",
+    "segmentId": "H7149002",
+    "planName": "Aetna Medicare Premier (HMO)",
+    "product": "MAPD",
+    "planType": "HMO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "West",
+    "region": "Arizona",
+    "legalEntity": "Aetna Health of Arizona",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-019-01",
+        "documentName": "Annual Notice of Change - Aetna Medicare Premier (HMO)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-019/annual-notice-of-change.pdf",
+        "documentDate": "2026-07-30"
+      },
+      {
+        "documentId": "DOC-PLAN-019-02",
+        "documentName": "Provider Directory - Aetna Medicare Premier (HMO)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-019/provider-directory.pdf",
+        "documentDate": "2026-07-07"
+      },
+      {
+        "documentId": "DOC-PLAN-019-03",
+        "documentName": "Formulary - Aetna Medicare Premier (HMO)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-019/formulary.pdf",
+        "documentDate": "2026-08-18"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-020",
+    "contractYear": 2026,
+    "contractNumber": "H0628",
+    "pbp": "001",
+    "segmentId": "H0628001",
+    "planName": "Aetna Medicare Value (HMO)",
+    "product": "MAPD",
+    "planType": "HMO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Midwest",
+    "region": "Great Lakes",
+    "legalEntity": "Aetna Health Inc.",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-020-01",
+        "documentName": "Summary of Benefits - Aetna Medicare Value (HMO)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-020/summary-of-benefits.pdf",
+        "documentDate": "2026-04-03"
+      },
+      {
+        "documentId": "DOC-PLAN-020-02",
+        "documentName": "Evidence of Coverage - Aetna Medicare Value (HMO)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-020/evidence-of-coverage.pdf",
+        "documentDate": "2026-11-12"
+      },
+      {
+        "documentId": "DOC-PLAN-020-03",
+        "documentName": "Provider Directory - Aetna Medicare Value (HMO)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-020/provider-directory.pdf",
+        "documentDate": "2026-05-01"
+      },
+      {
+        "documentId": "DOC-PLAN-020-04",
+        "documentName": "Formulary - Aetna Medicare Value (HMO)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-020/formulary.pdf",
+        "documentDate": "2026-03-01"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-021",
+    "contractYear": 2026,
+    "contractNumber": "H0523",
+    "pbp": "001",
+    "segmentId": "H0523001",
+    "planName": "Aetna Medicare Premier (HMO)",
+    "product": "MAPD",
+    "planType": "HMO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Midwest",
+    "region": "Great Lakes",
+    "legalEntity": "Aetna Health Inc.",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-021-01",
+        "documentName": "Provider Directory - Aetna Medicare Premier (HMO)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-021/provider-directory.pdf",
+        "documentDate": "2026-12-25"
+      },
+      {
+        "documentId": "DOC-PLAN-021-02",
+        "documentName": "Annual Notice of Change - Aetna Medicare Premier (HMO)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-021/annual-notice-of-change.pdf",
+        "documentDate": "2026-06-09"
+      },
+      {
+        "documentId": "DOC-PLAN-021-03",
+        "documentName": "Formulary - Aetna Medicare Premier (HMO)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-021/formulary.pdf",
+        "documentDate": "2026-03-13"
+      },
+      {
+        "documentId": "DOC-PLAN-021-04",
+        "documentName": "Summary of Benefits - Aetna Medicare Premier (HMO)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-021/summary-of-benefits.pdf",
+        "documentDate": "2026-02-02"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-022",
+    "contractYear": 2026,
+    "contractNumber": "H1692",
+    "pbp": "001",
+    "segmentId": "H1692001",
+    "planName": "Aetna Medicare Signature (HMO)",
+    "product": "MAPD",
+    "planType": "HMO",
+    "category": "Medicare Advantage",
+    "commissionable": false,
+    "planStatus": "Active",
+    "market": "Northeast",
+    "region": "Keystone",
+    "legalEntity": "Coventry Health Care of West Virginia",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-022-01",
+        "documentName": "Formulary - Aetna Medicare Signature (HMO)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-022/formulary.pdf",
+        "documentDate": "2026-02-25"
+      },
+      {
+        "documentId": "DOC-PLAN-022-02",
+        "documentName": "Evidence of Coverage - Aetna Medicare Signature (HMO)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-022/evidence-of-coverage.pdf",
+        "documentDate": "2026-07-07"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-023",
+    "contractYear": 2026,
+    "contractNumber": "H3146",
+    "pbp": "001",
+    "segmentId": "H3146001",
+    "planName": "Aetna Medicare Enhanced (PPO)",
+    "product": "MAPD",
+    "planType": "PPO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Southeast",
+    "region": "Georgia/Gulf States",
+    "legalEntity": "Aetna Life Insurance Company",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-023-01",
+        "documentName": "Evidence of Coverage - Aetna Medicare Enhanced (PPO)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-023/evidence-of-coverage.pdf",
+        "documentDate": "2026-08-08"
+      },
+      {
+        "documentId": "DOC-PLAN-023-02",
+        "documentName": "Provider Directory - Aetna Medicare Enhanced (PPO)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-023/provider-directory.pdf",
+        "documentDate": "2026-09-06"
+      },
+      {
+        "documentId": "DOC-PLAN-023-03",
+        "documentName": "Summary of Benefits - Aetna Medicare Enhanced (PPO)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-023/summary-of-benefits.pdf",
+        "documentDate": "2026-04-04"
+      },
+      {
+        "documentId": "DOC-PLAN-023-04",
+        "documentName": "Formulary - Aetna Medicare Enhanced (PPO)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-023/formulary.pdf",
+        "documentDate": "2026-01-17"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-024",
+    "contractYear": 2026,
+    "contractNumber": "H3192",
+    "pbp": "001",
+    "segmentId": "H3192001",
+    "planName": "Aetna Medicare Value (PPO)",
+    "product": "MAPD",
+    "planType": "PPO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Midwest",
+    "region": "Ohio/Kentucky",
+    "legalEntity": "Aetna Life Insurance Company",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-024-01",
+        "documentName": "Evidence of Coverage - Aetna Medicare Value (PPO)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-024/evidence-of-coverage.pdf",
+        "documentDate": "2026-06-03"
+      },
+      {
+        "documentId": "DOC-PLAN-024-02",
+        "documentName": "Summary of Benefits - Aetna Medicare Value (PPO)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-024/summary-of-benefits.pdf",
+        "documentDate": "2026-05-30"
+      },
+      {
+        "documentId": "DOC-PLAN-024-03",
+        "documentName": "Formulary - Aetna Medicare Value (PPO)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-024/formulary.pdf",
+        "documentDate": "2026-09-13"
+      },
+      {
+        "documentId": "DOC-PLAN-024-04",
+        "documentName": "Annual Notice of Change - Aetna Medicare Value (PPO)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-024/annual-notice-of-change.pdf",
+        "documentDate": "2026-08-29"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-025",
+    "contractYear": 2026,
+    "contractNumber": "H3219",
+    "pbp": "001",
+    "segmentId": "H3219001",
+    "planName": "Aetna Medicare Premier (PPO)",
+    "product": "MAPD",
+    "planType": "PPO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Southeast",
+    "region": "Mid South",
+    "legalEntity": "Aetna Life Insurance Company",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-025-01",
+        "documentName": "Evidence of Coverage - Aetna Medicare Premier (PPO)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-025/evidence-of-coverage.pdf",
+        "documentDate": "2026-12-07"
+      },
+      {
+        "documentId": "DOC-PLAN-025-02",
+        "documentName": "Annual Notice of Change - Aetna Medicare Premier (PPO)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-025/annual-notice-of-change.pdf",
+        "documentDate": "2026-12-29"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-026",
+    "contractYear": 2026,
+    "contractNumber": "S5601",
+    "pbp": "048",
+    "segmentId": "S5601048",
+    "planName": "SilverScript Choice (PDP)",
+    "product": "PDP",
+    "planType": "PDP",
+    "category": "PDP",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "National",
+    "region": "PDP",
+    "legalEntity": "SilverScript Insurance Company",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-026-01",
+        "documentName": "Formulary - SilverScript Choice (PDP)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-026/formulary.pdf",
+        "documentDate": "2026-08-05"
+      },
+      {
+        "documentId": "DOC-PLAN-026-02",
+        "documentName": "Annual Notice of Change - SilverScript Choice (PDP)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-026/annual-notice-of-change.pdf",
+        "documentDate": "2026-02-11"
+      },
+      {
+        "documentId": "DOC-PLAN-026-03",
+        "documentName": "Provider Directory - SilverScript Choice (PDP)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-026/provider-directory.pdf",
+        "documentDate": "2026-03-22"
+      },
+      {
+        "documentId": "DOC-PLAN-026-04",
+        "documentName": "Summary of Benefits - SilverScript Choice (PDP)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-026/summary-of-benefits.pdf",
+        "documentDate": "2026-09-01"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-027",
+    "contractYear": 2026,
+    "contractNumber": "S5601",
+    "pbp": "196",
+    "segmentId": "S5601196",
+    "planName": "SilverScript SmartRx (PDP)",
+    "product": "PDP",
+    "planType": "PDP",
+    "category": "PDP",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "National",
+    "region": "PDP",
+    "legalEntity": "SilverScript Insurance Company",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-027-01",
+        "documentName": "Annual Notice of Change - SilverScript SmartRx (PDP)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-027/annual-notice-of-change.pdf",
+        "documentDate": "2026-08-05"
+      },
+      {
+        "documentId": "DOC-PLAN-027-02",
+        "documentName": "Provider Directory - SilverScript SmartRx (PDP)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-027/provider-directory.pdf",
+        "documentDate": "2026-07-31"
+      },
+      {
+        "documentId": "DOC-PLAN-027-03",
+        "documentName": "Evidence of Coverage - SilverScript SmartRx (PDP)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-027/evidence-of-coverage.pdf",
+        "documentDate": "2026-05-28"
+      },
+      {
+        "documentId": "DOC-PLAN-027-04",
+        "documentName": "Summary of Benefits - SilverScript SmartRx (PDP)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-027/summary-of-benefits.pdf",
+        "documentDate": "2026-01-17"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-028",
+    "contractYear": 2026,
+    "contractNumber": "S5601",
+    "pbp": "203",
+    "segmentId": "S5601203",
+    "planName": "SilverScript SmartSaver (PDP)",
+    "product": "PDP",
+    "planType": "PDP",
+    "category": "PDP",
+    "commissionable": false,
+    "planStatus": "Active",
+    "market": "National",
+    "region": "PDP",
+    "legalEntity": "SilverScript Insurance Company",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-028-01",
+        "documentName": "Summary of Benefits - SilverScript SmartSaver (PDP)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-028/summary-of-benefits.pdf",
+        "documentDate": "2026-08-29"
+      },
+      {
+        "documentId": "DOC-PLAN-028-02",
+        "documentName": "Evidence of Coverage - SilverScript SmartSaver (PDP)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-028/evidence-of-coverage.pdf",
+        "documentDate": "2026-03-01"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-029",
+    "contractYear": 2026,
+    "contractNumber": "S5601",
+    "pbp": "208",
+    "segmentId": "S5601208",
+    "planName": "SilverScript Plus (PDP)",
+    "product": "PDP",
+    "planType": "PDP",
+    "category": "PDP",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "National",
+    "region": "PDP",
+    "legalEntity": "SilverScript Insurance Company",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-029-01",
+        "documentName": "Summary of Benefits - SilverScript Plus (PDP)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-029/summary-of-benefits.pdf",
+        "documentDate": "2026-04-08"
+      },
+      {
+        "documentId": "DOC-PLAN-029-02",
+        "documentName": "Formulary - SilverScript Plus (PDP)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-029/formulary.pdf",
+        "documentDate": "2026-09-28"
+      },
+      {
+        "documentId": "DOC-PLAN-029-03",
+        "documentName": "Annual Notice of Change - SilverScript Plus (PDP)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-029/annual-notice-of-change.pdf",
+        "documentDate": "2026-12-31"
+      },
+      {
+        "documentId": "DOC-PLAN-029-04",
+        "documentName": "Evidence of Coverage - SilverScript Plus (PDP)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-029/evidence-of-coverage.pdf",
+        "documentDate": "2026-11-20"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-030",
+    "contractYear": 2026,
+    "contractNumber": "S5601",
+    "pbp": "210",
+    "segmentId": "S5601210",
+    "planName": "SilverScript Allure (PDP)",
+    "product": "PDP",
+    "planType": "PDP",
+    "category": "PDP",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "National",
+    "region": "PDP",
+    "legalEntity": "SilverScript Insurance Company",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-030-01",
+        "documentName": "Formulary - SilverScript Allure (PDP)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-030/formulary.pdf",
+        "documentDate": "2026-03-19"
+      },
+      {
+        "documentId": "DOC-PLAN-030-02",
+        "documentName": "Annual Notice of Change - SilverScript Allure (PDP)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-030/annual-notice-of-change.pdf",
+        "documentDate": "2026-10-12"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-031",
+    "contractYear": 2026,
+    "contractNumber": "MEDSUP",
+    "pbp": "A",
+    "segmentId": "MEDSUPA",
+    "planName": "Aetna Medicare Supplement Plan A",
+    "product": "Medsup",
+    "planType": "Medigap",
+    "category": "Medsup",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "National",
+    "region": "National",
+    "legalEntity": "Aetna Life Insurance Company",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-031-01",
+        "documentName": "Summary of Benefits - Aetna Medicare Supplement Plan A",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-031/summary-of-benefits.pdf",
+        "documentDate": "2026-09-21"
+      },
+      {
+        "documentId": "DOC-PLAN-031-02",
+        "documentName": "Formulary - Aetna Medicare Supplement Plan A",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-031/formulary.pdf",
+        "documentDate": "2026-06-17"
+      },
+      {
+        "documentId": "DOC-PLAN-031-03",
+        "documentName": "Provider Directory - Aetna Medicare Supplement Plan A",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-031/provider-directory.pdf",
+        "documentDate": "2026-09-01"
+      },
+      {
+        "documentId": "DOC-PLAN-031-04",
+        "documentName": "Annual Notice of Change - Aetna Medicare Supplement Plan A",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-031/annual-notice-of-change.pdf",
+        "documentDate": "2026-07-29"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-032",
+    "contractYear": 2026,
+    "contractNumber": "MEDSUP",
+    "pbp": "B",
+    "segmentId": "MEDSUPB",
+    "planName": "Aetna Medicare Supplement Plan B",
+    "product": "Medsup",
+    "planType": "Medigap",
+    "category": "Medsup",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "National",
+    "region": "National",
+    "legalEntity": "Aetna Life Insurance Company",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-032-01",
+        "documentName": "Annual Notice of Change - Aetna Medicare Supplement Plan B",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-032/annual-notice-of-change.pdf",
+        "documentDate": "2026-06-15"
+      },
+      {
+        "documentId": "DOC-PLAN-032-02",
+        "documentName": "Summary of Benefits - Aetna Medicare Supplement Plan B",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-032/summary-of-benefits.pdf",
+        "documentDate": "2026-09-20"
+      },
+      {
+        "documentId": "DOC-PLAN-032-03",
+        "documentName": "Provider Directory - Aetna Medicare Supplement Plan B",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-032/provider-directory.pdf",
+        "documentDate": "2026-10-02"
+      },
+      {
+        "documentId": "DOC-PLAN-032-04",
+        "documentName": "Evidence of Coverage - Aetna Medicare Supplement Plan B",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-032/evidence-of-coverage.pdf",
+        "documentDate": "2026-03-30"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-033",
+    "contractYear": 2026,
+    "contractNumber": "MEDSUP",
+    "pbp": "C",
+    "segmentId": "MEDSUPC",
+    "planName": "Aetna Medicare Supplement Plan C",
+    "product": "Medsup",
+    "planType": "Medigap",
+    "category": "Medsup",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "National",
+    "region": "National",
+    "legalEntity": "Aetna Life Insurance Company",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-033-01",
+        "documentName": "Formulary - Aetna Medicare Supplement Plan C",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-033/formulary.pdf",
+        "documentDate": "2026-02-22"
+      },
+      {
+        "documentId": "DOC-PLAN-033-02",
+        "documentName": "Evidence of Coverage - Aetna Medicare Supplement Plan C",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-033/evidence-of-coverage.pdf",
+        "documentDate": "2026-06-25"
+      },
+      {
+        "documentId": "DOC-PLAN-033-03",
+        "documentName": "Provider Directory - Aetna Medicare Supplement Plan C",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-033/provider-directory.pdf",
+        "documentDate": "2026-03-18"
+      },
+      {
+        "documentId": "DOC-PLAN-033-04",
+        "documentName": "Annual Notice of Change - Aetna Medicare Supplement Plan C",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-033/annual-notice-of-change.pdf",
+        "documentDate": "2026-08-29"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-034",
+    "contractYear": 2026,
+    "contractNumber": "MEDSUP",
+    "pbp": "F",
+    "segmentId": "MEDSUPF",
+    "planName": "Aetna Medicare Supplement Plan F",
+    "product": "Medsup",
+    "planType": "Medigap",
+    "category": "Medsup",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "National",
+    "region": "National",
+    "legalEntity": "Aetna Life Insurance Company",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-034-01",
+        "documentName": "Formulary - Aetna Medicare Supplement Plan F",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-034/formulary.pdf",
+        "documentDate": "2026-10-12"
+      },
+      {
+        "documentId": "DOC-PLAN-034-02",
+        "documentName": "Summary of Benefits - Aetna Medicare Supplement Plan F",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-034/summary-of-benefits.pdf",
+        "documentDate": "2026-02-04"
+      },
+      {
+        "documentId": "DOC-PLAN-034-03",
+        "documentName": "Provider Directory - Aetna Medicare Supplement Plan F",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-034/provider-directory.pdf",
+        "documentDate": "2026-03-14"
+      },
+      {
+        "documentId": "DOC-PLAN-034-04",
+        "documentName": "Evidence of Coverage - Aetna Medicare Supplement Plan F",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-034/evidence-of-coverage.pdf",
+        "documentDate": "2026-07-20"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-035",
+    "contractYear": 2026,
+    "contractNumber": "MEDSUP",
+    "pbp": "G",
+    "segmentId": "MEDSUPG",
+    "planName": "Aetna Medicare Supplement Plan G",
+    "product": "Medsup",
+    "planType": "Medigap",
+    "category": "Medsup",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "National",
+    "region": "National",
+    "legalEntity": "Aetna Life Insurance Company",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-035-01",
+        "documentName": "Formulary - Aetna Medicare Supplement Plan G",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-035/formulary.pdf",
+        "documentDate": "2026-01-06"
+      },
+      {
+        "documentId": "DOC-PLAN-035-02",
+        "documentName": "Annual Notice of Change - Aetna Medicare Supplement Plan G",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-035/annual-notice-of-change.pdf",
+        "documentDate": "2026-08-09"
+      },
+      {
+        "documentId": "DOC-PLAN-035-03",
+        "documentName": "Provider Directory - Aetna Medicare Supplement Plan G",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-035/provider-directory.pdf",
+        "documentDate": "2026-01-18"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-036",
+    "contractYear": 2026,
+    "contractNumber": "MEDSUP",
+    "pbp": "N",
+    "segmentId": "MEDSUPN",
+    "planName": "Aetna Medicare Supplement Plan N",
+    "product": "Medsup",
+    "planType": "Medigap",
+    "category": "Medsup",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "National",
+    "region": "National",
+    "legalEntity": "Aetna Life Insurance Company",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-036-01",
+        "documentName": "Annual Notice of Change - Aetna Medicare Supplement Plan N",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-036/annual-notice-of-change.pdf",
+        "documentDate": "2026-10-29"
+      },
+      {
+        "documentId": "DOC-PLAN-036-02",
+        "documentName": "Provider Directory - Aetna Medicare Supplement Plan N",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-036/provider-directory.pdf",
+        "documentDate": "2026-07-05"
+      },
+      {
+        "documentId": "DOC-PLAN-036-03",
+        "documentName": "Evidence of Coverage - Aetna Medicare Supplement Plan N",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-036/evidence-of-coverage.pdf",
+        "documentDate": "2026-10-26"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-037",
+    "contractYear": 2026,
+    "contractNumber": "ANC",
+    "pbp": "DEN001",
+    "segmentId": "ANCDEN001",
+    "planName": "Aetna Dental PPO",
+    "product": "ANC",
+    "planType": "PPO",
+    "category": "ANC",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "National",
+    "region": "National",
+    "legalEntity": "Aetna Life Insurance Company",
+    "marketingName": "Aetna Ancillary",
+    "minAge": null,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-037-01",
+        "documentName": "Annual Notice of Change - Aetna Dental PPO",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-037/annual-notice-of-change.pdf",
+        "documentDate": "2026-12-10"
+      },
+      {
+        "documentId": "DOC-PLAN-037-02",
+        "documentName": "Provider Directory - Aetna Dental PPO",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-037/provider-directory.pdf",
+        "documentDate": "2026-01-03"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-038",
+    "contractYear": 2026,
+    "contractNumber": "ANC",
+    "pbp": "DEN002",
+    "segmentId": "ANCDEN002",
+    "planName": "Aetna Dental Plus",
+    "product": "ANC",
+    "planType": "PPO",
+    "category": "ANC",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "National",
+    "region": "National",
+    "legalEntity": "Aetna Life Insurance Company",
+    "marketingName": "Aetna Ancillary",
+    "minAge": null,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-038-01",
+        "documentName": "Provider Directory - Aetna Dental Plus",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-038/provider-directory.pdf",
+        "documentDate": "2026-10-18"
+      },
+      {
+        "documentId": "DOC-PLAN-038-02",
+        "documentName": "Formulary - Aetna Dental Plus",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-038/formulary.pdf",
+        "documentDate": "2026-09-13"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-039",
+    "contractYear": 2026,
+    "contractNumber": "ANC",
+    "pbp": "VIS001",
+    "segmentId": "ANCVIS001",
+    "planName": "Aetna Vision PPO",
+    "product": "ANC",
+    "planType": "PPO",
+    "category": "ANC",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "National",
+    "region": "National",
+    "legalEntity": "Aetna Life Insurance Company",
+    "marketingName": "Aetna Ancillary",
+    "minAge": null,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-039-01",
+        "documentName": "Evidence of Coverage - Aetna Vision PPO",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-039/evidence-of-coverage.pdf",
+        "documentDate": "2026-03-03"
+      },
+      {
+        "documentId": "DOC-PLAN-039-02",
+        "documentName": "Formulary - Aetna Vision PPO",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-039/formulary.pdf",
+        "documentDate": "2026-11-12"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-040",
+    "contractYear": 2026,
+    "contractNumber": "ANC",
+    "pbp": "VIS002",
+    "segmentId": "ANCVIS002",
+    "planName": "Aetna Vision Plus",
+    "product": "ANC",
+    "planType": "PPO",
+    "category": "ANC",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "National",
+    "region": "National",
+    "legalEntity": "Aetna Life Insurance Company",
+    "marketingName": "Aetna Ancillary",
+    "minAge": null,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-040-01",
+        "documentName": "Annual Notice of Change - Aetna Vision Plus",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-040/annual-notice-of-change.pdf",
+        "documentDate": "2026-05-31"
+      },
+      {
+        "documentId": "DOC-PLAN-040-02",
+        "documentName": "Summary of Benefits - Aetna Vision Plus",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-040/summary-of-benefits.pdf",
+        "documentDate": "2026-08-31"
+      },
+      {
+        "documentId": "DOC-PLAN-040-03",
+        "documentName": "Provider Directory - Aetna Vision Plus",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-040/provider-directory.pdf",
+        "documentDate": "2026-04-20"
+      },
+      {
+        "documentId": "DOC-PLAN-040-04",
+        "documentName": "Evidence of Coverage - Aetna Vision Plus",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-040/evidence-of-coverage.pdf",
+        "documentDate": "2026-05-13"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-041",
+    "contractYear": 2026,
+    "contractNumber": "ANC",
+    "pbp": "HRG001",
+    "segmentId": "ANCHRG001",
+    "planName": "Aetna Hearing Discount",
+    "product": "ANC",
+    "planType": "PPO",
+    "category": "ANC",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "National",
+    "region": "National",
+    "legalEntity": "Aetna Life Insurance Company",
+    "marketingName": "Aetna Ancillary",
+    "minAge": null,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-041-01",
+        "documentName": "Evidence of Coverage - Aetna Hearing Discount",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-041/evidence-of-coverage.pdf",
+        "documentDate": "2026-11-18"
+      },
+      {
+        "documentId": "DOC-PLAN-041-02",
+        "documentName": "Summary of Benefits - Aetna Hearing Discount",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-041/summary-of-benefits.pdf",
+        "documentDate": "2026-09-29"
+      },
+      {
+        "documentId": "DOC-PLAN-041-03",
+        "documentName": "Formulary - Aetna Hearing Discount",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-041/formulary.pdf",
+        "documentDate": "2026-04-02"
+      },
+      {
+        "documentId": "DOC-PLAN-041-04",
+        "documentName": "Annual Notice of Change - Aetna Hearing Discount",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-041/annual-notice-of-change.pdf",
+        "documentDate": "2026-10-06"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-042",
+    "contractYear": 2026,
+    "contractNumber": "R6694",
+    "pbp": "001",
+    "segmentId": "R6694001",
+    "planName": "Aetna Medicare Premier (Regional PPO)",
+    "product": "MAPD",
+    "planType": "RPPO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Midwest",
+    "region": "Ohio/Kentucky",
+    "legalEntity": "Aetna Life Insurance Company",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-042-01",
+        "documentName": "Provider Directory - Aetna Medicare Premier (Regional PPO)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-042/provider-directory.pdf",
+        "documentDate": "2026-03-26"
+      },
+      {
+        "documentId": "DOC-PLAN-042-02",
+        "documentName": "Formulary - Aetna Medicare Premier (Regional PPO)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-042/formulary.pdf",
+        "documentDate": "2026-08-16"
+      },
+      {
+        "documentId": "DOC-PLAN-042-03",
+        "documentName": "Evidence of Coverage - Aetna Medicare Premier (Regional PPO)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-042/evidence-of-coverage.pdf",
+        "documentDate": "2026-08-25"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-043",
+    "contractYear": 2026,
+    "contractNumber": "H2293",
+    "pbp": "001",
+    "segmentId": "H2293001",
+    "planName": "Aetna Medicare Dual Signature (PPO D-SNP)",
+    "product": "MAPD",
+    "planType": "DSNP",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Southeast",
+    "region": "Georgia/Gulf States",
+    "legalEntity": "SilverScript Insurance Company",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": "DSNP",
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-043-01",
+        "documentName": "Annual Notice of Change - Aetna Medicare Dual Signature (PPO D-SNP)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-043/annual-notice-of-change.pdf",
+        "documentDate": "2026-08-10"
+      },
+      {
+        "documentId": "DOC-PLAN-043-02",
+        "documentName": "Formulary - Aetna Medicare Dual Signature (PPO D-SNP)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-043/formulary.pdf",
+        "documentDate": "2026-02-10"
+      },
+      {
+        "documentId": "DOC-PLAN-043-03",
+        "documentName": "Provider Directory - Aetna Medicare Dual Signature (PPO D-SNP)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-043/provider-directory.pdf",
+        "documentDate": "2026-10-13"
+      },
+      {
+        "documentId": "DOC-PLAN-043-04",
+        "documentName": "Evidence of Coverage - Aetna Medicare Dual Signature (PPO D-SNP)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-043/evidence-of-coverage.pdf",
+        "documentDate": "2026-03-03"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-044",
+    "contractYear": 2026,
+    "contractNumber": "H5593",
+    "pbp": "001",
+    "segmentId": "H5593001",
+    "planName": "Aetna Medicare Value (HMO-POS)",
+    "product": "MAPD",
+    "planType": "POS",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "West",
+    "region": "Northwest",
+    "legalEntity": "Aetna Life Insurance Company",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-044-01",
+        "documentName": "Annual Notice of Change - Aetna Medicare Value (HMO-POS)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-044/annual-notice-of-change.pdf",
+        "documentDate": "2026-08-07"
+      },
+      {
+        "documentId": "DOC-PLAN-044-02",
+        "documentName": "Evidence of Coverage - Aetna Medicare Value (HMO-POS)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-044/evidence-of-coverage.pdf",
+        "documentDate": "2026-12-17"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-045",
+    "contractYear": 2026,
+    "contractNumber": "H4711",
+    "pbp": "001",
+    "segmentId": "H4711001",
+    "planName": "Aetna Medicare Select (HMO)",
+    "product": "MAPD",
+    "planType": "HMO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "West",
+    "region": "Mountain",
+    "legalEntity": "Aetna Health Inc.",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-045-01",
+        "documentName": "Summary of Benefits - Aetna Medicare Select (HMO)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-045/summary-of-benefits.pdf",
+        "documentDate": "2026-04-05"
+      },
+      {
+        "documentId": "DOC-PLAN-045-02",
+        "documentName": "Formulary - Aetna Medicare Select (HMO)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-045/formulary.pdf",
+        "documentDate": "2026-04-09"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-046",
+    "contractYear": 2026,
+    "contractNumber": "H4835",
+    "pbp": "001",
+    "segmentId": "H4835001",
+    "planName": "Aetna Medicare Premier (HMO)",
+    "product": "MAPD",
+    "planType": "HMO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "West",
+    "region": "California",
+    "legalEntity": "Aetna Health of California",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-046-01",
+        "documentName": "Annual Notice of Change - Aetna Medicare Premier (HMO)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-046/annual-notice-of-change.pdf",
+        "documentDate": "2026-11-06"
+      },
+      {
+        "documentId": "DOC-PLAN-046-02",
+        "documentName": "Evidence of Coverage - Aetna Medicare Premier (HMO)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-046/evidence-of-coverage.pdf",
+        "documentDate": "2026-07-26"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-047",
+    "contractYear": 2026,
+    "contractNumber": "H9314",
+    "pbp": "001",
+    "segmentId": "H9314001",
+    "planName": "Aetna Medicare Value (HMO)",
+    "product": "MAPD",
+    "planType": "HMO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Northeast",
+    "region": "New Jersey",
+    "legalEntity": "Aetna Health Inc. (NJ)",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-047-01",
+        "documentName": "Formulary - Aetna Medicare Value (HMO)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-047/formulary.pdf",
+        "documentDate": "2026-12-02"
+      },
+      {
+        "documentId": "DOC-PLAN-047-02",
+        "documentName": "Evidence of Coverage - Aetna Medicare Value (HMO)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-047/evidence-of-coverage.pdf",
+        "documentDate": "2026-06-12"
+      },
+      {
+        "documentId": "DOC-PLAN-047-03",
+        "documentName": "Provider Directory - Aetna Medicare Value (HMO)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-047/provider-directory.pdf",
+        "documentDate": "2026-09-09"
+      },
+      {
+        "documentId": "DOC-PLAN-047-04",
+        "documentName": "Summary of Benefits - Aetna Medicare Value (HMO)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-047/summary-of-benefits.pdf",
+        "documentDate": "2026-06-28"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-048",
+    "contractYear": 2026,
+    "contractNumber": "H9431",
+    "pbp": "001",
+    "segmentId": "H9431001",
+    "planName": "Aetna Medicare Explorer (PPO)",
+    "product": "MAPD",
+    "planType": "PPO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Northeast",
+    "region": "New England",
+    "legalEntity": "First Health Life & Health Insurance",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-048-01",
+        "documentName": "Provider Directory - Aetna Medicare Explorer (PPO)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-048/provider-directory.pdf",
+        "documentDate": "2026-01-14"
+      },
+      {
+        "documentId": "DOC-PLAN-048-02",
+        "documentName": "Annual Notice of Change - Aetna Medicare Explorer (PPO)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-048/annual-notice-of-change.pdf",
+        "documentDate": "2026-02-04"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-049",
+    "contractYear": 2026,
+    "contractNumber": "H5325",
+    "pbp": "001",
+    "segmentId": "H5325001",
+    "planName": "Aetna Medicare Eagle (HMO)",
+    "product": "MAPD",
+    "planType": "HMO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Midwest",
+    "region": "Great Lakes",
+    "legalEntity": "Aetna Life Insurance Company",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-049-01",
+        "documentName": "Summary of Benefits - Aetna Medicare Eagle (HMO)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-049/summary-of-benefits.pdf",
+        "documentDate": "2026-09-03"
+      },
+      {
+        "documentId": "DOC-PLAN-049-02",
+        "documentName": "Formulary - Aetna Medicare Eagle (HMO)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-049/formulary.pdf",
+        "documentDate": "2026-03-03"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-050",
+    "contractYear": 2026,
+    "contractNumber": "H1206",
+    "pbp": "001",
+    "segmentId": "H1206001",
+    "planName": "Aetna Medicare Flex (PPO)",
+    "product": "MAPD",
+    "planType": "PPO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Northeast",
+    "region": "Capitol",
+    "legalEntity": "Aetna Life Insurance Company",
+    "marketingName": "Aetna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-050-01",
+        "documentName": "Evidence of Coverage - Aetna Medicare Flex (PPO)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-050/evidence-of-coverage.pdf",
+        "documentDate": "2026-01-27"
+      },
+      {
+        "documentId": "DOC-PLAN-050-02",
+        "documentName": "Formulary - Aetna Medicare Flex (PPO)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-050/formulary.pdf",
+        "documentDate": "2026-10-03"
+      },
+      {
+        "documentId": "DOC-PLAN-050-03",
+        "documentName": "Provider Directory - Aetna Medicare Flex (PPO)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-050/provider-directory.pdf",
+        "documentDate": "2026-11-19"
+      },
+      {
+        "documentId": "DOC-PLAN-050-04",
+        "documentName": "Summary of Benefits - Aetna Medicare Flex (PPO)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-050/summary-of-benefits.pdf",
+        "documentDate": "2026-05-09"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-051",
+    "contractYear": 2026,
+    "contractNumber": "R4599",
+    "pbp": "001",
+    "segmentId": "R4599001",
+    "planName": "UnitedHealthcare Medicare Advantage Choice (PPO)",
+    "product": "MAPD",
+    "planType": "PPO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Northeast",
+    "region": "New England",
+    "legalEntity": "UnitedHealthcare Insurance Company",
+    "marketingName": "UnitedHealthcare Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-051-01",
+        "documentName": "Provider Directory - UnitedHealthcare Medicare Advantage Choice (PPO)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-051/provider-directory.pdf",
+        "documentDate": "2026-06-03"
+      },
+      {
+        "documentId": "DOC-PLAN-051-02",
+        "documentName": "Annual Notice of Change - UnitedHealthcare Medicare Advantage Choice (PPO)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-051/annual-notice-of-change.pdf",
+        "documentDate": "2026-09-10"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-052",
+    "contractYear": 2026,
+    "contractNumber": "R4599",
+    "pbp": "002",
+    "segmentId": "R4599002",
+    "planName": "UnitedHealthcare Medicare Advantage Essential (PPO)",
+    "product": "MAPD",
+    "planType": "PPO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Northeast",
+    "region": "New England",
+    "legalEntity": "UnitedHealthcare Insurance Company",
+    "marketingName": "UnitedHealthcare Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-052-01",
+        "documentName": "Annual Notice of Change - UnitedHealthcare Medicare Advantage Essential (PPO)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-052/annual-notice-of-change.pdf",
+        "documentDate": "2026-05-29"
+      },
+      {
+        "documentId": "DOC-PLAN-052-02",
+        "documentName": "Formulary - UnitedHealthcare Medicare Advantage Essential (PPO)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-052/formulary.pdf",
+        "documentDate": "2026-01-05"
+      },
+      {
+        "documentId": "DOC-PLAN-052-03",
+        "documentName": "Evidence of Coverage - UnitedHealthcare Medicare Advantage Essential (PPO)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-052/evidence-of-coverage.pdf",
+        "documentDate": "2026-04-28"
+      },
+      {
+        "documentId": "DOC-PLAN-052-04",
+        "documentName": "Provider Directory - UnitedHealthcare Medicare Advantage Essential (PPO)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-052/provider-directory.pdf",
+        "documentDate": "2026-05-10"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-053",
+    "contractYear": 2026,
+    "contractNumber": "H2025",
+    "pbp": "001",
+    "segmentId": "H2025001",
+    "planName": "UnitedHealthcare Medicare Advantage Core (HMO)",
+    "product": "MAPD",
+    "planType": "HMO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Southeast",
+    "region": "Florida",
+    "legalEntity": "UnitedHealthcare of Florida",
+    "marketingName": "UnitedHealthcare Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-053-01",
+        "documentName": "Evidence of Coverage - UnitedHealthcare Medicare Advantage Core (HMO)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-053/evidence-of-coverage.pdf",
+        "documentDate": "2026-05-20"
+      },
+      {
+        "documentId": "DOC-PLAN-053-02",
+        "documentName": "Provider Directory - UnitedHealthcare Medicare Advantage Core (HMO)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-053/provider-directory.pdf",
+        "documentDate": "2026-05-06"
+      },
+      {
+        "documentId": "DOC-PLAN-053-03",
+        "documentName": "Summary of Benefits - UnitedHealthcare Medicare Advantage Core (HMO)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-053/summary-of-benefits.pdf",
+        "documentDate": "2026-03-16"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-054",
+    "contractYear": 2026,
+    "contractNumber": "H2025",
+    "pbp": "002",
+    "segmentId": "H2025002",
+    "planName": "UnitedHealthcare Medicare Advantage Plus (HMO)",
+    "product": "MAPD",
+    "planType": "HMO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Southeast",
+    "region": "Florida",
+    "legalEntity": "UnitedHealthcare of Florida",
+    "marketingName": "UnitedHealthcare Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-054-01",
+        "documentName": "Annual Notice of Change - UnitedHealthcare Medicare Advantage Plus (HMO)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-054/annual-notice-of-change.pdf",
+        "documentDate": "2026-11-09"
+      },
+      {
+        "documentId": "DOC-PLAN-054-02",
+        "documentName": "Formulary - UnitedHealthcare Medicare Advantage Plus (HMO)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-054/formulary.pdf",
+        "documentDate": "2026-07-01"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-055",
+    "contractYear": 2026,
+    "contractNumber": "H5432",
+    "pbp": "001",
+    "segmentId": "H5432001",
+    "planName": "UnitedHealthcare Dual Complete (HMO D-SNP)",
+    "product": "MAPD",
+    "planType": "DSNP",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Southwest",
+    "region": "South Central",
+    "legalEntity": "UnitedHealthcare Insurance Company",
+    "marketingName": "UnitedHealthcare Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": "DSNP",
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-055-01",
+        "documentName": "Formulary - UnitedHealthcare Dual Complete (HMO D-SNP)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-055/formulary.pdf",
+        "documentDate": "2026-10-19"
+      },
+      {
+        "documentId": "DOC-PLAN-055-02",
+        "documentName": "Annual Notice of Change - UnitedHealthcare Dual Complete (HMO D-SNP)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-055/annual-notice-of-change.pdf",
+        "documentDate": "2026-04-21"
+      },
+      {
+        "documentId": "DOC-PLAN-055-03",
+        "documentName": "Evidence of Coverage - UnitedHealthcare Dual Complete (HMO D-SNP)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-055/evidence-of-coverage.pdf",
+        "documentDate": "2026-03-13"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-056",
+    "contractYear": 2026,
+    "contractNumber": "S5820",
+    "pbp": "045",
+    "segmentId": "S5820045",
+    "planName": "AARP MedicareRx Preferred (PDP)",
+    "product": "PDP",
+    "planType": "PDP",
+    "category": "PDP",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "National",
+    "region": "PDP",
+    "legalEntity": "UnitedHealthcare Insurance Company",
+    "marketingName": "UnitedHealthcare Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-056-01",
+        "documentName": "Evidence of Coverage - AARP MedicareRx Preferred (PDP)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-056/evidence-of-coverage.pdf",
+        "documentDate": "2026-10-04"
+      },
+      {
+        "documentId": "DOC-PLAN-056-02",
+        "documentName": "Provider Directory - AARP MedicareRx Preferred (PDP)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-056/provider-directory.pdf",
+        "documentDate": "2026-08-02"
+      },
+      {
+        "documentId": "DOC-PLAN-056-03",
+        "documentName": "Formulary - AARP MedicareRx Preferred (PDP)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-056/formulary.pdf",
+        "documentDate": "2026-12-24"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-057",
+    "contractYear": 2026,
+    "contractNumber": "S5820",
+    "pbp": "052",
+    "segmentId": "S5820052",
+    "planName": "AARP MedicareRx Saver Plus (PDP)",
+    "product": "PDP",
+    "planType": "PDP",
+    "category": "PDP",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "National",
+    "region": "PDP",
+    "legalEntity": "UnitedHealthcare Insurance Company",
+    "marketingName": "UnitedHealthcare Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-057-01",
+        "documentName": "Annual Notice of Change - AARP MedicareRx Saver Plus (PDP)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-057/annual-notice-of-change.pdf",
+        "documentDate": "2026-09-12"
+      },
+      {
+        "documentId": "DOC-PLAN-057-02",
+        "documentName": "Summary of Benefits - AARP MedicareRx Saver Plus (PDP)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-057/summary-of-benefits.pdf",
+        "documentDate": "2026-07-11"
+      },
+      {
+        "documentId": "DOC-PLAN-057-03",
+        "documentName": "Provider Directory - AARP MedicareRx Saver Plus (PDP)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-057/provider-directory.pdf",
+        "documentDate": "2026-06-09"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-058",
+    "contractYear": 2026,
+    "contractNumber": "H5216",
+    "pbp": "001",
+    "segmentId": "H5216001",
+    "planName": "Humana Gold Plus (HMO)",
+    "product": "MAPD",
+    "planType": "HMO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Southeast",
+    "region": "Georgia/Gulf States",
+    "legalEntity": "Humana Medical Plan",
+    "marketingName": "Humana Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-058-01",
+        "documentName": "Annual Notice of Change - Humana Gold Plus (HMO)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-058/annual-notice-of-change.pdf",
+        "documentDate": "2026-03-15"
+      },
+      {
+        "documentId": "DOC-PLAN-058-02",
+        "documentName": "Evidence of Coverage - Humana Gold Plus (HMO)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-058/evidence-of-coverage.pdf",
+        "documentDate": "2026-06-03"
+      },
+      {
+        "documentId": "DOC-PLAN-058-03",
+        "documentName": "Formulary - Humana Gold Plus (HMO)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-058/formulary.pdf",
+        "documentDate": "2026-08-10"
+      },
+      {
+        "documentId": "DOC-PLAN-058-04",
+        "documentName": "Provider Directory - Humana Gold Plus (HMO)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-058/provider-directory.pdf",
+        "documentDate": "2026-09-25"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-059",
+    "contractYear": 2026,
+    "contractNumber": "H5216",
+    "pbp": "002",
+    "segmentId": "H5216002",
+    "planName": "Humana Gold Plus HMO SNP (HMO D-SNP)",
+    "product": "MAPD",
+    "planType": "DSNP",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Southeast",
+    "region": "Georgia/Gulf States",
+    "legalEntity": "Humana Medical Plan",
+    "marketingName": "Humana Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": "DSNP",
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-059-01",
+        "documentName": "Summary of Benefits - Humana Gold Plus HMO SNP (HMO D-SNP)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-059/summary-of-benefits.pdf",
+        "documentDate": "2026-07-01"
+      },
+      {
+        "documentId": "DOC-PLAN-059-02",
+        "documentName": "Provider Directory - Humana Gold Plus HMO SNP (HMO D-SNP)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-059/provider-directory.pdf",
+        "documentDate": "2026-01-16"
+      },
+      {
+        "documentId": "DOC-PLAN-059-03",
+        "documentName": "Evidence of Coverage - Humana Gold Plus HMO SNP (HMO D-SNP)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-059/evidence-of-coverage.pdf",
+        "documentDate": "2026-07-24"
+      },
+      {
+        "documentId": "DOC-PLAN-059-04",
+        "documentName": "Annual Notice of Change - Humana Gold Plus HMO SNP (HMO D-SNP)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-059/annual-notice-of-change.pdf",
+        "documentDate": "2026-02-18"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-060",
+    "contractYear": 2026,
+    "contractNumber": "H4005",
+    "pbp": "001",
+    "segmentId": "H4005001",
+    "planName": "HumanaChoice (PPO)",
+    "product": "MAPD",
+    "planType": "PPO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Midwest",
+    "region": "Heartland",
+    "legalEntity": "Humana Insurance Company",
+    "marketingName": "Humana Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-060-01",
+        "documentName": "Provider Directory - HumanaChoice (PPO)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-060/provider-directory.pdf",
+        "documentDate": "2026-02-18"
+      },
+      {
+        "documentId": "DOC-PLAN-060-02",
+        "documentName": "Summary of Benefits - HumanaChoice (PPO)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-060/summary-of-benefits.pdf",
+        "documentDate": "2026-09-06"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-061",
+    "contractYear": 2026,
+    "contractNumber": "H4005",
+    "pbp": "002",
+    "segmentId": "H4005002",
+    "planName": "HumanaChoice Plus (PPO)",
+    "product": "MAPD",
+    "planType": "PPO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Midwest",
+    "region": "Heartland",
+    "legalEntity": "Humana Insurance Company",
+    "marketingName": "Humana Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-061-01",
+        "documentName": "Formulary - HumanaChoice Plus (PPO)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-061/formulary.pdf",
+        "documentDate": "2026-09-11"
+      },
+      {
+        "documentId": "DOC-PLAN-061-02",
+        "documentName": "Provider Directory - HumanaChoice Plus (PPO)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-061/provider-directory.pdf",
+        "documentDate": "2026-10-23"
+      },
+      {
+        "documentId": "DOC-PLAN-061-03",
+        "documentName": "Summary of Benefits - HumanaChoice Plus (PPO)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-061/summary-of-benefits.pdf",
+        "documentDate": "2026-01-15"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-062",
+    "contractYear": 2026,
+    "contractNumber": "S5884",
+    "pbp": "044",
+    "segmentId": "S5884044",
+    "planName": "Humana Walmart Value Rx Plan (PDP)",
+    "product": "PDP",
+    "planType": "PDP",
+    "category": "PDP",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "National",
+    "region": "PDP",
+    "legalEntity": "Humana Insurance Company",
+    "marketingName": "Humana Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-062-01",
+        "documentName": "Annual Notice of Change - Humana Walmart Value Rx Plan (PDP)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-062/annual-notice-of-change.pdf",
+        "documentDate": "2026-08-05"
+      },
+      {
+        "documentId": "DOC-PLAN-062-02",
+        "documentName": "Formulary - Humana Walmart Value Rx Plan (PDP)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-062/formulary.pdf",
+        "documentDate": "2026-04-06"
+      },
+      {
+        "documentId": "DOC-PLAN-062-03",
+        "documentName": "Provider Directory - Humana Walmart Value Rx Plan (PDP)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-062/provider-directory.pdf",
+        "documentDate": "2026-03-09"
+      },
+      {
+        "documentId": "DOC-PLAN-062-04",
+        "documentName": "Evidence of Coverage - Humana Walmart Value Rx Plan (PDP)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-062/evidence-of-coverage.pdf",
+        "documentDate": "2026-09-24"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-063",
+    "contractYear": 2026,
+    "contractNumber": "S5884",
+    "pbp": "051",
+    "segmentId": "S5884051",
+    "planName": "Humana Premier Rx Plan (PDP)",
+    "product": "PDP",
+    "planType": "PDP",
+    "category": "PDP",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "National",
+    "region": "PDP",
+    "legalEntity": "Humana Insurance Company",
+    "marketingName": "Humana Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-063-01",
+        "documentName": "Evidence of Coverage - Humana Premier Rx Plan (PDP)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-063/evidence-of-coverage.pdf",
+        "documentDate": "2026-04-13"
+      },
+      {
+        "documentId": "DOC-PLAN-063-02",
+        "documentName": "Formulary - Humana Premier Rx Plan (PDP)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-063/formulary.pdf",
+        "documentDate": "2026-09-09"
+      },
+      {
+        "documentId": "DOC-PLAN-063-03",
+        "documentName": "Provider Directory - Humana Premier Rx Plan (PDP)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-063/provider-directory.pdf",
+        "documentDate": "2026-11-12"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-064",
+    "contractYear": 2026,
+    "contractNumber": "H1035",
+    "pbp": "001",
+    "segmentId": "H1035001",
+    "planName": "Blue Cross Blue Shield Medicare Advantage Blue (HMO)",
+    "product": "MAPD",
+    "planType": "HMO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Northeast",
+    "region": "New York",
+    "legalEntity": "BlueCross BlueShield of New York",
+    "marketingName": "Blue Cross Blue Shield Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-064-01",
+        "documentName": "Formulary - Blue Cross Blue Shield Medicare Advantage Blue (HMO)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-064/formulary.pdf",
+        "documentDate": "2026-08-07"
+      },
+      {
+        "documentId": "DOC-PLAN-064-02",
+        "documentName": "Summary of Benefits - Blue Cross Blue Shield Medicare Advantage Blue (HMO)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-064/summary-of-benefits.pdf",
+        "documentDate": "2026-08-07"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-065",
+    "contractYear": 2026,
+    "contractNumber": "H1035",
+    "pbp": "002",
+    "segmentId": "H1035002",
+    "planName": "Blue Cross Blue Shield Medicare Advantage Blue Plus (HMO)",
+    "product": "MAPD",
+    "planType": "HMO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Northeast",
+    "region": "New York",
+    "legalEntity": "BlueCross BlueShield of New York",
+    "marketingName": "Blue Cross Blue Shield Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-065-01",
+        "documentName": "Provider Directory - Blue Cross Blue Shield Medicare Advantage Blue Plus (HMO)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-065/provider-directory.pdf",
+        "documentDate": "2026-07-16"
+      },
+      {
+        "documentId": "DOC-PLAN-065-02",
+        "documentName": "Formulary - Blue Cross Blue Shield Medicare Advantage Blue Plus (HMO)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-065/formulary.pdf",
+        "documentDate": "2026-02-15"
+      },
+      {
+        "documentId": "DOC-PLAN-065-03",
+        "documentName": "Annual Notice of Change - Blue Cross Blue Shield Medicare Advantage Blue Plus (HMO)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-065/annual-notice-of-change.pdf",
+        "documentDate": "2026-10-22"
+      },
+      {
+        "documentId": "DOC-PLAN-065-04",
+        "documentName": "Summary of Benefits - Blue Cross Blue Shield Medicare Advantage Blue Plus (HMO)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-065/summary-of-benefits.pdf",
+        "documentDate": "2026-03-25"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-066",
+    "contractYear": 2026,
+    "contractNumber": "H2110",
+    "pbp": "001",
+    "segmentId": "H2110001",
+    "planName": "Blue Cross Blue Shield Medicare Advantage PPO",
+    "product": "MAPD",
+    "planType": "PPO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "West",
+    "region": "California",
+    "legalEntity": "Blue Shield of California",
+    "marketingName": "Blue Cross Blue Shield Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-066-01",
+        "documentName": "Annual Notice of Change - Blue Cross Blue Shield Medicare Advantage PPO",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-066/annual-notice-of-change.pdf",
+        "documentDate": "2026-07-06"
+      },
+      {
+        "documentId": "DOC-PLAN-066-02",
+        "documentName": "Formulary - Blue Cross Blue Shield Medicare Advantage PPO",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-066/formulary.pdf",
+        "documentDate": "2026-09-18"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-067",
+    "contractYear": 2026,
+    "contractNumber": "S5824",
+    "pbp": "046",
+    "segmentId": "S5824046",
+    "planName": "BlueRx Complete (PDP)",
+    "product": "PDP",
+    "planType": "PDP",
+    "category": "PDP",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "National",
+    "region": "PDP",
+    "legalEntity": "BlueCross BlueShield Association",
+    "marketingName": "Blue Cross Blue Shield Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-067-01",
+        "documentName": "Annual Notice of Change - BlueRx Complete (PDP)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-067/annual-notice-of-change.pdf",
+        "documentDate": "2026-01-20"
+      },
+      {
+        "documentId": "DOC-PLAN-067-02",
+        "documentName": "Evidence of Coverage - BlueRx Complete (PDP)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-067/evidence-of-coverage.pdf",
+        "documentDate": "2026-01-13"
+      },
+      {
+        "documentId": "DOC-PLAN-067-03",
+        "documentName": "Summary of Benefits - BlueRx Complete (PDP)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-067/summary-of-benefits.pdf",
+        "documentDate": "2026-12-04"
+      },
+      {
+        "documentId": "DOC-PLAN-067-04",
+        "documentName": "Formulary - BlueRx Complete (PDP)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-067/formulary.pdf",
+        "documentDate": "2026-09-20"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-068",
+    "contractYear": 2026,
+    "contractNumber": "H4154",
+    "pbp": "001",
+    "segmentId": "H4154001",
+    "planName": "Cigna Medicare Advantage (HMO)",
+    "product": "MAPD",
+    "planType": "HMO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Southwest",
+    "region": "South Central",
+    "legalEntity": "Cigna HealthCare",
+    "marketingName": "Cigna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-068-01",
+        "documentName": "Evidence of Coverage - Cigna Medicare Advantage (HMO)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-068/evidence-of-coverage.pdf",
+        "documentDate": "2026-05-08"
+      },
+      {
+        "documentId": "DOC-PLAN-068-02",
+        "documentName": "Annual Notice of Change - Cigna Medicare Advantage (HMO)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-068/annual-notice-of-change.pdf",
+        "documentDate": "2026-12-21"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-069",
+    "contractYear": 2026,
+    "contractNumber": "H4154",
+    "pbp": "002",
+    "segmentId": "H4154002",
+    "planName": "Cigna Medicare Advantage Plus (HMO)",
+    "product": "MAPD",
+    "planType": "HMO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Southwest",
+    "region": "South Central",
+    "legalEntity": "Cigna HealthCare",
+    "marketingName": "Cigna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-069-01",
+        "documentName": "Evidence of Coverage - Cigna Medicare Advantage Plus (HMO)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-069/evidence-of-coverage.pdf",
+        "documentDate": "2026-07-16"
+      },
+      {
+        "documentId": "DOC-PLAN-069-02",
+        "documentName": "Annual Notice of Change - Cigna Medicare Advantage Plus (HMO)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-069/annual-notice-of-change.pdf",
+        "documentDate": "2026-10-12"
+      },
+      {
+        "documentId": "DOC-PLAN-069-03",
+        "documentName": "Summary of Benefits - Cigna Medicare Advantage Plus (HMO)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-069/summary-of-benefits.pdf",
+        "documentDate": "2026-12-28"
+      },
+      {
+        "documentId": "DOC-PLAN-069-04",
+        "documentName": "Formulary - Cigna Medicare Advantage Plus (HMO)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-069/formulary.pdf",
+        "documentDate": "2026-01-20"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-070",
+    "contractYear": 2026,
+    "contractNumber": "H4155",
+    "pbp": "001",
+    "segmentId": "H4155001",
+    "planName": "Cigna Medicare Advantage (PPO)",
+    "product": "MAPD",
+    "planType": "PPO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "West",
+    "region": "Arizona",
+    "legalEntity": "Cigna HealthCare",
+    "marketingName": "Cigna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-070-01",
+        "documentName": "Provider Directory - Cigna Medicare Advantage (PPO)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-070/provider-directory.pdf",
+        "documentDate": "2026-02-09"
+      },
+      {
+        "documentId": "DOC-PLAN-070-02",
+        "documentName": "Summary of Benefits - Cigna Medicare Advantage (PPO)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-070/summary-of-benefits.pdf",
+        "documentDate": "2026-05-25"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-071",
+    "contractYear": 2026,
+    "contractNumber": "S5617",
+    "pbp": "047",
+    "segmentId": "S5617047",
+    "planName": "Cigna Medicare Rx Plan (PDP)",
+    "product": "PDP",
+    "planType": "PDP",
+    "category": "PDP",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "National",
+    "region": "PDP",
+    "legalEntity": "Cigna HealthCare",
+    "marketingName": "Cigna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-071-01",
+        "documentName": "Summary of Benefits - Cigna Medicare Rx Plan (PDP)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-071/summary-of-benefits.pdf",
+        "documentDate": "2026-10-22"
+      },
+      {
+        "documentId": "DOC-PLAN-071-02",
+        "documentName": "Provider Directory - Cigna Medicare Rx Plan (PDP)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-071/provider-directory.pdf",
+        "documentDate": "2026-05-29"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-072",
+    "contractYear": 2026,
+    "contractNumber": "H5214",
+    "pbp": "001",
+    "segmentId": "H5214001",
+    "planName": "WellCare Value (HMO)",
+    "product": "MAPD",
+    "planType": "HMO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Southeast",
+    "region": "Georgia/Gulf States",
+    "legalEntity": "WellCare Health Plans",
+    "marketingName": "WellCare Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-072-01",
+        "documentName": "Evidence of Coverage - WellCare Value (HMO)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-072/evidence-of-coverage.pdf",
+        "documentDate": "2026-07-07"
+      },
+      {
+        "documentId": "DOC-PLAN-072-02",
+        "documentName": "Formulary - WellCare Value (HMO)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-072/formulary.pdf",
+        "documentDate": "2026-08-19"
+      },
+      {
+        "documentId": "DOC-PLAN-072-03",
+        "documentName": "Summary of Benefits - WellCare Value (HMO)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-072/summary-of-benefits.pdf",
+        "documentDate": "2026-05-30"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-073",
+    "contractYear": 2026,
+    "contractNumber": "H5214",
+    "pbp": "002",
+    "segmentId": "H5214002",
+    "planName": "WellCare Complete (HMO)",
+    "product": "MAPD",
+    "planType": "HMO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Southeast",
+    "region": "Georgia/Gulf States",
+    "legalEntity": "WellCare Health Plans",
+    "marketingName": "WellCare Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-073-01",
+        "documentName": "Annual Notice of Change - WellCare Complete (HMO)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-073/annual-notice-of-change.pdf",
+        "documentDate": "2026-06-05"
+      },
+      {
+        "documentId": "DOC-PLAN-073-02",
+        "documentName": "Summary of Benefits - WellCare Complete (HMO)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-073/summary-of-benefits.pdf",
+        "documentDate": "2026-07-17"
+      },
+      {
+        "documentId": "DOC-PLAN-073-03",
+        "documentName": "Formulary - WellCare Complete (HMO)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-073/formulary.pdf",
+        "documentDate": "2026-12-11"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-074",
+    "contractYear": 2026,
+    "contractNumber": "H4387",
+    "pbp": "001",
+    "segmentId": "H4387001",
+    "planName": "WellCare Dual Complete (HMO D-SNP)",
+    "product": "MAPD",
+    "planType": "DSNP",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Southeast",
+    "region": "Florida",
+    "legalEntity": "WellCare Health Plans",
+    "marketingName": "WellCare Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": "DSNP",
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-074-01",
+        "documentName": "Summary of Benefits - WellCare Dual Complete (HMO D-SNP)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-074/summary-of-benefits.pdf",
+        "documentDate": "2026-12-07"
+      },
+      {
+        "documentId": "DOC-PLAN-074-02",
+        "documentName": "Provider Directory - WellCare Dual Complete (HMO D-SNP)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-074/provider-directory.pdf",
+        "documentDate": "2026-02-19"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-075",
+    "contractYear": 2026,
+    "contractNumber": "S4802",
+    "pbp": "048",
+    "segmentId": "S4802048",
+    "planName": "WellCare Classic (PDP)",
+    "product": "PDP",
+    "planType": "PDP",
+    "category": "PDP",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "National",
+    "region": "PDP",
+    "legalEntity": "WellCare Prescription Insurance",
+    "marketingName": "WellCare Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-075-01",
+        "documentName": "Provider Directory - WellCare Classic (PDP)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-075/provider-directory.pdf",
+        "documentDate": "2026-06-09"
+      },
+      {
+        "documentId": "DOC-PLAN-075-02",
+        "documentName": "Formulary - WellCare Classic (PDP)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-075/formulary.pdf",
+        "documentDate": "2026-02-27"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-076",
+    "contractYear": 2026,
+    "contractNumber": "H3046",
+    "pbp": "001",
+    "segmentId": "H3046001",
+    "planName": "Humana Gold Choice (PPO)",
+    "product": "MAPD",
+    "planType": "PPO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "West",
+    "region": "California",
+    "legalEntity": "Humana Insurance Company",
+    "marketingName": "Humana Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-076-01",
+        "documentName": "Formulary - Humana Gold Choice (PPO)",
+        "documentType": "Formulary",
+        "documentUrl": "https://example.com/documents/plan-076/formulary.pdf",
+        "documentDate": "2026-07-26"
+      },
+      {
+        "documentId": "DOC-PLAN-076-02",
+        "documentName": "Evidence of Coverage - Humana Gold Choice (PPO)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-076/evidence-of-coverage.pdf",
+        "documentDate": "2026-02-06"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-077",
+    "contractYear": 2026,
+    "contractNumber": "H4148",
+    "pbp": "001",
+    "segmentId": "H4148001",
+    "planName": "UnitedHealthcare Medicare Advantage Classic (HMO)",
+    "product": "MAPD",
+    "planType": "HMO",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Midwest",
+    "region": "Great Lakes",
+    "legalEntity": "UnitedHealthcare Insurance Company",
+    "marketingName": "UnitedHealthcare Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": null,
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-077-01",
+        "documentName": "Provider Directory - UnitedHealthcare Medicare Advantage Classic (HMO)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-077/provider-directory.pdf",
+        "documentDate": "2026-03-26"
+      },
+      {
+        "documentId": "DOC-PLAN-077-02",
+        "documentName": "Evidence of Coverage - UnitedHealthcare Medicare Advantage Classic (HMO)",
+        "documentType": "Evidence of Coverage",
+        "documentUrl": "https://example.com/documents/plan-077/evidence-of-coverage.pdf",
+        "documentDate": "2026-06-15"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-078",
+    "contractYear": 2026,
+    "contractNumber": "H4148",
+    "pbp": "003",
+    "segmentId": "H4148003",
+    "planName": "UnitedHealthcare Chronic Complete (HMO C-SNP)",
+    "product": "MAPD",
+    "planType": "CSNP",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Midwest",
+    "region": "Great Lakes",
+    "legalEntity": "UnitedHealthcare Insurance Company",
+    "marketingName": "UnitedHealthcare Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": "CSNP",
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-078-01",
+        "documentName": "Summary of Benefits - UnitedHealthcare Chronic Complete (HMO C-SNP)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-078/summary-of-benefits.pdf",
+        "documentDate": "2026-07-08"
+      },
+      {
+        "documentId": "DOC-PLAN-078-02",
+        "documentName": "Provider Directory - UnitedHealthcare Chronic Complete (HMO C-SNP)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-078/provider-directory.pdf",
+        "documentDate": "2026-09-22"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-079",
+    "contractYear": 2026,
+    "contractNumber": "H2111",
+    "pbp": "001",
+    "segmentId": "H2111001",
+    "planName": "Blue Cross Blue Shield Medicare Advantage Dual (HMO D-SNP)",
+    "product": "MAPD",
+    "planType": "DSNP",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "Northeast",
+    "region": "Keystone",
+    "legalEntity": "BlueCross BlueShield of Pennsylvania",
+    "marketingName": "Blue Cross Blue Shield Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": "DSNP",
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-079-01",
+        "documentName": "Provider Directory - Blue Cross Blue Shield Medicare Advantage Dual (HMO D-SNP)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-079/provider-directory.pdf",
+        "documentDate": "2026-08-17"
+      },
+      {
+        "documentId": "DOC-PLAN-079-02",
+        "documentName": "Summary of Benefits - Blue Cross Blue Shield Medicare Advantage Dual (HMO D-SNP)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-079/summary-of-benefits.pdf",
+        "documentDate": "2026-11-20"
+      },
+      {
+        "documentId": "DOC-PLAN-079-03",
+        "documentName": "Annual Notice of Change - Blue Cross Blue Shield Medicare Advantage Dual (HMO D-SNP)",
+        "documentType": "Annual Notice of Change",
+        "documentUrl": "https://example.com/documents/plan-079/annual-notice-of-change.pdf",
+        "documentDate": "2026-05-25"
+      }
+    ]
+  },
+  {
+    "planId": "PLAN-080",
+    "contractYear": 2026,
+    "contractNumber": "H5217",
+    "pbp": "001",
+    "segmentId": "H5217001",
+    "planName": "Cigna Medicare Advantage Dual (HMO D-SNP)",
+    "product": "MAPD",
+    "planType": "DSNP",
+    "category": "Medicare Advantage",
+    "commissionable": true,
+    "planStatus": "Active",
+    "market": "West",
+    "region": "Arizona",
+    "legalEntity": "Cigna HealthCare",
+    "marketingName": "Cigna Medicare",
+    "minAge": 65,
+    "maxAge": null,
+    "snpType": "DSNP",
+    "isDeleted": false,
+    "documents": [
+      {
+        "documentId": "DOC-PLAN-080-01",
+        "documentName": "Provider Directory - Cigna Medicare Advantage Dual (HMO D-SNP)",
+        "documentType": "Provider Directory",
+        "documentUrl": "https://example.com/documents/plan-080/provider-directory.pdf",
+        "documentDate": "2026-01-22"
+      },
+      {
+        "documentId": "DOC-PLAN-080-02",
+        "documentName": "Summary of Benefits - Cigna Medicare Advantage Dual (HMO D-SNP)",
+        "documentType": "Summary of Benefits",
+        "documentUrl": "https://example.com/documents/plan-080/summary-of-benefits.pdf",
+        "documentDate": "2026-04-16"
+      }
+    ]
+  }
 ]
-

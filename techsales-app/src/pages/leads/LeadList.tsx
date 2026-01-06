@@ -20,15 +20,16 @@ import { EmptyState } from '../../components/common/EmptyState';
 import { useAuth } from '../../context/AuthContext';
 import type { Lead, LeadStatus } from '../../types';
 import { searchLeads, deleteLead, getAllLeads, type LeadFilters } from '../../services/leadService';
+import { calculateAge } from '../../utils/dateUtils';
 
 const statusOptions = [
   { value: '', label: 'All Status' },
-  { value: 'New', label: 'New' },
-  { value: 'Contacted', label: 'Contacted' },
-  { value: 'Qualified', label: 'Qualified' },
-  { value: 'Proposal', label: 'Proposal' },
+  { value: 'New Lead', label: 'New Lead' },
+  { value: 'Contacted Lead', label: 'Contacted Lead' },
+  { value: 'Appointment Schedule', label: 'Appointment Schedule' },
+  { value: 'Enrollment in progress', label: 'Enrollment in progress' },
   { value: 'Enrolled', label: 'Enrolled' },
-  { value: 'Lost', label: 'Lost' },
+  { value: 'Dropped / Lost lead', label: 'Dropped / Lost lead' },
 ];
 
 export function LeadList() {
@@ -50,13 +51,12 @@ export function LeadList() {
 
   // Status counts (total counts independent of filters)
   const [statusCounts, setStatusCounts] = useState<Record<LeadStatus, number>>({
-    New: 0,
-    Contacted: 0,
-    Qualified: 0,
-    Proposal: 0,
-    Enrolled: 0,
-    Lost: 0,
-    'Follow-up': 0,
+    'New Lead': 0,
+    'Contacted Lead': 0,
+    'Appointment Schedule': 0,
+    'Enrollment in progress': 0,
+    'Enrolled': 0,
+    'Dropped / Lost lead': 0,
   });
 
   // Delete modal state
@@ -97,13 +97,12 @@ export function LeadList() {
     const result = await getAllLeads();
     if (result.success && result.data) {
       const counts: Record<LeadStatus, number> = {
-        New: 0,
-        Contacted: 0,
-        Qualified: 0,
-        Proposal: 0,
-        Enrolled: 0,
-        Lost: 0,
-        'Follow-up': 0,
+        'New Lead': 0,
+        'Contacted Lead': 0,
+        'Appointment Schedule': 0,
+        'Enrollment in progress': 0,
+        'Enrolled': 0,
+        'Dropped / Lost lead': 0,
       };
       result.data.forEach((lead) => {
         if (lead.leadStatus && counts[lead.leadStatus] !== undefined) {
@@ -252,7 +251,7 @@ export function LeadList() {
 
       {/* Stats Summary */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-        {(['New', 'Contacted', 'Qualified', 'Proposal', 'Enrolled', 'Lost'] as LeadStatus[]).map((status) => {
+        {(['New Lead', 'Contacted Lead', 'Appointment Schedule', 'Enrollment in progress', 'Enrolled', 'Dropped / Lost lead'] as LeadStatus[]).map((status) => {
           return (
             <button
               key={status}
@@ -308,8 +307,13 @@ export function LeadList() {
                     {lead.firstName} {lead.lastName}
                   </h3>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Age: {lead.age} • MBI: {lead.mbi || 'N/A'}
+                    Age: {calculateAge(lead.dob)} • MBI: {lead.medicareNumber || 'N/A'}
                   </p>
+                  {lead.source && (
+                    <Badge variant="default" className="mt-1">
+                      {lead.source}
+                    </Badge>
+                  )}
                 </div>
                 <StatusBadge status={lead.leadStatus} />
               </div>
@@ -336,11 +340,8 @@ export function LeadList() {
 
               {/* Tags */}
               <div className="flex flex-wrap gap-2 mb-4">
-                {lead.isDualEligible && (
+                {lead.medicaidId && (
                   <Badge variant="warning">Dual Eligible</Badge>
-                )}
-                {lead.isLISEligible && (
-                  <Badge variant="info">LIS</Badge>
                 )}
                 {lead.taggedPharmacies && lead.taggedPharmacies.length > 0 && (
                   <Badge variant="primary">{lead.taggedPharmacies.length} Pharmacies</Badge>

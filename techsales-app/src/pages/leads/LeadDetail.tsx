@@ -12,13 +12,20 @@ import {
   Pill,
   FileText,
   Activity,
-  Clock
+  Clock,
+  Circle,
+  Check,
+  Sparkles,
+  ClipboardCheck,
+  CheckCircle,
+  XCircle
 } from 'lucide-react';
 import { Button, Badge } from '../../components/common';
 import { Tabs, TabPanel } from '../../components/common/Tabs';
 import { StatusBadge } from '../../components/common/StatusBadge';
-import type { Lead } from '../../types';
+import type { Lead, LeadStatus } from '../../types';
 import { getLeadById } from '../../services/leadService';
+import { getAllDrugs } from '../../services/drugService';
 import { calculateAge } from '../../utils/dateUtils';
 
 export function LeadDetail() {
@@ -27,18 +34,32 @@ export function LeadDetail() {
   const [lead, setLead] = useState<Lead | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
+  const [drugMap, setDrugMap] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    const loadLead = async () => {
+    const loadData = async () => {
       if (!id) return;
       setIsLoading(true);
-      const result = await getLeadById(id);
-      if (result.success && result.data) {
-        setLead(result.data);
+      
+      // Load lead
+      const leadResult = await getLeadById(id);
+      if (leadResult.success && leadResult.data) {
+        setLead(leadResult.data);
       }
+      
+      // Load drugs for lookup
+      const drugsResult = await getAllDrugs();
+      if (drugsResult.success && drugsResult.data) {
+        const map: Record<string, string> = {};
+        drugsResult.data.forEach(drug => {
+          map[drug.drugId] = drug.drugLabelName || drug.brandName || drug.genericName;
+        });
+        setDrugMap(map);
+      }
+      
       setIsLoading(false);
     };
-    loadLead();
+    loadData();
   }, [id]);
 
   const formatDate = (dateString: string) => {
@@ -63,7 +84,7 @@ export function LeadDetail() {
     return (
       <div className="flex items-center justify-center h-96">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-3 border-orange-200 border-t-orange-600 rounded-full animate-spin" />
+          <div className="w-8 h-8 border-3 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
           <p className="text-gray-500 dark:text-gray-400">Loading lead details...</p>
         </div>
       </div>
@@ -83,6 +104,42 @@ export function LeadDetail() {
       </div>
     );
   }
+
+  // Lead lifecycle stages in order (normal progression)
+  const normalStages: LeadStatus[] = [
+    'New Lead',
+    'Contacted Lead',
+    'Appointment Schedule',
+    'Enrollment in progress',
+    'Enrolled',
+  ];
+
+  // Terminal stages (these are end states, not part of normal progression)
+  const terminalStages: LeadStatus[] = [
+    'Dropped / Lost lead',
+  ];
+
+  // Get the current stage index
+  const getCurrentStageIndex = (status: LeadStatus): number => {
+    return normalStages.indexOf(status);
+  };
+
+  // Get icon for each lifecycle stage
+  const getStageIcon = (stage: LeadStatus) => {
+    switch (stage) {
+      case 'New Lead': return Sparkles;
+      case 'Contacted Lead': return Phone;
+      case 'Appointment Schedule': return Calendar;
+      case 'Enrollment in progress': return ClipboardCheck;
+      case 'Enrolled': return CheckCircle;
+      case 'Dropped / Lost lead': return XCircle;
+      default: return Circle;
+    }
+  };
+
+  const currentStatus = lead.leadStatus || 'New Lead';
+  const currentStageIndex = getCurrentStageIndex(currentStatus);
+  const isTerminalStage = terminalStages.includes(currentStatus);
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: User },
@@ -106,7 +163,7 @@ export function LeadDetail() {
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-orange-700 flex items-center justify-center text-white text-xl font-bold">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white text-xl font-bold">
               {lead.firstName[0]}{lead.lastName[0]}
             </div>
             <div>
@@ -115,17 +172,129 @@ export function LeadDetail() {
               </h1>
               <div className="flex items-center gap-3 mt-1">
                 <StatusBadge status={lead.leadStatus} size="md" />
-                {lead.isDualEligible && <Badge variant="warning">Dual Eligible</Badge>}
-                {lead.isLISEligible && <Badge variant="info">LIS Eligible</Badge>}
+                {lead.medicaidId && <Badge variant="warning">Dual Eligible</Badge>}
               </div>
             </div>
           </div>
+                 {/* Lead Lifecycle Timeline */}
+       <div className="flex-1 min-w-0 mx-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+         <div className="relative" style={{ height: '80px' }}>
+           {/* Horizontal timeline line - centered vertically */}
+           <div className="absolute left-0 right-0 h-0.5 bg-gray-200 dark:bg-gray-700" style={{ top: '50%', transform: 'translateY(-50%)' }} />
+           
+           <div className="relative flex items-start justify-between h-full">
+             {/* Normal progression stages */}
+             {normalStages.map((stage, index) => {
+               const isCompleted = !isTerminalStage && index <= currentStageIndex;
+               const isCurrent = !isTerminalStage && index === currentStageIndex;
+               
+               // Get color for each stage
+               const getStageColor = (stageName: LeadStatus) => {
+                 switch (stageName) {
+                   case 'New Lead': return 'blue';
+                   case 'Contacted Lead': return 'purple';
+                   case 'Appointment Schedule': return 'cyan';
+                   case 'Enrollment in progress': return 'amber';
+                   case 'Enrolled': return 'green';
+                   default: return 'gray';
+                 }
+               };
+               
+               const stageColor = getStageColor(stage);
+               const StageIcon = getStageIcon(stage);
+               
+               return (
+                 <div key={stage} className="relative flex flex-col items-center h-full" style={{ flex: 1 }}>
+                   {/* Green checkmark badge at top for completed stages */}
+                   {isCompleted && (
+                     <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 z-20">
+                       <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center border-2 border-white dark:border-gray-800 shadow-sm">
+                         <Check className="w-3 h-3 text-white" />
+                       </div>
+                     </div>
+                   )}
+                   
+                   {/* Timeline dot - centered on the line */}
+                   <div className="absolute z-10 flex items-center justify-center" style={{ top: '50%', transform: 'translateY(-50%)' }}>
+                     {isCompleted ? (
+                       <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                         isCurrent 
+                           ? `ring-2 shadow-md bg-green-600 ring-green-200 dark:ring-green-900/50`
+                           : `${
+                               stageColor === 'blue' ? 'bg-blue-500' :
+                               stageColor === 'purple' ? 'bg-purple-500' :
+                               stageColor === 'cyan' ? 'bg-cyan-500' :
+                               stageColor === 'amber' ? 'bg-amber-500' :
+                               'bg-green-500'
+                             }`
+                       }`}>
+                         <StageIcon className="w-6 h-6 text-white" />
+                       </div>
+                     ) : (
+                       <div className="w-12 h-12 rounded-full flex items-center justify-center bg-gray-200 dark:bg-gray-700 border-2 border-white dark:border-gray-800">
+                         <StageIcon className="w-6 h-6 text-gray-400" />
+                       </div>
+                     )}
+                   </div>
+                   
+                   {/* Stage name - positioned below */}
+                   <div className="absolute bottom-0 left-0 right-0 text-center">
+                     <div className={`text-xs font-medium leading-tight px-1 ${
+                       isCurrent 
+                         ? `${
+                             stageColor === 'blue' ? 'text-blue-700 dark:text-blue-400' :
+                             stageColor === 'purple' ? 'text-purple-700 dark:text-purple-400' :
+                             stageColor === 'cyan' ? 'text-cyan-700 dark:text-cyan-400' :
+                             stageColor === 'amber' ? 'text-amber-700 dark:text-amber-400' :
+                             'text-green-700 dark:text-green-400'
+                           }`
+                         : isCompleted 
+                           ? `${
+                               stageColor === 'blue' ? 'text-blue-600 dark:text-blue-300' :
+                               stageColor === 'purple' ? 'text-purple-600 dark:text-purple-300' :
+                               stageColor === 'cyan' ? 'text-cyan-600 dark:text-cyan-300' :
+                               stageColor === 'amber' ? 'text-amber-600 dark:text-amber-300' :
+                               'text-green-600 dark:text-green-300'
+                             }`
+                           : 'text-gray-500 dark:text-gray-400'
+                     }`}>
+                       {stage}
+                     </div>
+                   </div>
+                 </div>
+               );
+             })}
+             
+             {/* Terminal stage - show only if current */}
+             {isTerminalStage && (
+               <div className="relative flex flex-col items-center h-full" style={{ flex: 1 }}>
+                 {/* Terminal badge - positioned above icon */}
+                 <div className="absolute top-0 left-1/2 transform -translate-x-1/2 z-20">
+                   <Badge variant="danger" size="sm">Terminal</Badge>
+                 </div>
+                 
+                 <div className="absolute z-10 flex items-center justify-center" style={{ top: '50%', transform: 'translateY(-50%)' }}>
+                   <div className="w-12 h-12 rounded-full flex items-center justify-center bg-red-600 ring-2 ring-red-200 dark:ring-red-900/50 shadow-md">
+                     <XCircle className="w-6 h-6 text-white" />
+                   </div>
+                 </div>
+                 <div className="absolute bottom-0 left-0 right-0 text-center">
+                   <div className="text-xs font-medium leading-tight px-1 text-red-700 dark:text-red-400">
+                     {currentStatus}
+                   </div>
+                 </div>
+               </div>
+             )}
+           </div>
+         </div>
+       </div>
           <Button onClick={() => navigate(`/leads/${id}/edit`)}>
             <Edit2 className="w-4 h-4" />
             Edit Lead
           </Button>
         </div>
       </div>
+
 
       {/* Quick Info Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -214,7 +383,13 @@ export function LeadDetail() {
                   </div>
                   <div className="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700">
                     <dt className="text-gray-500 dark:text-gray-400">Part B Effective</dt>
-                    <dd className="font-medium text-gray-900 dark:text-white">{lead.partBEffectiveDate || 'N/A'}</dd>
+                    <dd className="font-medium text-gray-900 dark:text-white">{lead.partBDate || 'N/A'}</dd>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700">
+                    <dt className="text-gray-500 dark:text-gray-400">Source</dt>
+                    <dd className="font-medium text-gray-900 dark:text-white">
+                      <Badge variant="default">{lead.source || 'N/A'}</Badge>
+                    </dd>
                   </div>
                 </dl>
               </div>
@@ -227,7 +402,9 @@ export function LeadDetail() {
                 <dl className="space-y-3">
                   <div className="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700">
                     <dt className="text-gray-500 dark:text-gray-400">Address</dt>
-                    <dd className="font-medium text-gray-900 dark:text-white text-right">{lead.address}</dd>
+                    <dd className="font-medium text-gray-900 dark:text-white text-right">
+                      {lead.address1}{lead.address2 ? `, ${lead.address2}` : ''}
+                    </dd>
                   </div>
                   <div className="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700">
                     <dt className="text-gray-500 dark:text-gray-400">City</dt>
@@ -257,29 +434,15 @@ export function LeadDetail() {
                   <div className="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700">
                     <dt className="text-gray-500 dark:text-gray-400">Dual Eligible</dt>
                     <dd>
-                      <Badge variant={lead.isDualEligible ? 'success' : 'default'}>
-                        {lead.isDualEligible ? 'Yes' : 'No'}
+                      <Badge variant={lead.medicaidId ? 'success' : 'default'}>
+                        {lead.medicaidId ? 'Yes' : 'No'}
                       </Badge>
                     </dd>
                   </div>
                   <div className="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700">
-                    <dt className="text-gray-500 dark:text-gray-400">LIS Eligible</dt>
-                    <dd>
-                      <Badge variant={lead.isLISEligible ? 'success' : 'default'}>
-                        {lead.isLISEligible ? 'Yes' : 'No'}
-                      </Badge>
-                    </dd>
-                  </div>
-                  <div className="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700">
-                    <dt className="text-gray-500 dark:text-gray-400">Medicaid Number</dt>
+                    <dt className="text-gray-500 dark:text-gray-400">Medicaid ID</dt>
                     <dd className="font-medium text-gray-900 dark:text-white">
-                      {lead.medicaidNumber || 'N/A'}
-                    </dd>
-                  </div>
-                  <div className="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700">
-                    <dt className="text-gray-500 dark:text-gray-400">Current Plan</dt>
-                    <dd className="font-medium text-gray-900 dark:text-white">
-                      {lead.currentPlanId || 'None'}
+                      {lead.medicaidId || 'N/A'}
                     </dd>
                   </div>
                 </dl>
@@ -306,8 +469,8 @@ export function LeadDetail() {
                     </div>
                   )}
                   <div className="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700">
-                    <dt className="text-gray-500 dark:text-gray-400">Assigned To</dt>
-                    <dd className="text-gray-900 dark:text-white">{lead.assignedTo || 'Unassigned'}</dd>
+                    <dt className="text-gray-500 dark:text-gray-400">Created By</dt>
+                    <dd className="text-gray-900 dark:text-white">{lead.createdBy || 'System'}</dd>
                   </div>
                 </dl>
               </div>
@@ -358,7 +521,7 @@ export function LeadDetail() {
                         <Pill className="w-5 h-5 text-green-600 dark:text-green-400" />
                       </div>
                       <div>
-                        <p className="font-medium text-gray-900 dark:text-white">{drug.drugName}</p>
+                        <p className="font-medium text-gray-900 dark:text-white">{drugMap[drug.drugId] || 'Unknown Drug'}</p>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
                           {drug.dosage} • {drug.frequency} • Qty: {drug.quantity}
                         </p>
