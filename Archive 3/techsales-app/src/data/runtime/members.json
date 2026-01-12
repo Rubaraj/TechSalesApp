@@ -1,0 +1,44 @@
+[
+  {
+    "memberId": "MEMBER-001",
+    "policyNumber": "POL-2025-001",
+    "dateOfBirth": "1955-03-15",
+    "firstName": "Robert",
+    "lastName": "Anderson",
+    "email": "robert.anderson@email.com",
+    "phone": "555-0101",
+    "address": {
+      "street": "123 Main Street",
+      "city": "Hartford",
+      "state": "CT",
+      "zipCode": "06103"
+    },
+    "planId": "PLAN-001",
+    "carrier": "Aetna",
+    "assignedAgentId": "USER-002",
+    "enrollmentDate": "2025-01-15T00:00:00Z",
+    "isActive": true,
+    "createdAt": "2025-01-15T00:00:00Z"
+  },
+  {
+    "memberId": "MEMBER-002",
+    "policyNumber": "POL-2025-002",
+    "dateOfBirth": "1948-07-22",
+    "firstName": "Mary",
+    "lastName": "Johnson",
+    "email": "mary.johnson@email.com",
+    "phone": "555-0102",
+    "address": {
+      "street": "456 Oak Avenue",
+      "city": "Louisville",
+      "state": "KY",
+      "zipCode": "40202"
+    },
+    "planId": "PLAN-060",
+    "carrier": "Humana",
+    "assignedAgentId": "USER-003",
+    "enrollmentDate": "2025-02-01T00:00:00Z",
+    "isActive": true,
+    "createdAt": "2025-02-01T00:00:00Z"
+  }
+]

@@ -1,0 +1,27 @@
+[
+  {
+    "eligibilityId": "LIS-001",
+    "firstName": "Maria",
+    "lastName": "Garcia",
+    "dob": "1952-07-22",
+    "gender": "Female",
+    "medicareNumber": "2FH5-UF6-NL83",
+    "isEligible": true,
+    "lisLevel": 1,
+    "eligibilityDate": "2020-01-01",
+    "expirationDate": "2026-12-31"
+  },
+  {
+    "eligibilityId": "LIS-002",
+    "firstName": "Elizabeth",
+    "lastName": "Anderson",
+    "dob": "1951-12-03",
+    "gender": "Female",
+    "medicareNumber": "8LN1-AL2-TR49",
+    "isEligible": true,
+    "lisLevel": 3,
+    "eligibilityDate": "2019-06-01",
+    "expirationDate": "2026-12-31"
+  }
+]
+

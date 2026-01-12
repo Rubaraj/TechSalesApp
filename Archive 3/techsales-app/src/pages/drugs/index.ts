@@ -1,0 +1,2 @@
+export { DrugSearchPage } from './DrugSearch';
+

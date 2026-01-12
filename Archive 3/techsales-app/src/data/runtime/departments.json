@@ -1,0 +1,33 @@
+[
+  {
+    "departmentId": "DEPT-001",
+    "departmentName": "Administration",
+    "description": "System administration and management",
+    "managerId": "USER-001",
+    "parentDepartmentId": null,
+    "isActive": true,
+    "createdAt": "2025-01-01T00:00:00Z",
+    "createdBy": "SYSTEM"
+  },
+  {
+    "departmentId": "DEPT-002",
+    "departmentName": "Sales",
+    "description": "Medicare sales and enrollment",
+    "managerId": "USER-002",
+    "parentDepartmentId": null,
+    "isActive": true,
+    "createdAt": "2025-01-01T00:00:00Z",
+    "createdBy": "SYSTEM"
+  },
+  {
+    "departmentId": "DEPT-003",
+    "departmentName": "Customer Service",
+    "description": "Member support and service",
+    "managerId": "USER-004",
+    "parentDepartmentId": null,
+    "isActive": true,
+    "createdAt": "2025-01-01T00:00:00Z",
+    "createdBy": "SYSTEM"
+  }
+]
+

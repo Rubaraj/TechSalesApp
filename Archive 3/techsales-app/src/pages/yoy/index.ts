@@ -1,0 +1,2 @@
+export { YOYComparison } from './YOYComparison';
+

@@ -1,0 +1,2 @@
+export { PharmacySearchPage } from './PharmacySearch';
+
