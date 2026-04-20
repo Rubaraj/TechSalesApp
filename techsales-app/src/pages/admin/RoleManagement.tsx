@@ -53,7 +53,7 @@ export function RoleManagement() {
   const [formData, setFormData] = useState({
     roleName: '',
     description: '',
-    permissions: [] as string[],
+    permissions: [] as any[],
     isActive: true,
   });
 

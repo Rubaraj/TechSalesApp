@@ -1,4 +1,5 @@
 import type { Provider, ProviderSearchParams } from '../types';
+export type { ProviderSearchParams } from '../types';
 import type { ServiceResponse } from './baseService';
 import providerData from '../data/lookup/providerData.json';
 import { 

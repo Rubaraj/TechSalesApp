@@ -24,13 +24,17 @@ export interface Role {
   roleId: string;
   roleName: string;
   description: string;
-  permissions: string[]; // Simple string array for permission keys
+  permissions: RolePermission[];
   isActive: boolean;
   createdAt: string;
 }
 
-// Permission is now a simple string key
-export type Permission = string;
+export interface RolePermission {
+  module: string;
+  actions: string[];
+}
+
+export type Permission = RolePermission;
 
 export type ModuleName = 
   | 'dashboard'

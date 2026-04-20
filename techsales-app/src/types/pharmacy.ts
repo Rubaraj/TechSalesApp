@@ -22,6 +22,10 @@ export interface Pharmacy {
   latitude: number;
   longitude: number;
   isActive: boolean;
+  isRetail?: boolean;
+  isMailOrder?: boolean;
+  isSpecialty?: boolean;
+  isPreferred?: boolean;
 }
 
 export type PharmacyType = 
@@ -35,6 +39,7 @@ export type PharmacyType =
   | 'Clinic';
 
 export interface PharmacySearchParams {
+  searchTerm?: string;
   zipCode?: string;
   state?: string;
   county?: string;
@@ -43,5 +48,6 @@ export interface PharmacySearchParams {
   is24Hour?: boolean;
   hasDriveThru?: boolean;
   radius?: number; // miles
+  [key: string]: any;
 }
 

@@ -27,6 +27,10 @@ export interface Plan {
   snpType?: 'DSNP' | 'CSNP' | 'ISNP' | null;
   documents?: PlanDocument[];
   isDeleted: boolean;
+  carrier?: string;
+  annualOopMax?: number;
+  drugDeductible?: number;
+  premium?: any;
 }
 
 export type ProductType = 'MAPD' | 'MA' | 'PDP' | 'Medsup' | 'ANC';

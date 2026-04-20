@@ -15,6 +15,14 @@ export interface Drug {
   isVaccine: boolean;
   frequencies: string[];
   commonQuantities: number[];
+  tier?: number;
+  requiresPriorAuth?: boolean;
+  hasQuantityLimit?: boolean;
+  quantityLimit?: string;
+  hasStepTherapy?: boolean;
+  route?: string;
+  therapeuticCategory?: string;
+  manufacturer?: string;
 }
 
 export type DosageForm = 
@@ -42,6 +50,10 @@ export interface DrugSearchParams {
   dosageForm?: DosageForm;
   isBrand?: boolean;
   isGeneric?: boolean;
+  tier?: number;
+  page?: number;
+  pageSize?: number;
+  [key: string]: any;
 }
 
 export interface DrugFrequency {

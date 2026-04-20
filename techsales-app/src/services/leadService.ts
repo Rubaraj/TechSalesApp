@@ -23,6 +23,7 @@ export interface LeadFilters {
   zipCode?: string;
   existingMember?: boolean;
   createdBy?: string;
+  isDualEligible?: boolean;
 }
 
 export interface LeadSearchParams {

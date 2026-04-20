@@ -130,7 +130,7 @@ export function SelectPlan() {
               <SearchInput
                 placeholder="Search plans..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(value) => setSearchTerm(value)}
               />
             </div>
             {colorTheme === 'default' && (

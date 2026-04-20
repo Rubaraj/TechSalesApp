@@ -30,6 +30,7 @@ export interface PlanFilters {
   snpType?: string;
   carrier?: string; // Filter by insurance company (e.g., "Aetna", "UnitedHealthcare", "Humana")
   contractYear?: number | string; // Filter by contract year
+  product?: string;
 }
 
 export interface PlanSearchParams {

@@ -321,7 +321,7 @@ export function LeadForm() {
     if (isEditing && id) {
       result = await updateLead(id, leadData, user?.userId || '');
     } else {
-      result = await createLead(leadData as Omit<Lead, 'leadId' | 'createdAt' | 'createdBy' | 'age'>, user?.userId || '');
+      result = await createLead(leadData as any, user?.userId || '');
     }
 
     setIsSaving(false);

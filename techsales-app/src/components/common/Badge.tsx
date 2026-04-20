@@ -2,10 +2,11 @@ import type { ReactNode } from 'react';
 
 type BadgeVariant = 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info';
 
-interface BadgeProps {
+export interface BadgeProps {
   children: ReactNode;
   variant?: BadgeVariant;
   size?: 'sm' | 'md';
+  className?: string;
 }
 
 const variantClasses: Record<BadgeVariant, string> = {
@@ -22,13 +23,14 @@ const sizeClasses = {
   md: 'px-2 py-1 text-sm',
 };
 
-export function Badge({ children, variant = 'default', size = 'sm' }: BadgeProps) {
+export function Badge({ children, variant = 'default', size = 'sm', className = '' }: BadgeProps) {
   return (
     <span
       className={`
         inline-flex items-center font-medium rounded-full
         ${variantClasses[variant]}
         ${sizeClasses[size]}
+        ${className}
       `}
     >
       {children}

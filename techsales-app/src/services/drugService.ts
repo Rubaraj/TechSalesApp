@@ -1,4 +1,5 @@
 import type { Drug, DrugSearchParams, DosageForm } from '../types';
+export type { DrugSearchParams } from '../types';
 import type { ServiceResponse } from './baseService';
 import drugData from '../data/lookup/drugData.json';
 import { 

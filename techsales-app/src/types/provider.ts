@@ -18,11 +18,13 @@ export interface Provider {
 }
 
 export interface ProviderSearchParams {
+  searchTerm?: string;
   zipCode?: string;
   state?: string;
   county?: string;
   city?: string;
   covered?: boolean; // In Network only
   radius?: number; // miles
+  [key: string]: any;
 }
 

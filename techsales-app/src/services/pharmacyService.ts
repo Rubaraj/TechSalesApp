@@ -1,4 +1,5 @@
 import type { Pharmacy, PharmacySearchParams } from '../types';
+export type { PharmacySearchParams } from '../types';
 import type { ServiceResponse } from './baseService';
 import pharmacyData from '../data/lookup/pharmacyData.json';
 import { 
