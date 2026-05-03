@@ -46,8 +46,8 @@ interface YOYChange {
 const mockCurrentYear: PlanYear = {
   year: 2025,
   planId: 'PLAN-001-2025',
-  planName: 'Blue Cross MAPD Gold',
-  carrier: 'Blue Cross Blue Shield',
+  planName: 'Carrier 5 MAPD Gold',
+  carrier: 'Carrier 5',
   planType: 'MAPD',
   premium: 29,
   deductible: 250,
@@ -75,8 +75,8 @@ const mockCurrentYear: PlanYear = {
 const mockPreviousYear: PlanYear = {
   year: 2024,
   planId: 'PLAN-001-2024',
-  planName: 'Blue Cross MAPD Gold',
-  carrier: 'Blue Cross Blue Shield',
+  planName: 'Carrier 5 MAPD Gold',
+  carrier: 'Carrier 5',
   planType: 'MAPD',
   premium: 25,
   deductible: 200,
@@ -174,9 +174,9 @@ export function YOYComparison() {
 
   const planOptions = [
     { value: '', label: 'Select a plan to compare...' },
-    { value: 'PLAN-001', label: 'Blue Cross MAPD Gold' },
-    { value: 'PLAN-002', label: 'Aetna PPO Select' },
-    { value: 'PLAN-003', label: 'Humana Gold Plus' },
+    { value: 'PLAN-001', label: 'Carrier 5 MAPD Gold' },
+    { value: 'PLAN-002', label: 'Carrier 1 PPO Select' },
+    { value: 'PLAN-003', label: 'Carrier 2 Gold Plus' },
   ];
 
   const loadComparison = () => {

@@ -310,7 +310,7 @@ export function LeadForm() {
       leadStatus: formData.status,
       source: formData.source,
       permissionToContact: true, // Default, should be added to form
-      existingAetnaMember: false, // Default, should be added to form
+      existingCarrier1Member: false, // Default, should be added to form
       tobaccoUsage: false, // Default, should be added to form
       taggedPharmacies,
       taggedDrugs,

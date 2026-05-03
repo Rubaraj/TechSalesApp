@@ -1,0 +1,42 @@
+[
+  {
+    "targetId": "TARGET-001",
+    "metric": "New Leads",
+    "period": "monthly",
+    "targetValue": 50,
+    "points": 100,
+    "isActive": true,
+    "createdAt": "2025-01-15T10:00:00.000Z",
+    "createdBy": "USER-001"
+  },
+  {
+    "targetId": "TARGET-002",
+    "metric": "New Enrollments",
+    "period": "monthly",
+    "targetValue": 25,
+    "points": 200,
+    "isActive": true,
+    "createdAt": "2025-01-15T10:00:00.000Z",
+    "createdBy": "USER-001"
+  },
+  {
+    "targetId": "TARGET-003",
+    "metric": "New Appointments",
+    "period": "monthly",
+    "targetValue": 30,
+    "points": 150,
+    "isActive": true,
+    "createdAt": "2025-01-15T10:00:00.000Z",
+    "createdBy": "USER-001"
+  },
+  {
+    "targetId": "TARGET-004",
+    "metric": "Electronic Kits Sent",
+    "period": "monthly",
+    "targetValue": 50,
+    "points": 75,
+    "isActive": true,
+    "createdAt": "2025-01-15T10:00:00.000Z",
+    "createdBy": "USER-001"
+  }
+]

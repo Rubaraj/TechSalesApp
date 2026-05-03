@@ -84,7 +84,7 @@ export function Login() {
         <div className="text-center mb-8">
           <img 
             src={getLogoByTheme(colorTheme)} 
-            alt={colorTheme === 'aetna' ? 'Aetna' : colorTheme === 'humana' ? 'Humana' : 'EXL'}
+            alt={colorTheme === 'carrier1' ? 'Carrier 1' : colorTheme === 'carrier2' ? 'Carrier 2' : 'EXL'}
             className="h-16 w-auto mx-auto mb-4"
           />
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">

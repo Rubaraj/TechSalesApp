@@ -72,7 +72,7 @@ export function MemberLogin() {
         <div className="text-center mb-8">
           <img 
             src={getLogoByTheme(colorTheme)} 
-            alt={colorTheme === 'aetna' ? 'Aetna' : colorTheme === 'humana' ? 'Humana' : 'Medicare Hub'}
+            alt={colorTheme === 'carrier1' ? 'Carrier 1' : colorTheme === 'carrier2' ? 'Carrier 2' : 'Medicare Hub'}
             className="h-16 w-auto mx-auto mb-4"
           />
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -143,12 +143,12 @@ export function MemberLogin() {
             </p>
             <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
               <p>
-                <span className="font-mono bg-gray-200 dark:bg-gray-600 px-1 rounded">POL-2025-001</span> - 
-                DOB: <span className="font-mono bg-gray-200 dark:bg-gray-600 px-1 rounded">1955-03-15</span> (Aetna)
+                <span className="font-mono bg-gray-200 dark:bg-gray-600 px-1 rounded">POL-2025-001</span> -
+                DOB: <span className="font-mono bg-gray-200 dark:bg-gray-600 px-1 rounded">1955-03-15</span> (Carrier 1)
               </p>
               <p>
-                <span className="font-mono bg-gray-200 dark:bg-gray-600 px-1 rounded">POL-2025-002</span> - 
-                DOB: <span className="font-mono bg-gray-200 dark:bg-gray-600 px-1 rounded">1948-07-22</span> (Humana)
+                <span className="font-mono bg-gray-200 dark:bg-gray-600 px-1 rounded">POL-2025-002</span> -
+                DOB: <span className="font-mono bg-gray-200 dark:bg-gray-600 px-1 rounded">1948-07-22</span> (Carrier 2)
               </p>
             </div>
           </div>

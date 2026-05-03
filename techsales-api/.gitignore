@@ -1,0 +1,18 @@
+node_modules/
+dist/
+.env
+*.log
+npm-debug.log*
+
+# Runtime / lookup JSON stores — operator-owned, NOT checked in.
+# Sample data IS checked in (it's the bootstrap seed).
+data/runtime/*
+data/lookup/*
+!data/runtime/.gitkeep
+!data/lookup/.gitkeep
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

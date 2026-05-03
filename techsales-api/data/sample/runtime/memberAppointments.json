@@ -1,0 +1,38 @@
+[
+  {
+    "appointmentId": "APT-001",
+    "memberId": "MEMBER-001",
+    "agentId": "USER-002",
+    "agentName": "John Doe",
+    "appointmentType": "Annual Review",
+    "scheduledDate": "2025-12-30",
+    "scheduledTime": "10:00 AM",
+    "status": "Scheduled",
+    "notes": "Annual plan review and benefits discussion",
+    "createdAt": "2025-12-20T00:00:00Z"
+  },
+  {
+    "appointmentId": "APT-002",
+    "memberId": "MEMBER-001",
+    "agentId": "USER-002",
+    "agentName": "John Doe",
+    "appointmentType": "Follow-up",
+    "scheduledDate": "2026-01-15",
+    "scheduledTime": "2:00 PM",
+    "status": "Scheduled",
+    "notes": "Follow-up on medication coverage questions",
+    "createdAt": "2025-12-22T00:00:00Z"
+  },
+  {
+    "appointmentId": "APT-003",
+    "memberId": "MEMBER-002",
+    "agentId": "USER-003",
+    "agentName": "Jane Smith",
+    "appointmentType": "Plan Change",
+    "scheduledDate": "2026-01-10",
+    "scheduledTime": "11:00 AM",
+    "status": "Scheduled",
+    "notes": "Discussion about plan options for next year",
+    "createdAt": "2025-12-18T00:00:00Z"
+  }
+]

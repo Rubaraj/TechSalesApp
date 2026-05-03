@@ -26,9 +26,9 @@ Per the user requirement, **all DB connections go through the Node app** — the
 | Concern | Value |
 |---|---|
 | Mongo host | Raspberry Pi at `192.168.0.175:27017` |
-| Connection URI | `mongodb://192.168.0.175:27017/?replicaSet=rs0` |
-| Replica set | `rs0` (single-node) — gives transactions and change streams |
-| **RS advertised host** | **Must be `192.168.0.175:27017` in `rs.conf()` so the dev-laptop driver's SDAM can reach the primary. If `rs.conf()` advertises `localhost`, only the Pi itself can connect — Phase 0 spike below catches this.** |
+| Connection URI | `mongodb://192.168.0.175:27017/?directConnection=true` |
+| Replica set | `rs0` (exists but bypassed via `directConnection=true` — see Phase 0 finding below) |
+| **Phase 0 finding (2026-05-02)** | **The Pi's `rs.conf()` advertises hostname `mongodb` (not the LAN IP). Mongoose's SDAM cannot resolve it from the dev laptop, so the original `?replicaSet=rs0` URI failed with `getaddrinfo ENOTFOUND mongodb`. Resolved by switching to `?directConnection=true`, which talks to the URI host literally and skips topology discovery. Trade-off: no transactions, no change streams. Neither is used in current scope. To recover them later, fix `rs.conf()` on the Pi (`cfg.members[0].host = '192.168.0.175:27017'; rs.reconfig(cfg, {force:true})`).** |
 | Auth | **None** (LAN-only, trusted network). Documented as dev-only; production must enable auth. |
 | TLS | None |
 | App DB | `medhub_app` |
@@ -39,21 +39,20 @@ Per the user requirement, **all DB connections go through the Node app** — the
 
 ## 1. Repository Structure
 
-**Decision: sibling `server/` at repo root.**
+**Decision: sibling `techsales-api/` at repo root.**
 
 ```
 TechSalesApp/
-  techsales-app/         # existing Vite frontend (unchanged structure)
-  server/                # NEW Node backend
-  shared/                # NEW: shared TS types, imported from both sides
+  techsales-app/   # existing Vite frontend (unchanged structure)
+  techsales-api/   # NEW Node backend (types live in techsales-api/src/types)
 ```
 
-Rationale: cleanest separation, independent `node_modules` and tsconfigs, no Vite/Node ESM/CJS friction. Workspaces add ceremony for two packages.
+Rationale: cleanest separation, independent `node_modules` and tsconfigs, no Vite/Node ESM/CJS friction. (An earlier revision of the plan included a third sibling `shared/` package for `@medhub/shared` types meant to be consumed by both sides; the FE never wired up to it, so the types were consolidated into `techsales-api/src/types/` to remove the unused abstraction.)
 
-### Backend layout (`server/`)
+### Backend layout (`techsales-api/`)
 
 ```
-server/
+techsales-api/
   src/
     index.ts                      # bootstrap: connect both DBs → wire repos → start express
     config/
@@ -109,10 +108,6 @@ server/
   Dockerfile
   README.md                       # setup notes incl. Pi network requirements
 
-shared/
-  src/types/                      # promoted from techsales-app/src/types
-  package.json                    # "name": "@medhub/shared"
-  tsconfig.json
 ```
 
 ---
@@ -140,7 +135,7 @@ NODE_ENV=development
 PORT=4000
 
 # Mongo: same cluster URI for both DBs; separate dbName per logical database.
-MONGO_URI=mongodb://192.168.0.175:27017/?replicaSet=rs0
+MONGO_URI=mongodb://192.168.0.175:27017/?directConnection=true
 MONGO_APP_DB=medhub_app
 MONGO_LOOKUP_DB=medhub_lookup
 MONGO_CONNECT_TIMEOUT_MS=3000
@@ -153,7 +148,7 @@ JSON_PERSIST=true      # if false, JSON repo is in-memory only
 CORS_ORIGIN=http://localhost:5173
 ```
 
-### Mongo connection wiring (`server/src/config/mongo.ts`)
+### Mongo connection wiring (`techsales-api/src/config/mongo.ts`)
 
 ```ts
 import mongoose, { Connection } from 'mongoose';
@@ -167,13 +162,13 @@ export async function connectMongo(): Promise<{ ok: boolean; mode: 'mongo' | 'js
     appConn = await mongoose.createConnection(env.MONGO_URI, {
       dbName: env.MONGO_APP_DB,
       serverSelectionTimeoutMS: env.MONGO_CONNECT_TIMEOUT_MS,
-      appName: 'medhub-server-app',
+      appName: 'medhub-techsales-api-app',
     }).asPromise();
 
     lookupConn = await mongoose.createConnection(env.MONGO_URI, {
       dbName: env.MONGO_LOOKUP_DB,
       serverSelectionTimeoutMS: env.MONGO_CONNECT_TIMEOUT_MS,
-      appName: 'medhub-server-lookup',
+      appName: 'medhub-techsales-api-lookup',
     }).asPromise();
 
     return { ok: true, mode: 'mongo' };
@@ -205,11 +200,11 @@ The user requirement: portability across environments. Lookup data is large, mos
 Models are bound to a specific connection. The repository registry knows which connection each repo uses.
 
 ```ts
-// server/src/models/lead.model.ts
+// techsales-api/src/models/lead.model.ts
 import { appConn } from '../config/mongo';
 export const LeadModel = appConn.model<LeadDoc>('Lead', leadSchema);
 
-// server/src/models/plan.model.ts
+// techsales-api/src/models/plan.model.ts
 import { lookupConn } from '../config/mongo';
 export const PlanModel = lookupConn.model<PlanDoc>('Plan', planSchema);
 ```
@@ -242,7 +237,7 @@ The mode is fixed at backend startup; this endpoint reports what the backend boo
 ### Interface
 
 ```ts
-// server/src/repositories/types.ts
+// techsales-api/src/repositories/types.ts
 export interface IRepository<T, ID = string> {
   findAll(): Promise<T[]>;
   findById(id: ID): Promise<T | null>;
@@ -271,11 +266,11 @@ There is **no heartbeat, no per-request retry, no mid-flight mode switching**. I
 
 ### JSON repository persistence
 
-- **Source of truth in JSON mode: `server/data/{runtime,lookup}/`**, NOT `techsales-app/src/data/`.
+- **Source of truth in JSON mode: `techsales-api/data/{runtime,lookup}/`**, NOT `techsales-app/src/data/`.
 - **Bootstrap-copy algorithm** (runs ONCE per backend startup, before mounting routes):
-  - For each filename in `server/data/sample/runtime/`: if `server/data/runtime/<file>` does **not** exist, copy from sample; otherwise skip (operator owns the runtime dir; no clobber).
-  - Same for lookup. To force re-seed, run `npm run drop-runtime` (deletes `server/data/runtime/*.json`) then restart.
-  - If `server/data/sample/` is itself missing, the JSON mode panics at boot with a clear error pointing to `npm run transform-data`.
+  - For each filename in `techsales-api/data/sample/runtime/`: if `techsales-api/data/runtime/<file>` does **not** exist, copy from sample; otherwise skip (operator owns the runtime dir; no clobber).
+  - Same for lookup. To force re-seed, run `npm run drop-runtime` (deletes `techsales-api/data/runtime/*.json`) then restart.
+  - If `techsales-api/data/sample/` is itself missing, the JSON mode panics at boot with a clear error pointing to `npm run transform-data`.
 - **`JsonStore` write semantics** (concurrency-safe):
   - One in-flight write per collection, gated by a `currentWrite: Promise<void> | null` field. New writes await the previous one.
   - Dirty-flag pattern: any mutation flips `dirty=true`; the writer drains the flag *inside* the in-flight write before resolving — no update can be lost in a debounce window.
@@ -285,7 +280,7 @@ There is **no heartbeat, no per-request retry, no mid-flight mode switching**. I
 
 ### Read-only lookup data
 
-`server/data/lookup/` is the JSON-mode mirror of `medhub_lookup`. The seed script populates Mongo from this directory; the JSON read-only repos read from it. Never written via API.
+`techsales-api/data/lookup/` is the JSON-mode mirror of `medhub_lookup`. The seed script populates Mongo from this directory; the JSON read-only repos read from it. Never written via API.
 
 ---
 
@@ -300,8 +295,10 @@ There is **no heartbeat, no per-request retry, no mid-flight mode switching**. I
 | UnitedHealthcare | Carrier 3 | (no theme — uses default) |
 | Cigna | Carrier 4 | (no theme — uses default) |
 | Blue Cross Blue Shield | Carrier 5 | (no theme — uses default) |
+| WellCare *(Phase 2a addendum — found in dataset)* | Carrier 6 | (no theme — uses default) |
+| AARP MedicareRx *(Phase 1+2a code-review addendum)* | Carrier 7 | (no theme — uses default) |
 
-Common abbreviations also rewritten: `BCBS → C5`, `UHC → C3`, `BlueCross → Carrier 5`.
+Common abbreviations also rewritten: `BCBS → C5`, `UHC → C3`, `BlueCross → Carrier 5`, `AARP → C7`.
 
 ### Case-preservation algorithm
 
@@ -344,10 +341,10 @@ Edge cases verified by unit tests in the transform script:
 - `UHC` (caps, word-bounded) → `C3`; `uhc` → unchanged (URLs / lowercase identifiers); `Cuhc` → unchanged.
 - `aetna.com` → URL transform: `https://example.com/carrier1/...`.
 
-### Transform script (`server/src/scripts/transform-sample-data.ts`)
+### Transform script (`techsales-api/src/scripts/transform-sample-data.ts`)
 
 Inputs: `techsales-app/src/data/runtime/*.json` and `techsales-app/src/data/lookup/*.json`
-Output: `server/data/sample/runtime/*.json` and `server/data/sample/lookup/*.json`
+Output: `techsales-api/data/sample/runtime/*.json` and `techsales-api/data/sample/lookup/*.json`
 
 Fields rewritten (string-replace with case-preservation):
 - Plans: `carrier`, `planName`, `marketingName`, `legalEntity`, `documents[].name`, `documents[].url`
@@ -357,8 +354,8 @@ Fields rewritten (string-replace with case-preservation):
 
 Run order:
 ```
-npm run transform-data    # techsales-app/src/data/* → server/data/sample/*
-npm run seed              # server/data/sample/* → MongoDB (both DBs)
+npm run transform-data    # techsales-app/src/data/* → techsales-api/data/sample/*
+npm run seed              # techsales-api/data/sample/* → MongoDB (both DBs)
 ```
 
 The transform is **idempotent and sourced from the original JSON**, so re-running with updated source data is safe.
@@ -422,7 +419,7 @@ ServiceResponse<T>
 ServiceResponse<T[]>
 ```
 
-The shape is **fixed by the existing service signature** for each function. TypeScript will not catch a mismatch (`ServiceResponse<T>` is generic), so each route's contract must be JSDoc'd in `server/src/routes/<resource>.routes.ts` and verified against the consuming page during the slice that adds it.
+The shape is **fixed by the existing service signature** for each function. TypeScript will not catch a mismatch (`ServiceResponse<T>` is generic), so each route's contract must be JSDoc'd in `techsales-api/src/routes/<resource>.routes.ts` and verified against the consuming page during the slice that adds it.
 
 All responses preserve `ServiceResponse<T> = { success, data?, error?, message? }`. HTTP status mirrors `success` (200/201/400/404/500).
 
@@ -577,9 +574,9 @@ Rationale: lookup data is large (~1 MB JSON in the FE bundle). Dropping the look
 
 ## 8. Data Migration / Seeding
 
-`server/src/scripts/seed.ts` — invoked via `npm run seed`.
+`techsales-api/src/scripts/seed.ts` — invoked via `npm run seed`.
 
-Reads from `server/data/sample/` (after `transform-sample-data.ts` has run) and writes to MongoDB.
+Reads from `techsales-api/data/sample/` (after `transform-sample-data.ts` has run) and writes to MongoDB.
 
 ### Collection map (with target DB and indexes)
 
@@ -620,7 +617,7 @@ The `--reset --app` flag is exactly the "move to a new env" workflow: keep the l
 
 ```powershell
 # On source host
-mongodump --uri="mongodb://192.168.0.175:27017/?replicaSet=rs0" `
+mongodump --uri="mongodb://192.168.0.175:27017/?directConnection=true" `
           --db=medhub_app --out=./backup
 
 # Transfer ./backup to destination host
@@ -628,7 +625,7 @@ mongodump --uri="mongodb://192.168.0.175:27017/?replicaSet=rs0" `
 # On destination host
 mongorestore --uri="<new-host-uri>" --db=medhub_app ./backup/medhub_app
 
-# Update server/.env on the new host: MONGO_URI=<new-host-uri>
+# Update techsales-api/.env on the new host: MONGO_URI=<new-host-uri>
 # Lookup DB stays where it is (or restore separately if needed).
 ```
 
@@ -641,7 +638,7 @@ mongorestore --uri="<new-host-uri>" --db=medhub_app ./backup/medhub_app
 - **Goal:** Confirm the dev laptop can connect to the Pi's replica set with the new URI (no `directConnection=true`).
 - **Steps:**
   ```powershell
-  mongosh "mongodb://192.168.0.175:27017/?replicaSet=rs0"
+  mongosh "mongodb://192.168.0.175:27017/?directConnection=true"
   > rs.conf().members.forEach(m => print(m.host))
   # Must print 192.168.0.175:27017 (or another LAN-reachable host).
   # If it prints 'localhost:27017' or a Pi-only hostname, fix on the Pi:
@@ -654,7 +651,7 @@ mongorestore --uri="<new-host-uri>" --db=medhub_app ./backup/medhub_app
 ### Phase 1 — Backend skeleton + two-DB connections + dual-mode framework
 
 - **Goal:** Express boots, both connections established, `/api/health` reports the right mode, factory wiring proven on a stub repo.
-- **Files:** `server/package.json`, `tsconfig.json`, `src/index.ts`, `config/env.ts`, `config/mongo.ts`, `repositories/types.ts`, `repositories/registry.ts`, `routes/health.routes.ts`, `middleware/*`, `Dockerfile`, `.env.example`, `README.md`. Promote types to `shared/`.
+- **Files:** `techsales-api/package.json`, `tsconfig.json`, `src/index.ts`, `config/env.ts`, `config/mongo.ts`, `repositories/types.ts`, `repositories/registry.ts`, `routes/health.routes.ts`, `middleware/*`, `Dockerfile`, `.env.example`, `README.md`. Types live in `techsales-api/src/types/`.
 - **Acceptance:**
   - With Pi reachable: `npm run dev` connects to both `medhub_app` and `medhub_lookup`; `curl /api/health` returns `mode:'mongo'`.
   - With Pi unreachable (or `FORCE_JSON=true`) at startup: `npm run dev` boots in JSON mode and `curl /api/health` returns `mode:'json'`.
@@ -671,7 +668,7 @@ mongorestore --uri="<new-host-uri>" --db=medhub_app ./backup/medhub_app
   - `techsales-app/src/types/lead.ts` — `existingAetnaMember` → `existingCarrier1Member`.
   - `techsales-app/src/types/member.ts` — carrier union type.
   - **All ~17 components/JSON files** referencing real carrier names (verified count from critic, not 10–15). Run the CI grep first to enumerate them all in one pass.
-  - `techsales-app/src/data/runtime/*.json` and `lookup/*.json` — strings rewritten in place by a one-shot script (the FE still reads these in Phase 2a; backend doesn't exist yet to read from `server/data/sample/`).
+  - `techsales-app/src/data/runtime/*.json` and `lookup/*.json` — strings rewritten in place by a one-shot script (the FE still reads these in Phase 2a; backend doesn't exist yet to read from `techsales-api/data/sample/`).
 - **Acceptance:**
   - `npm run lint && tsc --noEmit && npm run build` all pass.
   - `npm run dev`, click through plans/leads/themes — UI shows `Carrier 1`–`Carrier 5`. Themed member portal still works for Carrier 1 (purple) and Carrier 2 (green).
@@ -679,15 +676,15 @@ mongorestore --uri="<new-host-uri>" --db=medhub_app ./backup/medhub_app
 
 ### Phase 2b — Backend transform + seeder + Mongo population
 
-- **Goal:** Backend skeleton from Phase 1 plus a working seeder that populates both `medhub_app` and `medhub_lookup` on the Pi from sanitized sample data. The transform script here is a *separate copy* (writes to `server/data/sample/`) — Phase 2a's in-place rewrite of `techsales-app/src/data/` is independent and stays.
+- **Goal:** Backend skeleton from Phase 1 plus a working seeder that populates both `medhub_app` and `medhub_lookup` on the Pi from sanitized sample data. The transform script here is a *separate copy* (writes to `techsales-api/data/sample/`) — Phase 2a's in-place rewrite of `techsales-app/src/data/` is independent and stays.
 - **Files:**
-  - `server/src/scripts/transform-sample-data.ts` (reads `techsales-app/src/data/` → writes `server/data/sample/`).
-  - `server/src/scripts/seed.ts`, `createIndexes.ts`, `drop.ts`, `drop-runtime.ts`.
-  - Generated: `server/data/sample/{runtime,lookup}/*.json`.
+  - `techsales-api/src/scripts/transform-sample-data.ts` (reads `techsales-app/src/data/` → writes `techsales-api/data/sample/`).
+  - `techsales-api/src/scripts/seed.ts`, `createIndexes.ts`, `drop.ts`, `drop-runtime.ts`.
+  - Generated: `techsales-api/data/sample/{runtime,lookup}/*.json`.
 - **Acceptance:**
-  - `npm run transform-data` produces sanitized files in `server/data/sample/`.
+  - `npm run transform-data` produces sanitized files in `techsales-api/data/sample/`.
   - `npm run seed -- --reset` populates both DBs on the Pi. `mongosh` confirms collection counts (8 + 8).
-  - CI guard regex extends to `server/data/sample/**` — must be zero matches.
+  - CI guard regex extends to `techsales-api/data/sample/**` — must be zero matches.
   - All indexes from §8 created.
 
 ### Phase 3 — Leads vertical slice + FE wrapper
@@ -696,7 +693,7 @@ mongorestore --uri="<new-host-uri>" --db=medhub_app ./backup/medhub_app
 - **Files:** `models/lead.model.ts`, `repositories/mongo/MongoLeadRepository.ts`, `repositories/json/JsonLeadRepository.ts`, `JsonStore.ts`, `controllers/lead.controller.ts`, `routes/lead.routes.ts`, `techsales-app/src/api/apiClient.ts`, rewritten `techsales-app/src/services/leadService.ts`, `techsales-app/vite.config.ts` (proxy), `.env`.
 - **Acceptance:**
   - Create a lead in UI → visible in `mongosh medhub_app db.leads.find()` on the Pi.
-  - Stop the Pi → create still succeeds, written to `server/data/runtime/leads.json` (the JSON-mode store).
+  - Stop the Pi → create still succeeds, written to `techsales-api/data/runtime/leads.json` (the JSON-mode store).
   - Stop backend entirely → create still succeeds via FE local fallback.
 
 ### Phase 4 — Migrate remaining `medhub_app` resources + AuthContext
@@ -720,7 +717,7 @@ mongorestore --uri="<new-host-uri>" --db=medhub_app ./backup/medhub_app
 ### Phase 6 — Hardening & Deployment (no auth in this phase either)
 
 - **Goal:** Validation, observability, deploy story. **Auth/authz remain out of scope** — when added later, that's a separate work item.
-- **Files:** `middleware/validate.ts` (zod), `middleware/rateLimit.ts`, structured pino logging, OpenAPI spec via `zod-to-openapi`, `server/Dockerfile`, GitHub Actions CI.
+- **Files:** `middleware/validate.ts` (zod), `middleware/rateLimit.ts`, structured pino logging, OpenAPI spec via `zod-to-openapi`, `techsales-api/Dockerfile`, GitHub Actions CI.
 - **Acceptance:** Bad payloads → 400 with field-level errors. Rate-limited 100 req/min/IP for write endpoints. `/api/openapi.json` served. Backend Dockerfile builds and runs.
 
 ### Phase 7 (Deferred) — AI foundation
@@ -734,16 +731,16 @@ Not in current scope. The schema already reserves room (`embedding?: number[]` o
 | # | Risk | Mitigation |
 |---|---|---|
 | 1 | **Pi is a single point of failure when backend is in `'mongo'` mode** | Two independent fallback layers, both decided ONCE: (a) backend startup falls through to JSON if Pi is unreachable at boot; (b) FE login falls through to bundled JSON if backend is unreachable at login. **Mid-session**: if Pi dies AFTER backend booted into `'mongo'`, requests 5xx until the backend is restarted. Operationally: Pi reboot during a working session = stop and restart `npm run dev` on the laptop. Sessions already in `'local'` mode are unaffected. |
-| 2 | **No auth on Pi MongoDB** | LAN-only deployment, documented in `server/README.md` as DEV-ONLY. Production checklist in Phase 6 requires enabling Mongo auth before any non-LAN exposure. Add bind-IP restriction (`bindIp` to LAN subnet only) on the Pi as a sanity check. |
-| 3 | **Cross-DB join attempts** | None planned; controllers compose. If a future feature needs it, options are (a) duplicate the lookup field into the app doc, (b) two queries + JS join. Document this in `server/README.md`. |
+| 2 | **No auth on Pi MongoDB** | LAN-only deployment, documented in `techsales-api/README.md` as DEV-ONLY. Production checklist in Phase 6 requires enabling Mongo auth before any non-LAN exposure. Add bind-IP restriction (`bindIp` to LAN subnet only) on the Pi as a sanity check. |
+| 3 | **Cross-DB join attempts** | None planned; controllers compose. If a future feature needs it, options are (a) duplicate the lookup field into the app doc, (b) two queries + JS join. Document this in `techsales-api/README.md`. |
 | 4 | **leads.json (495 K) loaded entirely into memory in JSON mode** | Acceptable in JS heap. In Mongo mode, **never `findAll()` from controllers** — `searchLeads` with mandatory pagination, `pageSize<=100`. Add §8 indexes during Phase 2's `createIndexes.ts`. |
-| 5 | **JSON writes corrupt source files in `src/data/`** | Hard-prohibited by design: backend reads from `server/data/`. Bootstrap copy runs once if empty. FE `src/data/` is read-only input. |
-| 6 | **Type drift between server and client** | Promote `techsales-app/src/types/*` to `shared/src/types/*` in Phase 1; import via `@medhub/shared` from both sides. 30 min of one-time wiring vs hours of debugging "why does `Lead.dob` differ." |
+| 5 | **JSON writes corrupt source files in `src/data/`** | Hard-prohibited by design: backend reads from `techsales-api/data/`. Bootstrap copy runs once if empty. FE `src/data/` is read-only input. |
+| 6 | **Type drift between API and frontend** | Types live in `techsales-api/src/types/`. The FE has its own `techsales-app/src/types/` with parallel definitions; renames must land in both. Future option: generate FE types from an OpenAPI spec served by the API (Phase 6) so they stay automatically in sync. |
 | 7 | **"Any password" demo is insecure — and stays that way in this plan** | Auth is deliberately out of scope. The deployment is LAN-only on a trusted home network with no Mongo auth, no JWT, no password verification. **Never expose this stack to the public internet** without first adding real auth. Mitigations while in scope: helmet, CORS allowlist, `bindIp` to LAN subnet on the Pi, `NODE_ENV=development` only. |
 | 8 | **Mongoose ties us to Mongo; Pi has no Vector Search** | Repository interface IS the abstraction. Mongoose stays inside `repositories/mongo/`. AI strategy is deferred — when picked up, the Pi can do in-aggregation cosine for small collections, or run Qdrant alongside. |
 | 9 | **~1.5 MB JSON in FE bundle** | After Phase 5, the lookup JSON files (~1 MB of the bundle) are removed from `techsales-app/src/data/lookup/` since lookup data has no local fallback (see §7 "Local-mode coverage by phase"). Runtime JSON (~0.5 MB) is kept for the agent/auth bootstrap fallback. Net saving: ~1 MB on the production bundle. |
 | 10 | **Mid-flight Pi unreachability** | Backend mode is fixed at startup — there is **no auto-failover**. If the Pi goes down while the backend is in `'mongo'` mode, requests start failing with 5xx until the backend is restarted (which then re-probes and likely boots into `'json'` mode). Trade-off accepted: simpler system, no split-brain, no reconciliation problem. Operationally: monitor backend uptime; restart on Pi reboot. A future enhancement could add a `/api/admin/reload-mode` endpoint to re-probe without a full restart, but it's out of scope. |
-| 11 | **Frontend rebrand misses a string** | CI grep guard: case-insensitive, word-bounded regex `(?i)\b(aetna\|humana\|cigna\|unitedhealthcare\|uhc\|bcbs\|blue[\s-]?cross\|anthem\|wellcare)\b` over `techsales-app/src/**`, `techsales-app/public/**`, AND `server/data/sample/**`. Fails PR on any match. The list covers the 5 mapped carriers + abbreviations + two adjacent carriers (Anthem, Wellcare) seen in the dataset. |
+| 11 | **Frontend rebrand misses a string** | CI grep guard: case-insensitive, word-bounded regex `(?i)\b(aetna\|humana\|cigna\|unitedhealthcare\|uhc\|bcbs\|blue[\s-]?cross\|anthem\|wellcare\|aarp)\b` over `techsales-app/src/**`, `techsales-app/public/**`, `techsales-app/**/*.md`, AND `techsales-api/data/sample/**`. Fails PR on any match. Covers the 7 mapped carriers + abbreviations. |
 | 12 | **CORS / cookies / sessions** | No tokens, no cookies, no auth headers → no CSRF or SameSite considerations. Vite dev proxy → FE+API share origin in dev. If the backend is ever exposed beyond the laptop, configure `CORS_ORIGIN` allowlist; never `*`. |
 
 ---
@@ -751,15 +748,15 @@ Not in current scope. The schema already reserves room (`embedding?: number[]` o
 ## 11. Critical Files
 
 ### New backend files (highest leverage)
-- `server\src\index.ts`
-- `server\src\config\mongo.ts` *(two connections, replica-set aware)*
-- `server\src\repositories\registry.ts`
-- `server\src\repositories\types.ts`
-- `server\src\repositories\json\JsonStore.ts`
-- `server\src\scripts\transform-sample-data.ts`
-- `server\src\scripts\seed.ts`
-- `server\src\scripts\createIndexes.ts`
-- `server\src\routes\index.ts`
+- `techsales-api\src\index.ts`
+- `techsales-api\src\config\mongo.ts` *(two connections, replica-set aware)*
+- `techsales-api\src\repositories\registry.ts`
+- `techsales-api\src\repositories\types.ts`
+- `techsales-api\src\repositories\json\JsonStore.ts`
+- `techsales-api\src\scripts\transform-sample-data.ts`
+- `techsales-api\src\scripts\seed.ts`
+- `techsales-api\src\scripts\createIndexes.ts`
+- `techsales-api\src\routes\index.ts`
 
 ### Frontend files needing edits
 - `techsales-app\vite.config.ts` — add proxy
@@ -773,10 +770,10 @@ Not in current scope. The schema already reserves room (`embedding?: number[]` o
 - `techsales-app\src\types\lead.ts` — `existingAetnaMember` → `existingCarrier1Member`
 - `techsales-app\src\types\member.ts` — carrier union type
 - Components referencing real carrier names (grep `Aetna\|Humana\|Cigna\|UnitedHealthcare\|BCBS` — expect ~10–15 hits)
-- NEW `shared\src\types\` — promoted from FE types
+- `techsales-api\src\types\` — promoted from FE types (lives inside the API package)
 
 ### Reuse from existing code
-- `techsales-app/src/services/baseService.ts` helpers (`filterByField`, `searchByFields`, `sortByField`, `paginateItems`) — port to `server/src/utils/` and reuse for the JSON repository implementations so list/search semantics stay identical.
+- `techsales-app/src/services/baseService.ts` helpers (`filterByField`, `searchByFields`, `sortByField`, `paginateItems`) — port to `techsales-api/src/utils/` and reuse for the JSON repository implementations so list/search semantics stay identical.
 - `techsales-app/src/types/*` — promote, do not duplicate.
 - `ServiceResponse<T>` shape — preserve verbatim across HTTP boundary so FE pages need zero changes.
 
@@ -790,7 +787,7 @@ End-to-end smoke test after Phase 3:
 # Pre-req: Pi MongoDB is up at 192.168.0.175:27017 with replica set rs0 initiated.
 
 # Terminal 1 — Backend
-cd server
+cd techsales-api
 npm install
 npm run transform-data        # sanitize sample data
 npm run seed -- --reset       # drop+seed both DBs on the Pi
@@ -814,7 +811,7 @@ Get-ChildItem -Recurse -Path techsales-app/src -Include *.ts,*.tsx,*.json |
 
 # 3) Two-DB write check (Phase 3 onward)
 #    Create a lead in UI; on the Pi:
-mongosh "mongodb://192.168.0.175:27017/?replicaSet=rs0"
+mongosh "mongodb://192.168.0.175:27017/?directConnection=true"
 > use medhub_app
 > db.leads.find({leadId: /LEAD/}).sort({_id:-1}).limit(1)
 #    → shows the new lead
@@ -827,7 +824,7 @@ mongosh "mongodb://192.168.0.175:27017/?replicaSet=rs0"
 #    /api/health now returns mode:'json' (the backend re-probed at startup and got no Mongo).
 #    Log in again — FE notices the change via /api/auth/login response and locks session to 'api' mode using the JSON-backed server.
 #    Create another lead in UI → succeeds.
-Get-Content server\data\runtime\leads.json | Select-String -Pattern "<the new firstName>"
+Get-Content techsales-api\data\runtime\leads.json | Select-String -Pattern "<the new firstName>"
 #    → confirms write to JSON store on the backend
 
 # 5) Backend failure scenario
@@ -836,11 +833,11 @@ Get-Content server\data\runtime\leads.json | Select-String -Pattern "<the new fi
 #    DevTools network shows ApiUnavailable; in-memory lead visible until refresh.
 
 # 6) Migration drill (Phase 4 onward)
-mongodump --uri="mongodb://192.168.0.175:27017/?replicaSet=rs0" `
+mongodump --uri="mongodb://192.168.0.175:27017/?directConnection=true" `
           --db=medhub_app --out=.\backup-app
 #    → ./backup-app/medhub_app/*.bson exists; ~the size of runtime data
 mongorestore --uri="<other-mongo-uri>" --db=medhub_app .\backup-app\medhub_app
-#    Update server/.env on other host: MONGO_URI=<other-mongo-uri>
+#    Update techsales-api/.env on other host: MONGO_URI=<other-mongo-uri>
 #    Backend starts; UI works on the new host without re-seeding lookup.
 ```
 
@@ -866,9 +863,9 @@ Vite dev proxy: `/api` → `http://localhost:4000` — no CORS in dev. Backend c
 |---|---|
 | Pi reboots / Mongo down (backend was in `'mongo'`) | `Ctrl+C` the backend, `npm run dev` again. It re-probes; boots into `'mongo'` if Pi is back, else `'json'`. |
 | Backend crashes | `npm run dev` again. FE sessions in `'api'` mode see fetch errors until backend is back; `'local'`-mode sessions unaffected. |
-| Want to force `'json'` mode without stopping the Pi | Set `FORCE_JSON=true` in `server/.env`, restart backend. |
+| Want to force `'json'` mode without stopping the Pi | Set `FORCE_JSON=true` in `techsales-api/.env`, restart backend. |
 | Mongo data corruption / accidental drop | `mongorestore --db=medhub_app ./backup-app/medhub_app` (procedure in §8 migration playbook). |
-| Reset JSON-mode data | `npm run drop-runtime` (deletes `server/data/runtime/*.json`); next backend boot re-seeds from `server/data/sample/`. |
+| Reset JSON-mode data | `npm run drop-runtime` (deletes `techsales-api/data/runtime/*.json`); next backend boot re-seeds from `techsales-api/data/sample/`. |
 
 ### Production posture (out of scope for this plan; checklist for later)
 

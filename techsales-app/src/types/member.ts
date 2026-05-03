@@ -13,7 +13,7 @@ export interface Member {
     zipCode: string;
   };
   planId: string;
-  carrier: 'Aetna' | 'Humana'; // Determines theme
+  carrier: 'Carrier 1' | 'Carrier 2' | 'Carrier 3' | 'Carrier 4' | 'Carrier 5'; // Determines theme (only Carrier 1 and Carrier 2 are themed)
   assignedAgentId?: string; // Agent assigned to this member
   enrollmentDate: string;
   isActive: boolean;

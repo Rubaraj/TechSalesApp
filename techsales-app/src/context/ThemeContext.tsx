@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 
 type Theme = 'light' | 'dark' | 'system';
-export type ColorTheme = 'default' | 'aetna' | 'humana';
+export type ColorTheme = 'default' | 'carrier1' | 'carrier2';
 
 interface ThemeContextType {
   theme: Theme;
@@ -37,7 +37,7 @@ function getStoredTheme(): Theme {
 function getStoredColorTheme(): ColorTheme {
   if (typeof window !== 'undefined') {
     const stored = localStorage.getItem(COLOR_THEME_STORAGE_KEY);
-    if (stored === 'default' || stored === 'aetna' || stored === 'humana') {
+    if (stored === 'default' || stored === 'carrier1' || stored === 'carrier2') {
       return stored;
     }
   }
@@ -53,7 +53,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const stored = getStoredColorTheme();
     const root = document.documentElement;
-    root.classList.remove('theme-default', 'theme-aetna', 'theme-humana');
+    root.classList.remove('theme-default', 'theme-carrier1', 'theme-carrier2');
     root.classList.add(`theme-${stored}`);
   }, []);
 
@@ -71,7 +71,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   // Apply color theme to document when it changes
   useEffect(() => {
     const root = document.documentElement;
-    root.classList.remove('theme-default', 'theme-aetna', 'theme-humana');
+    root.classList.remove('theme-default', 'theme-carrier1', 'theme-carrier2');
     root.classList.add(`theme-${colorTheme}`);
   }, [colorTheme]);
 
@@ -105,7 +105,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(COLOR_THEME_STORAGE_KEY, newColorTheme);
     // Apply immediately
     const root = document.documentElement;
-    root.classList.remove('theme-default', 'theme-aetna', 'theme-humana');
+    root.classList.remove('theme-default', 'theme-carrier1', 'theme-carrier2');
     root.classList.add(`theme-${newColorTheme}`);
   };
 

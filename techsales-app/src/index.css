@@ -35,7 +35,7 @@
 }
 
 /* Color Theme Overrides - These override the @theme values */
-:root:not(.theme-aetna):not(.theme-humana),
+:root:not(.theme-carrier1):not(.theme-carrier2),
 :root.theme-default {
   /* Primary - Orange (Default) - same as base theme */
   --color-primary-50: #fff7ed;
@@ -51,8 +51,8 @@
   --color-primary-950: #431407;
 }
 
-:root.theme-aetna {
-  /* Primary - Aetna Purple (#5a2e6f) */
+:root.theme-carrier1 {
+  /* Primary - Carrier 1 Purple (#5a2e6f) */
   --color-primary-50: #f5f0f9;
   --color-primary-100: #e9ddf2;
   --color-primary-200: #d4bce5;
@@ -66,8 +66,8 @@
   --color-primary-950: #1c0d22;
 }
 
-:root.theme-humana {
-  /* Primary - Humana Green (#5c9a1b) */
+:root.theme-carrier2 {
+  /* Primary - Carrier 2 Green (#5c9a1b) */
   --color-primary-50: #f5f9f0;
   --color-primary-100: #e8f2d9;
   --color-primary-200: #d1e5b3;

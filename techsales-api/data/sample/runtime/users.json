@@ -1,0 +1,285 @@
+[
+  {
+    "userId": "USER-001",
+    "username": "admin",
+    "email": "admin@medicarehub.com",
+    "firstName": "System",
+    "lastName": "Admin",
+    "phone": "800-555-0001",
+    "roleId": "ROLE-001",
+    "departmentId": "DEPT-001",
+    "isActive": true,
+    "isSuperAdmin": true,
+    "accessLevel": "admin",
+    "markets": [
+      "Northeast",
+      "Southeast",
+      "Midwest",
+      "Southwest",
+      "West"
+    ],
+    "createdAt": "2025-01-01T00:00:00Z",
+    "createdBy": "SYSTEM",
+    "lastLoginAt": "2025-12-24T08:00:00Z"
+  },
+  {
+    "userId": "USER-002",
+    "username": "johndoe11",
+    "email": "johndoe11@medicarehub.com",
+    "firstName": "John",
+    "lastName": "Doe",
+    "phone": "203-555-1001",
+    "roleId": "ROLE-002",
+    "departmentId": "DEPT-002",
+    "isActive": true,
+    "isSuperAdmin": false,
+    "accessLevel": "agent",
+    "markets": [
+      "Northeast",
+      "Southeast"
+    ],
+    "createdAt": "2025-01-15T09:00:00Z",
+    "createdBy": "USER-001",
+    "lastLoginAt": "2025-12-24T07:30:00Z"
+  },
+  {
+    "userId": "USER-003",
+    "username": "janesmith22",
+    "email": "janesmith22@medicarehub.com",
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "phone": "305-555-2002",
+    "roleId": "ROLE-002",
+    "departmentId": "DEPT-002",
+    "isActive": true,
+    "isSuperAdmin": false,
+    "accessLevel": "agent",
+    "markets": [
+      "Southeast",
+      "Southwest"
+    ],
+    "createdAt": "2025-02-01T10:00:00Z",
+    "createdBy": "USER-001",
+    "lastLoginAt": "2025-12-23T16:45:00Z"
+  },
+  {
+    "userId": "USER-004",
+    "username": "mikewilson33",
+    "email": "mikewilson33@medicarehub.com",
+    "firstName": "Mike",
+    "lastName": "Wilson",
+    "phone": "312-555-3003",
+    "roleId": "ROLE-002",
+    "departmentId": "DEPT-002",
+    "isActive": true,
+    "isSuperAdmin": false,
+    "accessLevel": "agent",
+    "markets": [
+      "Midwest",
+      "West"
+    ],
+    "createdAt": "2025-03-01T11:00:00Z",
+    "createdBy": "USER-001",
+    "lastLoginAt": "2025-12-22T14:20:00Z"
+  },
+  {
+    "userId": "USER-005",
+    "username": "sarahjones44",
+    "email": "sarahjones44@medicarehub.com",
+    "firstName": "Sarah",
+    "lastName": "Jones",
+    "phone": "404-555-4005",
+    "roleId": "ROLE-002",
+    "departmentId": "DEPT-002",
+    "isActive": true,
+    "isSuperAdmin": false,
+    "accessLevel": "agent",
+    "markets": [
+      "Southeast",
+      "Northeast"
+    ],
+    "createdAt": "2025-04-01T09:00:00Z",
+    "createdBy": "USER-001",
+    "lastLoginAt": "2025-10-23T23:02:35.323Z"
+  },
+  {
+    "userId": "USER-006",
+    "username": "davidbrown55",
+    "email": "davidbrown55@medicarehub.com",
+    "firstName": "David",
+    "lastName": "Brown",
+    "phone": "214-555-5006",
+    "roleId": "ROLE-002",
+    "departmentId": "DEPT-002",
+    "isActive": true,
+    "isSuperAdmin": false,
+    "accessLevel": "agent",
+    "markets": [
+      "Southwest",
+      "West"
+    ],
+    "createdAt": "2025-04-15T10:00:00Z",
+    "createdBy": "USER-001",
+    "lastLoginAt": "2025-10-28T18:17:20.820Z"
+  },
+  {
+    "userId": "USER-007",
+    "username": "lisadavis66",
+    "email": "lisadavis66@medicarehub.com",
+    "firstName": "Lisa",
+    "lastName": "Davis",
+    "phone": "617-555-6007",
+    "roleId": "ROLE-002",
+    "departmentId": "DEPT-002",
+    "isActive": true,
+    "isSuperAdmin": false,
+    "accessLevel": "agent",
+    "markets": [
+      "Northeast",
+      "Midwest"
+    ],
+    "createdAt": "2025-05-01T11:00:00Z",
+    "createdBy": "USER-001",
+    "lastLoginAt": "2025-10-30T16:38:22.423Z"
+  },
+  {
+    "userId": "USER-008",
+    "username": "michaelmiller77",
+    "email": "michaelmiller77@medicarehub.com",
+    "firstName": "Michael",
+    "lastName": "Miller",
+    "phone": "602-555-7008",
+    "roleId": "ROLE-002",
+    "departmentId": "DEPT-002",
+    "isActive": true,
+    "isSuperAdmin": false,
+    "accessLevel": "agent",
+    "markets": [
+      "West",
+      "Southwest"
+    ],
+    "createdAt": "2025-05-15T12:00:00Z",
+    "createdBy": "USER-001",
+    "lastLoginAt": "2025-10-11T15:33:24.074Z"
+  },
+  {
+    "userId": "USER-009",
+    "username": "jenniferwilson88",
+    "email": "jenniferwilson88@medicarehub.com",
+    "firstName": "Jennifer",
+    "lastName": "Wilson",
+    "phone": "713-555-8009",
+    "roleId": "ROLE-002",
+    "departmentId": "DEPT-002",
+    "isActive": true,
+    "isSuperAdmin": false,
+    "accessLevel": "agent",
+    "markets": [
+      "Southwest",
+      "Southeast"
+    ],
+    "createdAt": "2025-06-01T13:00:00Z",
+    "createdBy": "USER-001",
+    "lastLoginAt": "2025-10-15T13:30:18.092Z"
+  },
+  {
+    "userId": "USER-010",
+    "username": "robertmoore99",
+    "email": "robertmoore99@medicarehub.com",
+    "firstName": "Robert",
+    "lastName": "Moore",
+    "phone": "415-555-9010",
+    "roleId": "ROLE-002",
+    "departmentId": "DEPT-002",
+    "isActive": true,
+    "isSuperAdmin": false,
+    "accessLevel": "agent",
+    "markets": [
+      "West",
+      "Northeast"
+    ],
+    "createdAt": "2025-06-15T14:00:00Z",
+    "createdBy": "USER-001",
+    "lastLoginAt": "2025-12-10T03:27:33.410Z"
+  },
+  {
+    "userId": "USER-011",
+    "username": "amandataylor00",
+    "email": "amandataylor00@medicarehub.com",
+    "firstName": "Amanda",
+    "lastName": "Taylor",
+    "phone": "919-555-0011",
+    "roleId": "ROLE-002",
+    "departmentId": "DEPT-002",
+    "isActive": true,
+    "isSuperAdmin": false,
+    "accessLevel": "agent",
+    "markets": [
+      "Southeast",
+      "Northeast"
+    ],
+    "createdAt": "2025-07-01T15:00:00Z",
+    "createdBy": "USER-001",
+    "lastLoginAt": "2025-11-20T18:30:05.138Z"
+  },
+  {
+    "userId": "USER-012",
+    "username": "christopheranderson11",
+    "email": "christopheranderson11@medicarehub.com",
+    "firstName": "Christopher",
+    "lastName": "Anderson",
+    "phone": "312-555-1012",
+    "roleId": "ROLE-002",
+    "departmentId": "DEPT-002",
+    "isActive": true,
+    "isSuperAdmin": false,
+    "accessLevel": "agent",
+    "markets": [
+      "Midwest",
+      "West"
+    ],
+    "createdAt": "2025-07-15T16:00:00Z",
+    "createdBy": "USER-001",
+    "lastLoginAt": "2025-12-18T07:32:55.292Z"
+  },
+  {
+    "userId": "USER-013",
+    "username": "jessicathomas22",
+    "email": "jessicathomas22@medicarehub.com",
+    "firstName": "Jessica",
+    "lastName": "Thomas",
+    "phone": "305-555-2013",
+    "roleId": "ROLE-002",
+    "departmentId": "DEPT-002",
+    "isActive": true,
+    "isSuperAdmin": false,
+    "accessLevel": "agent",
+    "markets": [
+      "Southeast",
+      "Southwest"
+    ],
+    "createdAt": "2025-08-01T17:00:00Z",
+    "createdBy": "USER-001",
+    "lastLoginAt": "2025-12-22T09:36:39.464Z"
+  },
+  {
+    "userId": "USER-014",
+    "username": "danieljackson33",
+    "email": "danieljackson33@medicarehub.com",
+    "firstName": "Daniel",
+    "lastName": "Jackson",
+    "phone": "404-555-3014",
+    "roleId": "ROLE-002",
+    "departmentId": "DEPT-002",
+    "isActive": true,
+    "isSuperAdmin": false,
+    "accessLevel": "agent",
+    "markets": [
+      "Southeast",
+      "Northeast"
+    ],
+    "createdAt": "2025-08-15T18:00:00Z",
+    "createdBy": "USER-001",
+    "lastLoginAt": "2025-11-23T22:00:54.353Z"
+  }
+]

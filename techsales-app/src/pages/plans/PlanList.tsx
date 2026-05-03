@@ -46,12 +46,12 @@ const categoryOptions = [
 
 const carrierOptions = [
   { value: '', label: 'All Carriers' },
-  { value: 'Aetna', label: 'Aetna' },
-  { value: 'UnitedHealthcare', label: 'UnitedHealthcare' },
-  { value: 'Humana', label: 'Humana' },
-  { value: 'Blue Cross Blue Shield', label: 'Blue Cross Blue Shield' },
-  { value: 'Cigna', label: 'Cigna' },
-  { value: 'WellCare', label: 'WellCare' },
+  { value: 'Carrier 1', label: 'Carrier 1' },
+  { value: 'Carrier 3', label: 'Carrier 3' },
+  { value: 'Carrier 2', label: 'Carrier 2' },
+  { value: 'Carrier 5', label: 'Carrier 5' },
+  { value: 'Carrier 4', label: 'Carrier 4' },
+  { value: 'Carrier 6', label: 'Carrier 6' },
 ];
 
 const yearOptions = [
@@ -85,12 +85,12 @@ export function PlanList() {
 
   // Lock carrier filter based on theme
   useEffect(() => {
-    if (colorTheme === 'aetna') {
-      // Lock to Aetna
-      setFilters(prev => ({ ...prev, carrier: 'Aetna' }));
-    } else if (colorTheme === 'humana') {
-      // Lock to Humana
-      setFilters(prev => ({ ...prev, carrier: 'Humana' }));
+    if (colorTheme === 'carrier1') {
+      // Lock to Carrier 1
+      setFilters(prev => ({ ...prev, carrier: 'Carrier 1' }));
+    } else if (colorTheme === 'carrier2') {
+      // Lock to Carrier 2
+      setFilters(prev => ({ ...prev, carrier: 'Carrier 2' }));
     } else {
       // Default theme: unlock and clear carrier filter
       setFilters(prev => {
@@ -376,12 +376,12 @@ export function PlanList() {
               options={carrierOptions}
               value={filters.carrier || ''}
               onChange={(e) => setFilters({ ...filters, carrier: e.target.value || undefined })}
-              disabled={colorTheme === 'aetna' || colorTheme === 'humana'}
+              disabled={colorTheme === 'carrier1' || colorTheme === 'carrier2'}
               helperText={
-                colorTheme === 'aetna' 
-                  ? 'Locked to Aetna based on selected theme'
-                  : colorTheme === 'humana'
-                  ? 'Locked to Humana based on selected theme'
+                colorTheme === 'carrier1'
+                  ? 'Locked to Carrier 1 based on selected theme'
+                  : colorTheme === 'carrier2'
+                  ? 'Locked to Carrier 2 based on selected theme'
                   : undefined
               }
             />

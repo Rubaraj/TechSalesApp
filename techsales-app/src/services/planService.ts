@@ -28,7 +28,7 @@ export interface PlanFilters {
   maxAge?: number;
   commissionable?: boolean;
   snpType?: string;
-  carrier?: string; // Filter by insurance company (e.g., "Aetna", "UnitedHealthcare", "Humana")
+  carrier?: string; // Filter by insurance company (e.g., "Carrier 1", "Carrier 3", "Carrier 2")
   contractYear?: number | string; // Filter by contract year
   product?: string;
 }
@@ -40,7 +40,7 @@ export interface PlanSearchParams {
   sortDirection?: 'asc' | 'desc';
   page?: number;
   pageSize?: number;
-  colorTheme?: ColorTheme; // Theme-based filtering (default shows all, aetna/humana filter by carrier)
+  colorTheme?: ColorTheme; // Theme-based filtering (default shows all, carrier1/carrier2 filter by carrier)
 }
 
 export interface PlanWithDetails extends Plan {
@@ -111,17 +111,17 @@ export const searchPlans = async (params: PlanSearchParams): Promise<ServiceResp
   
   // Apply theme-based carrier filtering first (before other filters)
   // Default theme: show all plans
-  // Aetna theme: show only Aetna plans
-  // Humana theme: show only Humana plans
-  if (params.colorTheme === 'aetna') {
-    filteredPlans = filteredPlans.filter(p => 
-      p.marketingName.toLowerCase().includes('aetna') ||
-      p.legalEntity.toLowerCase().includes('aetna')
+  // Carrier 1 theme: show only Carrier 1 plans
+  // Carrier 2 theme: show only Carrier 2 plans
+  if (params.colorTheme === 'carrier1') {
+    filteredPlans = filteredPlans.filter(p =>
+      p.marketingName.toLowerCase().includes('carrier 1') ||
+      p.legalEntity.toLowerCase().includes('carrier 1')
     );
-  } else if (params.colorTheme === 'humana') {
-    filteredPlans = filteredPlans.filter(p => 
-      p.marketingName.toLowerCase().includes('humana') ||
-      p.legalEntity.toLowerCase().includes('humana')
+  } else if (params.colorTheme === 'carrier2') {
+    filteredPlans = filteredPlans.filter(p =>
+      p.marketingName.toLowerCase().includes('carrier 2') ||
+      p.legalEntity.toLowerCase().includes('carrier 2')
     );
   }
   // Default theme: no filtering (show all plans)

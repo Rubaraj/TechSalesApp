@@ -523,7 +523,7 @@ function ContactInfoStep({ formData, onUpdate, onNext, onBack, onSaveDraft }: an
         type="email"
         value={formData.email}
         onChange={(e) => onUpdate({ email: e.target.value })}
-        helperText="Providing an email address authorizes us to contact you via email. Your email address will be handled consistent with our Privacy Policy which you can find on our website at https://www.aetna.com/medicare.html?cid=site_medicare and you can opt out anytime.*"
+        helperText="Providing an email address authorizes us to contact you via email. Your email address will be handled consistent with our Privacy Policy which you can find on our website at https://example.com/carrier1/medicare.html?cid=site_medicare and you can opt out anytime.*"
         rightIcon={<Mail className="w-4 h-4 text-gray-400" />}
       />
 
@@ -576,10 +576,10 @@ function OtherInfoStep({ formData, onUpdate, onNext, onBack, onSaveDraft }: any)
 
       <div>
         <h3 className="text-lg font-semibold text-primary-600 dark:text-primary-400 mb-4">
-          Aetna Medicare Member
+          Carrier 1 Medicare Member
         </h3>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Are you a current or past Aetna Medicare member?
+          Are you a current or past Carrier 1 Medicare member?
         </label>
         <div className="flex gap-4">
           {['Yes', 'No'].map((option) => (
@@ -654,7 +654,7 @@ function PaymentStep({ formData, onUpdate, onNext, onBack, onSaveDraft }: any) {
 
       <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-6 text-sm text-gray-700 dark:text-gray-300 space-y-3">
         <p>
-          I acknowledge that Aetna Medicare Advantage will release information for treatment, payment, and health care operations, including prescription drug event data, to Medicare.
+          I acknowledge that Carrier 1 Medicare Advantage will release information for treatment, payment, and health care operations, including prescription drug event data, to Medicare.
         </p>
         <p>
           I acknowledge that information may be released for research purposes under federal statutes.
@@ -666,7 +666,7 @@ function PaymentStep({ formData, onUpdate, onNext, onBack, onSaveDraft }: any) {
           By signing (or having an authorized person sign), I certify that I have read and understand the contents of this application. If signed by an authorized individual, I certify that I am authorized to act on behalf of the enrollee under State law and that documentation is available upon request.
         </p>
         <p>
-          Aetna Medicare is a PDP, HMO, PPO plan with a Medicare contract. SNPs have contracts with state Medicaid programs. Enrollment depends on contract renewal.
+          Carrier 1 Medicare is a PDP, HMO, PPO plan with a Medicare contract. SNPs have contracts with state Medicaid programs. Enrollment depends on contract renewal.
         </p>
         <p>
           This is not a complete description of benefits. A complete description of benefits, exclusions, limitations, and conditions of coverage is available.

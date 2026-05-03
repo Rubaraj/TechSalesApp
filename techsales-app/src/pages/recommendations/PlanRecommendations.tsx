@@ -78,8 +78,8 @@ const mockLeads: LeadForRecommendation[] = [
 const mockRecommendations: RecommendedPlan[] = [
   {
     planId: 'PLAN-001',
-    planName: 'Blue Cross MAPD Gold',
-    carrier: 'Blue Cross Blue Shield',
+    planName: 'Carrier 5 MAPD Gold',
+    carrier: 'Carrier 5',
     planType: 'MAPD',
     category: 'HMO',
     premium: 0,
@@ -93,8 +93,8 @@ const mockRecommendations: RecommendedPlan[] = [
   },
   {
     planId: 'PLAN-002',
-    planName: 'Aetna DSNP Complete',
-    carrier: 'Aetna',
+    planName: 'Carrier 1 DSNP Complete',
+    carrier: 'Carrier 1',
     planType: 'DSNP',
     category: 'HMO',
     premium: 0,
@@ -108,8 +108,8 @@ const mockRecommendations: RecommendedPlan[] = [
   },
   {
     planId: 'PLAN-003',
-    planName: 'Humana Gold Plus',
-    carrier: 'Humana',
+    planName: 'Carrier 2 Gold Plus',
+    carrier: 'Carrier 2',
     planType: 'MAPD',
     category: 'PPO',
     premium: 25,

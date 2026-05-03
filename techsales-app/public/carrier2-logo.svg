@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 64" width="200" height="64">
+  <title>Carrier 2 Logo</title>
+  <desc>Generic placeholder logo for Carrier 2</desc>
+  <rect x="0" y="0" width="64" height="64" rx="8" fill="#5c9a1b"/>
+  <text x="32" y="42" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" fill="#ffffff" text-anchor="middle">C2</text>
+  <text x="76" y="40" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="600" fill="#5c9a1b">Carrier 2</text>
+</svg>

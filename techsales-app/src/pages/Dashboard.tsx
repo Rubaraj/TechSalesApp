@@ -1342,9 +1342,9 @@ export function Dashboard({ tab }: DashboardProps) {
                 
                 <div className="space-y-3">
                   {[
-                    { name: 'Blue Cross MAPD Gold', carrier: 'BCBS', enrollments: 8, rating: 4.5 },
-                    { name: 'Aetna DSNP Complete', carrier: 'Aetna', enrollments: 5, rating: 4.0 },
-                    { name: 'Humana PPO Select', carrier: 'Humana', enrollments: 3, rating: 4.5 },
+                    { name: 'Carrier 5 MAPD Gold', carrier: 'C5', enrollments: 8, rating: 4.5 },
+                    { name: 'Carrier 1 DSNP Complete', carrier: 'Carrier 1', enrollments: 5, rating: 4.0 },
+                    { name: 'Carrier 2 PPO Select', carrier: 'Carrier 2', enrollments: 3, rating: 4.5 },
                   ].map((plan, idx) => (
                     <div
                       key={idx}

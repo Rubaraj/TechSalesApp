@@ -45,10 +45,11 @@ export function MemberDashboard() {
       setIsLoading(true);
 
       // Set theme based on member's carrier
-      if (member.carrier === 'Aetna') {
-        setColorTheme('aetna');
-      } else if (member.carrier === 'Humana') {
-        setColorTheme('humana');
+      // Only Carrier 1 and Carrier 2 have themed branding; others use default theme.
+      if (member.carrier === 'Carrier 1') {
+        setColorTheme('carrier1');
+      } else if (member.carrier === 'Carrier 2') {
+        setColorTheme('carrier2');
       }
 
       // Load member details, plan, and appointments

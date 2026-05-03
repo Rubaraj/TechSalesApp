@@ -164,32 +164,32 @@ export function SystemSettings() {
                 )}
               </button>
               <button
-                onClick={() => setPreviewColorTheme('aetna')}
+                onClick={() => setPreviewColorTheme('carrier1')}
                 className={`p-4 border-2 rounded-lg cursor-pointer bg-white transition-all ${
-                  previewColorTheme === 'aetna' 
-                    ? 'border-[#5a2e6f] shadow-lg scale-105' 
+                  previewColorTheme === 'carrier1'
+                    ? 'border-[#5a2e6f] shadow-lg scale-105'
                     : 'border-gray-200 hover:border-gray-300'
                 }`}
               >
                 <div className="h-20 bg-gradient-to-br from-[#5a2e6f] to-[#482459] rounded mb-2" />
-                <p className="text-center text-sm font-medium text-gray-900">Aetna Theme</p>
-                {previewColorTheme === 'aetna' && (
+                <p className="text-center text-sm font-medium text-gray-900">Carrier 1 Theme</p>
+                {previewColorTheme === 'carrier1' && (
                   <p className="text-center text-xs text-[#5a2e6f] mt-1 font-semibold">
                     {previewColorTheme !== colorTheme ? 'Selected' : 'Active'}
                   </p>
                 )}
               </button>
               <button
-                onClick={() => setPreviewColorTheme('humana')}
+                onClick={() => setPreviewColorTheme('carrier2')}
                 className={`p-4 border-2 rounded-lg cursor-pointer bg-white transition-all ${
-                  previewColorTheme === 'humana' 
-                    ? 'border-[#5c9a1b] shadow-lg scale-105' 
+                  previewColorTheme === 'carrier2'
+                    ? 'border-[#5c9a1b] shadow-lg scale-105'
                     : 'border-gray-200 hover:border-gray-300'
                 }`}
               >
                 <div className="h-20 bg-gradient-to-br from-[#5c9a1b] to-[#4a7a16] rounded mb-2" />
-                <p className="text-center text-sm font-medium text-gray-900">Humana Theme</p>
-                {previewColorTheme === 'humana' && (
+                <p className="text-center text-sm font-medium text-gray-900">Carrier 2 Theme</p>
+                {previewColorTheme === 'carrier2' && (
                   <p className="text-center text-xs text-[#5c9a1b] mt-1 font-semibold">
                     {previewColorTheme !== colorTheme ? 'Selected' : 'Active'}
                   </p>
@@ -201,7 +201,7 @@ export function SystemSettings() {
               <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                 <p className="text-sm text-blue-700 dark:text-blue-300">
                   <strong>Note:</strong> Theme selection will be applied when you click "Save Changes". 
-                  Current active theme: <strong>{colorTheme === 'default' ? 'Default (Orange)' : colorTheme === 'aetna' ? 'Aetna (Purple)' : 'Humana (Green)'}</strong>
+                  Current active theme: <strong>{colorTheme === 'default' ? 'Default (Orange)' : colorTheme === 'carrier1' ? 'Carrier 1 (Purple)' : 'Carrier 2 (Green)'}</strong>
                 </p>
               </div>
             )}

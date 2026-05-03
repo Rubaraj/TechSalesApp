@@ -5,7 +5,7 @@
     "contractNumber": "H5521",
     "pbp": "001",
     "segmentId": "H5521001",
-    "planName": "Aetna Medicare Value (PPO)",
+    "planName": "Carrier 1 Medicare Value (PPO)",
     "product": "MAPD",
     "planType": "PPO",
     "category": "Medicare Advantage",
@@ -13,8 +13,8 @@
     "planStatus": "Active",
     "market": "Northeast",
     "region": "New England",
-    "legalEntity": "Aetna Life Insurance Company",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Life Insurance Company",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -22,28 +22,28 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-001-01",
-        "documentName": "Annual Notice of Change - Aetna Medicare Value (PPO)",
+        "documentName": "Annual Notice of Change - Carrier 1 Medicare Value (PPO)",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-001/annual-notice-of-change.pdf",
         "documentDate": "2026-02-04"
       },
       {
         "documentId": "DOC-PLAN-001-02",
-        "documentName": "Evidence of Coverage - Aetna Medicare Value (PPO)",
+        "documentName": "Evidence of Coverage - Carrier 1 Medicare Value (PPO)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-001/evidence-of-coverage.pdf",
         "documentDate": "2026-12-01"
       },
       {
         "documentId": "DOC-PLAN-001-03",
-        "documentName": "Formulary - Aetna Medicare Value (PPO)",
+        "documentName": "Formulary - Carrier 1 Medicare Value (PPO)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-001/formulary.pdf",
         "documentDate": "2026-02-27"
       },
       {
         "documentId": "DOC-PLAN-001-04",
-        "documentName": "Summary of Benefits - Aetna Medicare Value (PPO)",
+        "documentName": "Summary of Benefits - Carrier 1 Medicare Value (PPO)",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-001/summary-of-benefits.pdf",
         "documentDate": "2026-07-19"
@@ -56,7 +56,7 @@
     "contractNumber": "H5521",
     "pbp": "002",
     "segmentId": "H5521002",
-    "planName": "Aetna Medicare Premier (PPO)",
+    "planName": "Carrier 1 Medicare Premier (PPO)",
     "product": "MAPD",
     "planType": "PPO",
     "category": "Medicare Advantage",
@@ -64,8 +64,8 @@
     "planStatus": "Active",
     "market": "Northeast",
     "region": "New England",
-    "legalEntity": "Aetna Life Insurance Company",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Life Insurance Company",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -73,28 +73,28 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-002-01",
-        "documentName": "Evidence of Coverage - Aetna Medicare Premier (PPO)",
+        "documentName": "Evidence of Coverage - Carrier 1 Medicare Premier (PPO)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-002/evidence-of-coverage.pdf",
         "documentDate": "2026-11-12"
       },
       {
         "documentId": "DOC-PLAN-002-02",
-        "documentName": "Summary of Benefits - Aetna Medicare Premier (PPO)",
+        "documentName": "Summary of Benefits - Carrier 1 Medicare Premier (PPO)",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-002/summary-of-benefits.pdf",
         "documentDate": "2026-07-12"
       },
       {
         "documentId": "DOC-PLAN-002-03",
-        "documentName": "Annual Notice of Change - Aetna Medicare Premier (PPO)",
+        "documentName": "Annual Notice of Change - Carrier 1 Medicare Premier (PPO)",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-002/annual-notice-of-change.pdf",
         "documentDate": "2026-01-14"
       },
       {
         "documentId": "DOC-PLAN-002-04",
-        "documentName": "Formulary - Aetna Medicare Premier (PPO)",
+        "documentName": "Formulary - Carrier 1 Medicare Premier (PPO)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-002/formulary.pdf",
         "documentDate": "2026-10-02"
@@ -107,7 +107,7 @@
     "contractNumber": "H5521",
     "pbp": "003",
     "segmentId": "H5521003",
-    "planName": "Aetna Medicare Elite (PPO)",
+    "planName": "Carrier 1 Medicare Elite (PPO)",
     "product": "MAPD",
     "planType": "PPO",
     "category": "Medicare Advantage",
@@ -115,8 +115,8 @@
     "planStatus": "Active",
     "market": "Northeast",
     "region": "New York",
-    "legalEntity": "Aetna Life Insurance Company",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Life Insurance Company",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -124,28 +124,28 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-003-01",
-        "documentName": "Evidence of Coverage - Aetna Medicare Elite (PPO)",
+        "documentName": "Evidence of Coverage - Carrier 1 Medicare Elite (PPO)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-003/evidence-of-coverage.pdf",
         "documentDate": "2026-08-05"
       },
       {
         "documentId": "DOC-PLAN-003-02",
-        "documentName": "Summary of Benefits - Aetna Medicare Elite (PPO)",
+        "documentName": "Summary of Benefits - Carrier 1 Medicare Elite (PPO)",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-003/summary-of-benefits.pdf",
         "documentDate": "2026-08-16"
       },
       {
         "documentId": "DOC-PLAN-003-03",
-        "documentName": "Formulary - Aetna Medicare Elite (PPO)",
+        "documentName": "Formulary - Carrier 1 Medicare Elite (PPO)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-003/formulary.pdf",
         "documentDate": "2026-09-12"
       },
       {
         "documentId": "DOC-PLAN-003-04",
-        "documentName": "Annual Notice of Change - Aetna Medicare Elite (PPO)",
+        "documentName": "Annual Notice of Change - Carrier 1 Medicare Elite (PPO)",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-003/annual-notice-of-change.pdf",
         "documentDate": "2026-01-08"
@@ -158,7 +158,7 @@
     "contractNumber": "H1609",
     "pbp": "001",
     "segmentId": "H1609001",
-    "planName": "Aetna Medicare Select (HMO)",
+    "planName": "Carrier 1 Medicare Select (HMO)",
     "product": "MAPD",
     "planType": "HMO",
     "category": "Medicare Advantage",
@@ -166,8 +166,8 @@
     "planStatus": "Active",
     "market": "Southeast",
     "region": "Florida",
-    "legalEntity": "Aetna Health Inc. (FL)",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Health Inc. (FL)",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -175,14 +175,14 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-004-01",
-        "documentName": "Evidence of Coverage - Aetna Medicare Select (HMO)",
+        "documentName": "Evidence of Coverage - Carrier 1 Medicare Select (HMO)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-004/evidence-of-coverage.pdf",
         "documentDate": "2026-11-29"
       },
       {
         "documentId": "DOC-PLAN-004-02",
-        "documentName": "Summary of Benefits - Aetna Medicare Select (HMO)",
+        "documentName": "Summary of Benefits - Carrier 1 Medicare Select (HMO)",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-004/summary-of-benefits.pdf",
         "documentDate": "2026-10-29"
@@ -195,7 +195,7 @@
     "contractNumber": "H1609",
     "pbp": "002",
     "segmentId": "H1609002",
-    "planName": "Aetna Medicare Premier (HMO)",
+    "planName": "Carrier 1 Medicare Premier (HMO)",
     "product": "MAPD",
     "planType": "HMO",
     "category": "Medicare Advantage",
@@ -203,8 +203,8 @@
     "planStatus": "Active",
     "market": "Southeast",
     "region": "Florida",
-    "legalEntity": "Aetna Health Inc. (FL)",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Health Inc. (FL)",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -212,21 +212,21 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-005-01",
-        "documentName": "Annual Notice of Change - Aetna Medicare Premier (HMO)",
+        "documentName": "Annual Notice of Change - Carrier 1 Medicare Premier (HMO)",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-005/annual-notice-of-change.pdf",
         "documentDate": "2026-01-22"
       },
       {
         "documentId": "DOC-PLAN-005-02",
-        "documentName": "Formulary - Aetna Medicare Premier (HMO)",
+        "documentName": "Formulary - Carrier 1 Medicare Premier (HMO)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-005/formulary.pdf",
         "documentDate": "2026-12-10"
       },
       {
         "documentId": "DOC-PLAN-005-03",
-        "documentName": "Provider Directory - Aetna Medicare Premier (HMO)",
+        "documentName": "Provider Directory - Carrier 1 Medicare Premier (HMO)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-005/provider-directory.pdf",
         "documentDate": "2026-07-27"
@@ -239,7 +239,7 @@
     "contractNumber": "H3931",
     "pbp": "001",
     "segmentId": "H3931001",
-    "planName": "Aetna Medicare Value (HMO)",
+    "planName": "Carrier 1 Medicare Value (HMO)",
     "product": "MAPD",
     "planType": "HMO",
     "category": "Medicare Advantage",
@@ -247,8 +247,8 @@
     "planStatus": "Active",
     "market": "Northeast",
     "region": "Keystone",
-    "legalEntity": "Aetna Health Inc. (PA)",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Health Inc. (PA)",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -256,14 +256,14 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-006-01",
-        "documentName": "Formulary - Aetna Medicare Value (HMO)",
+        "documentName": "Formulary - Carrier 1 Medicare Value (HMO)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-006/formulary.pdf",
         "documentDate": "2026-12-21"
       },
       {
         "documentId": "DOC-PLAN-006-02",
-        "documentName": "Evidence of Coverage - Aetna Medicare Value (HMO)",
+        "documentName": "Evidence of Coverage - Carrier 1 Medicare Value (HMO)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-006/evidence-of-coverage.pdf",
         "documentDate": "2026-07-20"
@@ -276,7 +276,7 @@
     "contractNumber": "H3931",
     "pbp": "002",
     "segmentId": "H3931002",
-    "planName": "Aetna Medicare Premier Plus (HMO)",
+    "planName": "Carrier 1 Medicare Premier Plus (HMO)",
     "product": "MAPD",
     "planType": "HMO",
     "category": "Medicare Advantage",
@@ -284,8 +284,8 @@
     "planStatus": "Active",
     "market": "Northeast",
     "region": "Keystone",
-    "legalEntity": "Aetna Health Inc. (PA)",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Health Inc. (PA)",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -293,14 +293,14 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-007-01",
-        "documentName": "Provider Directory - Aetna Medicare Premier Plus (HMO)",
+        "documentName": "Provider Directory - Carrier 1 Medicare Premier Plus (HMO)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-007/provider-directory.pdf",
         "documentDate": "2026-07-07"
       },
       {
         "documentId": "DOC-PLAN-007-02",
-        "documentName": "Annual Notice of Change - Aetna Medicare Premier Plus (HMO)",
+        "documentName": "Annual Notice of Change - Carrier 1 Medicare Premier Plus (HMO)",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-007/annual-notice-of-change.pdf",
         "documentDate": "2026-04-11"
@@ -313,7 +313,7 @@
     "contractNumber": "H2663",
     "pbp": "001",
     "segmentId": "H2663001",
-    "planName": "Aetna Medicare Value (HMO)",
+    "planName": "Carrier 1 Medicare Value (HMO)",
     "product": "MAPD",
     "planType": "HMO",
     "category": "Medicare Advantage",
@@ -322,7 +322,7 @@
     "market": "Midwest",
     "region": "Heartland",
     "legalEntity": "Coventry Health Care of Missouri",
-    "marketingName": "Aetna Medicare",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -330,14 +330,14 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-008-01",
-        "documentName": "Summary of Benefits - Aetna Medicare Value (HMO)",
+        "documentName": "Summary of Benefits - Carrier 1 Medicare Value (HMO)",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-008/summary-of-benefits.pdf",
         "documentDate": "2026-09-23"
       },
       {
         "documentId": "DOC-PLAN-008-02",
-        "documentName": "Annual Notice of Change - Aetna Medicare Value (HMO)",
+        "documentName": "Annual Notice of Change - Carrier 1 Medicare Value (HMO)",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-008/annual-notice-of-change.pdf",
         "documentDate": "2026-05-01"
@@ -350,7 +350,7 @@
     "contractNumber": "H2663",
     "pbp": "002",
     "segmentId": "H2663002",
-    "planName": "Aetna Medicare Premier (HMO)",
+    "planName": "Carrier 1 Medicare Premier (HMO)",
     "product": "MAPD",
     "planType": "HMO",
     "category": "Medicare Advantage",
@@ -359,7 +359,7 @@
     "market": "Midwest",
     "region": "Heartland",
     "legalEntity": "Coventry Health Care of Missouri",
-    "marketingName": "Aetna Medicare",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -367,21 +367,21 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-009-01",
-        "documentName": "Formulary - Aetna Medicare Premier (HMO)",
+        "documentName": "Formulary - Carrier 1 Medicare Premier (HMO)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-009/formulary.pdf",
         "documentDate": "2026-01-20"
       },
       {
         "documentId": "DOC-PLAN-009-02",
-        "documentName": "Provider Directory - Aetna Medicare Premier (HMO)",
+        "documentName": "Provider Directory - Carrier 1 Medicare Premier (HMO)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-009/provider-directory.pdf",
         "documentDate": "2026-05-23"
       },
       {
         "documentId": "DOC-PLAN-009-03",
-        "documentName": "Annual Notice of Change - Aetna Medicare Premier (HMO)",
+        "documentName": "Annual Notice of Change - Carrier 1 Medicare Premier (HMO)",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-009/annual-notice-of-change.pdf",
         "documentDate": "2026-06-24"
@@ -394,7 +394,7 @@
     "contractNumber": "H3288",
     "pbp": "001",
     "segmentId": "H3288001",
-    "planName": "Aetna Medicare Value Plus (PPO)",
+    "planName": "Carrier 1 Medicare Value Plus (PPO)",
     "product": "MAPD",
     "planType": "PPO",
     "category": "Medicare Advantage",
@@ -402,8 +402,8 @@
     "planStatus": "Active",
     "market": "Southwest",
     "region": "South Central",
-    "legalEntity": "Aetna Health and Life Insurance Company",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Health and Life Insurance Company",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -411,28 +411,28 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-010-01",
-        "documentName": "Summary of Benefits - Aetna Medicare Value Plus (PPO)",
+        "documentName": "Summary of Benefits - Carrier 1 Medicare Value Plus (PPO)",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-010/summary-of-benefits.pdf",
         "documentDate": "2026-05-27"
       },
       {
         "documentId": "DOC-PLAN-010-02",
-        "documentName": "Evidence of Coverage - Aetna Medicare Value Plus (PPO)",
+        "documentName": "Evidence of Coverage - Carrier 1 Medicare Value Plus (PPO)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-010/evidence-of-coverage.pdf",
         "documentDate": "2026-06-22"
       },
       {
         "documentId": "DOC-PLAN-010-03",
-        "documentName": "Formulary - Aetna Medicare Value Plus (PPO)",
+        "documentName": "Formulary - Carrier 1 Medicare Value Plus (PPO)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-010/formulary.pdf",
         "documentDate": "2026-06-01"
       },
       {
         "documentId": "DOC-PLAN-010-04",
-        "documentName": "Provider Directory - Aetna Medicare Value Plus (PPO)",
+        "documentName": "Provider Directory - Carrier 1 Medicare Value Plus (PPO)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-010/provider-directory.pdf",
         "documentDate": "2026-05-31"
@@ -445,7 +445,7 @@
     "contractNumber": "H4523",
     "pbp": "001",
     "segmentId": "H4523001",
-    "planName": "Aetna Medicare Dual Complete (HMO D-SNP)",
+    "planName": "Carrier 1 Medicare Dual Complete (HMO D-SNP)",
     "product": "MAPD",
     "planType": "DSNP",
     "category": "Medicare Advantage",
@@ -453,8 +453,8 @@
     "planStatus": "Active",
     "market": "Southwest",
     "region": "South Central",
-    "legalEntity": "Aetna Health Inc. (TX)",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Health Inc. (TX)",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": "DSNP",
@@ -462,14 +462,14 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-011-01",
-        "documentName": "Annual Notice of Change - Aetna Medicare Dual Complete (HMO D-SNP)",
+        "documentName": "Annual Notice of Change - Carrier 1 Medicare Dual Complete (HMO D-SNP)",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-011/annual-notice-of-change.pdf",
         "documentDate": "2026-01-06"
       },
       {
         "documentId": "DOC-PLAN-011-02",
-        "documentName": "Evidence of Coverage - Aetna Medicare Dual Complete (HMO D-SNP)",
+        "documentName": "Evidence of Coverage - Carrier 1 Medicare Dual Complete (HMO D-SNP)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-011/evidence-of-coverage.pdf",
         "documentDate": "2026-10-20"
@@ -482,7 +482,7 @@
     "contractNumber": "H4523",
     "pbp": "002",
     "segmentId": "H4523002",
-    "planName": "Aetna Medicare Dual Extra Care (HMO D-SNP)",
+    "planName": "Carrier 1 Medicare Dual Extra Care (HMO D-SNP)",
     "product": "MAPD",
     "planType": "DSNP",
     "category": "Medicare Advantage",
@@ -490,8 +490,8 @@
     "planStatus": "Active",
     "market": "Southwest",
     "region": "South Central",
-    "legalEntity": "Aetna Health Inc. (TX)",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Health Inc. (TX)",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": "DSNP",
@@ -499,21 +499,21 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-012-01",
-        "documentName": "Formulary - Aetna Medicare Dual Extra Care (HMO D-SNP)",
+        "documentName": "Formulary - Carrier 1 Medicare Dual Extra Care (HMO D-SNP)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-012/formulary.pdf",
         "documentDate": "2026-06-19"
       },
       {
         "documentId": "DOC-PLAN-012-02",
-        "documentName": "Summary of Benefits - Aetna Medicare Dual Extra Care (HMO D-SNP)",
+        "documentName": "Summary of Benefits - Carrier 1 Medicare Dual Extra Care (HMO D-SNP)",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-012/summary-of-benefits.pdf",
         "documentDate": "2026-05-17"
       },
       {
         "documentId": "DOC-PLAN-012-03",
-        "documentName": "Evidence of Coverage - Aetna Medicare Dual Extra Care (HMO D-SNP)",
+        "documentName": "Evidence of Coverage - Carrier 1 Medicare Dual Extra Care (HMO D-SNP)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-012/evidence-of-coverage.pdf",
         "documentDate": "2026-07-19"
@@ -526,7 +526,7 @@
     "contractNumber": "H1609",
     "pbp": "010",
     "segmentId": "H1609010",
-    "planName": "Aetna Medicare Chronic Care (HMO C-SNP)",
+    "planName": "Carrier 1 Medicare Chronic Care (HMO C-SNP)",
     "product": "MAPD",
     "planType": "CSNP",
     "category": "Medicare Advantage",
@@ -534,8 +534,8 @@
     "planStatus": "Active",
     "market": "Southeast",
     "region": "Florida",
-    "legalEntity": "Aetna Health Inc. (FL)",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Health Inc. (FL)",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": "CSNP",
@@ -543,21 +543,21 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-013-01",
-        "documentName": "Evidence of Coverage - Aetna Medicare Chronic Care (HMO C-SNP)",
+        "documentName": "Evidence of Coverage - Carrier 1 Medicare Chronic Care (HMO C-SNP)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-013/evidence-of-coverage.pdf",
         "documentDate": "2026-11-11"
       },
       {
         "documentId": "DOC-PLAN-013-02",
-        "documentName": "Formulary - Aetna Medicare Chronic Care (HMO C-SNP)",
+        "documentName": "Formulary - Carrier 1 Medicare Chronic Care (HMO C-SNP)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-013/formulary.pdf",
         "documentDate": "2026-10-01"
       },
       {
         "documentId": "DOC-PLAN-013-03",
-        "documentName": "Annual Notice of Change - Aetna Medicare Chronic Care (HMO C-SNP)",
+        "documentName": "Annual Notice of Change - Carrier 1 Medicare Chronic Care (HMO C-SNP)",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-013/annual-notice-of-change.pdf",
         "documentDate": "2026-09-29"
@@ -570,7 +570,7 @@
     "contractNumber": "H3312",
     "pbp": "001",
     "segmentId": "H3312001",
-    "planName": "Aetna Medicare Value (HMO)",
+    "planName": "Carrier 1 Medicare Value (HMO)",
     "product": "MAPD",
     "planType": "HMO",
     "category": "Medicare Advantage",
@@ -578,8 +578,8 @@
     "planStatus": "Active",
     "market": "Northeast",
     "region": "New York",
-    "legalEntity": "Aetna Health Inc. (NY)",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Health Inc. (NY)",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -587,28 +587,28 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-014-01",
-        "documentName": "Formulary - Aetna Medicare Value (HMO)",
+        "documentName": "Formulary - Carrier 1 Medicare Value (HMO)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-014/formulary.pdf",
         "documentDate": "2026-12-19"
       },
       {
         "documentId": "DOC-PLAN-014-02",
-        "documentName": "Evidence of Coverage - Aetna Medicare Value (HMO)",
+        "documentName": "Evidence of Coverage - Carrier 1 Medicare Value (HMO)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-014/evidence-of-coverage.pdf",
         "documentDate": "2026-02-08"
       },
       {
         "documentId": "DOC-PLAN-014-03",
-        "documentName": "Provider Directory - Aetna Medicare Value (HMO)",
+        "documentName": "Provider Directory - Carrier 1 Medicare Value (HMO)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-014/provider-directory.pdf",
         "documentDate": "2026-06-28"
       },
       {
         "documentId": "DOC-PLAN-014-04",
-        "documentName": "Summary of Benefits - Aetna Medicare Value (HMO)",
+        "documentName": "Summary of Benefits - Carrier 1 Medicare Value (HMO)",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-014/summary-of-benefits.pdf",
         "documentDate": "2026-09-30"
@@ -621,7 +621,7 @@
     "contractNumber": "H3312",
     "pbp": "002",
     "segmentId": "H3312002",
-    "planName": "Aetna Medicare Premier (HMO)",
+    "planName": "Carrier 1 Medicare Premier (HMO)",
     "product": "MAPD",
     "planType": "HMO",
     "category": "Medicare Advantage",
@@ -629,8 +629,8 @@
     "planStatus": "Active",
     "market": "Northeast",
     "region": "New York",
-    "legalEntity": "Aetna Health Inc. (NY)",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Health Inc. (NY)",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -638,28 +638,28 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-015-01",
-        "documentName": "Annual Notice of Change - Aetna Medicare Premier (HMO)",
+        "documentName": "Annual Notice of Change - Carrier 1 Medicare Premier (HMO)",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-015/annual-notice-of-change.pdf",
         "documentDate": "2026-01-26"
       },
       {
         "documentId": "DOC-PLAN-015-02",
-        "documentName": "Provider Directory - Aetna Medicare Premier (HMO)",
+        "documentName": "Provider Directory - Carrier 1 Medicare Premier (HMO)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-015/provider-directory.pdf",
         "documentDate": "2026-03-03"
       },
       {
         "documentId": "DOC-PLAN-015-03",
-        "documentName": "Summary of Benefits - Aetna Medicare Premier (HMO)",
+        "documentName": "Summary of Benefits - Carrier 1 Medicare Premier (HMO)",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-015/summary-of-benefits.pdf",
         "documentDate": "2026-11-10"
       },
       {
         "documentId": "DOC-PLAN-015-04",
-        "documentName": "Formulary - Aetna Medicare Premier (HMO)",
+        "documentName": "Formulary - Carrier 1 Medicare Premier (HMO)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-015/formulary.pdf",
         "documentDate": "2026-10-18"
@@ -672,7 +672,7 @@
     "contractNumber": "H5522",
     "pbp": "001",
     "segmentId": "H5522001",
-    "planName": "Aetna Medicare Advantra (PPO)",
+    "planName": "Carrier 1 Medicare Advantra (PPO)",
     "product": "MAPD",
     "planType": "PPO",
     "category": "Medicare Advantage",
@@ -680,8 +680,8 @@
     "planStatus": "Active",
     "market": "Northeast",
     "region": "Keystone",
-    "legalEntity": "Aetna Life Insurance Company",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Life Insurance Company",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -689,14 +689,14 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-016-01",
-        "documentName": "Annual Notice of Change - Aetna Medicare Advantra (PPO)",
+        "documentName": "Annual Notice of Change - Carrier 1 Medicare Advantra (PPO)",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-016/annual-notice-of-change.pdf",
         "documentDate": "2026-05-19"
       },
       {
         "documentId": "DOC-PLAN-016-02",
-        "documentName": "Summary of Benefits - Aetna Medicare Advantra (PPO)",
+        "documentName": "Summary of Benefits - Carrier 1 Medicare Advantra (PPO)",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-016/summary-of-benefits.pdf",
         "documentDate": "2026-07-02"
@@ -709,7 +709,7 @@
     "contractNumber": "H3959",
     "pbp": "001",
     "segmentId": "H3959001",
-    "planName": "Aetna Medicare Dual Complete (HMO D-SNP)",
+    "planName": "Carrier 1 Medicare Dual Complete (HMO D-SNP)",
     "product": "MAPD",
     "planType": "DSNP",
     "category": "Medicare Advantage",
@@ -717,8 +717,8 @@
     "planStatus": "Active",
     "market": "West",
     "region": "California",
-    "legalEntity": "Aetna Better Health of California",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Better Health of California",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": "DSNP",
@@ -726,21 +726,21 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-017-01",
-        "documentName": "Annual Notice of Change - Aetna Medicare Dual Complete (HMO D-SNP)",
+        "documentName": "Annual Notice of Change - Carrier 1 Medicare Dual Complete (HMO D-SNP)",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-017/annual-notice-of-change.pdf",
         "documentDate": "2026-01-24"
       },
       {
         "documentId": "DOC-PLAN-017-02",
-        "documentName": "Provider Directory - Aetna Medicare Dual Complete (HMO D-SNP)",
+        "documentName": "Provider Directory - Carrier 1 Medicare Dual Complete (HMO D-SNP)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-017/provider-directory.pdf",
         "documentDate": "2026-08-21"
       },
       {
         "documentId": "DOC-PLAN-017-03",
-        "documentName": "Formulary - Aetna Medicare Dual Complete (HMO D-SNP)",
+        "documentName": "Formulary - Carrier 1 Medicare Dual Complete (HMO D-SNP)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-017/formulary.pdf",
         "documentDate": "2026-02-21"
@@ -753,7 +753,7 @@
     "contractNumber": "H7149",
     "pbp": "001",
     "segmentId": "H7149001",
-    "planName": "Aetna Medicare Select (HMO)",
+    "planName": "Carrier 1 Medicare Select (HMO)",
     "product": "MAPD",
     "planType": "HMO",
     "category": "Medicare Advantage",
@@ -761,8 +761,8 @@
     "planStatus": "Active",
     "market": "West",
     "region": "Arizona",
-    "legalEntity": "Aetna Health of Arizona",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Health of Arizona",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -770,21 +770,21 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-018-01",
-        "documentName": "Evidence of Coverage - Aetna Medicare Select (HMO)",
+        "documentName": "Evidence of Coverage - Carrier 1 Medicare Select (HMO)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-018/evidence-of-coverage.pdf",
         "documentDate": "2026-01-24"
       },
       {
         "documentId": "DOC-PLAN-018-02",
-        "documentName": "Formulary - Aetna Medicare Select (HMO)",
+        "documentName": "Formulary - Carrier 1 Medicare Select (HMO)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-018/formulary.pdf",
         "documentDate": "2026-12-13"
       },
       {
         "documentId": "DOC-PLAN-018-03",
-        "documentName": "Provider Directory - Aetna Medicare Select (HMO)",
+        "documentName": "Provider Directory - Carrier 1 Medicare Select (HMO)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-018/provider-directory.pdf",
         "documentDate": "2026-10-05"
@@ -797,7 +797,7 @@
     "contractNumber": "H7149",
     "pbp": "002",
     "segmentId": "H7149002",
-    "planName": "Aetna Medicare Premier (HMO)",
+    "planName": "Carrier 1 Medicare Premier (HMO)",
     "product": "MAPD",
     "planType": "HMO",
     "category": "Medicare Advantage",
@@ -805,8 +805,8 @@
     "planStatus": "Active",
     "market": "West",
     "region": "Arizona",
-    "legalEntity": "Aetna Health of Arizona",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Health of Arizona",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -814,21 +814,21 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-019-01",
-        "documentName": "Annual Notice of Change - Aetna Medicare Premier (HMO)",
+        "documentName": "Annual Notice of Change - Carrier 1 Medicare Premier (HMO)",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-019/annual-notice-of-change.pdf",
         "documentDate": "2026-07-30"
       },
       {
         "documentId": "DOC-PLAN-019-02",
-        "documentName": "Provider Directory - Aetna Medicare Premier (HMO)",
+        "documentName": "Provider Directory - Carrier 1 Medicare Premier (HMO)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-019/provider-directory.pdf",
         "documentDate": "2026-07-07"
       },
       {
         "documentId": "DOC-PLAN-019-03",
-        "documentName": "Formulary - Aetna Medicare Premier (HMO)",
+        "documentName": "Formulary - Carrier 1 Medicare Premier (HMO)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-019/formulary.pdf",
         "documentDate": "2026-08-18"
@@ -841,7 +841,7 @@
     "contractNumber": "H0628",
     "pbp": "001",
     "segmentId": "H0628001",
-    "planName": "Aetna Medicare Value (HMO)",
+    "planName": "Carrier 1 Medicare Value (HMO)",
     "product": "MAPD",
     "planType": "HMO",
     "category": "Medicare Advantage",
@@ -849,8 +849,8 @@
     "planStatus": "Active",
     "market": "Midwest",
     "region": "Great Lakes",
-    "legalEntity": "Aetna Health Inc.",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Health Inc.",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -858,28 +858,28 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-020-01",
-        "documentName": "Summary of Benefits - Aetna Medicare Value (HMO)",
+        "documentName": "Summary of Benefits - Carrier 1 Medicare Value (HMO)",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-020/summary-of-benefits.pdf",
         "documentDate": "2026-04-03"
       },
       {
         "documentId": "DOC-PLAN-020-02",
-        "documentName": "Evidence of Coverage - Aetna Medicare Value (HMO)",
+        "documentName": "Evidence of Coverage - Carrier 1 Medicare Value (HMO)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-020/evidence-of-coverage.pdf",
         "documentDate": "2026-11-12"
       },
       {
         "documentId": "DOC-PLAN-020-03",
-        "documentName": "Provider Directory - Aetna Medicare Value (HMO)",
+        "documentName": "Provider Directory - Carrier 1 Medicare Value (HMO)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-020/provider-directory.pdf",
         "documentDate": "2026-05-01"
       },
       {
         "documentId": "DOC-PLAN-020-04",
-        "documentName": "Formulary - Aetna Medicare Value (HMO)",
+        "documentName": "Formulary - Carrier 1 Medicare Value (HMO)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-020/formulary.pdf",
         "documentDate": "2026-03-01"
@@ -892,7 +892,7 @@
     "contractNumber": "H0523",
     "pbp": "001",
     "segmentId": "H0523001",
-    "planName": "Aetna Medicare Premier (HMO)",
+    "planName": "Carrier 1 Medicare Premier (HMO)",
     "product": "MAPD",
     "planType": "HMO",
     "category": "Medicare Advantage",
@@ -900,8 +900,8 @@
     "planStatus": "Active",
     "market": "Midwest",
     "region": "Great Lakes",
-    "legalEntity": "Aetna Health Inc.",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Health Inc.",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -909,28 +909,28 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-021-01",
-        "documentName": "Provider Directory - Aetna Medicare Premier (HMO)",
+        "documentName": "Provider Directory - Carrier 1 Medicare Premier (HMO)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-021/provider-directory.pdf",
         "documentDate": "2026-12-25"
       },
       {
         "documentId": "DOC-PLAN-021-02",
-        "documentName": "Annual Notice of Change - Aetna Medicare Premier (HMO)",
+        "documentName": "Annual Notice of Change - Carrier 1 Medicare Premier (HMO)",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-021/annual-notice-of-change.pdf",
         "documentDate": "2026-06-09"
       },
       {
         "documentId": "DOC-PLAN-021-03",
-        "documentName": "Formulary - Aetna Medicare Premier (HMO)",
+        "documentName": "Formulary - Carrier 1 Medicare Premier (HMO)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-021/formulary.pdf",
         "documentDate": "2026-03-13"
       },
       {
         "documentId": "DOC-PLAN-021-04",
-        "documentName": "Summary of Benefits - Aetna Medicare Premier (HMO)",
+        "documentName": "Summary of Benefits - Carrier 1 Medicare Premier (HMO)",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-021/summary-of-benefits.pdf",
         "documentDate": "2026-02-02"
@@ -943,7 +943,7 @@
     "contractNumber": "H1692",
     "pbp": "001",
     "segmentId": "H1692001",
-    "planName": "Aetna Medicare Signature (HMO)",
+    "planName": "Carrier 1 Medicare Signature (HMO)",
     "product": "MAPD",
     "planType": "HMO",
     "category": "Medicare Advantage",
@@ -952,7 +952,7 @@
     "market": "Northeast",
     "region": "Keystone",
     "legalEntity": "Coventry Health Care of West Virginia",
-    "marketingName": "Aetna Medicare",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -960,14 +960,14 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-022-01",
-        "documentName": "Formulary - Aetna Medicare Signature (HMO)",
+        "documentName": "Formulary - Carrier 1 Medicare Signature (HMO)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-022/formulary.pdf",
         "documentDate": "2026-02-25"
       },
       {
         "documentId": "DOC-PLAN-022-02",
-        "documentName": "Evidence of Coverage - Aetna Medicare Signature (HMO)",
+        "documentName": "Evidence of Coverage - Carrier 1 Medicare Signature (HMO)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-022/evidence-of-coverage.pdf",
         "documentDate": "2026-07-07"
@@ -980,7 +980,7 @@
     "contractNumber": "H3146",
     "pbp": "001",
     "segmentId": "H3146001",
-    "planName": "Aetna Medicare Enhanced (PPO)",
+    "planName": "Carrier 1 Medicare Enhanced (PPO)",
     "product": "MAPD",
     "planType": "PPO",
     "category": "Medicare Advantage",
@@ -988,8 +988,8 @@
     "planStatus": "Active",
     "market": "Southeast",
     "region": "Georgia/Gulf States",
-    "legalEntity": "Aetna Life Insurance Company",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Life Insurance Company",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -997,28 +997,28 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-023-01",
-        "documentName": "Evidence of Coverage - Aetna Medicare Enhanced (PPO)",
+        "documentName": "Evidence of Coverage - Carrier 1 Medicare Enhanced (PPO)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-023/evidence-of-coverage.pdf",
         "documentDate": "2026-08-08"
       },
       {
         "documentId": "DOC-PLAN-023-02",
-        "documentName": "Provider Directory - Aetna Medicare Enhanced (PPO)",
+        "documentName": "Provider Directory - Carrier 1 Medicare Enhanced (PPO)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-023/provider-directory.pdf",
         "documentDate": "2026-09-06"
       },
       {
         "documentId": "DOC-PLAN-023-03",
-        "documentName": "Summary of Benefits - Aetna Medicare Enhanced (PPO)",
+        "documentName": "Summary of Benefits - Carrier 1 Medicare Enhanced (PPO)",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-023/summary-of-benefits.pdf",
         "documentDate": "2026-04-04"
       },
       {
         "documentId": "DOC-PLAN-023-04",
-        "documentName": "Formulary - Aetna Medicare Enhanced (PPO)",
+        "documentName": "Formulary - Carrier 1 Medicare Enhanced (PPO)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-023/formulary.pdf",
         "documentDate": "2026-01-17"
@@ -1031,7 +1031,7 @@
     "contractNumber": "H3192",
     "pbp": "001",
     "segmentId": "H3192001",
-    "planName": "Aetna Medicare Value (PPO)",
+    "planName": "Carrier 1 Medicare Value (PPO)",
     "product": "MAPD",
     "planType": "PPO",
     "category": "Medicare Advantage",
@@ -1039,8 +1039,8 @@
     "planStatus": "Active",
     "market": "Midwest",
     "region": "Ohio/Kentucky",
-    "legalEntity": "Aetna Life Insurance Company",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Life Insurance Company",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -1048,28 +1048,28 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-024-01",
-        "documentName": "Evidence of Coverage - Aetna Medicare Value (PPO)",
+        "documentName": "Evidence of Coverage - Carrier 1 Medicare Value (PPO)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-024/evidence-of-coverage.pdf",
         "documentDate": "2026-06-03"
       },
       {
         "documentId": "DOC-PLAN-024-02",
-        "documentName": "Summary of Benefits - Aetna Medicare Value (PPO)",
+        "documentName": "Summary of Benefits - Carrier 1 Medicare Value (PPO)",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-024/summary-of-benefits.pdf",
         "documentDate": "2026-05-30"
       },
       {
         "documentId": "DOC-PLAN-024-03",
-        "documentName": "Formulary - Aetna Medicare Value (PPO)",
+        "documentName": "Formulary - Carrier 1 Medicare Value (PPO)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-024/formulary.pdf",
         "documentDate": "2026-09-13"
       },
       {
         "documentId": "DOC-PLAN-024-04",
-        "documentName": "Annual Notice of Change - Aetna Medicare Value (PPO)",
+        "documentName": "Annual Notice of Change - Carrier 1 Medicare Value (PPO)",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-024/annual-notice-of-change.pdf",
         "documentDate": "2026-08-29"
@@ -1082,7 +1082,7 @@
     "contractNumber": "H3219",
     "pbp": "001",
     "segmentId": "H3219001",
-    "planName": "Aetna Medicare Premier (PPO)",
+    "planName": "Carrier 1 Medicare Premier (PPO)",
     "product": "MAPD",
     "planType": "PPO",
     "category": "Medicare Advantage",
@@ -1090,8 +1090,8 @@
     "planStatus": "Active",
     "market": "Southeast",
     "region": "Mid South",
-    "legalEntity": "Aetna Life Insurance Company",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Life Insurance Company",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -1099,14 +1099,14 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-025-01",
-        "documentName": "Evidence of Coverage - Aetna Medicare Premier (PPO)",
+        "documentName": "Evidence of Coverage - Carrier 1 Medicare Premier (PPO)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-025/evidence-of-coverage.pdf",
         "documentDate": "2026-12-07"
       },
       {
         "documentId": "DOC-PLAN-025-02",
-        "documentName": "Annual Notice of Change - Aetna Medicare Premier (PPO)",
+        "documentName": "Annual Notice of Change - Carrier 1 Medicare Premier (PPO)",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-025/annual-notice-of-change.pdf",
         "documentDate": "2026-12-29"
@@ -1128,7 +1128,7 @@
     "market": "National",
     "region": "PDP",
     "legalEntity": "SilverScript Insurance Company",
-    "marketingName": "Aetna Medicare",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -1179,7 +1179,7 @@
     "market": "National",
     "region": "PDP",
     "legalEntity": "SilverScript Insurance Company",
-    "marketingName": "Aetna Medicare",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -1230,7 +1230,7 @@
     "market": "National",
     "region": "PDP",
     "legalEntity": "SilverScript Insurance Company",
-    "marketingName": "Aetna Medicare",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -1267,7 +1267,7 @@
     "market": "National",
     "region": "PDP",
     "legalEntity": "SilverScript Insurance Company",
-    "marketingName": "Aetna Medicare",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -1318,7 +1318,7 @@
     "market": "National",
     "region": "PDP",
     "legalEntity": "SilverScript Insurance Company",
-    "marketingName": "Aetna Medicare",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -1346,7 +1346,7 @@
     "contractNumber": "MEDSUP",
     "pbp": "A",
     "segmentId": "MEDSUPA",
-    "planName": "Aetna Medicare Supplement Plan A",
+    "planName": "Carrier 1 Medicare Supplement Plan A",
     "product": "Medsup",
     "planType": "Medigap",
     "category": "Medsup",
@@ -1354,8 +1354,8 @@
     "planStatus": "Active",
     "market": "National",
     "region": "National",
-    "legalEntity": "Aetna Life Insurance Company",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Life Insurance Company",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -1363,28 +1363,28 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-031-01",
-        "documentName": "Summary of Benefits - Aetna Medicare Supplement Plan A",
+        "documentName": "Summary of Benefits - Carrier 1 Medicare Supplement Plan A",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-031/summary-of-benefits.pdf",
         "documentDate": "2026-09-21"
       },
       {
         "documentId": "DOC-PLAN-031-02",
-        "documentName": "Formulary - Aetna Medicare Supplement Plan A",
+        "documentName": "Formulary - Carrier 1 Medicare Supplement Plan A",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-031/formulary.pdf",
         "documentDate": "2026-06-17"
       },
       {
         "documentId": "DOC-PLAN-031-03",
-        "documentName": "Provider Directory - Aetna Medicare Supplement Plan A",
+        "documentName": "Provider Directory - Carrier 1 Medicare Supplement Plan A",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-031/provider-directory.pdf",
         "documentDate": "2026-09-01"
       },
       {
         "documentId": "DOC-PLAN-031-04",
-        "documentName": "Annual Notice of Change - Aetna Medicare Supplement Plan A",
+        "documentName": "Annual Notice of Change - Carrier 1 Medicare Supplement Plan A",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-031/annual-notice-of-change.pdf",
         "documentDate": "2026-07-29"
@@ -1397,7 +1397,7 @@
     "contractNumber": "MEDSUP",
     "pbp": "B",
     "segmentId": "MEDSUPB",
-    "planName": "Aetna Medicare Supplement Plan B",
+    "planName": "Carrier 1 Medicare Supplement Plan B",
     "product": "Medsup",
     "planType": "Medigap",
     "category": "Medsup",
@@ -1405,8 +1405,8 @@
     "planStatus": "Active",
     "market": "National",
     "region": "National",
-    "legalEntity": "Aetna Life Insurance Company",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Life Insurance Company",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -1414,28 +1414,28 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-032-01",
-        "documentName": "Annual Notice of Change - Aetna Medicare Supplement Plan B",
+        "documentName": "Annual Notice of Change - Carrier 1 Medicare Supplement Plan B",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-032/annual-notice-of-change.pdf",
         "documentDate": "2026-06-15"
       },
       {
         "documentId": "DOC-PLAN-032-02",
-        "documentName": "Summary of Benefits - Aetna Medicare Supplement Plan B",
+        "documentName": "Summary of Benefits - Carrier 1 Medicare Supplement Plan B",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-032/summary-of-benefits.pdf",
         "documentDate": "2026-09-20"
       },
       {
         "documentId": "DOC-PLAN-032-03",
-        "documentName": "Provider Directory - Aetna Medicare Supplement Plan B",
+        "documentName": "Provider Directory - Carrier 1 Medicare Supplement Plan B",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-032/provider-directory.pdf",
         "documentDate": "2026-10-02"
       },
       {
         "documentId": "DOC-PLAN-032-04",
-        "documentName": "Evidence of Coverage - Aetna Medicare Supplement Plan B",
+        "documentName": "Evidence of Coverage - Carrier 1 Medicare Supplement Plan B",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-032/evidence-of-coverage.pdf",
         "documentDate": "2026-03-30"
@@ -1448,7 +1448,7 @@
     "contractNumber": "MEDSUP",
     "pbp": "C",
     "segmentId": "MEDSUPC",
-    "planName": "Aetna Medicare Supplement Plan C",
+    "planName": "Carrier 1 Medicare Supplement Plan C",
     "product": "Medsup",
     "planType": "Medigap",
     "category": "Medsup",
@@ -1456,8 +1456,8 @@
     "planStatus": "Active",
     "market": "National",
     "region": "National",
-    "legalEntity": "Aetna Life Insurance Company",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Life Insurance Company",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -1465,28 +1465,28 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-033-01",
-        "documentName": "Formulary - Aetna Medicare Supplement Plan C",
+        "documentName": "Formulary - Carrier 1 Medicare Supplement Plan C",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-033/formulary.pdf",
         "documentDate": "2026-02-22"
       },
       {
         "documentId": "DOC-PLAN-033-02",
-        "documentName": "Evidence of Coverage - Aetna Medicare Supplement Plan C",
+        "documentName": "Evidence of Coverage - Carrier 1 Medicare Supplement Plan C",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-033/evidence-of-coverage.pdf",
         "documentDate": "2026-06-25"
       },
       {
         "documentId": "DOC-PLAN-033-03",
-        "documentName": "Provider Directory - Aetna Medicare Supplement Plan C",
+        "documentName": "Provider Directory - Carrier 1 Medicare Supplement Plan C",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-033/provider-directory.pdf",
         "documentDate": "2026-03-18"
       },
       {
         "documentId": "DOC-PLAN-033-04",
-        "documentName": "Annual Notice of Change - Aetna Medicare Supplement Plan C",
+        "documentName": "Annual Notice of Change - Carrier 1 Medicare Supplement Plan C",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-033/annual-notice-of-change.pdf",
         "documentDate": "2026-08-29"
@@ -1499,7 +1499,7 @@
     "contractNumber": "MEDSUP",
     "pbp": "F",
     "segmentId": "MEDSUPF",
-    "planName": "Aetna Medicare Supplement Plan F",
+    "planName": "Carrier 1 Medicare Supplement Plan F",
     "product": "Medsup",
     "planType": "Medigap",
     "category": "Medsup",
@@ -1507,8 +1507,8 @@
     "planStatus": "Active",
     "market": "National",
     "region": "National",
-    "legalEntity": "Aetna Life Insurance Company",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Life Insurance Company",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -1516,28 +1516,28 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-034-01",
-        "documentName": "Formulary - Aetna Medicare Supplement Plan F",
+        "documentName": "Formulary - Carrier 1 Medicare Supplement Plan F",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-034/formulary.pdf",
         "documentDate": "2026-10-12"
       },
       {
         "documentId": "DOC-PLAN-034-02",
-        "documentName": "Summary of Benefits - Aetna Medicare Supplement Plan F",
+        "documentName": "Summary of Benefits - Carrier 1 Medicare Supplement Plan F",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-034/summary-of-benefits.pdf",
         "documentDate": "2026-02-04"
       },
       {
         "documentId": "DOC-PLAN-034-03",
-        "documentName": "Provider Directory - Aetna Medicare Supplement Plan F",
+        "documentName": "Provider Directory - Carrier 1 Medicare Supplement Plan F",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-034/provider-directory.pdf",
         "documentDate": "2026-03-14"
       },
       {
         "documentId": "DOC-PLAN-034-04",
-        "documentName": "Evidence of Coverage - Aetna Medicare Supplement Plan F",
+        "documentName": "Evidence of Coverage - Carrier 1 Medicare Supplement Plan F",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-034/evidence-of-coverage.pdf",
         "documentDate": "2026-07-20"
@@ -1550,7 +1550,7 @@
     "contractNumber": "MEDSUP",
     "pbp": "G",
     "segmentId": "MEDSUPG",
-    "planName": "Aetna Medicare Supplement Plan G",
+    "planName": "Carrier 1 Medicare Supplement Plan G",
     "product": "Medsup",
     "planType": "Medigap",
     "category": "Medsup",
@@ -1558,8 +1558,8 @@
     "planStatus": "Active",
     "market": "National",
     "region": "National",
-    "legalEntity": "Aetna Life Insurance Company",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Life Insurance Company",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -1567,21 +1567,21 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-035-01",
-        "documentName": "Formulary - Aetna Medicare Supplement Plan G",
+        "documentName": "Formulary - Carrier 1 Medicare Supplement Plan G",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-035/formulary.pdf",
         "documentDate": "2026-01-06"
       },
       {
         "documentId": "DOC-PLAN-035-02",
-        "documentName": "Annual Notice of Change - Aetna Medicare Supplement Plan G",
+        "documentName": "Annual Notice of Change - Carrier 1 Medicare Supplement Plan G",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-035/annual-notice-of-change.pdf",
         "documentDate": "2026-08-09"
       },
       {
         "documentId": "DOC-PLAN-035-03",
-        "documentName": "Provider Directory - Aetna Medicare Supplement Plan G",
+        "documentName": "Provider Directory - Carrier 1 Medicare Supplement Plan G",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-035/provider-directory.pdf",
         "documentDate": "2026-01-18"
@@ -1594,7 +1594,7 @@
     "contractNumber": "MEDSUP",
     "pbp": "N",
     "segmentId": "MEDSUPN",
-    "planName": "Aetna Medicare Supplement Plan N",
+    "planName": "Carrier 1 Medicare Supplement Plan N",
     "product": "Medsup",
     "planType": "Medigap",
     "category": "Medsup",
@@ -1602,8 +1602,8 @@
     "planStatus": "Active",
     "market": "National",
     "region": "National",
-    "legalEntity": "Aetna Life Insurance Company",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Life Insurance Company",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -1611,21 +1611,21 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-036-01",
-        "documentName": "Annual Notice of Change - Aetna Medicare Supplement Plan N",
+        "documentName": "Annual Notice of Change - Carrier 1 Medicare Supplement Plan N",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-036/annual-notice-of-change.pdf",
         "documentDate": "2026-10-29"
       },
       {
         "documentId": "DOC-PLAN-036-02",
-        "documentName": "Provider Directory - Aetna Medicare Supplement Plan N",
+        "documentName": "Provider Directory - Carrier 1 Medicare Supplement Plan N",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-036/provider-directory.pdf",
         "documentDate": "2026-07-05"
       },
       {
         "documentId": "DOC-PLAN-036-03",
-        "documentName": "Evidence of Coverage - Aetna Medicare Supplement Plan N",
+        "documentName": "Evidence of Coverage - Carrier 1 Medicare Supplement Plan N",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-036/evidence-of-coverage.pdf",
         "documentDate": "2026-10-26"
@@ -1638,7 +1638,7 @@
     "contractNumber": "ANC",
     "pbp": "DEN001",
     "segmentId": "ANCDEN001",
-    "planName": "Aetna Dental PPO",
+    "planName": "Carrier 1 Dental PPO",
     "product": "ANC",
     "planType": "PPO",
     "category": "ANC",
@@ -1646,8 +1646,8 @@
     "planStatus": "Active",
     "market": "National",
     "region": "National",
-    "legalEntity": "Aetna Life Insurance Company",
-    "marketingName": "Aetna Ancillary",
+    "legalEntity": "Carrier 1 Life Insurance Company",
+    "marketingName": "Carrier 1 Ancillary",
     "minAge": null,
     "maxAge": null,
     "snpType": null,
@@ -1655,14 +1655,14 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-037-01",
-        "documentName": "Annual Notice of Change - Aetna Dental PPO",
+        "documentName": "Annual Notice of Change - Carrier 1 Dental PPO",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-037/annual-notice-of-change.pdf",
         "documentDate": "2026-12-10"
       },
       {
         "documentId": "DOC-PLAN-037-02",
-        "documentName": "Provider Directory - Aetna Dental PPO",
+        "documentName": "Provider Directory - Carrier 1 Dental PPO",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-037/provider-directory.pdf",
         "documentDate": "2026-01-03"
@@ -1675,7 +1675,7 @@
     "contractNumber": "ANC",
     "pbp": "DEN002",
     "segmentId": "ANCDEN002",
-    "planName": "Aetna Dental Plus",
+    "planName": "Carrier 1 Dental Plus",
     "product": "ANC",
     "planType": "PPO",
     "category": "ANC",
@@ -1683,8 +1683,8 @@
     "planStatus": "Active",
     "market": "National",
     "region": "National",
-    "legalEntity": "Aetna Life Insurance Company",
-    "marketingName": "Aetna Ancillary",
+    "legalEntity": "Carrier 1 Life Insurance Company",
+    "marketingName": "Carrier 1 Ancillary",
     "minAge": null,
     "maxAge": null,
     "snpType": null,
@@ -1692,14 +1692,14 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-038-01",
-        "documentName": "Provider Directory - Aetna Dental Plus",
+        "documentName": "Provider Directory - Carrier 1 Dental Plus",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-038/provider-directory.pdf",
         "documentDate": "2026-10-18"
       },
       {
         "documentId": "DOC-PLAN-038-02",
-        "documentName": "Formulary - Aetna Dental Plus",
+        "documentName": "Formulary - Carrier 1 Dental Plus",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-038/formulary.pdf",
         "documentDate": "2026-09-13"
@@ -1712,7 +1712,7 @@
     "contractNumber": "ANC",
     "pbp": "VIS001",
     "segmentId": "ANCVIS001",
-    "planName": "Aetna Vision PPO",
+    "planName": "Carrier 1 Vision PPO",
     "product": "ANC",
     "planType": "PPO",
     "category": "ANC",
@@ -1720,8 +1720,8 @@
     "planStatus": "Active",
     "market": "National",
     "region": "National",
-    "legalEntity": "Aetna Life Insurance Company",
-    "marketingName": "Aetna Ancillary",
+    "legalEntity": "Carrier 1 Life Insurance Company",
+    "marketingName": "Carrier 1 Ancillary",
     "minAge": null,
     "maxAge": null,
     "snpType": null,
@@ -1729,14 +1729,14 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-039-01",
-        "documentName": "Evidence of Coverage - Aetna Vision PPO",
+        "documentName": "Evidence of Coverage - Carrier 1 Vision PPO",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-039/evidence-of-coverage.pdf",
         "documentDate": "2026-03-03"
       },
       {
         "documentId": "DOC-PLAN-039-02",
-        "documentName": "Formulary - Aetna Vision PPO",
+        "documentName": "Formulary - Carrier 1 Vision PPO",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-039/formulary.pdf",
         "documentDate": "2026-11-12"
@@ -1749,7 +1749,7 @@
     "contractNumber": "ANC",
     "pbp": "VIS002",
     "segmentId": "ANCVIS002",
-    "planName": "Aetna Vision Plus",
+    "planName": "Carrier 1 Vision Plus",
     "product": "ANC",
     "planType": "PPO",
     "category": "ANC",
@@ -1757,8 +1757,8 @@
     "planStatus": "Active",
     "market": "National",
     "region": "National",
-    "legalEntity": "Aetna Life Insurance Company",
-    "marketingName": "Aetna Ancillary",
+    "legalEntity": "Carrier 1 Life Insurance Company",
+    "marketingName": "Carrier 1 Ancillary",
     "minAge": null,
     "maxAge": null,
     "snpType": null,
@@ -1766,28 +1766,28 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-040-01",
-        "documentName": "Annual Notice of Change - Aetna Vision Plus",
+        "documentName": "Annual Notice of Change - Carrier 1 Vision Plus",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-040/annual-notice-of-change.pdf",
         "documentDate": "2026-05-31"
       },
       {
         "documentId": "DOC-PLAN-040-02",
-        "documentName": "Summary of Benefits - Aetna Vision Plus",
+        "documentName": "Summary of Benefits - Carrier 1 Vision Plus",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-040/summary-of-benefits.pdf",
         "documentDate": "2026-08-31"
       },
       {
         "documentId": "DOC-PLAN-040-03",
-        "documentName": "Provider Directory - Aetna Vision Plus",
+        "documentName": "Provider Directory - Carrier 1 Vision Plus",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-040/provider-directory.pdf",
         "documentDate": "2026-04-20"
       },
       {
         "documentId": "DOC-PLAN-040-04",
-        "documentName": "Evidence of Coverage - Aetna Vision Plus",
+        "documentName": "Evidence of Coverage - Carrier 1 Vision Plus",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-040/evidence-of-coverage.pdf",
         "documentDate": "2026-05-13"
@@ -1800,7 +1800,7 @@
     "contractNumber": "ANC",
     "pbp": "HRG001",
     "segmentId": "ANCHRG001",
-    "planName": "Aetna Hearing Discount",
+    "planName": "Carrier 1 Hearing Discount",
     "product": "ANC",
     "planType": "PPO",
     "category": "ANC",
@@ -1808,8 +1808,8 @@
     "planStatus": "Active",
     "market": "National",
     "region": "National",
-    "legalEntity": "Aetna Life Insurance Company",
-    "marketingName": "Aetna Ancillary",
+    "legalEntity": "Carrier 1 Life Insurance Company",
+    "marketingName": "Carrier 1 Ancillary",
     "minAge": null,
     "maxAge": null,
     "snpType": null,
@@ -1817,28 +1817,28 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-041-01",
-        "documentName": "Evidence of Coverage - Aetna Hearing Discount",
+        "documentName": "Evidence of Coverage - Carrier 1 Hearing Discount",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-041/evidence-of-coverage.pdf",
         "documentDate": "2026-11-18"
       },
       {
         "documentId": "DOC-PLAN-041-02",
-        "documentName": "Summary of Benefits - Aetna Hearing Discount",
+        "documentName": "Summary of Benefits - Carrier 1 Hearing Discount",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-041/summary-of-benefits.pdf",
         "documentDate": "2026-09-29"
       },
       {
         "documentId": "DOC-PLAN-041-03",
-        "documentName": "Formulary - Aetna Hearing Discount",
+        "documentName": "Formulary - Carrier 1 Hearing Discount",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-041/formulary.pdf",
         "documentDate": "2026-04-02"
       },
       {
         "documentId": "DOC-PLAN-041-04",
-        "documentName": "Annual Notice of Change - Aetna Hearing Discount",
+        "documentName": "Annual Notice of Change - Carrier 1 Hearing Discount",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-041/annual-notice-of-change.pdf",
         "documentDate": "2026-10-06"
@@ -1851,7 +1851,7 @@
     "contractNumber": "R6694",
     "pbp": "001",
     "segmentId": "R6694001",
-    "planName": "Aetna Medicare Premier (Regional PPO)",
+    "planName": "Carrier 1 Medicare Premier (Regional PPO)",
     "product": "MAPD",
     "planType": "RPPO",
     "category": "Medicare Advantage",
@@ -1859,8 +1859,8 @@
     "planStatus": "Active",
     "market": "Midwest",
     "region": "Ohio/Kentucky",
-    "legalEntity": "Aetna Life Insurance Company",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Life Insurance Company",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -1868,21 +1868,21 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-042-01",
-        "documentName": "Provider Directory - Aetna Medicare Premier (Regional PPO)",
+        "documentName": "Provider Directory - Carrier 1 Medicare Premier (Regional PPO)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-042/provider-directory.pdf",
         "documentDate": "2026-03-26"
       },
       {
         "documentId": "DOC-PLAN-042-02",
-        "documentName": "Formulary - Aetna Medicare Premier (Regional PPO)",
+        "documentName": "Formulary - Carrier 1 Medicare Premier (Regional PPO)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-042/formulary.pdf",
         "documentDate": "2026-08-16"
       },
       {
         "documentId": "DOC-PLAN-042-03",
-        "documentName": "Evidence of Coverage - Aetna Medicare Premier (Regional PPO)",
+        "documentName": "Evidence of Coverage - Carrier 1 Medicare Premier (Regional PPO)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-042/evidence-of-coverage.pdf",
         "documentDate": "2026-08-25"
@@ -1895,7 +1895,7 @@
     "contractNumber": "H2293",
     "pbp": "001",
     "segmentId": "H2293001",
-    "planName": "Aetna Medicare Dual Signature (PPO D-SNP)",
+    "planName": "Carrier 1 Medicare Dual Signature (PPO D-SNP)",
     "product": "MAPD",
     "planType": "DSNP",
     "category": "Medicare Advantage",
@@ -1904,7 +1904,7 @@
     "market": "Southeast",
     "region": "Georgia/Gulf States",
     "legalEntity": "SilverScript Insurance Company",
-    "marketingName": "Aetna Medicare",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": "DSNP",
@@ -1912,28 +1912,28 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-043-01",
-        "documentName": "Annual Notice of Change - Aetna Medicare Dual Signature (PPO D-SNP)",
+        "documentName": "Annual Notice of Change - Carrier 1 Medicare Dual Signature (PPO D-SNP)",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-043/annual-notice-of-change.pdf",
         "documentDate": "2026-08-10"
       },
       {
         "documentId": "DOC-PLAN-043-02",
-        "documentName": "Formulary - Aetna Medicare Dual Signature (PPO D-SNP)",
+        "documentName": "Formulary - Carrier 1 Medicare Dual Signature (PPO D-SNP)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-043/formulary.pdf",
         "documentDate": "2026-02-10"
       },
       {
         "documentId": "DOC-PLAN-043-03",
-        "documentName": "Provider Directory - Aetna Medicare Dual Signature (PPO D-SNP)",
+        "documentName": "Provider Directory - Carrier 1 Medicare Dual Signature (PPO D-SNP)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-043/provider-directory.pdf",
         "documentDate": "2026-10-13"
       },
       {
         "documentId": "DOC-PLAN-043-04",
-        "documentName": "Evidence of Coverage - Aetna Medicare Dual Signature (PPO D-SNP)",
+        "documentName": "Evidence of Coverage - Carrier 1 Medicare Dual Signature (PPO D-SNP)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-043/evidence-of-coverage.pdf",
         "documentDate": "2026-03-03"
@@ -1946,7 +1946,7 @@
     "contractNumber": "H5593",
     "pbp": "001",
     "segmentId": "H5593001",
-    "planName": "Aetna Medicare Value (HMO-POS)",
+    "planName": "Carrier 1 Medicare Value (HMO-POS)",
     "product": "MAPD",
     "planType": "POS",
     "category": "Medicare Advantage",
@@ -1954,8 +1954,8 @@
     "planStatus": "Active",
     "market": "West",
     "region": "Northwest",
-    "legalEntity": "Aetna Life Insurance Company",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Life Insurance Company",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -1963,14 +1963,14 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-044-01",
-        "documentName": "Annual Notice of Change - Aetna Medicare Value (HMO-POS)",
+        "documentName": "Annual Notice of Change - Carrier 1 Medicare Value (HMO-POS)",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-044/annual-notice-of-change.pdf",
         "documentDate": "2026-08-07"
       },
       {
         "documentId": "DOC-PLAN-044-02",
-        "documentName": "Evidence of Coverage - Aetna Medicare Value (HMO-POS)",
+        "documentName": "Evidence of Coverage - Carrier 1 Medicare Value (HMO-POS)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-044/evidence-of-coverage.pdf",
         "documentDate": "2026-12-17"
@@ -1983,7 +1983,7 @@
     "contractNumber": "H4711",
     "pbp": "001",
     "segmentId": "H4711001",
-    "planName": "Aetna Medicare Select (HMO)",
+    "planName": "Carrier 1 Medicare Select (HMO)",
     "product": "MAPD",
     "planType": "HMO",
     "category": "Medicare Advantage",
@@ -1991,8 +1991,8 @@
     "planStatus": "Active",
     "market": "West",
     "region": "Mountain",
-    "legalEntity": "Aetna Health Inc.",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Health Inc.",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -2000,14 +2000,14 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-045-01",
-        "documentName": "Summary of Benefits - Aetna Medicare Select (HMO)",
+        "documentName": "Summary of Benefits - Carrier 1 Medicare Select (HMO)",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-045/summary-of-benefits.pdf",
         "documentDate": "2026-04-05"
       },
       {
         "documentId": "DOC-PLAN-045-02",
-        "documentName": "Formulary - Aetna Medicare Select (HMO)",
+        "documentName": "Formulary - Carrier 1 Medicare Select (HMO)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-045/formulary.pdf",
         "documentDate": "2026-04-09"
@@ -2020,7 +2020,7 @@
     "contractNumber": "H4835",
     "pbp": "001",
     "segmentId": "H4835001",
-    "planName": "Aetna Medicare Premier (HMO)",
+    "planName": "Carrier 1 Medicare Premier (HMO)",
     "product": "MAPD",
     "planType": "HMO",
     "category": "Medicare Advantage",
@@ -2028,8 +2028,8 @@
     "planStatus": "Active",
     "market": "West",
     "region": "California",
-    "legalEntity": "Aetna Health of California",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Health of California",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -2037,14 +2037,14 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-046-01",
-        "documentName": "Annual Notice of Change - Aetna Medicare Premier (HMO)",
+        "documentName": "Annual Notice of Change - Carrier 1 Medicare Premier (HMO)",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-046/annual-notice-of-change.pdf",
         "documentDate": "2026-11-06"
       },
       {
         "documentId": "DOC-PLAN-046-02",
-        "documentName": "Evidence of Coverage - Aetna Medicare Premier (HMO)",
+        "documentName": "Evidence of Coverage - Carrier 1 Medicare Premier (HMO)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-046/evidence-of-coverage.pdf",
         "documentDate": "2026-07-26"
@@ -2057,7 +2057,7 @@
     "contractNumber": "H9314",
     "pbp": "001",
     "segmentId": "H9314001",
-    "planName": "Aetna Medicare Value (HMO)",
+    "planName": "Carrier 1 Medicare Value (HMO)",
     "product": "MAPD",
     "planType": "HMO",
     "category": "Medicare Advantage",
@@ -2065,8 +2065,8 @@
     "planStatus": "Active",
     "market": "Northeast",
     "region": "New Jersey",
-    "legalEntity": "Aetna Health Inc. (NJ)",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Health Inc. (NJ)",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -2074,28 +2074,28 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-047-01",
-        "documentName": "Formulary - Aetna Medicare Value (HMO)",
+        "documentName": "Formulary - Carrier 1 Medicare Value (HMO)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-047/formulary.pdf",
         "documentDate": "2026-12-02"
       },
       {
         "documentId": "DOC-PLAN-047-02",
-        "documentName": "Evidence of Coverage - Aetna Medicare Value (HMO)",
+        "documentName": "Evidence of Coverage - Carrier 1 Medicare Value (HMO)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-047/evidence-of-coverage.pdf",
         "documentDate": "2026-06-12"
       },
       {
         "documentId": "DOC-PLAN-047-03",
-        "documentName": "Provider Directory - Aetna Medicare Value (HMO)",
+        "documentName": "Provider Directory - Carrier 1 Medicare Value (HMO)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-047/provider-directory.pdf",
         "documentDate": "2026-09-09"
       },
       {
         "documentId": "DOC-PLAN-047-04",
-        "documentName": "Summary of Benefits - Aetna Medicare Value (HMO)",
+        "documentName": "Summary of Benefits - Carrier 1 Medicare Value (HMO)",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-047/summary-of-benefits.pdf",
         "documentDate": "2026-06-28"
@@ -2108,7 +2108,7 @@
     "contractNumber": "H9431",
     "pbp": "001",
     "segmentId": "H9431001",
-    "planName": "Aetna Medicare Explorer (PPO)",
+    "planName": "Carrier 1 Medicare Explorer (PPO)",
     "product": "MAPD",
     "planType": "PPO",
     "category": "Medicare Advantage",
@@ -2117,7 +2117,7 @@
     "market": "Northeast",
     "region": "New England",
     "legalEntity": "First Health Life & Health Insurance",
-    "marketingName": "Aetna Medicare",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -2125,14 +2125,14 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-048-01",
-        "documentName": "Provider Directory - Aetna Medicare Explorer (PPO)",
+        "documentName": "Provider Directory - Carrier 1 Medicare Explorer (PPO)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-048/provider-directory.pdf",
         "documentDate": "2026-01-14"
       },
       {
         "documentId": "DOC-PLAN-048-02",
-        "documentName": "Annual Notice of Change - Aetna Medicare Explorer (PPO)",
+        "documentName": "Annual Notice of Change - Carrier 1 Medicare Explorer (PPO)",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-048/annual-notice-of-change.pdf",
         "documentDate": "2026-02-04"
@@ -2145,7 +2145,7 @@
     "contractNumber": "H5325",
     "pbp": "001",
     "segmentId": "H5325001",
-    "planName": "Aetna Medicare Eagle (HMO)",
+    "planName": "Carrier 1 Medicare Eagle (HMO)",
     "product": "MAPD",
     "planType": "HMO",
     "category": "Medicare Advantage",
@@ -2153,8 +2153,8 @@
     "planStatus": "Active",
     "market": "Midwest",
     "region": "Great Lakes",
-    "legalEntity": "Aetna Life Insurance Company",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Life Insurance Company",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -2162,14 +2162,14 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-049-01",
-        "documentName": "Summary of Benefits - Aetna Medicare Eagle (HMO)",
+        "documentName": "Summary of Benefits - Carrier 1 Medicare Eagle (HMO)",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-049/summary-of-benefits.pdf",
         "documentDate": "2026-09-03"
       },
       {
         "documentId": "DOC-PLAN-049-02",
-        "documentName": "Formulary - Aetna Medicare Eagle (HMO)",
+        "documentName": "Formulary - Carrier 1 Medicare Eagle (HMO)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-049/formulary.pdf",
         "documentDate": "2026-03-03"
@@ -2182,7 +2182,7 @@
     "contractNumber": "H1206",
     "pbp": "001",
     "segmentId": "H1206001",
-    "planName": "Aetna Medicare Flex (PPO)",
+    "planName": "Carrier 1 Medicare Flex (PPO)",
     "product": "MAPD",
     "planType": "PPO",
     "category": "Medicare Advantage",
@@ -2190,8 +2190,8 @@
     "planStatus": "Active",
     "market": "Northeast",
     "region": "Capitol",
-    "legalEntity": "Aetna Life Insurance Company",
-    "marketingName": "Aetna Medicare",
+    "legalEntity": "Carrier 1 Life Insurance Company",
+    "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -2199,28 +2199,28 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-050-01",
-        "documentName": "Evidence of Coverage - Aetna Medicare Flex (PPO)",
+        "documentName": "Evidence of Coverage - Carrier 1 Medicare Flex (PPO)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-050/evidence-of-coverage.pdf",
         "documentDate": "2026-01-27"
       },
       {
         "documentId": "DOC-PLAN-050-02",
-        "documentName": "Formulary - Aetna Medicare Flex (PPO)",
+        "documentName": "Formulary - Carrier 1 Medicare Flex (PPO)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-050/formulary.pdf",
         "documentDate": "2026-10-03"
       },
       {
         "documentId": "DOC-PLAN-050-03",
-        "documentName": "Provider Directory - Aetna Medicare Flex (PPO)",
+        "documentName": "Provider Directory - Carrier 1 Medicare Flex (PPO)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-050/provider-directory.pdf",
         "documentDate": "2026-11-19"
       },
       {
         "documentId": "DOC-PLAN-050-04",
-        "documentName": "Summary of Benefits - Aetna Medicare Flex (PPO)",
+        "documentName": "Summary of Benefits - Carrier 1 Medicare Flex (PPO)",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-050/summary-of-benefits.pdf",
         "documentDate": "2026-05-09"
@@ -2233,7 +2233,7 @@
     "contractNumber": "R4599",
     "pbp": "001",
     "segmentId": "R4599001",
-    "planName": "UnitedHealthcare Medicare Advantage Choice (PPO)",
+    "planName": "Carrier 3 Medicare Advantage Choice (PPO)",
     "product": "MAPD",
     "planType": "PPO",
     "category": "Medicare Advantage",
@@ -2241,8 +2241,8 @@
     "planStatus": "Active",
     "market": "Northeast",
     "region": "New England",
-    "legalEntity": "UnitedHealthcare Insurance Company",
-    "marketingName": "UnitedHealthcare Medicare",
+    "legalEntity": "Carrier 3 Insurance Company",
+    "marketingName": "Carrier 3 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -2250,14 +2250,14 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-051-01",
-        "documentName": "Provider Directory - UnitedHealthcare Medicare Advantage Choice (PPO)",
+        "documentName": "Provider Directory - Carrier 3 Medicare Advantage Choice (PPO)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-051/provider-directory.pdf",
         "documentDate": "2026-06-03"
       },
       {
         "documentId": "DOC-PLAN-051-02",
-        "documentName": "Annual Notice of Change - UnitedHealthcare Medicare Advantage Choice (PPO)",
+        "documentName": "Annual Notice of Change - Carrier 3 Medicare Advantage Choice (PPO)",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-051/annual-notice-of-change.pdf",
         "documentDate": "2026-09-10"
@@ -2270,7 +2270,7 @@
     "contractNumber": "R4599",
     "pbp": "002",
     "segmentId": "R4599002",
-    "planName": "UnitedHealthcare Medicare Advantage Essential (PPO)",
+    "planName": "Carrier 3 Medicare Advantage Essential (PPO)",
     "product": "MAPD",
     "planType": "PPO",
     "category": "Medicare Advantage",
@@ -2278,8 +2278,8 @@
     "planStatus": "Active",
     "market": "Northeast",
     "region": "New England",
-    "legalEntity": "UnitedHealthcare Insurance Company",
-    "marketingName": "UnitedHealthcare Medicare",
+    "legalEntity": "Carrier 3 Insurance Company",
+    "marketingName": "Carrier 3 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -2287,28 +2287,28 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-052-01",
-        "documentName": "Annual Notice of Change - UnitedHealthcare Medicare Advantage Essential (PPO)",
+        "documentName": "Annual Notice of Change - Carrier 3 Medicare Advantage Essential (PPO)",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-052/annual-notice-of-change.pdf",
         "documentDate": "2026-05-29"
       },
       {
         "documentId": "DOC-PLAN-052-02",
-        "documentName": "Formulary - UnitedHealthcare Medicare Advantage Essential (PPO)",
+        "documentName": "Formulary - Carrier 3 Medicare Advantage Essential (PPO)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-052/formulary.pdf",
         "documentDate": "2026-01-05"
       },
       {
         "documentId": "DOC-PLAN-052-03",
-        "documentName": "Evidence of Coverage - UnitedHealthcare Medicare Advantage Essential (PPO)",
+        "documentName": "Evidence of Coverage - Carrier 3 Medicare Advantage Essential (PPO)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-052/evidence-of-coverage.pdf",
         "documentDate": "2026-04-28"
       },
       {
         "documentId": "DOC-PLAN-052-04",
-        "documentName": "Provider Directory - UnitedHealthcare Medicare Advantage Essential (PPO)",
+        "documentName": "Provider Directory - Carrier 3 Medicare Advantage Essential (PPO)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-052/provider-directory.pdf",
         "documentDate": "2026-05-10"
@@ -2321,7 +2321,7 @@
     "contractNumber": "H2025",
     "pbp": "001",
     "segmentId": "H2025001",
-    "planName": "UnitedHealthcare Medicare Advantage Core (HMO)",
+    "planName": "Carrier 3 Medicare Advantage Core (HMO)",
     "product": "MAPD",
     "planType": "HMO",
     "category": "Medicare Advantage",
@@ -2329,8 +2329,8 @@
     "planStatus": "Active",
     "market": "Southeast",
     "region": "Florida",
-    "legalEntity": "UnitedHealthcare of Florida",
-    "marketingName": "UnitedHealthcare Medicare",
+    "legalEntity": "Carrier 3 of Florida",
+    "marketingName": "Carrier 3 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -2338,21 +2338,21 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-053-01",
-        "documentName": "Evidence of Coverage - UnitedHealthcare Medicare Advantage Core (HMO)",
+        "documentName": "Evidence of Coverage - Carrier 3 Medicare Advantage Core (HMO)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-053/evidence-of-coverage.pdf",
         "documentDate": "2026-05-20"
       },
       {
         "documentId": "DOC-PLAN-053-02",
-        "documentName": "Provider Directory - UnitedHealthcare Medicare Advantage Core (HMO)",
+        "documentName": "Provider Directory - Carrier 3 Medicare Advantage Core (HMO)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-053/provider-directory.pdf",
         "documentDate": "2026-05-06"
       },
       {
         "documentId": "DOC-PLAN-053-03",
-        "documentName": "Summary of Benefits - UnitedHealthcare Medicare Advantage Core (HMO)",
+        "documentName": "Summary of Benefits - Carrier 3 Medicare Advantage Core (HMO)",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-053/summary-of-benefits.pdf",
         "documentDate": "2026-03-16"
@@ -2365,7 +2365,7 @@
     "contractNumber": "H2025",
     "pbp": "002",
     "segmentId": "H2025002",
-    "planName": "UnitedHealthcare Medicare Advantage Plus (HMO)",
+    "planName": "Carrier 3 Medicare Advantage Plus (HMO)",
     "product": "MAPD",
     "planType": "HMO",
     "category": "Medicare Advantage",
@@ -2373,8 +2373,8 @@
     "planStatus": "Active",
     "market": "Southeast",
     "region": "Florida",
-    "legalEntity": "UnitedHealthcare of Florida",
-    "marketingName": "UnitedHealthcare Medicare",
+    "legalEntity": "Carrier 3 of Florida",
+    "marketingName": "Carrier 3 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -2382,14 +2382,14 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-054-01",
-        "documentName": "Annual Notice of Change - UnitedHealthcare Medicare Advantage Plus (HMO)",
+        "documentName": "Annual Notice of Change - Carrier 3 Medicare Advantage Plus (HMO)",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-054/annual-notice-of-change.pdf",
         "documentDate": "2026-11-09"
       },
       {
         "documentId": "DOC-PLAN-054-02",
-        "documentName": "Formulary - UnitedHealthcare Medicare Advantage Plus (HMO)",
+        "documentName": "Formulary - Carrier 3 Medicare Advantage Plus (HMO)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-054/formulary.pdf",
         "documentDate": "2026-07-01"
@@ -2402,7 +2402,7 @@
     "contractNumber": "H5432",
     "pbp": "001",
     "segmentId": "H5432001",
-    "planName": "UnitedHealthcare Dual Complete (HMO D-SNP)",
+    "planName": "Carrier 3 Dual Complete (HMO D-SNP)",
     "product": "MAPD",
     "planType": "DSNP",
     "category": "Medicare Advantage",
@@ -2410,8 +2410,8 @@
     "planStatus": "Active",
     "market": "Southwest",
     "region": "South Central",
-    "legalEntity": "UnitedHealthcare Insurance Company",
-    "marketingName": "UnitedHealthcare Medicare",
+    "legalEntity": "Carrier 3 Insurance Company",
+    "marketingName": "Carrier 3 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": "DSNP",
@@ -2419,21 +2419,21 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-055-01",
-        "documentName": "Formulary - UnitedHealthcare Dual Complete (HMO D-SNP)",
+        "documentName": "Formulary - Carrier 3 Dual Complete (HMO D-SNP)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-055/formulary.pdf",
         "documentDate": "2026-10-19"
       },
       {
         "documentId": "DOC-PLAN-055-02",
-        "documentName": "Annual Notice of Change - UnitedHealthcare Dual Complete (HMO D-SNP)",
+        "documentName": "Annual Notice of Change - Carrier 3 Dual Complete (HMO D-SNP)",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-055/annual-notice-of-change.pdf",
         "documentDate": "2026-04-21"
       },
       {
         "documentId": "DOC-PLAN-055-03",
-        "documentName": "Evidence of Coverage - UnitedHealthcare Dual Complete (HMO D-SNP)",
+        "documentName": "Evidence of Coverage - Carrier 3 Dual Complete (HMO D-SNP)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-055/evidence-of-coverage.pdf",
         "documentDate": "2026-03-13"
@@ -2446,7 +2446,7 @@
     "contractNumber": "S5820",
     "pbp": "045",
     "segmentId": "S5820045",
-    "planName": "AARP MedicareRx Preferred (PDP)",
+    "planName": "Carrier 7 MedicareRx Preferred (PDP)",
     "product": "PDP",
     "planType": "PDP",
     "category": "PDP",
@@ -2454,8 +2454,8 @@
     "planStatus": "Active",
     "market": "National",
     "region": "PDP",
-    "legalEntity": "UnitedHealthcare Insurance Company",
-    "marketingName": "UnitedHealthcare Medicare",
+    "legalEntity": "Carrier 3 Insurance Company",
+    "marketingName": "Carrier 3 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -2463,21 +2463,21 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-056-01",
-        "documentName": "Evidence of Coverage - AARP MedicareRx Preferred (PDP)",
+        "documentName": "Evidence of Coverage - Carrier 7 MedicareRx Preferred (PDP)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-056/evidence-of-coverage.pdf",
         "documentDate": "2026-10-04"
       },
       {
         "documentId": "DOC-PLAN-056-02",
-        "documentName": "Provider Directory - AARP MedicareRx Preferred (PDP)",
+        "documentName": "Provider Directory - Carrier 7 MedicareRx Preferred (PDP)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-056/provider-directory.pdf",
         "documentDate": "2026-08-02"
       },
       {
         "documentId": "DOC-PLAN-056-03",
-        "documentName": "Formulary - AARP MedicareRx Preferred (PDP)",
+        "documentName": "Formulary - Carrier 7 MedicareRx Preferred (PDP)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-056/formulary.pdf",
         "documentDate": "2026-12-24"
@@ -2490,7 +2490,7 @@
     "contractNumber": "S5820",
     "pbp": "052",
     "segmentId": "S5820052",
-    "planName": "AARP MedicareRx Saver Plus (PDP)",
+    "planName": "Carrier 7 MedicareRx Saver Plus (PDP)",
     "product": "PDP",
     "planType": "PDP",
     "category": "PDP",
@@ -2498,8 +2498,8 @@
     "planStatus": "Active",
     "market": "National",
     "region": "PDP",
-    "legalEntity": "UnitedHealthcare Insurance Company",
-    "marketingName": "UnitedHealthcare Medicare",
+    "legalEntity": "Carrier 3 Insurance Company",
+    "marketingName": "Carrier 3 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -2507,21 +2507,21 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-057-01",
-        "documentName": "Annual Notice of Change - AARP MedicareRx Saver Plus (PDP)",
+        "documentName": "Annual Notice of Change - Carrier 7 MedicareRx Saver Plus (PDP)",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-057/annual-notice-of-change.pdf",
         "documentDate": "2026-09-12"
       },
       {
         "documentId": "DOC-PLAN-057-02",
-        "documentName": "Summary of Benefits - AARP MedicareRx Saver Plus (PDP)",
+        "documentName": "Summary of Benefits - Carrier 7 MedicareRx Saver Plus (PDP)",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-057/summary-of-benefits.pdf",
         "documentDate": "2026-07-11"
       },
       {
         "documentId": "DOC-PLAN-057-03",
-        "documentName": "Provider Directory - AARP MedicareRx Saver Plus (PDP)",
+        "documentName": "Provider Directory - Carrier 7 MedicareRx Saver Plus (PDP)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-057/provider-directory.pdf",
         "documentDate": "2026-06-09"
@@ -2534,7 +2534,7 @@
     "contractNumber": "H5216",
     "pbp": "001",
     "segmentId": "H5216001",
-    "planName": "Humana Gold Plus (HMO)",
+    "planName": "Carrier 2 Gold Plus (HMO)",
     "product": "MAPD",
     "planType": "HMO",
     "category": "Medicare Advantage",
@@ -2542,8 +2542,8 @@
     "planStatus": "Active",
     "market": "Southeast",
     "region": "Georgia/Gulf States",
-    "legalEntity": "Humana Medical Plan",
-    "marketingName": "Humana Medicare",
+    "legalEntity": "Carrier 2 Medical Plan",
+    "marketingName": "Carrier 2 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -2551,28 +2551,28 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-058-01",
-        "documentName": "Annual Notice of Change - Humana Gold Plus (HMO)",
+        "documentName": "Annual Notice of Change - Carrier 2 Gold Plus (HMO)",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-058/annual-notice-of-change.pdf",
         "documentDate": "2026-03-15"
       },
       {
         "documentId": "DOC-PLAN-058-02",
-        "documentName": "Evidence of Coverage - Humana Gold Plus (HMO)",
+        "documentName": "Evidence of Coverage - Carrier 2 Gold Plus (HMO)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-058/evidence-of-coverage.pdf",
         "documentDate": "2026-06-03"
       },
       {
         "documentId": "DOC-PLAN-058-03",
-        "documentName": "Formulary - Humana Gold Plus (HMO)",
+        "documentName": "Formulary - Carrier 2 Gold Plus (HMO)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-058/formulary.pdf",
         "documentDate": "2026-08-10"
       },
       {
         "documentId": "DOC-PLAN-058-04",
-        "documentName": "Provider Directory - Humana Gold Plus (HMO)",
+        "documentName": "Provider Directory - Carrier 2 Gold Plus (HMO)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-058/provider-directory.pdf",
         "documentDate": "2026-09-25"
@@ -2585,7 +2585,7 @@
     "contractNumber": "H5216",
     "pbp": "002",
     "segmentId": "H5216002",
-    "planName": "Humana Gold Plus HMO SNP (HMO D-SNP)",
+    "planName": "Carrier 2 Gold Plus HMO SNP (HMO D-SNP)",
     "product": "MAPD",
     "planType": "DSNP",
     "category": "Medicare Advantage",
@@ -2593,8 +2593,8 @@
     "planStatus": "Active",
     "market": "Southeast",
     "region": "Georgia/Gulf States",
-    "legalEntity": "Humana Medical Plan",
-    "marketingName": "Humana Medicare",
+    "legalEntity": "Carrier 2 Medical Plan",
+    "marketingName": "Carrier 2 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": "DSNP",
@@ -2602,28 +2602,28 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-059-01",
-        "documentName": "Summary of Benefits - Humana Gold Plus HMO SNP (HMO D-SNP)",
+        "documentName": "Summary of Benefits - Carrier 2 Gold Plus HMO SNP (HMO D-SNP)",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-059/summary-of-benefits.pdf",
         "documentDate": "2026-07-01"
       },
       {
         "documentId": "DOC-PLAN-059-02",
-        "documentName": "Provider Directory - Humana Gold Plus HMO SNP (HMO D-SNP)",
+        "documentName": "Provider Directory - Carrier 2 Gold Plus HMO SNP (HMO D-SNP)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-059/provider-directory.pdf",
         "documentDate": "2026-01-16"
       },
       {
         "documentId": "DOC-PLAN-059-03",
-        "documentName": "Evidence of Coverage - Humana Gold Plus HMO SNP (HMO D-SNP)",
+        "documentName": "Evidence of Coverage - Carrier 2 Gold Plus HMO SNP (HMO D-SNP)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-059/evidence-of-coverage.pdf",
         "documentDate": "2026-07-24"
       },
       {
         "documentId": "DOC-PLAN-059-04",
-        "documentName": "Annual Notice of Change - Humana Gold Plus HMO SNP (HMO D-SNP)",
+        "documentName": "Annual Notice of Change - Carrier 2 Gold Plus HMO SNP (HMO D-SNP)",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-059/annual-notice-of-change.pdf",
         "documentDate": "2026-02-18"
@@ -2636,7 +2636,7 @@
     "contractNumber": "H4005",
     "pbp": "001",
     "segmentId": "H4005001",
-    "planName": "HumanaChoice (PPO)",
+    "planName": "Carrier 2Choice (PPO)",
     "product": "MAPD",
     "planType": "PPO",
     "category": "Medicare Advantage",
@@ -2644,8 +2644,8 @@
     "planStatus": "Active",
     "market": "Midwest",
     "region": "Heartland",
-    "legalEntity": "Humana Insurance Company",
-    "marketingName": "Humana Medicare",
+    "legalEntity": "Carrier 2 Insurance Company",
+    "marketingName": "Carrier 2 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -2653,14 +2653,14 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-060-01",
-        "documentName": "Provider Directory - HumanaChoice (PPO)",
+        "documentName": "Provider Directory - Carrier 2Choice (PPO)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-060/provider-directory.pdf",
         "documentDate": "2026-02-18"
       },
       {
         "documentId": "DOC-PLAN-060-02",
-        "documentName": "Summary of Benefits - HumanaChoice (PPO)",
+        "documentName": "Summary of Benefits - Carrier 2Choice (PPO)",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-060/summary-of-benefits.pdf",
         "documentDate": "2026-09-06"
@@ -2673,7 +2673,7 @@
     "contractNumber": "H4005",
     "pbp": "002",
     "segmentId": "H4005002",
-    "planName": "HumanaChoice Plus (PPO)",
+    "planName": "Carrier 2Choice Plus (PPO)",
     "product": "MAPD",
     "planType": "PPO",
     "category": "Medicare Advantage",
@@ -2681,8 +2681,8 @@
     "planStatus": "Active",
     "market": "Midwest",
     "region": "Heartland",
-    "legalEntity": "Humana Insurance Company",
-    "marketingName": "Humana Medicare",
+    "legalEntity": "Carrier 2 Insurance Company",
+    "marketingName": "Carrier 2 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -2690,21 +2690,21 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-061-01",
-        "documentName": "Formulary - HumanaChoice Plus (PPO)",
+        "documentName": "Formulary - Carrier 2Choice Plus (PPO)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-061/formulary.pdf",
         "documentDate": "2026-09-11"
       },
       {
         "documentId": "DOC-PLAN-061-02",
-        "documentName": "Provider Directory - HumanaChoice Plus (PPO)",
+        "documentName": "Provider Directory - Carrier 2Choice Plus (PPO)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-061/provider-directory.pdf",
         "documentDate": "2026-10-23"
       },
       {
         "documentId": "DOC-PLAN-061-03",
-        "documentName": "Summary of Benefits - HumanaChoice Plus (PPO)",
+        "documentName": "Summary of Benefits - Carrier 2Choice Plus (PPO)",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-061/summary-of-benefits.pdf",
         "documentDate": "2026-01-15"
@@ -2717,7 +2717,7 @@
     "contractNumber": "S5884",
     "pbp": "044",
     "segmentId": "S5884044",
-    "planName": "Humana Walmart Value Rx Plan (PDP)",
+    "planName": "Carrier 2 Walmart Value Rx Plan (PDP)",
     "product": "PDP",
     "planType": "PDP",
     "category": "PDP",
@@ -2725,8 +2725,8 @@
     "planStatus": "Active",
     "market": "National",
     "region": "PDP",
-    "legalEntity": "Humana Insurance Company",
-    "marketingName": "Humana Medicare",
+    "legalEntity": "Carrier 2 Insurance Company",
+    "marketingName": "Carrier 2 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -2734,28 +2734,28 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-062-01",
-        "documentName": "Annual Notice of Change - Humana Walmart Value Rx Plan (PDP)",
+        "documentName": "Annual Notice of Change - Carrier 2 Walmart Value Rx Plan (PDP)",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-062/annual-notice-of-change.pdf",
         "documentDate": "2026-08-05"
       },
       {
         "documentId": "DOC-PLAN-062-02",
-        "documentName": "Formulary - Humana Walmart Value Rx Plan (PDP)",
+        "documentName": "Formulary - Carrier 2 Walmart Value Rx Plan (PDP)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-062/formulary.pdf",
         "documentDate": "2026-04-06"
       },
       {
         "documentId": "DOC-PLAN-062-03",
-        "documentName": "Provider Directory - Humana Walmart Value Rx Plan (PDP)",
+        "documentName": "Provider Directory - Carrier 2 Walmart Value Rx Plan (PDP)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-062/provider-directory.pdf",
         "documentDate": "2026-03-09"
       },
       {
         "documentId": "DOC-PLAN-062-04",
-        "documentName": "Evidence of Coverage - Humana Walmart Value Rx Plan (PDP)",
+        "documentName": "Evidence of Coverage - Carrier 2 Walmart Value Rx Plan (PDP)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-062/evidence-of-coverage.pdf",
         "documentDate": "2026-09-24"
@@ -2768,7 +2768,7 @@
     "contractNumber": "S5884",
     "pbp": "051",
     "segmentId": "S5884051",
-    "planName": "Humana Premier Rx Plan (PDP)",
+    "planName": "Carrier 2 Premier Rx Plan (PDP)",
     "product": "PDP",
     "planType": "PDP",
     "category": "PDP",
@@ -2776,8 +2776,8 @@
     "planStatus": "Active",
     "market": "National",
     "region": "PDP",
-    "legalEntity": "Humana Insurance Company",
-    "marketingName": "Humana Medicare",
+    "legalEntity": "Carrier 2 Insurance Company",
+    "marketingName": "Carrier 2 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -2785,21 +2785,21 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-063-01",
-        "documentName": "Evidence of Coverage - Humana Premier Rx Plan (PDP)",
+        "documentName": "Evidence of Coverage - Carrier 2 Premier Rx Plan (PDP)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-063/evidence-of-coverage.pdf",
         "documentDate": "2026-04-13"
       },
       {
         "documentId": "DOC-PLAN-063-02",
-        "documentName": "Formulary - Humana Premier Rx Plan (PDP)",
+        "documentName": "Formulary - Carrier 2 Premier Rx Plan (PDP)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-063/formulary.pdf",
         "documentDate": "2026-09-09"
       },
       {
         "documentId": "DOC-PLAN-063-03",
-        "documentName": "Provider Directory - Humana Premier Rx Plan (PDP)",
+        "documentName": "Provider Directory - Carrier 2 Premier Rx Plan (PDP)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-063/provider-directory.pdf",
         "documentDate": "2026-11-12"
@@ -2812,7 +2812,7 @@
     "contractNumber": "H1035",
     "pbp": "001",
     "segmentId": "H1035001",
-    "planName": "Blue Cross Blue Shield Medicare Advantage Blue (HMO)",
+    "planName": "Carrier 5 Medicare Advantage Blue (HMO)",
     "product": "MAPD",
     "planType": "HMO",
     "category": "Medicare Advantage",
@@ -2820,8 +2820,8 @@
     "planStatus": "Active",
     "market": "Northeast",
     "region": "New York",
-    "legalEntity": "BlueCross BlueShield of New York",
-    "marketingName": "Blue Cross Blue Shield Medicare",
+    "legalEntity": "Carrier 5 of New York",
+    "marketingName": "Carrier 5 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -2829,14 +2829,14 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-064-01",
-        "documentName": "Formulary - Blue Cross Blue Shield Medicare Advantage Blue (HMO)",
+        "documentName": "Formulary - Carrier 5 Medicare Advantage Blue (HMO)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-064/formulary.pdf",
         "documentDate": "2026-08-07"
       },
       {
         "documentId": "DOC-PLAN-064-02",
-        "documentName": "Summary of Benefits - Blue Cross Blue Shield Medicare Advantage Blue (HMO)",
+        "documentName": "Summary of Benefits - Carrier 5 Medicare Advantage Blue (HMO)",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-064/summary-of-benefits.pdf",
         "documentDate": "2026-08-07"
@@ -2849,7 +2849,7 @@
     "contractNumber": "H1035",
     "pbp": "002",
     "segmentId": "H1035002",
-    "planName": "Blue Cross Blue Shield Medicare Advantage Blue Plus (HMO)",
+    "planName": "Carrier 5 Medicare Advantage Blue Plus (HMO)",
     "product": "MAPD",
     "planType": "HMO",
     "category": "Medicare Advantage",
@@ -2857,8 +2857,8 @@
     "planStatus": "Active",
     "market": "Northeast",
     "region": "New York",
-    "legalEntity": "BlueCross BlueShield of New York",
-    "marketingName": "Blue Cross Blue Shield Medicare",
+    "legalEntity": "Carrier 5 of New York",
+    "marketingName": "Carrier 5 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -2866,28 +2866,28 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-065-01",
-        "documentName": "Provider Directory - Blue Cross Blue Shield Medicare Advantage Blue Plus (HMO)",
+        "documentName": "Provider Directory - Carrier 5 Medicare Advantage Blue Plus (HMO)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-065/provider-directory.pdf",
         "documentDate": "2026-07-16"
       },
       {
         "documentId": "DOC-PLAN-065-02",
-        "documentName": "Formulary - Blue Cross Blue Shield Medicare Advantage Blue Plus (HMO)",
+        "documentName": "Formulary - Carrier 5 Medicare Advantage Blue Plus (HMO)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-065/formulary.pdf",
         "documentDate": "2026-02-15"
       },
       {
         "documentId": "DOC-PLAN-065-03",
-        "documentName": "Annual Notice of Change - Blue Cross Blue Shield Medicare Advantage Blue Plus (HMO)",
+        "documentName": "Annual Notice of Change - Carrier 5 Medicare Advantage Blue Plus (HMO)",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-065/annual-notice-of-change.pdf",
         "documentDate": "2026-10-22"
       },
       {
         "documentId": "DOC-PLAN-065-04",
-        "documentName": "Summary of Benefits - Blue Cross Blue Shield Medicare Advantage Blue Plus (HMO)",
+        "documentName": "Summary of Benefits - Carrier 5 Medicare Advantage Blue Plus (HMO)",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-065/summary-of-benefits.pdf",
         "documentDate": "2026-03-25"
@@ -2900,7 +2900,7 @@
     "contractNumber": "H2110",
     "pbp": "001",
     "segmentId": "H2110001",
-    "planName": "Blue Cross Blue Shield Medicare Advantage PPO",
+    "planName": "Carrier 5 Medicare Advantage PPO",
     "product": "MAPD",
     "planType": "PPO",
     "category": "Medicare Advantage",
@@ -2909,7 +2909,7 @@
     "market": "West",
     "region": "California",
     "legalEntity": "Blue Shield of California",
-    "marketingName": "Blue Cross Blue Shield Medicare",
+    "marketingName": "Carrier 5 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -2917,14 +2917,14 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-066-01",
-        "documentName": "Annual Notice of Change - Blue Cross Blue Shield Medicare Advantage PPO",
+        "documentName": "Annual Notice of Change - Carrier 5 Medicare Advantage PPO",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-066/annual-notice-of-change.pdf",
         "documentDate": "2026-07-06"
       },
       {
         "documentId": "DOC-PLAN-066-02",
-        "documentName": "Formulary - Blue Cross Blue Shield Medicare Advantage PPO",
+        "documentName": "Formulary - Carrier 5 Medicare Advantage PPO",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-066/formulary.pdf",
         "documentDate": "2026-09-18"
@@ -2945,8 +2945,8 @@
     "planStatus": "Active",
     "market": "National",
     "region": "PDP",
-    "legalEntity": "BlueCross BlueShield Association",
-    "marketingName": "Blue Cross Blue Shield Medicare",
+    "legalEntity": "Carrier 5 Association",
+    "marketingName": "Carrier 5 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -2988,7 +2988,7 @@
     "contractNumber": "H4154",
     "pbp": "001",
     "segmentId": "H4154001",
-    "planName": "Cigna Medicare Advantage (HMO)",
+    "planName": "Carrier 4 Medicare Advantage (HMO)",
     "product": "MAPD",
     "planType": "HMO",
     "category": "Medicare Advantage",
@@ -2996,8 +2996,8 @@
     "planStatus": "Active",
     "market": "Southwest",
     "region": "South Central",
-    "legalEntity": "Cigna HealthCare",
-    "marketingName": "Cigna Medicare",
+    "legalEntity": "Carrier 4 HealthCare",
+    "marketingName": "Carrier 4 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -3005,14 +3005,14 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-068-01",
-        "documentName": "Evidence of Coverage - Cigna Medicare Advantage (HMO)",
+        "documentName": "Evidence of Coverage - Carrier 4 Medicare Advantage (HMO)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-068/evidence-of-coverage.pdf",
         "documentDate": "2026-05-08"
       },
       {
         "documentId": "DOC-PLAN-068-02",
-        "documentName": "Annual Notice of Change - Cigna Medicare Advantage (HMO)",
+        "documentName": "Annual Notice of Change - Carrier 4 Medicare Advantage (HMO)",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-068/annual-notice-of-change.pdf",
         "documentDate": "2026-12-21"
@@ -3025,7 +3025,7 @@
     "contractNumber": "H4154",
     "pbp": "002",
     "segmentId": "H4154002",
-    "planName": "Cigna Medicare Advantage Plus (HMO)",
+    "planName": "Carrier 4 Medicare Advantage Plus (HMO)",
     "product": "MAPD",
     "planType": "HMO",
     "category": "Medicare Advantage",
@@ -3033,8 +3033,8 @@
     "planStatus": "Active",
     "market": "Southwest",
     "region": "South Central",
-    "legalEntity": "Cigna HealthCare",
-    "marketingName": "Cigna Medicare",
+    "legalEntity": "Carrier 4 HealthCare",
+    "marketingName": "Carrier 4 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -3042,28 +3042,28 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-069-01",
-        "documentName": "Evidence of Coverage - Cigna Medicare Advantage Plus (HMO)",
+        "documentName": "Evidence of Coverage - Carrier 4 Medicare Advantage Plus (HMO)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-069/evidence-of-coverage.pdf",
         "documentDate": "2026-07-16"
       },
       {
         "documentId": "DOC-PLAN-069-02",
-        "documentName": "Annual Notice of Change - Cigna Medicare Advantage Plus (HMO)",
+        "documentName": "Annual Notice of Change - Carrier 4 Medicare Advantage Plus (HMO)",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-069/annual-notice-of-change.pdf",
         "documentDate": "2026-10-12"
       },
       {
         "documentId": "DOC-PLAN-069-03",
-        "documentName": "Summary of Benefits - Cigna Medicare Advantage Plus (HMO)",
+        "documentName": "Summary of Benefits - Carrier 4 Medicare Advantage Plus (HMO)",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-069/summary-of-benefits.pdf",
         "documentDate": "2026-12-28"
       },
       {
         "documentId": "DOC-PLAN-069-04",
-        "documentName": "Formulary - Cigna Medicare Advantage Plus (HMO)",
+        "documentName": "Formulary - Carrier 4 Medicare Advantage Plus (HMO)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-069/formulary.pdf",
         "documentDate": "2026-01-20"
@@ -3076,7 +3076,7 @@
     "contractNumber": "H4155",
     "pbp": "001",
     "segmentId": "H4155001",
-    "planName": "Cigna Medicare Advantage (PPO)",
+    "planName": "Carrier 4 Medicare Advantage (PPO)",
     "product": "MAPD",
     "planType": "PPO",
     "category": "Medicare Advantage",
@@ -3084,8 +3084,8 @@
     "planStatus": "Active",
     "market": "West",
     "region": "Arizona",
-    "legalEntity": "Cigna HealthCare",
-    "marketingName": "Cigna Medicare",
+    "legalEntity": "Carrier 4 HealthCare",
+    "marketingName": "Carrier 4 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -3093,14 +3093,14 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-070-01",
-        "documentName": "Provider Directory - Cigna Medicare Advantage (PPO)",
+        "documentName": "Provider Directory - Carrier 4 Medicare Advantage (PPO)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-070/provider-directory.pdf",
         "documentDate": "2026-02-09"
       },
       {
         "documentId": "DOC-PLAN-070-02",
-        "documentName": "Summary of Benefits - Cigna Medicare Advantage (PPO)",
+        "documentName": "Summary of Benefits - Carrier 4 Medicare Advantage (PPO)",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-070/summary-of-benefits.pdf",
         "documentDate": "2026-05-25"
@@ -3113,7 +3113,7 @@
     "contractNumber": "S5617",
     "pbp": "047",
     "segmentId": "S5617047",
-    "planName": "Cigna Medicare Rx Plan (PDP)",
+    "planName": "Carrier 4 Medicare Rx Plan (PDP)",
     "product": "PDP",
     "planType": "PDP",
     "category": "PDP",
@@ -3121,8 +3121,8 @@
     "planStatus": "Active",
     "market": "National",
     "region": "PDP",
-    "legalEntity": "Cigna HealthCare",
-    "marketingName": "Cigna Medicare",
+    "legalEntity": "Carrier 4 HealthCare",
+    "marketingName": "Carrier 4 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -3130,14 +3130,14 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-071-01",
-        "documentName": "Summary of Benefits - Cigna Medicare Rx Plan (PDP)",
+        "documentName": "Summary of Benefits - Carrier 4 Medicare Rx Plan (PDP)",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-071/summary-of-benefits.pdf",
         "documentDate": "2026-10-22"
       },
       {
         "documentId": "DOC-PLAN-071-02",
-        "documentName": "Provider Directory - Cigna Medicare Rx Plan (PDP)",
+        "documentName": "Provider Directory - Carrier 4 Medicare Rx Plan (PDP)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-071/provider-directory.pdf",
         "documentDate": "2026-05-29"
@@ -3150,7 +3150,7 @@
     "contractNumber": "H5214",
     "pbp": "001",
     "segmentId": "H5214001",
-    "planName": "WellCare Value (HMO)",
+    "planName": "Carrier 6 Value (HMO)",
     "product": "MAPD",
     "planType": "HMO",
     "category": "Medicare Advantage",
@@ -3158,8 +3158,8 @@
     "planStatus": "Active",
     "market": "Southeast",
     "region": "Georgia/Gulf States",
-    "legalEntity": "WellCare Health Plans",
-    "marketingName": "WellCare Medicare",
+    "legalEntity": "Carrier 6 Health Plans",
+    "marketingName": "Carrier 6 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -3167,21 +3167,21 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-072-01",
-        "documentName": "Evidence of Coverage - WellCare Value (HMO)",
+        "documentName": "Evidence of Coverage - Carrier 6 Value (HMO)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-072/evidence-of-coverage.pdf",
         "documentDate": "2026-07-07"
       },
       {
         "documentId": "DOC-PLAN-072-02",
-        "documentName": "Formulary - WellCare Value (HMO)",
+        "documentName": "Formulary - Carrier 6 Value (HMO)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-072/formulary.pdf",
         "documentDate": "2026-08-19"
       },
       {
         "documentId": "DOC-PLAN-072-03",
-        "documentName": "Summary of Benefits - WellCare Value (HMO)",
+        "documentName": "Summary of Benefits - Carrier 6 Value (HMO)",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-072/summary-of-benefits.pdf",
         "documentDate": "2026-05-30"
@@ -3194,7 +3194,7 @@
     "contractNumber": "H5214",
     "pbp": "002",
     "segmentId": "H5214002",
-    "planName": "WellCare Complete (HMO)",
+    "planName": "Carrier 6 Complete (HMO)",
     "product": "MAPD",
     "planType": "HMO",
     "category": "Medicare Advantage",
@@ -3202,8 +3202,8 @@
     "planStatus": "Active",
     "market": "Southeast",
     "region": "Georgia/Gulf States",
-    "legalEntity": "WellCare Health Plans",
-    "marketingName": "WellCare Medicare",
+    "legalEntity": "Carrier 6 Health Plans",
+    "marketingName": "Carrier 6 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -3211,21 +3211,21 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-073-01",
-        "documentName": "Annual Notice of Change - WellCare Complete (HMO)",
+        "documentName": "Annual Notice of Change - Carrier 6 Complete (HMO)",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-073/annual-notice-of-change.pdf",
         "documentDate": "2026-06-05"
       },
       {
         "documentId": "DOC-PLAN-073-02",
-        "documentName": "Summary of Benefits - WellCare Complete (HMO)",
+        "documentName": "Summary of Benefits - Carrier 6 Complete (HMO)",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-073/summary-of-benefits.pdf",
         "documentDate": "2026-07-17"
       },
       {
         "documentId": "DOC-PLAN-073-03",
-        "documentName": "Formulary - WellCare Complete (HMO)",
+        "documentName": "Formulary - Carrier 6 Complete (HMO)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-073/formulary.pdf",
         "documentDate": "2026-12-11"
@@ -3238,7 +3238,7 @@
     "contractNumber": "H4387",
     "pbp": "001",
     "segmentId": "H4387001",
-    "planName": "WellCare Dual Complete (HMO D-SNP)",
+    "planName": "Carrier 6 Dual Complete (HMO D-SNP)",
     "product": "MAPD",
     "planType": "DSNP",
     "category": "Medicare Advantage",
@@ -3246,8 +3246,8 @@
     "planStatus": "Active",
     "market": "Southeast",
     "region": "Florida",
-    "legalEntity": "WellCare Health Plans",
-    "marketingName": "WellCare Medicare",
+    "legalEntity": "Carrier 6 Health Plans",
+    "marketingName": "Carrier 6 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": "DSNP",
@@ -3255,14 +3255,14 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-074-01",
-        "documentName": "Summary of Benefits - WellCare Dual Complete (HMO D-SNP)",
+        "documentName": "Summary of Benefits - Carrier 6 Dual Complete (HMO D-SNP)",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-074/summary-of-benefits.pdf",
         "documentDate": "2026-12-07"
       },
       {
         "documentId": "DOC-PLAN-074-02",
-        "documentName": "Provider Directory - WellCare Dual Complete (HMO D-SNP)",
+        "documentName": "Provider Directory - Carrier 6 Dual Complete (HMO D-SNP)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-074/provider-directory.pdf",
         "documentDate": "2026-02-19"
@@ -3275,7 +3275,7 @@
     "contractNumber": "S4802",
     "pbp": "048",
     "segmentId": "S4802048",
-    "planName": "WellCare Classic (PDP)",
+    "planName": "Carrier 6 Classic (PDP)",
     "product": "PDP",
     "planType": "PDP",
     "category": "PDP",
@@ -3283,8 +3283,8 @@
     "planStatus": "Active",
     "market": "National",
     "region": "PDP",
-    "legalEntity": "WellCare Prescription Insurance",
-    "marketingName": "WellCare Medicare",
+    "legalEntity": "Carrier 6 Prescription Insurance",
+    "marketingName": "Carrier 6 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -3292,14 +3292,14 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-075-01",
-        "documentName": "Provider Directory - WellCare Classic (PDP)",
+        "documentName": "Provider Directory - Carrier 6 Classic (PDP)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-075/provider-directory.pdf",
         "documentDate": "2026-06-09"
       },
       {
         "documentId": "DOC-PLAN-075-02",
-        "documentName": "Formulary - WellCare Classic (PDP)",
+        "documentName": "Formulary - Carrier 6 Classic (PDP)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-075/formulary.pdf",
         "documentDate": "2026-02-27"
@@ -3312,7 +3312,7 @@
     "contractNumber": "H3046",
     "pbp": "001",
     "segmentId": "H3046001",
-    "planName": "Humana Gold Choice (PPO)",
+    "planName": "Carrier 2 Gold Choice (PPO)",
     "product": "MAPD",
     "planType": "PPO",
     "category": "Medicare Advantage",
@@ -3320,8 +3320,8 @@
     "planStatus": "Active",
     "market": "West",
     "region": "California",
-    "legalEntity": "Humana Insurance Company",
-    "marketingName": "Humana Medicare",
+    "legalEntity": "Carrier 2 Insurance Company",
+    "marketingName": "Carrier 2 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -3329,14 +3329,14 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-076-01",
-        "documentName": "Formulary - Humana Gold Choice (PPO)",
+        "documentName": "Formulary - Carrier 2 Gold Choice (PPO)",
         "documentType": "Formulary",
         "documentUrl": "https://example.com/documents/plan-076/formulary.pdf",
         "documentDate": "2026-07-26"
       },
       {
         "documentId": "DOC-PLAN-076-02",
-        "documentName": "Evidence of Coverage - Humana Gold Choice (PPO)",
+        "documentName": "Evidence of Coverage - Carrier 2 Gold Choice (PPO)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-076/evidence-of-coverage.pdf",
         "documentDate": "2026-02-06"
@@ -3349,7 +3349,7 @@
     "contractNumber": "H4148",
     "pbp": "001",
     "segmentId": "H4148001",
-    "planName": "UnitedHealthcare Medicare Advantage Classic (HMO)",
+    "planName": "Carrier 3 Medicare Advantage Classic (HMO)",
     "product": "MAPD",
     "planType": "HMO",
     "category": "Medicare Advantage",
@@ -3357,8 +3357,8 @@
     "planStatus": "Active",
     "market": "Midwest",
     "region": "Great Lakes",
-    "legalEntity": "UnitedHealthcare Insurance Company",
-    "marketingName": "UnitedHealthcare Medicare",
+    "legalEntity": "Carrier 3 Insurance Company",
+    "marketingName": "Carrier 3 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": null,
@@ -3366,14 +3366,14 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-077-01",
-        "documentName": "Provider Directory - UnitedHealthcare Medicare Advantage Classic (HMO)",
+        "documentName": "Provider Directory - Carrier 3 Medicare Advantage Classic (HMO)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-077/provider-directory.pdf",
         "documentDate": "2026-03-26"
       },
       {
         "documentId": "DOC-PLAN-077-02",
-        "documentName": "Evidence of Coverage - UnitedHealthcare Medicare Advantage Classic (HMO)",
+        "documentName": "Evidence of Coverage - Carrier 3 Medicare Advantage Classic (HMO)",
         "documentType": "Evidence of Coverage",
         "documentUrl": "https://example.com/documents/plan-077/evidence-of-coverage.pdf",
         "documentDate": "2026-06-15"
@@ -3386,7 +3386,7 @@
     "contractNumber": "H4148",
     "pbp": "003",
     "segmentId": "H4148003",
-    "planName": "UnitedHealthcare Chronic Complete (HMO C-SNP)",
+    "planName": "Carrier 3 Chronic Complete (HMO C-SNP)",
     "product": "MAPD",
     "planType": "CSNP",
     "category": "Medicare Advantage",
@@ -3394,8 +3394,8 @@
     "planStatus": "Active",
     "market": "Midwest",
     "region": "Great Lakes",
-    "legalEntity": "UnitedHealthcare Insurance Company",
-    "marketingName": "UnitedHealthcare Medicare",
+    "legalEntity": "Carrier 3 Insurance Company",
+    "marketingName": "Carrier 3 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": "CSNP",
@@ -3403,14 +3403,14 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-078-01",
-        "documentName": "Summary of Benefits - UnitedHealthcare Chronic Complete (HMO C-SNP)",
+        "documentName": "Summary of Benefits - Carrier 3 Chronic Complete (HMO C-SNP)",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-078/summary-of-benefits.pdf",
         "documentDate": "2026-07-08"
       },
       {
         "documentId": "DOC-PLAN-078-02",
-        "documentName": "Provider Directory - UnitedHealthcare Chronic Complete (HMO C-SNP)",
+        "documentName": "Provider Directory - Carrier 3 Chronic Complete (HMO C-SNP)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-078/provider-directory.pdf",
         "documentDate": "2026-09-22"
@@ -3423,7 +3423,7 @@
     "contractNumber": "H2111",
     "pbp": "001",
     "segmentId": "H2111001",
-    "planName": "Blue Cross Blue Shield Medicare Advantage Dual (HMO D-SNP)",
+    "planName": "Carrier 5 Medicare Advantage Dual (HMO D-SNP)",
     "product": "MAPD",
     "planType": "DSNP",
     "category": "Medicare Advantage",
@@ -3431,8 +3431,8 @@
     "planStatus": "Active",
     "market": "Northeast",
     "region": "Keystone",
-    "legalEntity": "BlueCross BlueShield of Pennsylvania",
-    "marketingName": "Blue Cross Blue Shield Medicare",
+    "legalEntity": "Carrier 5 of Pennsylvania",
+    "marketingName": "Carrier 5 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": "DSNP",
@@ -3440,21 +3440,21 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-079-01",
-        "documentName": "Provider Directory - Blue Cross Blue Shield Medicare Advantage Dual (HMO D-SNP)",
+        "documentName": "Provider Directory - Carrier 5 Medicare Advantage Dual (HMO D-SNP)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-079/provider-directory.pdf",
         "documentDate": "2026-08-17"
       },
       {
         "documentId": "DOC-PLAN-079-02",
-        "documentName": "Summary of Benefits - Blue Cross Blue Shield Medicare Advantage Dual (HMO D-SNP)",
+        "documentName": "Summary of Benefits - Carrier 5 Medicare Advantage Dual (HMO D-SNP)",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-079/summary-of-benefits.pdf",
         "documentDate": "2026-11-20"
       },
       {
         "documentId": "DOC-PLAN-079-03",
-        "documentName": "Annual Notice of Change - Blue Cross Blue Shield Medicare Advantage Dual (HMO D-SNP)",
+        "documentName": "Annual Notice of Change - Carrier 5 Medicare Advantage Dual (HMO D-SNP)",
         "documentType": "Annual Notice of Change",
         "documentUrl": "https://example.com/documents/plan-079/annual-notice-of-change.pdf",
         "documentDate": "2026-05-25"
@@ -3467,7 +3467,7 @@
     "contractNumber": "H5217",
     "pbp": "001",
     "segmentId": "H5217001",
-    "planName": "Cigna Medicare Advantage Dual (HMO D-SNP)",
+    "planName": "Carrier 4 Medicare Advantage Dual (HMO D-SNP)",
     "product": "MAPD",
     "planType": "DSNP",
     "category": "Medicare Advantage",
@@ -3475,8 +3475,8 @@
     "planStatus": "Active",
     "market": "West",
     "region": "Arizona",
-    "legalEntity": "Cigna HealthCare",
-    "marketingName": "Cigna Medicare",
+    "legalEntity": "Carrier 4 HealthCare",
+    "marketingName": "Carrier 4 Medicare",
     "minAge": 65,
     "maxAge": null,
     "snpType": "DSNP",
@@ -3484,14 +3484,14 @@
     "documents": [
       {
         "documentId": "DOC-PLAN-080-01",
-        "documentName": "Provider Directory - Cigna Medicare Advantage Dual (HMO D-SNP)",
+        "documentName": "Provider Directory - Carrier 4 Medicare Advantage Dual (HMO D-SNP)",
         "documentType": "Provider Directory",
         "documentUrl": "https://example.com/documents/plan-080/provider-directory.pdf",
         "documentDate": "2026-01-22"
       },
       {
         "documentId": "DOC-PLAN-080-02",
-        "documentName": "Summary of Benefits - Cigna Medicare Advantage Dual (HMO D-SNP)",
+        "documentName": "Summary of Benefits - Carrier 4 Medicare Advantage Dual (HMO D-SNP)",
         "documentType": "Summary of Benefits",
         "documentUrl": "https://example.com/documents/plan-080/summary-of-benefits.pdf",
         "documentDate": "2026-04-16"

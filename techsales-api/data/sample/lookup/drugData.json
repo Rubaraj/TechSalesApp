@@ -1,0 +1,1191 @@
+[
+  {
+    "drugId": "DRUG-001",
+    "gpiCode": "0120001000",
+    "ndc": "00781261305",
+    "brandName": "Amoxicillin",
+    "genericName": "Amoxicillin",
+    "drugLabelName": "AMOXICILLIN CAP 500MG",
+    "strength": "500mg",
+    "strengthNumber": 500,
+    "strengthUnit": "mg",
+    "dosageForm": "Capsule",
+    "drugClass": "Aminopenicillins",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily",
+      "Twice daily",
+      "Three times daily"
+    ],
+    "commonQuantities": [
+      14,
+      21,
+      30
+    ]
+  },
+  {
+    "drugId": "DRUG-002",
+    "gpiCode": "0120001001",
+    "ndc": "00781261401",
+    "brandName": "Amoxicillin",
+    "genericName": "Amoxicillin",
+    "drugLabelName": "AMOXICILLIN CAP 250MG",
+    "strength": "250mg",
+    "strengthNumber": 250,
+    "strengthUnit": "mg",
+    "dosageForm": "Capsule",
+    "drugClass": "Aminopenicillins",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily",
+      "Twice daily",
+      "Three times daily"
+    ],
+    "commonQuantities": [
+      14,
+      21,
+      30
+    ]
+  },
+  {
+    "drugId": "DRUG-003",
+    "gpiCode": "2710004000",
+    "ndc": "00071015523",
+    "brandName": "Lipitor",
+    "genericName": "Atorvastatin Calcium",
+    "drugLabelName": "LIPITOR TAB 10MG",
+    "strength": "10mg",
+    "strengthNumber": 10,
+    "strengthUnit": "mg",
+    "dosageForm": "Tablet",
+    "drugClass": "HMG-CoA Reductase Inhibitors",
+    "isBrand": true,
+    "isGeneric": false,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily"
+    ],
+    "commonQuantities": [
+      30,
+      90
+    ]
+  },
+  {
+    "drugId": "DRUG-004",
+    "gpiCode": "2710004001",
+    "ndc": "00591376301",
+    "brandName": "Atorvastatin",
+    "genericName": "Atorvastatin Calcium",
+    "drugLabelName": "ATORVASTATIN TAB 20MG",
+    "strength": "20mg",
+    "strengthNumber": 20,
+    "strengthUnit": "mg",
+    "dosageForm": "Tablet",
+    "drugClass": "HMG-CoA Reductase Inhibitors",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily"
+    ],
+    "commonQuantities": [
+      30,
+      90
+    ]
+  },
+  {
+    "drugId": "DRUG-005",
+    "gpiCode": "2710004002",
+    "ndc": "00591376401",
+    "brandName": "Atorvastatin",
+    "genericName": "Atorvastatin Calcium",
+    "drugLabelName": "ATORVASTATIN TAB 40MG",
+    "strength": "40mg",
+    "strengthNumber": 40,
+    "strengthUnit": "mg",
+    "dosageForm": "Tablet",
+    "drugClass": "HMG-CoA Reductase Inhibitors",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily"
+    ],
+    "commonQuantities": [
+      30,
+      90
+    ]
+  },
+  {
+    "drugId": "DRUG-006",
+    "gpiCode": "3610001000",
+    "ndc": "00093505601",
+    "brandName": "Metformin",
+    "genericName": "Metformin HCl",
+    "drugLabelName": "METFORMIN TAB 500MG",
+    "strength": "500mg",
+    "strengthNumber": 500,
+    "strengthUnit": "mg",
+    "dosageForm": "Tablet",
+    "drugClass": "Biguanides",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily",
+      "Twice daily"
+    ],
+    "commonQuantities": [
+      60,
+      90,
+      180
+    ]
+  },
+  {
+    "drugId": "DRUG-007",
+    "gpiCode": "3610001001",
+    "ndc": "00093505701",
+    "brandName": "Metformin",
+    "genericName": "Metformin HCl",
+    "drugLabelName": "METFORMIN TAB 850MG",
+    "strength": "850mg",
+    "strengthNumber": 850,
+    "strengthUnit": "mg",
+    "dosageForm": "Tablet",
+    "drugClass": "Biguanides",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily",
+      "Twice daily"
+    ],
+    "commonQuantities": [
+      60,
+      90,
+      180
+    ]
+  },
+  {
+    "drugId": "DRUG-008",
+    "gpiCode": "3610001002",
+    "ndc": "00093505801",
+    "brandName": "Metformin",
+    "genericName": "Metformin HCl",
+    "drugLabelName": "METFORMIN TAB 1000MG",
+    "strength": "1000mg",
+    "strengthNumber": 1000,
+    "strengthUnit": "mg",
+    "dosageForm": "Tablet",
+    "drugClass": "Biguanides",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily",
+      "Twice daily"
+    ],
+    "commonQuantities": [
+      60,
+      90,
+      180
+    ]
+  },
+  {
+    "drugId": "DRUG-009",
+    "gpiCode": "3320001000",
+    "ndc": "00378180101",
+    "brandName": "Lisinopril",
+    "genericName": "Lisinopril",
+    "drugLabelName": "LISINOPRIL TAB 10MG",
+    "strength": "10mg",
+    "strengthNumber": 10,
+    "strengthUnit": "mg",
+    "dosageForm": "Tablet",
+    "drugClass": "ACE Inhibitors",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily"
+    ],
+    "commonQuantities": [
+      30,
+      90
+    ]
+  },
+  {
+    "drugId": "DRUG-010",
+    "gpiCode": "3320001001",
+    "ndc": "00378180201",
+    "brandName": "Lisinopril",
+    "genericName": "Lisinopril",
+    "drugLabelName": "LISINOPRIL TAB 20MG",
+    "strength": "20mg",
+    "strengthNumber": 20,
+    "strengthUnit": "mg",
+    "dosageForm": "Tablet",
+    "drugClass": "ACE Inhibitors",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily"
+    ],
+    "commonQuantities": [
+      30,
+      90
+    ]
+  },
+  {
+    "drugId": "DRUG-011",
+    "gpiCode": "3320001002",
+    "ndc": "00378180301",
+    "brandName": "Lisinopril",
+    "genericName": "Lisinopril",
+    "drugLabelName": "LISINOPRIL TAB 40MG",
+    "strength": "40mg",
+    "strengthNumber": 40,
+    "strengthUnit": "mg",
+    "dosageForm": "Tablet",
+    "drugClass": "ACE Inhibitors",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily"
+    ],
+    "commonQuantities": [
+      30,
+      90
+    ]
+  },
+  {
+    "drugId": "DRUG-012",
+    "gpiCode": "3340001000",
+    "ndc": "00378001101",
+    "brandName": "Amlodipine",
+    "genericName": "Amlodipine Besylate",
+    "drugLabelName": "AMLODIPINE TAB 5MG",
+    "strength": "5mg",
+    "strengthNumber": 5,
+    "strengthUnit": "mg",
+    "dosageForm": "Tablet",
+    "drugClass": "Calcium Channel Blockers",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily"
+    ],
+    "commonQuantities": [
+      30,
+      90
+    ]
+  },
+  {
+    "drugId": "DRUG-013",
+    "gpiCode": "3340001001",
+    "ndc": "00378001201",
+    "brandName": "Amlodipine",
+    "genericName": "Amlodipine Besylate",
+    "drugLabelName": "AMLODIPINE TAB 10MG",
+    "strength": "10mg",
+    "strengthNumber": 10,
+    "strengthUnit": "mg",
+    "dosageForm": "Tablet",
+    "drugClass": "Calcium Channel Blockers",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily"
+    ],
+    "commonQuantities": [
+      30,
+      90
+    ]
+  },
+  {
+    "drugId": "DRUG-014",
+    "gpiCode": "4920001000",
+    "ndc": "00093317056",
+    "brandName": "Omeprazole",
+    "genericName": "Omeprazole",
+    "drugLabelName": "OMEPRAZOLE CAP 20MG",
+    "strength": "20mg",
+    "strengthNumber": 20,
+    "strengthUnit": "mg",
+    "dosageForm": "Capsule",
+    "drugClass": "Proton Pump Inhibitors",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily",
+      "Twice daily"
+    ],
+    "commonQuantities": [
+      30,
+      90
+    ]
+  },
+  {
+    "drugId": "DRUG-015",
+    "gpiCode": "4920001001",
+    "ndc": "00093317156",
+    "brandName": "Omeprazole",
+    "genericName": "Omeprazole",
+    "drugLabelName": "OMEPRAZOLE CAP 40MG",
+    "strength": "40mg",
+    "strengthNumber": 40,
+    "strengthUnit": "mg",
+    "dosageForm": "Capsule",
+    "drugClass": "Proton Pump Inhibitors",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily",
+      "Twice daily"
+    ],
+    "commonQuantities": [
+      30,
+      90
+    ]
+  },
+  {
+    "drugId": "DRUG-016",
+    "gpiCode": "5810001000",
+    "ndc": "00378620001",
+    "brandName": "Gabapentin",
+    "genericName": "Gabapentin",
+    "drugLabelName": "GABAPENTIN CAP 100MG",
+    "strength": "100mg",
+    "strengthNumber": 100,
+    "strengthUnit": "mg",
+    "dosageForm": "Capsule",
+    "drugClass": "GABA Analog",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily",
+      "Twice daily",
+      "Three times daily"
+    ],
+    "commonQuantities": [
+      90,
+      180,
+      270
+    ]
+  },
+  {
+    "drugId": "DRUG-017",
+    "gpiCode": "5810001001",
+    "ndc": "00378620101",
+    "brandName": "Gabapentin",
+    "genericName": "Gabapentin",
+    "drugLabelName": "GABAPENTIN CAP 300MG",
+    "strength": "300mg",
+    "strengthNumber": 300,
+    "strengthUnit": "mg",
+    "dosageForm": "Capsule",
+    "drugClass": "GABA Analog",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily",
+      "Twice daily",
+      "Three times daily"
+    ],
+    "commonQuantities": [
+      90,
+      180,
+      270
+    ]
+  },
+  {
+    "drugId": "DRUG-018",
+    "gpiCode": "5810001002",
+    "ndc": "00378620201",
+    "brandName": "Gabapentin",
+    "genericName": "Gabapentin",
+    "drugLabelName": "GABAPENTIN CAP 400MG",
+    "strength": "400mg",
+    "strengthNumber": 400,
+    "strengthUnit": "mg",
+    "dosageForm": "Capsule",
+    "drugClass": "GABA Analog",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily",
+      "Twice daily",
+      "Three times daily"
+    ],
+    "commonQuantities": [
+      90,
+      180,
+      270
+    ]
+  },
+  {
+    "drugId": "DRUG-019",
+    "gpiCode": "3410001000",
+    "ndc": "00781524731",
+    "brandName": "Losartan",
+    "genericName": "Losartan Potassium",
+    "drugLabelName": "LOSARTAN TAB 25MG",
+    "strength": "25mg",
+    "strengthNumber": 25,
+    "strengthUnit": "mg",
+    "dosageForm": "Tablet",
+    "drugClass": "ARBs",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily"
+    ],
+    "commonQuantities": [
+      30,
+      90
+    ]
+  },
+  {
+    "drugId": "DRUG-020",
+    "gpiCode": "3410001001",
+    "ndc": "00781524831",
+    "brandName": "Losartan",
+    "genericName": "Losartan Potassium",
+    "drugLabelName": "LOSARTAN TAB 50MG",
+    "strength": "50mg",
+    "strengthNumber": 50,
+    "strengthUnit": "mg",
+    "dosageForm": "Tablet",
+    "drugClass": "ARBs",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily"
+    ],
+    "commonQuantities": [
+      30,
+      90
+    ]
+  },
+  {
+    "drugId": "DRUG-021",
+    "gpiCode": "3410001002",
+    "ndc": "00781524931",
+    "brandName": "Losartan",
+    "genericName": "Losartan Potassium",
+    "drugLabelName": "LOSARTAN TAB 100MG",
+    "strength": "100mg",
+    "strengthNumber": 100,
+    "strengthUnit": "mg",
+    "dosageForm": "Tablet",
+    "drugClass": "ARBs",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily"
+    ],
+    "commonQuantities": [
+      30,
+      90
+    ]
+  },
+  {
+    "drugId": "DRUG-022",
+    "gpiCode": "6610001000",
+    "ndc": "00093534456",
+    "brandName": "Levothyroxine",
+    "genericName": "Levothyroxine Sodium",
+    "drugLabelName": "LEVOTHYROXINE TAB 25MCG",
+    "strength": "25mcg",
+    "strengthNumber": 25,
+    "strengthUnit": "mcg",
+    "dosageForm": "Tablet",
+    "drugClass": "Thyroid Hormones",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily"
+    ],
+    "commonQuantities": [
+      30,
+      90
+    ]
+  },
+  {
+    "drugId": "DRUG-023",
+    "gpiCode": "6610001001",
+    "ndc": "00093534556",
+    "brandName": "Levothyroxine",
+    "genericName": "Levothyroxine Sodium",
+    "drugLabelName": "LEVOTHYROXINE TAB 50MCG",
+    "strength": "50mcg",
+    "strengthNumber": 50,
+    "strengthUnit": "mcg",
+    "dosageForm": "Tablet",
+    "drugClass": "Thyroid Hormones",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily"
+    ],
+    "commonQuantities": [
+      30,
+      90
+    ]
+  },
+  {
+    "drugId": "DRUG-024",
+    "gpiCode": "6610001002",
+    "ndc": "00093534656",
+    "brandName": "Levothyroxine",
+    "genericName": "Levothyroxine Sodium",
+    "drugLabelName": "LEVOTHYROXINE TAB 75MCG",
+    "strength": "75mcg",
+    "strengthNumber": 75,
+    "strengthUnit": "mcg",
+    "dosageForm": "Tablet",
+    "drugClass": "Thyroid Hormones",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily"
+    ],
+    "commonQuantities": [
+      30,
+      90
+    ]
+  },
+  {
+    "drugId": "DRUG-025",
+    "gpiCode": "6610001003",
+    "ndc": "00093534756",
+    "brandName": "Levothyroxine",
+    "genericName": "Levothyroxine Sodium",
+    "drugLabelName": "LEVOTHYROXINE TAB 100MCG",
+    "strength": "100mcg",
+    "strengthNumber": 100,
+    "strengthUnit": "mcg",
+    "dosageForm": "Tablet",
+    "drugClass": "Thyroid Hormones",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily"
+    ],
+    "commonQuantities": [
+      30,
+      90
+    ]
+  },
+  {
+    "drugId": "DRUG-026",
+    "gpiCode": "8330001000",
+    "ndc": "00185001301",
+    "brandName": "Prednisone",
+    "genericName": "Prednisone",
+    "drugLabelName": "PREDNISONE TAB 5MG",
+    "strength": "5mg",
+    "strengthNumber": 5,
+    "strengthUnit": "mg",
+    "dosageForm": "Tablet",
+    "drugClass": "Corticosteroids",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily",
+      "As directed"
+    ],
+    "commonQuantities": [
+      21,
+      30,
+      42
+    ]
+  },
+  {
+    "drugId": "DRUG-027",
+    "gpiCode": "8330001001",
+    "ndc": "00185001401",
+    "brandName": "Prednisone",
+    "genericName": "Prednisone",
+    "drugLabelName": "PREDNISONE TAB 10MG",
+    "strength": "10mg",
+    "strengthNumber": 10,
+    "strengthUnit": "mg",
+    "dosageForm": "Tablet",
+    "drugClass": "Corticosteroids",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily",
+      "As directed"
+    ],
+    "commonQuantities": [
+      21,
+      30,
+      42
+    ]
+  },
+  {
+    "drugId": "DRUG-028",
+    "gpiCode": "8330001002",
+    "ndc": "00185001501",
+    "brandName": "Prednisone",
+    "genericName": "Prednisone",
+    "drugLabelName": "PREDNISONE TAB 20MG",
+    "strength": "20mg",
+    "strengthNumber": 20,
+    "strengthUnit": "mg",
+    "dosageForm": "Tablet",
+    "drugClass": "Corticosteroids",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily",
+      "As directed"
+    ],
+    "commonQuantities": [
+      21,
+      30,
+      42
+    ]
+  },
+  {
+    "drugId": "DRUG-029",
+    "gpiCode": "8510001000",
+    "ndc": "00093097501",
+    "brandName": "Albuterol",
+    "genericName": "Albuterol Sulfate",
+    "drugLabelName": "ALBUTEROL INH 90MCG",
+    "strength": "90mcg",
+    "strengthNumber": 90,
+    "strengthUnit": "mcg",
+    "dosageForm": "Inhaler",
+    "drugClass": "Beta-2 Agonists",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "As needed",
+      "Four times daily"
+    ],
+    "commonQuantities": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "drugId": "DRUG-030",
+    "gpiCode": "8510002000",
+    "ndc": "00173069620",
+    "brandName": "Ventolin HFA",
+    "genericName": "Albuterol Sulfate",
+    "drugLabelName": "VENTOLIN HFA INH 90MCG",
+    "strength": "90mcg",
+    "strengthNumber": 90,
+    "strengthUnit": "mcg",
+    "dosageForm": "Inhaler",
+    "drugClass": "Beta-2 Agonists",
+    "isBrand": true,
+    "isGeneric": false,
+    "isVaccine": false,
+    "frequencies": [
+      "As needed",
+      "Four times daily"
+    ],
+    "commonQuantities": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "drugId": "DRUG-031",
+    "gpiCode": "6510001000",
+    "ndc": "64764091530",
+    "brandName": "Eliquis",
+    "genericName": "Apixaban",
+    "drugLabelName": "ELIQUIS TAB 5MG",
+    "strength": "5mg",
+    "strengthNumber": 5,
+    "strengthUnit": "mg",
+    "dosageForm": "Tablet",
+    "drugClass": "Factor Xa Inhibitors",
+    "isBrand": true,
+    "isGeneric": false,
+    "isVaccine": false,
+    "frequencies": [
+      "Twice daily"
+    ],
+    "commonQuantities": [
+      60,
+      180
+    ]
+  },
+  {
+    "drugId": "DRUG-032",
+    "gpiCode": "6510001001",
+    "ndc": "64764091330",
+    "brandName": "Eliquis",
+    "genericName": "Apixaban",
+    "drugLabelName": "ELIQUIS TAB 2.5MG",
+    "strength": "2.5mg",
+    "strengthNumber": 2.5,
+    "strengthUnit": "mg",
+    "dosageForm": "Tablet",
+    "drugClass": "Factor Xa Inhibitors",
+    "isBrand": true,
+    "isGeneric": false,
+    "isVaccine": false,
+    "frequencies": [
+      "Twice daily"
+    ],
+    "commonQuantities": [
+      60,
+      180
+    ]
+  },
+  {
+    "drugId": "DRUG-033",
+    "gpiCode": "6520001000",
+    "ndc": "50458057801",
+    "brandName": "Xarelto",
+    "genericName": "Rivaroxaban",
+    "drugLabelName": "XARELTO TAB 20MG",
+    "strength": "20mg",
+    "strengthNumber": 20,
+    "strengthUnit": "mg",
+    "dosageForm": "Tablet",
+    "drugClass": "Factor Xa Inhibitors",
+    "isBrand": true,
+    "isGeneric": false,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily"
+    ],
+    "commonQuantities": [
+      30,
+      90
+    ]
+  },
+  {
+    "drugId": "DRUG-034",
+    "gpiCode": "6520001001",
+    "ndc": "50458057701",
+    "brandName": "Xarelto",
+    "genericName": "Rivaroxaban",
+    "drugLabelName": "XARELTO TAB 15MG",
+    "strength": "15mg",
+    "strengthNumber": 15,
+    "strengthUnit": "mg",
+    "dosageForm": "Tablet",
+    "drugClass": "Factor Xa Inhibitors",
+    "isBrand": true,
+    "isGeneric": false,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily",
+      "Twice daily"
+    ],
+    "commonQuantities": [
+      30,
+      90
+    ]
+  },
+  {
+    "drugId": "DRUG-035",
+    "gpiCode": "6520001002",
+    "ndc": "50458057601",
+    "brandName": "Xarelto",
+    "genericName": "Rivaroxaban",
+    "drugLabelName": "XARELTO TAB 10MG",
+    "strength": "10mg",
+    "strengthNumber": 10,
+    "strengthUnit": "mg",
+    "dosageForm": "Tablet",
+    "drugClass": "Factor Xa Inhibitors",
+    "isBrand": true,
+    "isGeneric": false,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily"
+    ],
+    "commonQuantities": [
+      30,
+      90
+    ]
+  },
+  {
+    "drugId": "DRUG-036",
+    "gpiCode": "3615001000",
+    "ndc": "00169412612",
+    "brandName": "Ozempic",
+    "genericName": "Semaglutide",
+    "drugLabelName": "OZEMPIC INJ 0.25MG/0.5ML",
+    "strength": "0.25mg",
+    "strengthNumber": 0.25,
+    "strengthUnit": "mg",
+    "dosageForm": "Injection",
+    "drugClass": "GLP-1 Agonists",
+    "isBrand": true,
+    "isGeneric": false,
+    "isVaccine": false,
+    "frequencies": [
+      "Weekly"
+    ],
+    "commonQuantities": [
+      1,
+      4
+    ]
+  },
+  {
+    "drugId": "DRUG-037",
+    "gpiCode": "3615001001",
+    "ndc": "00169412712",
+    "brandName": "Ozempic",
+    "genericName": "Semaglutide",
+    "drugLabelName": "OZEMPIC INJ 0.5MG/0.5ML",
+    "strength": "0.5mg",
+    "strengthNumber": 0.5,
+    "strengthUnit": "mg",
+    "dosageForm": "Injection",
+    "drugClass": "GLP-1 Agonists",
+    "isBrand": true,
+    "isGeneric": false,
+    "isVaccine": false,
+    "frequencies": [
+      "Weekly"
+    ],
+    "commonQuantities": [
+      1,
+      4
+    ]
+  },
+  {
+    "drugId": "DRUG-038",
+    "gpiCode": "3615001002",
+    "ndc": "00169412812",
+    "brandName": "Ozempic",
+    "genericName": "Semaglutide",
+    "drugLabelName": "OZEMPIC INJ 1MG/0.5ML",
+    "strength": "1mg",
+    "strengthNumber": 1,
+    "strengthUnit": "mg",
+    "dosageForm": "Injection",
+    "drugClass": "GLP-1 Agonists",
+    "isBrand": true,
+    "isGeneric": false,
+    "isVaccine": false,
+    "frequencies": [
+      "Weekly"
+    ],
+    "commonQuantities": [
+      1,
+      4
+    ]
+  },
+  {
+    "drugId": "DRUG-039",
+    "gpiCode": "3612001000",
+    "ndc": "00002147580",
+    "brandName": "Trulicity",
+    "genericName": "Dulaglutide",
+    "drugLabelName": "TRULICITY INJ 0.75MG/0.5ML",
+    "strength": "0.75mg",
+    "strengthNumber": 0.75,
+    "strengthUnit": "mg",
+    "dosageForm": "Injection",
+    "drugClass": "GLP-1 Agonists",
+    "isBrand": true,
+    "isGeneric": false,
+    "isVaccine": false,
+    "frequencies": [
+      "Weekly"
+    ],
+    "commonQuantities": [
+      4,
+      12
+    ]
+  },
+  {
+    "drugId": "DRUG-040",
+    "gpiCode": "3612001001",
+    "ndc": "00002147680",
+    "brandName": "Trulicity",
+    "genericName": "Dulaglutide",
+    "drugLabelName": "TRULICITY INJ 1.5MG/0.5ML",
+    "strength": "1.5mg",
+    "strengthNumber": 1.5,
+    "strengthUnit": "mg",
+    "dosageForm": "Injection",
+    "drugClass": "GLP-1 Agonists",
+    "isBrand": true,
+    "isGeneric": false,
+    "isVaccine": false,
+    "frequencies": [
+      "Weekly"
+    ],
+    "commonQuantities": [
+      4,
+      12
+    ]
+  },
+  {
+    "drugId": "DRUG-041",
+    "gpiCode": "3618001000",
+    "ndc": "00002151701",
+    "brandName": "Jardiance",
+    "genericName": "Empagliflozin",
+    "drugLabelName": "JARDIANCE TAB 10MG",
+    "strength": "10mg",
+    "strengthNumber": 10,
+    "strengthUnit": "mg",
+    "dosageForm": "Tablet",
+    "drugClass": "SGLT2 Inhibitors",
+    "isBrand": true,
+    "isGeneric": false,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily"
+    ],
+    "commonQuantities": [
+      30,
+      90
+    ]
+  },
+  {
+    "drugId": "DRUG-042",
+    "gpiCode": "3618001001",
+    "ndc": "00002151801",
+    "brandName": "Jardiance",
+    "genericName": "Empagliflozin",
+    "drugLabelName": "JARDIANCE TAB 25MG",
+    "strength": "25mg",
+    "strengthNumber": 25,
+    "strengthUnit": "mg",
+    "dosageForm": "Tablet",
+    "drugClass": "SGLT2 Inhibitors",
+    "isBrand": true,
+    "isGeneric": false,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily"
+    ],
+    "commonQuantities": [
+      30,
+      90
+    ]
+  },
+  {
+    "drugId": "DRUG-043",
+    "gpiCode": "5830001000",
+    "ndc": "00002416430",
+    "brandName": "Cymbalta",
+    "genericName": "Duloxetine HCl",
+    "drugLabelName": "CYMBALTA CAP 30MG",
+    "strength": "30mg",
+    "strengthNumber": 30,
+    "strengthUnit": "mg",
+    "dosageForm": "Capsule",
+    "drugClass": "SNRIs",
+    "isBrand": true,
+    "isGeneric": false,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily"
+    ],
+    "commonQuantities": [
+      30,
+      90
+    ]
+  },
+  {
+    "drugId": "DRUG-044",
+    "gpiCode": "5830001001",
+    "ndc": "00591378130",
+    "brandName": "Duloxetine",
+    "genericName": "Duloxetine HCl",
+    "drugLabelName": "DULOXETINE CAP 60MG",
+    "strength": "60mg",
+    "strengthNumber": 60,
+    "strengthUnit": "mg",
+    "dosageForm": "Capsule",
+    "drugClass": "SNRIs",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily"
+    ],
+    "commonQuantities": [
+      30,
+      90
+    ]
+  },
+  {
+    "drugId": "DRUG-045",
+    "gpiCode": "5820001000",
+    "ndc": "00378011810",
+    "brandName": "Sertraline",
+    "genericName": "Sertraline HCl",
+    "drugLabelName": "SERTRALINE TAB 50MG",
+    "strength": "50mg",
+    "strengthNumber": 50,
+    "strengthUnit": "mg",
+    "dosageForm": "Tablet",
+    "drugClass": "SSRIs",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily"
+    ],
+    "commonQuantities": [
+      30,
+      90
+    ]
+  },
+  {
+    "drugId": "DRUG-046",
+    "gpiCode": "5820001001",
+    "ndc": "00378011910",
+    "brandName": "Sertraline",
+    "genericName": "Sertraline HCl",
+    "drugLabelName": "SERTRALINE TAB 100MG",
+    "strength": "100mg",
+    "strengthNumber": 100,
+    "strengthUnit": "mg",
+    "dosageForm": "Tablet",
+    "drugClass": "SSRIs",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily"
+    ],
+    "commonQuantities": [
+      30,
+      90
+    ]
+  },
+  {
+    "drugId": "DRUG-047",
+    "gpiCode": "6410001000",
+    "ndc": "00310075190",
+    "brandName": "Aspirin",
+    "genericName": "Aspirin",
+    "drugLabelName": "ASPIRIN TAB 81MG",
+    "strength": "81mg",
+    "strengthNumber": 81,
+    "strengthUnit": "mg",
+    "dosageForm": "Tablet",
+    "drugClass": "Salicylates",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily"
+    ],
+    "commonQuantities": [
+      30,
+      90,
+      120
+    ]
+  },
+  {
+    "drugId": "DRUG-048",
+    "gpiCode": "6410001001",
+    "ndc": "00310075290",
+    "brandName": "Aspirin",
+    "genericName": "Aspirin",
+    "drugLabelName": "ASPIRIN TAB 325MG",
+    "strength": "325mg",
+    "strengthNumber": 325,
+    "strengthUnit": "mg",
+    "dosageForm": "Tablet",
+    "drugClass": "Salicylates",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily",
+      "As needed"
+    ],
+    "commonQuantities": [
+      30,
+      90,
+      100
+    ]
+  },
+  {
+    "drugId": "DRUG-049",
+    "gpiCode": "4430001000",
+    "ndc": "00904582461",
+    "brandName": "Vitamin D3",
+    "genericName": "Cholecalciferol",
+    "drugLabelName": "VITAMIN D3 CAP 1000IU",
+    "strength": "1000IU",
+    "strengthNumber": 1000,
+    "strengthUnit": "IU",
+    "dosageForm": "Capsule",
+    "drugClass": "Vitamins",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily"
+    ],
+    "commonQuantities": [
+      30,
+      90,
+      100
+    ]
+  },
+  {
+    "drugId": "DRUG-050",
+    "gpiCode": "4430001001",
+    "ndc": "00904582561",
+    "brandName": "Vitamin D3",
+    "genericName": "Cholecalciferol",
+    "drugLabelName": "VITAMIN D3 CAP 2000IU",
+    "strength": "2000IU",
+    "strengthNumber": 2000,
+    "strengthUnit": "IU",
+    "dosageForm": "Capsule",
+    "drugClass": "Vitamins",
+    "isBrand": false,
+    "isGeneric": true,
+    "isVaccine": false,
+    "frequencies": [
+      "Once daily"
+    ],
+    "commonQuantities": [
+      30,
+      90,
+      100
+    ]
+  }
+]

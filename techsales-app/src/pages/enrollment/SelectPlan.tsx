@@ -52,11 +52,11 @@ export function SelectPlan() {
 
   const carrierOptions = [
     { value: '', label: 'All Carriers' },
-    { value: 'Aetna', label: 'Aetna' },
-    { value: 'UnitedHealthcare', label: 'UnitedHealthcare' },
-    { value: 'Humana', label: 'Humana' },
-    { value: 'Blue Cross Blue Shield', label: 'Blue Cross Blue Shield' },
-    { value: 'Cigna', label: 'Cigna' },
+    { value: 'Carrier 1', label: 'Carrier 1' },
+    { value: 'Carrier 3', label: 'Carrier 3' },
+    { value: 'Carrier 2', label: 'Carrier 2' },
+    { value: 'Carrier 5', label: 'Carrier 5' },
+    { value: 'Carrier 4', label: 'Carrier 4' },
   ];
 
   // Get plan type color

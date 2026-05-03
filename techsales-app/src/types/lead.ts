@@ -23,7 +23,7 @@ export interface Lead {
   leadStatus: LeadStatus;
   source: LeadSource;
   permissionToContact: boolean;
-  existingAetnaMember: boolean;
+  existingCarrier1Member: boolean;
   tobaccoUsage: boolean;
   taggedPharmacies: string[]; // Array of pharmacy IDs (max 3)
   taggedDrugs: TaggedDrug[];

@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Sun, Moon, LogOut, User, Bell, LayoutDashboard, ShoppingBag, Settings } from 'lucide-react';
+import { Sun, Moon, LogOut, User, Bell, LayoutDashboard, ShoppingBag, Settings, Database, FileJson } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { getLogoByTheme } from '../../utils/logoUtils';
@@ -24,7 +24,7 @@ const SALES_ROUTES = [
 export function Header() {
   const location = useLocation();
   const { resolvedTheme, toggleTheme, colorTheme } = useTheme();
-  const { user, logout } = useAuth();
+  const { user, logout, dataSource } = useAuth();
 
   // Check if current path matches any sales routes
   const isSalesRoute = SALES_ROUTES.some(route => 
@@ -56,7 +56,7 @@ export function Header() {
           <Link to="/insights" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
             <img 
               src={getLogoByTheme(colorTheme)} 
-              alt={colorTheme === 'aetna' ? 'Aetna' : colorTheme === 'humana' ? 'Humana' : 'EXL'}
+              alt={colorTheme === 'carrier1' ? 'Carrier 1' : colorTheme === 'carrier2' ? 'Carrier 2' : 'EXL'}
               className="h-8 w-auto"
             />
             <div className="hidden sm:block">
@@ -131,6 +131,31 @@ export function Header() {
             <div className="w-9 h-9 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center">
               <User className="w-5 h-5 text-primary-600 dark:text-primary-400" />
             </div>
+
+            {/* Data source badge — what's actually backing the data behind this session.
+                MongoDB = green pill, JSON = amber pill (visual cue for the degraded path). */}
+            {dataSource && (
+              <span
+                className={
+                  dataSource === 'mongo'
+                    ? 'inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+                    : 'inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300'
+                }
+                title={
+                  dataSource === 'mongo'
+                    ? 'Data is being served from MongoDB (Pi)'
+                    : 'Data is being served from JSON file store (backend or bundled fallback)'
+                }
+                aria-label={`Data source: ${dataSource === 'mongo' ? 'MongoDB' : 'JSON'}`}
+              >
+                {dataSource === 'mongo' ? (
+                  <Database className="w-3.5 h-3.5" />
+                ) : (
+                  <FileJson className="w-3.5 h-3.5" />
+                )}
+                {dataSource === 'mongo' ? 'MongoDB' : 'JSON'}
+              </span>
+            )}
 
             <button
               onClick={logout}

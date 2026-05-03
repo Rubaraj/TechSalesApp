@@ -28,7 +28,7 @@ const mockPBKits: PBKit[] = [
     agentName: 'Demo Agent',
     status: 'opened',
     planIds: ['PLAN-001', 'PLAN-002'],
-    planNames: ['Blue Cross MAPD Gold', 'Aetna PPO Select'],
+    planNames: ['Carrier 5 MAPD Gold', 'Carrier 1 PPO Select'],
     sentDate: '2025-01-10T10:00:00Z',
     openedDate: '2025-01-10T14:30:00Z',
     createdAt: '2025-01-10T09:00:00Z',
@@ -42,7 +42,7 @@ const mockPBKits: PBKit[] = [
     agentName: 'Demo Agent',
     status: 'sent',
     planIds: ['PLAN-003'],
-    planNames: ['Humana PDP Basic'],
+    planNames: ['Carrier 2 PDP Basic'],
     sentDate: '2025-01-12T11:00:00Z',
     createdAt: '2025-01-12T10:00:00Z',
   },
@@ -55,7 +55,7 @@ const mockPBKits: PBKit[] = [
     agentName: 'Demo Agent',
     status: 'pending',
     planIds: ['PLAN-001'],
-    planNames: ['Blue Cross MAPD Gold'],
+    planNames: ['Carrier 5 MAPD Gold'],
     createdAt: '2025-01-14T15:00:00Z',
   },
 ];
@@ -353,7 +353,7 @@ export function PBKitList() {
               Select Plans to Include
             </label>
             <div className="border border-gray-300 dark:border-gray-600 rounded-lg p-3 space-y-2 max-h-48 overflow-y-auto">
-              {['Blue Cross MAPD Gold', 'Aetna PPO Select', 'Humana PDP Basic', 'UHC DSNP Complete'].map((plan) => (
+              {['Carrier 5 MAPD Gold', 'Carrier 1 PPO Select', 'Carrier 2 PDP Basic', 'C3 DSNP Complete'].map((plan) => (
                 <label key={plan} className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-800">
                   <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-orange-600" />
                   <span className="text-sm text-gray-700 dark:text-gray-300">{plan}</span>

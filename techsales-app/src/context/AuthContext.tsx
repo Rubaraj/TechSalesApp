@@ -2,7 +2,8 @@ import { createContext, useContext, useState, useEffect, type ReactNode } from '
 import type { User, Role, Permission, ModuleName, ActionType, Member } from '../types';
 import usersData from '../data/runtime/users.json';
 import rolesData from '../data/runtime/roles.json';
-import { memberLogin } from '../services/memberService';
+import membersData from '../data/runtime/members.json';
+import { setMode, clearMode, setDataSource, getDataSource, probeBackendMode, type DataSource } from '../api/mode';
 
 interface AuthContextType {
   user: User | null;
@@ -10,6 +11,9 @@ interface AuthContextType {
   role: Role | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  /** What's backing the data shown in the UI: `'mongo'` (Pi via API) or `'json'`
+   * (either backend's JSON-store mode or FE bundled fallback). `null` until login. */
+  dataSource: DataSource | null;
   login: (username: string, password: string) => Promise<boolean>;
   memberLogin: (policyNumber: string, dateOfBirth: string) => Promise<boolean>;
   logout: () => void;
@@ -31,6 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [member, setMember] = useState<Member | null>(null);
   const [role, setRole] = useState<Role | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [dataSource, setDataSourceState] = useState<DataSource | null>(null);
 
   // Check for stored auth on mount
   useEffect(() => {
@@ -57,34 +62,81 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.removeItem(MEMBER_AUTH_STORAGE_KEY);
       }
     }
-    
+
+    // Rehydrate data source from sessionStorage (set at login).
+    const storedSource = getDataSource();
+    if (storedSource) setDataSourceState(storedSource);
+
     setIsLoading(false);
   }, []);
 
-  const login = async (username: string, _password: string): Promise<boolean> => {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+  /**
+   * Decides the UI `dataSource` based on the resolved app mode after login.
+   *
+   * - `local` → the FE bundled JSON is the source.
+   * - `api`   → probe the backend's `/api/health` to see if it's serving from
+   *             Mongo or its own JSON file store. If the probe fails, default
+   *             to `'mongo'` (the optimistic case, since the login API call
+   *             that just succeeded means the backend is alive).
+   */
+  const resolveDataSource = async (resolvedMode: 'api' | 'local'): Promise<DataSource> => {
+    if (resolvedMode === 'local') return 'json';
+    const probed = await probeBackendMode();
+    return probed ?? 'mongo';
+  };
 
-    // For demo, accept any password and find user by username
-    const foundUser = users.find(
-      u => u.username.toLowerCase() === username.toLowerCase() && u.isActive
-    );
-
-    if (!foundUser) {
-      return false;
+  const login = async (username: string, password: string): Promise<boolean> => {
+    // Plan §6/§7 — try the API first; on network error or 5xx fall back to
+    // bundled JSON. 4xx (bad creds) does NOT trigger fallback.
+    let apiUser: User | null = null;
+    let apiAttempted = true;
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+      if (res.ok) {
+        const body = (await res.json()) as { success: boolean; data?: { user: User } };
+        if (body.success && body.data?.user) {
+          apiUser = body.data.user;
+        }
+      } else if (res.status >= 400 && res.status < 500) {
+        // Authoritative "bad creds" — never silently succeed against local copy.
+        return false;
+      }
+      // 5xx → fall through to local
+    } catch {
+      // Network error → fall back
+      apiAttempted = false;
     }
 
-    const userRole = roles.find(r => r.roleId === foundUser.roleId) || null;
+    let resolvedUser: User | null = apiUser;
+    let resolvedMode: 'api' | 'local' = 'api';
+    if (!resolvedUser) {
+      // Local fallback: accept any password, match by username.
+      const foundUser = users.find(
+        (u) => u.username.toLowerCase() === username.toLowerCase() && u.isActive,
+      );
+      if (!foundUser) return false;
+      resolvedUser = foundUser;
+      resolvedMode = 'local';
+    } else if (!apiAttempted) {
+      resolvedMode = 'local';
+    }
 
-    // Update last login
-    const updatedUser = {
-      ...foundUser,
-      lastLoginAt: new Date().toISOString()
-    };
+    const userRole = roles.find((r) => r.roleId === resolvedUser!.roleId) || null;
+    const updatedUser: User = { ...resolvedUser, lastLoginAt: new Date().toISOString() };
 
     setUser(updatedUser);
     setRole(userRole);
     localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(updatedUser));
+    setMode(resolvedMode);
+
+    // Resolve and persist what's actually backing the data (for the header badge).
+    const source = await resolveDataSource(resolvedMode);
+    setDataSource(source);
+    setDataSourceState(source);
 
     return true;
   };
@@ -93,18 +145,55 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     policyNumber: string,
     dateOfBirth: string
   ): Promise<boolean> => {
-    const result = await memberLogin(policyNumber, dateOfBirth);
-    
-    if (!result.success || !result.data) {
-      return false;
+    // Mirrors agent login: try API first, on network error / 5xx fall back to
+    // bundled members.json. 4xx is authoritative bad creds — no fallback.
+    let apiMember: Member | null = null;
+    let apiAttempted = true;
+    try {
+      const res = await fetch('/api/auth/member-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ policyNumber, dateOfBirth }),
+      });
+      if (res.ok) {
+        const body = (await res.json()) as { success: boolean; data?: { member: Member } };
+        if (body.success && body.data?.member) {
+          apiMember = body.data.member;
+        }
+      } else if (res.status >= 400 && res.status < 500) {
+        return false;
+      }
+    } catch {
+      apiAttempted = false;
     }
-    
-    setMember(result.data);
-    setUser(null); // Clear user if member logs in
+
+    let resolvedMember: Member | null = apiMember;
+    let resolvedMode: 'api' | 'local' = 'api';
+    if (!resolvedMember) {
+      const members = (membersData as unknown) as Member[];
+      const found = members.find(
+        (m) => m.policyNumber.toLowerCase() === policyNumber.toLowerCase().trim()
+            && m.dateOfBirth === dateOfBirth
+            && m.isActive
+      );
+      if (!found) return false;
+      resolvedMember = found;
+      resolvedMode = 'local';
+    } else if (!apiAttempted) {
+      resolvedMode = 'local';
+    }
+
+    setMember(resolvedMember);
+    setUser(null);
     setRole(null);
-    localStorage.setItem(MEMBER_AUTH_STORAGE_KEY, JSON.stringify(result.data));
-    localStorage.removeItem(AUTH_STORAGE_KEY); // Clear user auth
-    
+    localStorage.setItem(MEMBER_AUTH_STORAGE_KEY, JSON.stringify(resolvedMember));
+    localStorage.removeItem(AUTH_STORAGE_KEY);
+    setMode(resolvedMode);
+
+    const source = await resolveDataSource(resolvedMode);
+    setDataSource(source);
+    setDataSourceState(source);
+
     return true;
   };
 
@@ -112,8 +201,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
     setMember(null);
     setRole(null);
+    setDataSourceState(null);
     localStorage.removeItem(AUTH_STORAGE_KEY);
     localStorage.removeItem(MEMBER_AUTH_STORAGE_KEY);
+    clearMode();
   };
 
   const hasPermission = (module: ModuleName, action: ActionType): boolean => {
@@ -148,6 +239,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         role,
         isAuthenticated: !!user || !!member,
         isLoading,
+        dataSource,
         login,
         memberLogin: memberLoginHandler,
         logout,

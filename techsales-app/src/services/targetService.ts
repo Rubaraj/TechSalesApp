@@ -1,120 +1,104 @@
 import type { Target, TargetFormData } from '../types';
 import type { ServiceResponse } from './baseService';
+import { apiGet, apiPost, apiPatch, apiDelete } from '../api/apiClient';
+import { getMode } from '../api/mode';
 import targetsData from '../data/runtime/targets.json';
 import { delay, generateId, formatDate, filterByField } from './baseService';
 
-let targets: Target[] = (targetsData as unknown) as Target[];
+const _targets: Target[] = (targetsData as unknown) as Target[];
 
-export const getAllTargets = async (): Promise<ServiceResponse<Target[]>> => {
+// ---------------- API helpers ----------------
+
+const _getAllApi = (): Promise<ServiceResponse<Target[]>> => apiGet<Target[]>('/targets');
+const _getByIdApi = (id: string): Promise<ServiceResponse<Target>> => apiGet<Target>(`/targets/${encodeURIComponent(id)}`);
+const _byPeriodApi = (p: string): Promise<ServiceResponse<Target[]>> => apiGet<Target[]>(`/targets/by-period/${encodeURIComponent(p)}`);
+const _byMetricApi = (m: string): Promise<ServiceResponse<Target[]>> => apiGet<Target[]>(`/targets/by-metric/${encodeURIComponent(m)}`);
+const _activeApi = (): Promise<ServiceResponse<Target[]>> => apiGet<Target[]>('/targets/active');
+const _createApi = (data: TargetFormData, createdBy: string): Promise<ServiceResponse<Target>> =>
+  apiPost<Target>('/targets', { ...data, createdBy });
+const _updateApi = (id: string, data: Partial<TargetFormData>, updatedBy: string): Promise<ServiceResponse<Target>> =>
+  apiPatch<Target>(`/targets/${encodeURIComponent(id)}`, { ...data, updatedBy });
+const _deleteApi = (id: string): Promise<ServiceResponse<void>> =>
+  apiDelete<void>(`/targets/${encodeURIComponent(id)}`);
+const _toggleApi = (id: string, updatedBy: string): Promise<ServiceResponse<Target>> =>
+  apiPost<Target>(`/targets/${encodeURIComponent(id)}/toggle-status`, { updatedBy });
+
+// ---------------- Local helpers ----------------
+
+const _getAllLocal = async (): Promise<ServiceResponse<Target[]>> => {
   await delay();
-  return { success: true, data: [...targets] };
+  return { success: true, data: [..._targets] };
 };
-
-export const getTargetById = async (targetId: string): Promise<ServiceResponse<Target>> => {
+const _getByIdLocal = async (id: string): Promise<ServiceResponse<Target>> => {
   await delay();
-  const target = targets.find(t => t.targetId === targetId);
-  
-  if (!target) {
-    return { success: false, error: 'Target not found' };
-  }
-  
-  return { success: true, data: target };
+  const t = _targets.find(x => x.targetId === id);
+  return t ? { success: true, data: t } : { success: false, error: 'Target not found' };
 };
-
-export const getTargetsByPeriod = async (period: string): Promise<ServiceResponse<Target[]>> => {
+const _byPeriodLocal = async (period: string): Promise<ServiceResponse<Target[]>> => {
   await delay();
-  const filtered = filterByField(targets, 'period', period);
-  return { success: true, data: filtered };
+  return { success: true, data: filterByField(_targets, 'period', period) };
 };
-
-export const getTargetsByMetric = async (metric: string): Promise<ServiceResponse<Target[]>> => {
+const _byMetricLocal = async (metric: string): Promise<ServiceResponse<Target[]>> => {
   await delay();
-  const filtered = filterByField(targets, 'metric', metric);
-  return { success: true, data: filtered };
+  return { success: true, data: filterByField(_targets, 'metric', metric) };
 };
-
-export const getActiveTargets = async (): Promise<ServiceResponse<Target[]>> => {
+const _activeLocal = async (): Promise<ServiceResponse<Target[]>> => {
   await delay();
-  const active = targets.filter(t => t.isActive);
-  return { success: true, data: active };
+  return { success: true, data: _targets.filter(t => t.isActive) };
 };
-
-export const createTarget = async (
-  data: TargetFormData,
-  createdBy: string
-): Promise<ServiceResponse<Target>> => {
+const _createLocal = async (data: TargetFormData, createdBy: string): Promise<ServiceResponse<Target>> => {
   await delay();
-  
-  const newTarget: Target = {
-    targetId: generateId('TARGET'),
-    ...data,
-    createdAt: formatDate(),
-    createdBy,
-  };
-  
-  targets.push(newTarget);
-  
-  // In a real app, this would be an API call
-  // For now, we'll simulate saving
-  return { success: true, data: newTarget };
+  const t: Target = { targetId: generateId('TARGET'), ...data, createdAt: formatDate(), createdBy };
+  _targets.push(t);
+  return { success: true, data: t };
 };
-
-export const updateTarget = async (
-  targetId: string,
-  data: Partial<TargetFormData>,
-  updatedBy: string
-): Promise<ServiceResponse<Target>> => {
+const _updateLocal = async (id: string, data: Partial<TargetFormData>, updatedBy: string): Promise<ServiceResponse<Target>> => {
   await delay();
-  
-  const index = targets.findIndex(t => t.targetId === targetId);
-  
-  if (index === -1) {
-    return { success: false, error: 'Target not found' };
-  }
-  
-  targets[index] = {
-    ...targets[index],
-    ...data,
-    updatedAt: formatDate(),
-    updatedBy,
-  };
-  
-  return { success: true, data: targets[index] };
+  const i = _targets.findIndex(t => t.targetId === id);
+  if (i === -1) return { success: false, error: 'Target not found' };
+  _targets[i] = { ..._targets[i], ...data, updatedAt: formatDate(), updatedBy };
+  return { success: true, data: _targets[i] };
 };
-
-export const deleteTarget = async (targetId: string): Promise<ServiceResponse<void>> => {
+const _deleteLocal = async (id: string): Promise<ServiceResponse<void>> => {
   await delay();
-  
-  const index = targets.findIndex(t => t.targetId === targetId);
-  
-  if (index === -1) {
-    return { success: false, error: 'Target not found' };
-  }
-  
-  targets.splice(index, 1);
-  
+  const i = _targets.findIndex(t => t.targetId === id);
+  if (i === -1) return { success: false, error: 'Target not found' };
+  _targets.splice(i, 1);
   return { success: true };
 };
-
-export const toggleTargetStatus = async (
-  targetId: string,
-  updatedBy: string
-): Promise<ServiceResponse<Target>> => {
+const _toggleLocal = async (id: string, updatedBy: string): Promise<ServiceResponse<Target>> => {
   await delay();
-  
-  const index = targets.findIndex(t => t.targetId === targetId);
-  
-  if (index === -1) {
-    return { success: false, error: 'Target not found' };
-  }
-  
-  targets[index] = {
-    ...targets[index],
-    isActive: !targets[index].isActive,
-    updatedAt: formatDate(),
-    updatedBy,
-  };
-  
-  return { success: true, data: targets[index] };
+  const i = _targets.findIndex(t => t.targetId === id);
+  if (i === -1) return { success: false, error: 'Target not found' };
+  _targets[i] = { ..._targets[i], isActive: !_targets[i].isActive, updatedAt: formatDate(), updatedBy };
+  return { success: true, data: _targets[i] };
 };
 
+// ---------------- Public surface ----------------
+
+export const getAllTargets = (): Promise<ServiceResponse<Target[]>> =>
+  getMode() === 'local' ? _getAllLocal() : _getAllApi();
+
+export const getTargetById = (targetId: string): Promise<ServiceResponse<Target>> =>
+  getMode() === 'local' ? _getByIdLocal(targetId) : _getByIdApi(targetId);
+
+export const getTargetsByPeriod = (period: string): Promise<ServiceResponse<Target[]>> =>
+  getMode() === 'local' ? _byPeriodLocal(period) : _byPeriodApi(period);
+
+export const getTargetsByMetric = (metric: string): Promise<ServiceResponse<Target[]>> =>
+  getMode() === 'local' ? _byMetricLocal(metric) : _byMetricApi(metric);
+
+export const getActiveTargets = (): Promise<ServiceResponse<Target[]>> =>
+  getMode() === 'local' ? _activeLocal() : _activeApi();
+
+export const createTarget = (data: TargetFormData, createdBy: string): Promise<ServiceResponse<Target>> =>
+  getMode() === 'local' ? _createLocal(data, createdBy) : _createApi(data, createdBy);
+
+export const updateTarget = (targetId: string, data: Partial<TargetFormData>, updatedBy: string): Promise<ServiceResponse<Target>> =>
+  getMode() === 'local' ? _updateLocal(targetId, data, updatedBy) : _updateApi(targetId, data, updatedBy);
+
+export const deleteTarget = (targetId: string): Promise<ServiceResponse<void>> =>
+  getMode() === 'local' ? _deleteLocal(targetId) : _deleteApi(targetId);
+
+export const toggleTargetStatus = (targetId: string, updatedBy: string): Promise<ServiceResponse<Target>> =>
+  getMode() === 'local' ? _toggleLocal(targetId, updatedBy) : _toggleApi(targetId, updatedBy);

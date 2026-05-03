@@ -21,6 +21,8 @@ export interface EnrollmentFormData {
   
   // Step 3: Other Info
   medicaidEnrolled?: boolean;
+  // Legacy field name kept as `aetnaMember` (no word boundary in camelCase) per plan §5 case-preservation rule.
+  // Semantically equivalent to `Lead.existingCarrier1Member`. Renaming would require coordinated DOM + form-state changes.
   aetnaMember?: boolean;
   preferredLanguage: string;
   preferredWrittenLanguage: string;
