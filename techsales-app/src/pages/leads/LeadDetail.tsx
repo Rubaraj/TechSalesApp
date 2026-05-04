@@ -28,6 +28,9 @@ import { getLeadById } from '../../services/leadService';
 import { getAllDrugs } from '../../services/drugService';
 import { getAllProviders } from '../../services/providerService';
 import { calculateAge } from '../../utils/dateUtils';
+import { useAiEnabled } from '../../hooks/useAiEnabled';
+import { RecommendedPlansTab } from '../../components/recommendations/RecommendedPlansTab';
+import { DrugCoverageButton } from '../../components/drugs/DrugCoverageButton';
 
 export function LeadDetail() {
   const { id } = useParams<{ id: string }>();
@@ -37,6 +40,7 @@ export function LeadDetail() {
   const [activeTab, setActiveTab] = useState('overview');
   const [drugMap, setDrugMap] = useState<Record<string, string>>({});
   const [providerMap, setProviderMap] = useState<Record<string, { name: string; npi: string }>>({});
+  const aiEnabled = useAiEnabled();
 
   useEffect(() => {
     const loadData = async () => {
@@ -155,6 +159,9 @@ export function LeadDetail() {
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: User },
+    ...(aiEnabled
+      ? [{ id: 'recommendations', label: 'Recommended Plans', icon: Sparkles, badge: 'AI' }]
+      : []),
     { id: 'pharmacies', label: 'Pharmacies', icon: Building2, badge: lead.taggedPharmacies?.length || 0 },
     { id: 'drugs', label: 'Drugs', icon: Pill, badge: lead.taggedDrugs?.length || 0 },
     { id: 'providers', label: 'Providers', icon: User, badge: lead.taggedProviders?.length || 0 },
@@ -490,6 +497,12 @@ export function LeadDetail() {
             </div>
           </TabPanel>
 
+          {aiEnabled && (
+            <TabPanel isActive={activeTab === 'recommendations'}>
+              <RecommendedPlansTab leadId={lead.leadId} />
+            </TabPanel>
+          )}
+
           <TabPanel isActive={activeTab === 'pharmacies'}>
             {lead.taggedPharmacies && lead.taggedPharmacies.length > 0 ? (
               <div className="space-y-4">
@@ -541,6 +554,9 @@ export function LeadDetail() {
                           {drug.dosage} • {drug.frequency} • Qty: {drug.quantity}
                         </p>
                       </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <DrugCoverageButton lead={lead} drug={drug} />
                     </div>
                   </div>
                 ))}

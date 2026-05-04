@@ -7,6 +7,8 @@ import { useAuth } from '../../context/AuthContext';
 import type { Lead, LeadStatus, LeadSource, ZipStateCounty, TaggedDrug } from '../../types';
 import { getLeadById, createLead, updateLead } from '../../services/leadService';
 import { getLocationByZip, getCountiesByState } from '../../services/zipService';
+import { aiService } from '../../services/aiService';
+import { useAiEnabled } from '../../hooks/useAiEnabled';
 import { calculateAge } from '../../utils/dateUtils';
 
 const statusOptions = [
@@ -74,6 +76,7 @@ export function LeadForm() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const aiEnabled = useAiEnabled();
   const isEditing = Boolean(id);
 
   const [formData, setFormData] = useState<FormData>(initialFormData);
@@ -327,6 +330,14 @@ export function LeadForm() {
     setIsSaving(false);
 
     if (result.success) {
+      // Phase 3 — kick off a background recommendation pre-warm so the
+      // RecommendedPlansTab on the lead detail page is hot-cached when the
+      // user lands on it. Fire-and-forget; never block navigation.
+      if (aiEnabled && !isEditing && result.data?.leadId) {
+        void aiService.recommend(result.data.leadId, {
+          ...(user?.userId ? { userId: user.userId } : {}),
+        });
+      }
       navigate('/leads');
     } else {
       setSubmitError(result.error || 'Failed to save lead');

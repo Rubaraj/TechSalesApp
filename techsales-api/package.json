@@ -15,16 +15,30 @@
     "drop": "tsx src/scripts/drop.ts",
     "drop-runtime": "tsx src/scripts/drop-runtime.ts",
     "verify-counts": "node scripts-debug/verify-counts.mjs",
-    "lint": "eslint \"src/**/*.ts\""
+    "index:build": "tsx src/scripts/build-vector-index.ts",
+    "index:reset": "tsx src/scripts/build-vector-index.ts --reset",
+    "formulary:build": "tsx src/scripts/build-formulary.ts",
+    "vector:query": "tsx src/scripts/query-qdrant.ts",
+    "lint": "eslint \"src/**/*.ts\"",
+    "check:carriers": "node ../scripts/check-no-real-carriers.mjs"
   },
   "dependencies": {
+    "@langchain/anthropic": "^1.3.28",
+    "@langchain/community": "^1.1.27",
+    "@langchain/core": "^1.1.44",
+    "@langchain/langgraph": "^1.2.9",
+    "@langchain/ollama": "^1.2.7",
+    "@qdrant/js-client-rest": "^1.17.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^5.0.1",
+    "express-rate-limit": "^8.4.1",
     "helmet": "^8.0.0",
+    "langchain": "^1.3.5",
     "mongoose": "^8.8.0",
     "pino": "^9.5.0",
     "pino-http": "^10.3.0",
+    "wink-bm25-text-search": "^3.1.2",
     "zod": "^3.23.8"
   },
   "devDependencies": {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
+import {
   Sparkles,
   Star,
   DollarSign,
@@ -15,9 +15,12 @@ import {
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
-import { Button, Badge, Select, Input, Modal } from '../../components/common';
+import { Button, Badge, Select, Input, Modal, LeadAutocomplete } from '../../components/common';
 import { SearchInput } from '../../components/common/SearchInput';
 import { EmptyState } from '../../components/common/EmptyState';
+import { useAiEnabled } from '../../hooks/useAiEnabled';
+import { RecommendedPlansTab } from '../../components/recommendations/RecommendedPlansTab';
+import type { Lead } from '../../types';
 
 interface LeadForRecommendation {
   id: string;
@@ -123,7 +126,56 @@ const mockRecommendations: RecommendedPlan[] = [
   },
 ];
 
-export function PlanRecommendations() {
+function PlanRecommendationsAI() {
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [selectedLeadId, setSelectedLeadId] = useState('');
+
+  return (
+    <div className="p-6 space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <Sparkles className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+            Plan Recommendations
+          </h1>
+          <p className="text-gray-500 dark:text-gray-400">
+            AI-powered plan suggestions tailored to a beneficiary's profile.
+          </p>
+        </div>
+      </div>
+
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          Select Beneficiary
+        </h2>
+        <LeadAutocomplete
+          value={selectedLeadId}
+          onChange={(leadId, lead) => {
+            setSelectedLeadId(leadId);
+            setSelectedLead(lead);
+          }}
+          placeholder="Type to search by name, email, phone, or lead id..."
+        />
+      </div>
+
+      {selectedLead ? (
+        <RecommendedPlansTab leadId={selectedLead.leadId} />
+      ) : (
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-12 text-center">
+          <Sparkles className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            Select a Beneficiary
+          </h3>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">
+            Choose a beneficiary above to see personalized plan recommendations.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PlanRecommendationsLegacy() {
   const navigate = useNavigate();
   const [selectedLead, setSelectedLead] = useState<LeadForRecommendation | null>(null);
   const [recommendations, setRecommendations] = useState<RecommendedPlan[]>([]);
@@ -454,5 +506,11 @@ export function PlanRecommendations() {
       )}
     </div>
   );
+}
+
+export function PlanRecommendations() {
+  const aiEnabled = useAiEnabled();
+  if (aiEnabled) return <PlanRecommendationsAI />;
+  return <PlanRecommendationsLegacy />;
 }
 

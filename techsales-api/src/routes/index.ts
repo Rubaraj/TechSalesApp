@@ -8,6 +8,7 @@ import { departmentRouter } from './department.routes.js';
 import { enrollmentRouter } from './enrollment.routes.js';
 import { memberRouter } from './member.routes.js';
 import { targetRouter } from './target.routes.js';
+import { aiRouter } from './ai.routes.js';
 
 /**
  * Root API router — mounts all `/api/*` sub-routers.
@@ -24,3 +25,4 @@ apiRouter.use('/departments', departmentRouter);
 apiRouter.use('/enrollments', enrollmentRouter);
 apiRouter.use('/members', memberRouter);
 apiRouter.use('/targets', targetRouter);
+apiRouter.use('/ai', aiRouter);

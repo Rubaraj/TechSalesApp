@@ -29,6 +29,42 @@ const envSchema = z.object({
   JSON_PERSIST: truthy.default(true),
 
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
+
+  // ----- AI pipeline (Phase 1+) -----
+  // Master switch. When false, /api/ai/* returns 501 AI_DISABLED.
+  AI_ENABLED: truthy.default(true),
+
+  // Phase 7 — LLM provider switch. Default 'ollama' (free, local). Flip to
+  // 'anthropic' when the user has Console credits. The same getChatModel()
+  // factory dispatches; agent code is unchanged.
+  AI_LLM_PROVIDER: z.enum(['ollama', 'anthropic']).default('ollama'),
+
+  // Anthropic config (only required when AI_LLM_PROVIDER='anthropic').
+  ANTHROPIC_API_KEY: z.string().optional(),
+  AI_MODEL_DEFAULT: z.string().default('claude-sonnet-4-6'),
+  AI_MODEL_PREMIUM: z.string().default('claude-opus-4-7'),
+  AI_MAX_DAILY_TOKENS: z.coerce.number().int().nonnegative().default(5_000_000),
+
+  // Ollama config (chat models — used when AI_LLM_PROVIDER='ollama').
+  // Default chat + premium chat are both qwen2.5:7b — bump premium to
+  // qwen2.5:14b on a GPU box / patient demos.
+  OLLAMA_LLM_MODEL: z.string().default('qwen2.5:7b'),
+  OLLAMA_LLM_PREMIUM_MODEL: z.string().default('qwen2.5:7b'),
+
+  // Local services (Qdrant + Ollama via Docker on the laptop).
+  QDRANT_URL: z.string().default('http://localhost:6333'),
+  QDRANT_API_KEY: z.string().optional(),
+  OLLAMA_URL: z.string().default('http://localhost:11434'),
+  AI_EMBED_MODEL: z.string().default('nomic-embed-text'),
+  AI_EMBED_DIM: z.coerce.number().int().positive().default(768),
+
+  // Agent guardrails.
+  AI_MAX_TOOL_STEPS: z.coerce.number().int().positive().default(8),
+  AI_REQUEST_TIMEOUT_MS: z.coerce.number().int().positive().default(60_000),
+
+  // Phase 6 — per-user/IP rate limiting on /api/ai/* (echo exempt).
+  AI_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(30),
+  AI_RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(300_000),
 });
 
 const parsed = envSchema.safeParse(process.env);

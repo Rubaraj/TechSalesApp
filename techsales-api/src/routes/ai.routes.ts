@@ -1,0 +1,61 @@
+/**
+ * /api/ai/* router. Every route is gated behind the `AI_ENABLED` env flag —
+ * when off, the entire surface returns 501 with a structured error code
+ * (`AI_DISABLED`) so the frontend can render a clean "AI is off" UI without
+ * relying on free-text matching.
+ *
+ * Phase 6 hardening — middleware order:
+ *   /api/ai/stats  ←─ skips the entire AI guard chain (read-only metrics)
+ *   AI_ENABLED guard  →  rateLimit  →  tokenCap  →  route handlers
+ *
+ * Stats is mounted FIRST so the AI_ENABLED guard / rate-limit / token-cap
+ * never short-circuit a metrics request.
+ */
+import { Router, type Request, type Response, type NextFunction } from 'express';
+import { asyncHandler } from '../middleware/asyncHandler.js';
+import { aiRateLimiter } from '../middleware/rateLimit.js';
+import { aiDailyTokenCap } from '../middleware/tokenCap.js';
+import {
+  postEcho,
+  recommendHandler,
+  explainHandler,
+  searchHandler,
+  compareHandler,
+  drugCoverageHandler,
+  chatHandler,
+  aiStatsHandler,
+} from '../controllers/ai.controller.js';
+import { env } from '../config/env.js';
+
+export const aiRouter: Router = Router();
+
+// Read-only metrics endpoint — mounted BEFORE the AI_ENABLED guard so it works
+// regardless of whether AI is currently switched on. Pure aggregation over the
+// existing aiInteractions audit log.
+aiRouter.get('/stats', asyncHandler(aiStatsHandler));
+
+aiRouter.use((_req: Request, res: Response, next: NextFunction) => {
+  if (!env.AI_ENABLED) {
+    res.status(501).json({
+      success: false,
+      error: 'AI features are disabled',
+      code: 'AI_DISABLED',
+    });
+    return;
+  }
+  next();
+});
+
+// Per-user/per-IP bucket. /echo is exempt internally.
+aiRouter.use(aiRateLimiter);
+
+// Daily token cap. Cheap-ish (one Mongo aggregate); runs after rate-limit.
+aiRouter.use(asyncHandler(aiDailyTokenCap));
+
+aiRouter.post('/echo', asyncHandler(postEcho));
+aiRouter.post('/recommend', asyncHandler(recommendHandler));
+aiRouter.post('/explain', asyncHandler(explainHandler));
+aiRouter.post('/search', asyncHandler(searchHandler));
+aiRouter.post('/compare', asyncHandler(compareHandler));
+aiRouter.post('/drug-coverage', asyncHandler(drugCoverageHandler));
+aiRouter.post('/chat', asyncHandler(chatHandler));

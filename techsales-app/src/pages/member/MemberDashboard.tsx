@@ -24,6 +24,7 @@ import { getMemberById, getMemberAppointments } from '../../services/memberServi
 import { getPlanById, getPlanRating } from '../../services/planService';
 import type { Member, MemberAppointment, Plan } from '../../types';
 import { getLogoByTheme } from '../../utils/logoUtils';
+import { ChatWidget } from '../../components/chat/ChatWidget';
 
 export function MemberDashboard() {
   const { member, logout } = useAuth();
@@ -399,6 +400,12 @@ export function MemberDashboard() {
           </div>
         </div>
       </main>
+
+      {/* Floating AI chat assistant — only renders when AI is enabled and the
+          member has an active plan. Hidden in offline / agent contexts. */}
+      {member?.memberId && member?.planId && (
+        <ChatWidget memberId={member.memberId} planId={member.planId} />
+      )}
     </div>
   );
 }

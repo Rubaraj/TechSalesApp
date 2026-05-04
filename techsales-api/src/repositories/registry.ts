@@ -14,6 +14,8 @@ import { MongoMemberRepository } from './mongo/MongoMemberRepository.js';
 import { JsonMemberRepository } from './json/JsonMemberRepository.js';
 import { MongoTargetRepository } from './mongo/MongoTargetRepository.js';
 import { JsonTargetRepository } from './json/JsonTargetRepository.js';
+import { MongoAiInteractionRepository } from './mongo/MongoAiInteractionRepository.js';
+import { JsonAiInteractionRepository } from './json/JsonAiInteractionRepository.js';
 
 /**
  * Global repository registry.
@@ -34,6 +36,7 @@ export type DepartmentRepo = MongoDepartmentRepository | JsonDepartmentRepositor
 export type EnrollmentRepo = MongoEnrollmentRepository | JsonEnrollmentRepository;
 export type MemberRepo = MongoMemberRepository | JsonMemberRepository;
 export type TargetRepo = MongoTargetRepository | JsonTargetRepository;
+export type AiInteractionRepo = MongoAiInteractionRepository | JsonAiInteractionRepository;
 
 export interface Repos {
   health: HealthRepo;
@@ -44,6 +47,7 @@ export interface Repos {
   enrollment: EnrollmentRepo;
   member: MemberRepo;
   target: TargetRepo;
+  aiInteraction: AiInteractionRepo;
 }
 
 interface RegistryState {
@@ -76,6 +80,9 @@ export function initRegistry(connectResult: ConnectResult): void {
       enrollment: mongo ? new MongoEnrollmentRepository() : new JsonEnrollmentRepository(),
       member: mongo ? new MongoMemberRepository() : new JsonMemberRepository(),
       target: mongo ? new MongoTargetRepository() : new JsonTargetRepository(),
+      aiInteraction: mongo
+        ? new MongoAiInteractionRepository()
+        : new JsonAiInteractionRepository(),
     },
   };
   logger.info({ mode }, 'Repository registry initialized');

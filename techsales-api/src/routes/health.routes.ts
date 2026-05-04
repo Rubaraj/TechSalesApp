@@ -1,6 +1,7 @@
 import { Router, type Request, type Response } from 'express';
 import { getDbHealth, isMongoConnected } from '../config/mongo.js';
 import { getMode } from '../repositories/registry.js';
+import { env } from '../config/env.js';
 import type { ServiceResponse } from '../repositories/types.js';
 
 const PROCESS_START = Date.now();
@@ -13,6 +14,10 @@ interface HealthPayload {
     lookup: { name: string; readyState: number };
   };
   uptimeSec: number;
+  /** Whether /api/ai/* is currently accepting requests (mirrors `AI_ENABLED`). */
+  aiEnabled: boolean;
+  /** Active LLM provider — `ollama` (free, local) or `anthropic` (Claude). */
+  aiProvider: 'ollama' | 'anthropic';
 }
 
 /**
@@ -29,6 +34,8 @@ healthRouter.get('/', (_req: Request, res: Response<ServiceResponse<HealthPayloa
     mongoUp: isMongoConnected(),
     dbs,
     uptimeSec: Math.floor((Date.now() - PROCESS_START) / 1000),
+    aiEnabled: env.AI_ENABLED,
+    aiProvider: env.AI_LLM_PROVIDER,
   };
   res.json({ success: true, data: payload });
 });

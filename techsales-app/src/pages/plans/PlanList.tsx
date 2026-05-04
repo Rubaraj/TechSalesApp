@@ -13,12 +13,13 @@ import {
   MapPin
 } from 'lucide-react';
 import { Button, Select, Badge, Pagination } from '../../components/common';
-import { SearchInput } from '../../components/common/SearchInput';
 import { EmptyState } from '../../components/common/EmptyState';
 import type { PlanCategory } from '../../types';
 import { searchPlans, type PlanFilters, type PlanWithPremium } from '../../services/planService';
 import { autoPopulateFromZip } from '../../services/zipService';
 import { useTheme } from '../../context/ThemeContext';
+import { NLSearchBar } from '../../components/plans/NLSearchBar';
+import type { AISearchResult } from '../../types/ai';
 
 const productOptions = [
   { value: '', label: 'All Products' },
@@ -79,6 +80,9 @@ export function PlanList() {
   const [zipCode, setZipCode] = useState('');
   const [zipError, setZipError] = useState('');
   const [zipLocation, setZipLocation] = useState<{ region: string; state: string; city: string } | null>(null);
+
+  // AI search results override the keyword-driven plan list when present.
+  const [aiResultPlanIds, setAiResultPlanIds] = useState<string[] | null>(null);
 
   // Check if a string is a valid 5-digit zip code pattern
   const isZipCode = (value: string) => /^\d{5}$/.test(value.trim());
@@ -179,16 +183,26 @@ export function PlanList() {
     });
 
     if (result.success && result.data) {
-      setPlans(result.data.data);
+      let listed = result.data.data;
+      // When an AI NL search produced a planId set, narrow + reorder to it.
+      if (aiResultPlanIds && aiResultPlanIds.length > 0) {
+        const idx = new Map(aiResultPlanIds.map((id, i) => [id, i]));
+        listed = listed
+          .filter((p) => idx.has(p.planId))
+          .sort((a, b) => (idx.get(a.planId) ?? 0) - (idx.get(b.planId) ?? 0));
+      }
+      setPlans(listed);
       setPagination({
         page: result.data.page,
         pageSize: result.data.pageSize,
-        total: result.data.total,
-        totalPages: result.data.totalPages,
+        total: aiResultPlanIds ? listed.length : result.data.total,
+        totalPages: aiResultPlanIds
+          ? Math.max(1, Math.ceil(listed.length / result.data.pageSize))
+          : result.data.totalPages,
       });
     }
     setIsLoading(false);
-  }, [searchTerm, filters, pagination.page, pagination.pageSize, colorTheme]);
+  }, [searchTerm, filters, pagination.page, pagination.pageSize, colorTheme, aiResultPlanIds]);
 
   useEffect(() => {
     loadPlans();
@@ -272,10 +286,31 @@ export function PlanList() {
       {/* Search and Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1 max-w-lg">
-          <SearchInput
-            value={searchTerm}
-            onChange={handleSearchChange}
-            placeholder="Search by plan name, contract, PBP, or zip code..."
+          <NLSearchBar
+            onResults={(result: AISearchResult | null) => {
+              if (!result) {
+                setAiResultPlanIds(null);
+                return;
+              }
+              const ids = result.results.map((r) => r.planId);
+              setAiResultPlanIds(ids.length > 0 ? ids : null);
+              // Only fold AI-supplied filters into our local PlanFilters when
+              // they map cleanly. Carrier and planType are direct.
+              if (result.filters.carrier || result.filters.planType) {
+                setFilters((prev) => ({
+                  ...prev,
+                  ...(result.filters.carrier ? { carrier: result.filters.carrier } : {}),
+                  ...(result.filters.planType ? { planType: result.filters.planType } : {}),
+                }));
+              }
+            }}
+            placeholder='Ask in plain English… e.g. "low premium HMO in Florida"'
+            fallback={{
+              value: searchTerm,
+              onChange: handleSearchChange,
+              placeholder: 'Search by plan name, contract, PBP, or zip code...',
+              className: 'w-full',
+            }}
             className="w-full"
           />
           {zipLocation && isZipCode(searchTerm) && (

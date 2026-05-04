@@ -1,32 +1,37 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  ArrowLeft, 
-  Star, 
-  DollarSign, 
-  Shield, 
-  Heart, 
+import {
+  ArrowLeft,
+  Star,
+  DollarSign,
+  Shield,
+  Heart,
   Check,
   X,
   Info,
   FileText,
-  Calculator
+  Calculator,
+  Sparkles
 } from 'lucide-react';
-import { Button, Badge } from '../../components/common';
+import { Button, Badge, Modal } from '../../components/common';
 import { Tabs, TabPanel } from '../../components/common/Tabs';
 import type { Plan, Benefit, Premium } from '../../types';
 import { getPlanById, getPlanBenefits, getPlanPremiums, getPlanRating } from '../../services/planService';
 import { useAuth } from '../../context/AuthContext';
+import { useAiEnabled } from '../../hooks/useAiEnabled';
+import { PlanExplainerPanel } from '../../components/plans/PlanExplainerPanel';
 
 export function MemberPlanDetail() {
   const { member } = useAuth();
   const navigate = useNavigate();
+  const aiEnabled = useAiEnabled();
   const [plan, setPlan] = useState<Plan | null>(null);
   const [benefits, setBenefits] = useState<Benefit[]>([]);
   const [premiums, setPremiums] = useState<Premium[]>([]);
   const [starRating, setStarRating] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
+  const [explainerOpen, setExplainerOpen] = useState(false);
 
   // Get the primary premium (first one or null)
   const primaryPremium = premiums.length > 0 ? premiums[0] : null;
@@ -186,6 +191,17 @@ export function MemberPlanDetail() {
                     <Badge variant="success">Commissionable</Badge>
                   )}
                 </div>
+
+                {aiEnabled && (
+                  <Button
+                    variant="outline"
+                    className="mt-4"
+                    onClick={() => setExplainerOpen(true)}
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    Explain in plain English
+                  </Button>
+                )}
               </div>
 
               {/* Premium Card */}
@@ -420,6 +436,17 @@ export function MemberPlanDetail() {
           </div>
         </div>
       </div>
+
+      {aiEnabled && (
+        <Modal
+          isOpen={explainerOpen}
+          onClose={() => setExplainerOpen(false)}
+          title="Plain-English explanation"
+          size="lg"
+        >
+          <PlanExplainerPanel mode="member" planId={plan.planId} />
+        </Modal>
+      )}
     </div>
   );
 }

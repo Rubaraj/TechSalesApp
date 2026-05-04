@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { Button, Badge, Select, Modal } from '../../components/common';
 import { EmptyState } from '../../components/common/EmptyState';
+import { ComparisonGrid, type ComparisonRow } from '../../components/comparison/ComparisonGrid';
 
 interface PlanYear {
   year: number;
@@ -338,77 +339,39 @@ export function YOYComparison() {
           </div>
 
           {/* Side by Side Comparison */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-            <div className="grid grid-cols-3 bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700">
-              <div className="p-4 font-semibold text-gray-700 dark:text-gray-300">Feature</div>
-              <div className="p-4 font-semibold text-center text-blue-600">2024</div>
-              <div className="p-4 font-semibold text-center text-green-600">2025</div>
-            </div>
-
-            {/* Key Metrics */}
-            <div className="divide-y divide-gray-100 dark:divide-gray-700">
-              <div className="grid grid-cols-3">
-                <div className="p-4 font-medium text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-800/30">Monthly Premium</div>
-                <div className="p-4 text-center text-gray-600 dark:text-gray-400">${previousPlan.premium}</div>
-                <div className="p-4 text-center">
-                  <span className="font-medium text-gray-900 dark:text-white">${currentPlan.premium}</span>
-                  {currentPlan.premium !== previousPlan.premium && (
-                    <span className={`ml-2 text-sm ${currentPlan.premium > previousPlan.premium ? 'text-red-600' : 'text-green-600'}`}>
-                      ({currentPlan.premium > previousPlan.premium ? '+' : ''}${currentPlan.premium - previousPlan.premium})
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3">
-                <div className="p-4 font-medium text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-800/30">Deductible</div>
-                <div className="p-4 text-center text-gray-600 dark:text-gray-400">${previousPlan.deductible}</div>
-                <div className="p-4 text-center">
-                  <span className="font-medium text-gray-900 dark:text-white">${currentPlan.deductible}</span>
-                  {currentPlan.deductible !== previousPlan.deductible && (
-                    <span className={`ml-2 text-sm ${currentPlan.deductible > previousPlan.deductible ? 'text-red-600' : 'text-green-600'}`}>
-                      ({currentPlan.deductible > previousPlan.deductible ? '+' : ''}${currentPlan.deductible - previousPlan.deductible})
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3">
-                <div className="p-4 font-medium text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-800/30">Max Out-of-Pocket</div>
-                <div className="p-4 text-center text-gray-600 dark:text-gray-400">${previousPlan.maxOutOfPocket}</div>
-                <div className="p-4 text-center">
-                  <span className="font-medium text-gray-900 dark:text-white">${currentPlan.maxOutOfPocket}</span>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3">
-                <div className="p-4 font-medium text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-800/30">Star Rating</div>
-                <div className="p-4 flex justify-center">{renderStars(previousPlan.starRating)}</div>
-                <div className="p-4 flex justify-center">{renderStars(currentPlan.starRating)}</div>
-              </div>
-
-              {/* Benefits */}
-              {currentPlan.benefits.map((benefit, index) => {
-                const prevBenefit = previousPlan.benefits.find(b => b.name === benefit.name);
-                const hasChanged = prevBenefit && benefit.value !== prevBenefit.value;
-                
-                return (
-                  <div key={benefit.name} className={`grid grid-cols-3 ${hasChanged ? 'bg-amber-50/50 dark:bg-amber-900/10' : ''}`}>
-                    <div className="p-4 font-medium text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-800/30 flex items-center gap-2">
-                      {benefit.name}
-                      {hasChanged && <AlertTriangle className="w-4 h-4 text-amber-500" />}
-                    </div>
-                    <div className="p-4 text-center text-gray-600 dark:text-gray-400">{prevBenefit?.value || 'N/A'}</div>
-                    <div className="p-4 text-center">
-                      <span className={hasChanged ? 'font-medium text-amber-700 dark:text-amber-400' : 'text-gray-900 dark:text-white'}>
-                        {benefit.value}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+          <ComparisonGrid
+            columns={[String(previousPlan.year), String(currentPlan.year)]}
+            columnTint={['text-blue-600', 'text-green-600']}
+            highlightChanges
+            items={(() => {
+              const rows: ComparisonRow[] = [
+                {
+                  label: 'Monthly Premium',
+                  values: [`$${previousPlan.premium}`, `$${currentPlan.premium}`],
+                },
+                {
+                  label: 'Deductible',
+                  values: [`$${previousPlan.deductible}`, `$${currentPlan.deductible}`],
+                },
+                {
+                  label: 'Max Out-of-Pocket',
+                  values: [`$${previousPlan.maxOutOfPocket}`, `$${currentPlan.maxOutOfPocket}`],
+                },
+                {
+                  label: 'Star Rating',
+                  values: [renderStars(previousPlan.starRating), renderStars(currentPlan.starRating)],
+                },
+              ];
+              for (const benefit of currentPlan.benefits) {
+                const prev = previousPlan.benefits.find((b) => b.name === benefit.name);
+                rows.push({
+                  label: benefit.name,
+                  values: [prev?.value ?? 'N/A', benefit.value],
+                });
+              }
+              return rows;
+            })()}
+          />
 
           {/* Changes Summary */}
           <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">

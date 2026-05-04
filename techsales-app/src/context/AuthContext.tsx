@@ -3,7 +3,19 @@ import type { User, Role, Permission, ModuleName, ActionType, Member } from '../
 import usersData from '../data/runtime/users.json';
 import rolesData from '../data/runtime/roles.json';
 import membersData from '../data/runtime/members.json';
-import { setMode, clearMode, setDataSource, getDataSource, probeBackendMode, type DataSource } from '../api/mode';
+import {
+  setMode,
+  clearMode,
+  setDataSource,
+  getDataSource,
+  setAiEnabled as persistAiEnabled,
+  getAiEnabled,
+  setAiProvider as persistAiProvider,
+  getAiProvider,
+  probeBackendMode,
+  type DataSource,
+  type AiProvider,
+} from '../api/mode';
 
 interface AuthContextType {
   user: User | null;
@@ -14,6 +26,13 @@ interface AuthContextType {
   /** What's backing the data shown in the UI: `'mongo'` (Pi via API) or `'json'`
    * (either backend's JSON-store mode or FE bundled fallback). `null` until login. */
   dataSource: DataSource | null;
+  /** Whether the backend's `AI_ENABLED` flag is currently true. Mirrors
+   * `/api/health.aiEnabled`; refreshed at login. `false` until login. */
+  aiEnabled: boolean;
+  /** Active LLM provider on the backend (`'ollama'` | `'anthropic'`). Mirrors
+   * `/api/health.aiProvider`; refreshed at login. `null` until login or when
+   * AI is disabled. Drives the header AI badge. */
+  aiProvider: AiProvider | null;
   login: (username: string, password: string) => Promise<boolean>;
   memberLogin: (policyNumber: string, dateOfBirth: string) => Promise<boolean>;
   logout: () => void;
@@ -36,6 +55,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [role, setRole] = useState<Role | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [dataSource, setDataSourceState] = useState<DataSource | null>(null);
+  const [aiEnabled, setAiEnabledState] = useState<boolean>(false);
+  const [aiProvider, setAiProviderState] = useState<AiProvider | null>(null);
 
   // Check for stored auth on mount
   useEffect(() => {
@@ -67,22 +88,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const storedSource = getDataSource();
     if (storedSource) setDataSourceState(storedSource);
 
+    // Rehydrate AI flag from sessionStorage (set at login). Default false.
+    setAiEnabledState(getAiEnabled());
+    setAiProviderState(getAiProvider());
+
     setIsLoading(false);
   }, []);
 
   /**
-   * Decides the UI `dataSource` based on the resolved app mode after login.
+   * Decides the UI `dataSource` and `aiEnabled` flag based on the resolved
+   * app mode after login.
    *
-   * - `local` → the FE bundled JSON is the source.
-   * - `api`   → probe the backend's `/api/health` to see if it's serving from
-   *             Mongo or its own JSON file store. If the probe fails, default
-   *             to `'mongo'` (the optimistic case, since the login API call
-   *             that just succeeded means the backend is alive).
+   * - `local` → bundled JSON; AI is OFF (no backend to call).
+   * - `api`   → probe `/api/health`. dataSource defaults to `'mongo'` on
+   *             probe failure (optimistic: the login API just succeeded).
+   *             aiEnabled defaults to `false` on probe failure — we'd rather
+   *             hide AI UI than 501 the user mid-flow.
    */
-  const resolveDataSource = async (resolvedMode: 'api' | 'local'): Promise<DataSource> => {
-    if (resolvedMode === 'local') return 'json';
+  const resolveBackendState = async (
+    resolvedMode: 'api' | 'local',
+  ): Promise<{ dataSource: DataSource; aiEnabled: boolean; aiProvider: AiProvider | null }> => {
+    if (resolvedMode === 'local') {
+      return { dataSource: 'json', aiEnabled: false, aiProvider: null };
+    }
     const probed = await probeBackendMode();
-    return probed ?? 'mongo';
+    return {
+      dataSource: probed.dataSource ?? 'mongo',
+      aiEnabled: probed.aiEnabled,
+      aiProvider: probed.aiProvider,
+    };
   };
 
   const login = async (username: string, password: string): Promise<boolean> => {
@@ -133,10 +167,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(updatedUser));
     setMode(resolvedMode);
 
-    // Resolve and persist what's actually backing the data (for the header badge).
-    const source = await resolveDataSource(resolvedMode);
+    // Resolve and persist what's actually backing the data (for the header
+    // badge) plus the AI feature flag (for `useAiEnabled`).
+    const { dataSource: source, aiEnabled: ai, aiProvider: provider } =
+      await resolveBackendState(resolvedMode);
     setDataSource(source);
     setDataSourceState(source);
+    persistAiEnabled(ai);
+    setAiEnabledState(ai);
+    persistAiProvider(provider);
+    setAiProviderState(provider);
 
     return true;
   };
@@ -190,9 +230,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem(AUTH_STORAGE_KEY);
     setMode(resolvedMode);
 
-    const source = await resolveDataSource(resolvedMode);
+    const { dataSource: source, aiEnabled: ai, aiProvider: provider } =
+      await resolveBackendState(resolvedMode);
     setDataSource(source);
     setDataSourceState(source);
+    persistAiEnabled(ai);
+    setAiEnabledState(ai);
+    persistAiProvider(provider);
+    setAiProviderState(provider);
 
     return true;
   };
@@ -202,6 +247,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setMember(null);
     setRole(null);
     setDataSourceState(null);
+    setAiEnabledState(false);
+    setAiProviderState(null);
     localStorage.removeItem(AUTH_STORAGE_KEY);
     localStorage.removeItem(MEMBER_AUTH_STORAGE_KEY);
     clearMode();
@@ -240,6 +287,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAuthenticated: !!user || !!member,
         isLoading,
         dataSource,
+        aiEnabled,
+        aiProvider,
         login,
         memberLogin: memberLoginHandler,
         logout,

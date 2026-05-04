@@ -14,14 +14,18 @@ import {
   Activity,
   Calculator
 } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { Button, Badge } from '../../components/common';
 import { Tabs, TabPanel } from '../../components/common/Tabs';
 import type { Plan, Benefit, Premium } from '../../types';
 import { getPlanById, getPlanBenefits, getPlanPremiums, getPlanRating } from '../../services/planService';
+import { useAiEnabled } from '../../hooks/useAiEnabled';
+import { PlanExplainerPanel } from '../../components/plans/PlanExplainerPanel';
 
 export function PlanDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const aiEnabled = useAiEnabled();
   const [plan, setPlan] = useState<Plan | null>(null);
   const [benefits, setBenefits] = useState<Benefit[]>([]);
   const [premiums, setPremiums] = useState<Premium[]>([]);
@@ -133,6 +137,9 @@ export function PlanDetail() {
     { id: 'benefits', label: 'Benefits', icon: Heart, badge: benefits.length },
     { id: 'premiums', label: 'Premiums', icon: DollarSign },
     { id: 'documents', label: 'Documents', icon: FileText },
+    ...(aiEnabled
+      ? [{ id: 'ai-explainer', label: 'AI Explainer', icon: Sparkles, badge: 'AI' }]
+      : []),
   ];
 
   return (
@@ -410,6 +417,10 @@ export function PlanDetail() {
                 <p>No premium information available</p>
               </div>
             )}
+          </TabPanel>
+
+          <TabPanel isActive={activeTab === 'ai-explainer'}>
+            <PlanExplainerPanel mode="agent" planId={plan.planId} />
           </TabPanel>
 
           <TabPanel isActive={activeTab === 'documents'}>

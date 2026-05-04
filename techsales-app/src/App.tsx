@@ -16,7 +16,7 @@ import {
   AllEnrollments,
 } from './pages/admin';
 import { LeadList, LeadDetail, LeadForm } from './pages/leads';
-import { PlanList, PlanDetail } from './pages/plans';
+import { PlanList, PlanDetail, PlanCompare } from './pages/plans';
 import { PharmacySearchPage } from './pages/pharmacies';
 import { DrugSearchPage } from './pages/drugs';
 import { ProviderSearchPage } from './pages/providers';
@@ -175,6 +175,7 @@ function AppRoutes() {
         
         {/* Plan Routes */}
         <Route path="plans" element={<PlanList />} />
+        <Route path="plans/compare" element={<PlanCompare />} />
         <Route path="plans/:id" element={<PlanDetail />} />
         
         {/* Pharmacy, Drug, and Provider Routes */}

@@ -52,3 +52,33 @@ export interface IReadOnlyRepository<T> {
   findById(id: string): Promise<T | null>;
   search(params: SearchParams<T>): Promise<Paginated<T>>;
 }
+
+/**
+ * Phase 6 — `/api/ai/stats` aggregate shapes. Returned by both the Mongo and
+ * JSON aiInteraction repos so callers can switch storage without caring.
+ */
+export interface AiStatsByKind {
+  kind: string;
+  calls: number;
+  tokensIn: number;
+  tokensOut: number;
+  cachedInput: number;
+  cachedRead: number;
+  errors: number;
+}
+
+export interface AiStatsAggregate {
+  windowMs: number;
+  totalCalls: number;
+  totalTokensIn: number;
+  totalTokensOut: number;
+  totalCachedInput: number;
+  totalCachedRead: number;
+  /** cachedRead / totalTokensIn — protects against div-by-zero when totalTokensIn = 0. */
+  cacheHitRatio: number;
+  errors: number;
+  errorRate: number;
+  latencyP50Ms: number;
+  latencyP95Ms: number;
+  byKind: AiStatsByKind[];
+}
