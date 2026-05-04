@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Medicare Hub — AI Module Deep Dive</title>
+<style>
+  :root {
+    --bg: #f8fafc;
+    --panel: #ffffff;
+    --ink: #0f172a;
+    --muted: #475569;
+    --line: #cbd5e1;
+    --accent: #2563eb;
+    --route: #e0e7ff;
+    --route-stroke: #4338ca;
+    --guard: #fee2e2;
+    --guard-stroke: #b91c1c;
+    --agent: #dcfce7;
+    --agent-stroke: #166534;
+    --tool: #fef3c7;
+    --tool-stroke: #92400e;
+    --llm: #fce7f3;
+    --llm-stroke: #9f1239;
+    --vec: #cffafe;
+    --vec-stroke: #0e7490;
+    --audit: #ede9fe;
+    --audit-stroke: #6d28d9;
+  }
+  [data-theme="dark"] {
+    --bg: #0b1220;
+    --panel: #111a2e;
+    --ink: #e2e8f0;
+    --muted: #94a3b8;
+    --line: #334155;
+    --accent: #60a5fa;
+    --route: #312e81;
+    --route-stroke: #a5b4fc;
+    --guard: #7f1d1d;
+    --guard-stroke: #fecaca;
+    --agent: #14532d;
+    --agent-stroke: #86efac;
+    --tool: #78350f;
+    --tool-stroke: #fcd34d;
+    --llm: #831843;
+    --llm-stroke: #fbcfe8;
+    --vec: #164e63;
+    --vec-stroke: #67e8f9;
+    --audit: #4c1d95;
+    --audit-stroke: #c4b5fd;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.55;
+    padding: 32px 24px 80px;
+  }
+  .wrap { max-width: 1200px; margin: 0 auto; }
+  header.page {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 24px; margin-bottom: 8px;
+  }
+  h1 { font-size: 28px; margin: 0 0 4px; letter-spacing: -0.01em; }
+  .lede { color: var(--muted); margin: 0 0 24px; max-width: 880px; }
+  .toolbar {
+    display: flex; gap: 8px; align-items: center;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 6px 10px; border-radius: 8px;
+    font-size: 13px;
+  }
+  .toolbar button {
+    background: transparent; border: 1px solid var(--line);
+    color: var(--ink); padding: 4px 10px; border-radius: 6px;
+    cursor: pointer; font: inherit;
+  }
+  .toolbar button:hover { background: var(--bg); }
+  nav.toc {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 18px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    display: flex; gap: 18px; flex-wrap: wrap;
+  }
+  nav.toc a { color: var(--accent); text-decoration: none; }
+  nav.toc a:hover { text-decoration: underline; }
+  section.card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 24px;
+    margin: 20px 0;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    scroll-margin-top: 16px;
+  }
+  section.card h2 {
+    margin: 0 0 16px; font-size: 18px; letter-spacing: -0.005em;
+  }
+  section.card h3 {
+    margin: 24px 0 8px; font-size: 15px;
+  }
+  .legend {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px; font-size: 13px;
+  }
+  .legend .swatch {
+    display: inline-block; width: 12px; height: 12px; border-radius: 3px;
+    margin-right: 8px; vertical-align: middle;
+    border: 1px solid var(--line);
+  }
+  .swatch-route { background: var(--route); }
+  .swatch-guard { background: var(--guard); }
+  .swatch-agent { background: var(--agent); }
+  .swatch-tool  { background: var(--tool); }
+  .swatch-llm   { background: var(--llm); }
+  .swatch-vec   { background: var(--vec); }
+  .swatch-audit { background: var(--audit); }
+  .diagram {
+    overflow-x: auto;
+    border: 1px dashed var(--line);
+    border-radius: 8px;
+    padding: 16px;
+    background: var(--bg);
+  }
+  table {
+    width: 100%; border-collapse: collapse; font-size: 14px;
+  }
+  th, td {
+    text-align: left; padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  th { color: var(--muted); font-weight: 600; font-size: 12px;
+       text-transform: uppercase; letter-spacing: 0.04em; }
+  code {
+    background: var(--bg); padding: 1px 6px; border-radius: 4px;
+    border: 1px solid var(--line);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+  }
+  .callout {
+    background: var(--bg);
+    border-left: 3px solid var(--accent);
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    margin: 12px 0;
+  }
+  footer.page {
+    margin-top: 40px; padding-top: 16px;
+    border-top: 1px solid var(--line);
+    color: var(--muted); font-size: 13px;
+    display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  }
+  footer.page a { color: var(--accent); }
+  @media print {
+    body { background: white; padding: 0; }
+    .toolbar, nav.toc, footer.page a { display: none; }
+    section.card { break-inside: avoid; box-shadow: none; }
+    .diagram { border: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="page">
+    <div>
+      <h1>AI Module — Deep Dive</h1>
+      <p class="lede">
+        How <code>/api/ai/*</code> works inside the backend: a single guard chain feeds
+        seven LangGraph agents that share six tools, route every chat call through one
+        provider-switchable LLM chokepoint, and write a full audit trail to MongoDB.
+        Vector retrieval lives in Qdrant; embeddings come from a local Ollama instance.
+      </p>
+    </div>
+    <div class="toolbar">
+      <span>Theme</span>
+      <button onclick="setTheme('light')">Light</button>
+      <button onclick="setTheme('dark')">Dark</button>
+      <button onclick="window.print()">Print / PDF</button>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <a href="#module">Module diagram</a>
+    <a href="#sequence">Recommend flow</a>
+    <a href="#provider">Provider matrix</a>
+    <a href="#filemap">File map</a>
+    <a href="#switch">How to switch providers</a>
+  </nav>
+
+  <section id="module" class="card">
+    <h2>1. Module architecture</h2>
+    <div class="diagram">
+      <pre class="mermaid">
+flowchart TB
+    %% ============ ENTRY ============
+    subgraph ROUTES["/api/ai/* routes — ai.routes.ts"]
+      direction LR
+      R_ECHO["POST /echo"]
+      R_REC["POST /recommend"]
+      R_EXP["POST /explain"]
+      R_SRCH["POST /search"]
+      R_CMP["POST /compare"]
+      R_DRUG["POST /drug-coverage"]
+      R_CHAT["POST /chat (SSE)"]
+      R_STATS["GET /stats"]
+    end
+
+    %% ============ GUARDS ============
+    subgraph GUARDS["Guards (run in this order)"]
+      direction TB
+      G_EN{"AI_ENABLED?<br/>(route-level middleware)"}
+      G_RL["aiRateLimit<br/>(per user, default 30/5min)"]
+      G_TC["aiTokenCap<br/>(daily, anthropic only)"]
+      G_RDY{"requireProviderReady()<br/>(controller pre-flight)<br/>· Anthropic: key present?<br/>· Ollama: probe :11434 (1.5s, 10s cache)"}
+      G_EN -->|on| G_RL --> G_TC --> G_RDY
+      G_EN -->|off| G_501["501 AI_DISABLED"]
+      G_RDY -->|fail| G_503["503 provider not ready"]
+    end
+
+    %% ============ AGENTS ============
+    subgraph AGENTS["Agents — src/ai/agents/"]
+      direction LR
+      A_ECHO["echoAgent<br/>(smoke test)"]
+      A_REC["recommendAgent<br/>(5-tool ReAct)"]
+      A_EXP["explainAgent<br/>(agent · member modes)"]
+      A_SRCH["searchAgent<br/>(NL → filters)"]
+      A_CMP["compareAgent<br/>(multi-doc diff)"]
+      A_DRUG["drugCoverageAgent"]
+      A_CHAT["chatAgent<br/>(SSE streaming + memory)"]
+    end
+
+    %% ============ TOOLS ============
+    subgraph TOOLS["Tools — src/ai/tools/"]
+      direction LR
+      T_LEAD["getLeadDetails"]
+      T_PLANS["searchPlans<br/>(hybrid: BM25 ⊕ ANN)"]
+      T_DRUG["checkDrugCoverage<br/>(Qdrant formulary)"]
+      T_CMP["comparePlans"]
+      T_SAV["calcSavings"]
+      T_MEM["getMemberPlan"]
+    end
+
+    %% ============ LLM SWITCH ============
+    subgraph LLM["LLM provider switch — src/ai/llm/"]
+      direction TB
+      L_FACT{"getChatModel()<br/>chatModel.ts"}
+      L_OL["ChatOllama<br/>providers/ollama.ts<br/>qwen2.5:7b"]
+      L_AN["ChatAnthropic<br/>providers/anthropic.ts<br/>claude-sonnet-4-6 / opus-4-7"]
+      L_FACT -- "AI_LLM_PROVIDER=ollama (default)" --> L_OL
+      L_FACT -- "AI_LLM_PROVIDER=anthropic" --> L_AN
+    end
+
+    %% ============ RETRIEVAL ============
+    subgraph VEC["Vector layer — src/ai/vectorstore/ + embeddings/"]
+      direction TB
+      V_HYB["hybridRetriever.ts<br/>BM25 (wink) ⊕ Qdrant ANN<br/>RRF fusion (k=60)"]
+      V_QC["qdrantClient.ts<br/>:6333"]
+      V_COL["collections.ts<br/>plans · benefits · drugs · formulary · faqs"]
+      V_EMB["ollamaEmbedder.ts<br/>nomic-embed-text · 768-dim"]
+      V_HYB --> V_QC --> V_COL
+      V_HYB --> V_EMB
+    end
+
+    %% ============ AUDIT ============
+    subgraph AUDIT["Audit — src/ai/llm/callbacks.ts"]
+      AUD_CB["AuditCallbackHandler<br/>(per-request)"]
+      AUD_COL[("aiInteractions<br/>medhub_app collection<br/>provider · model · tokensIn/Out<br/>cachedInputTokens · cachedReadTokens<br/>latencyMs · toolCalls[]")]
+      AUD_CB --> AUD_COL
+    end
+
+    %% ============ EDGES ============
+    R_ECHO --> G_EN
+    R_REC  --> G_EN
+    R_EXP  --> G_EN
+    R_SRCH --> G_EN
+    R_CMP  --> G_EN
+    R_DRUG --> G_EN
+    R_CHAT --> G_EN
+    R_STATS -. "bypasses guards" .-> AUD_COL
+
+    G_RDY --> A_ECHO
+    G_RDY --> A_REC
+    G_RDY --> A_EXP
+    G_RDY --> A_SRCH
+    G_RDY --> A_CMP
+    G_RDY --> A_DRUG
+    G_RDY --> A_CHAT
+
+    A_REC  --> T_LEAD
+    A_REC  --> T_PLANS
+    A_REC  --> T_DRUG
+    A_REC  --> T_CMP
+    A_REC  --> T_SAV
+    A_EXP  --> T_PLANS
+    A_SRCH --> T_PLANS
+    A_CMP  --> T_PLANS
+    A_CMP  --> T_CMP
+    A_DRUG --> T_DRUG
+    A_CHAT --> T_LEAD
+    A_CHAT --> T_PLANS
+    A_CHAT --> T_DRUG
+    A_CHAT --> T_MEM
+    A_CHAT --> T_SAV
+
+    T_PLANS --> V_HYB
+    T_DRUG  --> V_QC
+
+    A_ECHO --> L_FACT
+    A_REC  --> L_FACT
+    A_EXP  --> L_FACT
+    A_SRCH --> L_FACT
+    A_CMP  --> L_FACT
+    A_DRUG --> L_FACT
+    A_CHAT --> L_FACT
+
+    A_REC  -. callbacks .-> AUD_CB
+    A_EXP  -. callbacks .-> AUD_CB
+    A_SRCH -. callbacks .-> AUD_CB
+    A_CMP  -. callbacks .-> AUD_CB
+    A_DRUG -. callbacks .-> AUD_CB
+    A_CHAT -. callbacks .-> AUD_CB
+    A_ECHO -. callbacks .-> AUD_CB
+
+    %% ============ STYLING ============
+    classDef route fill:#e0e7ff,stroke:#4338ca,color:#0f172a
+    classDef guard fill:#fee2e2,stroke:#b91c1c,color:#0f172a
+    classDef agent fill:#dcfce7,stroke:#166534,color:#0f172a
+    classDef tool  fill:#fef3c7,stroke:#92400e,color:#0f172a
+    classDef llm   fill:#fce7f3,stroke:#9f1239,color:#0f172a
+    classDef vec   fill:#cffafe,stroke:#0e7490,color:#0f172a
+    classDef audit fill:#ede9fe,stroke:#6d28d9,color:#0f172a
+
+    class R_ECHO,R_REC,R_EXP,R_SRCH,R_CMP,R_DRUG,R_CHAT,R_STATS route
+    class G_EN,G_RDY,G_RL,G_TC,G_501,G_503 guard
+    class A_ECHO,A_REC,A_EXP,A_SRCH,A_CMP,A_DRUG,A_CHAT agent
+    class T_LEAD,T_PLANS,T_DRUG,T_CMP,T_SAV,T_MEM tool
+    class L_FACT,L_OL,L_AN llm
+    class V_HYB,V_QC,V_COL,V_EMB vec
+    class AUD_CB,AUD_COL audit
+      </pre>
+    </div>
+
+    <h3>Legend</h3>
+    <div class="legend">
+      <div><span class="swatch swatch-route"></span> Route entry</div>
+      <div><span class="swatch swatch-guard"></span> Middleware / guard</div>
+      <div><span class="swatch swatch-agent"></span> LangGraph agent</div>
+      <div><span class="swatch swatch-tool"></span> Tool</div>
+      <div><span class="swatch swatch-llm"></span> LLM provider</div>
+      <div><span class="swatch swatch-vec"></span> Vector / embeddings</div>
+      <div><span class="swatch swatch-audit"></span> Audit log</div>
+    </div>
+  </section>
+
+  <section id="sequence" class="card">
+    <h2>2. Recommend agent — end-to-end sequence</h2>
+    <div class="callout">
+      The most-tools-per-call agent. Walks 4 tools before the LLM call, then logs the
+      full trace. Same shape applies to <code>chatAgent</code> with SSE deltas instead
+      of one JSON response.
+    </div>
+    <div class="diagram">
+      <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    participant FE as Browser (RecommendedPlansTab)
+    participant API as Express controller<br/>(ai.controller.ts)
+    participant G as Guards
+    participant Ag as recommendAgent (LangGraph ReAct)
+    participant Repo as Repository registry<br/>(Mongo / JSON)
+    participant Q as Qdrant + Embedder<br/>(Ollama nomic-embed-text)
+    participant LLM as LLM provider switch<br/>(getChatModel)
+    participant DB as aiInteractions (Mongo)
+
+    FE->>API: POST /api/ai/recommend { leadId }
+    API->>G: AI_ENABLED → requireProviderReady → rateLimit → tokenCap
+    G-->>API: pass
+    API->>Ag: run({ leadId })
+    Ag->>Repo: getLeadDetails(leadId)
+    Repo-->>Ag: lead profile
+    Ag->>Q: searchPlans(query) — embed → ANN top-K
+    Q-->>Ag: candidate plans
+    Ag->>Q: checkDrugCoverage(planIds, drugIds) — formulary lookup
+    Q-->>Ag: tier + PA flags
+    Ag->>Ag: calcSavings(plans) (pure JS)
+    opt when LLM decides a side-by-side helps
+      Ag->>Ag: comparePlans(planIds)
+    end
+    Ag->>LLM: rank candidates with rationale
+    LLM-->>Ag: ranked JSON
+    Ag-->>API: { recommendations, rationale }
+    API->>DB: AuditCallbackHandler.flush() (provider, model, tokens, toolCalls, latency)
+    API-->>FE: 200 { data: { recommendations, interactionId } }
+      </pre>
+    </div>
+  </section>
+
+  <section id="provider" class="card">
+    <h2>3. Provider comparison matrix</h2>
+    <table>
+      <thead>
+        <tr><th>Dimension</th><th>Ollama (default)</th><th>Anthropic</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Model</td>
+          <td><code>qwen2.5:7b</code> (premium slot identical until GPU box)</td>
+          <td><code>claude-sonnet-4-6</code> default · <code>claude-opus-4-7</code> premium</td>
+        </tr>
+        <tr>
+          <td>Cost</td>
+          <td>Free</td>
+          <td>Pay-per-token (Anthropic Console; Max plan does <i>not</i> include API credits)</td>
+        </tr>
+        <tr>
+          <td>API key needed</td>
+          <td>No</td>
+          <td>Yes — <code>ANTHROPIC_API_KEY</code></td>
+        </tr>
+        <tr>
+          <td>Where it runs</td>
+          <td>Docker on laptop, port <code>:11434</code></td>
+          <td><code>api.anthropic.com</code> over HTTPS</td>
+        </tr>
+        <tr>
+          <td>Tool-call reliability (multi-step)</td>
+          <td>~75–90% first-pass on a 5-tool chain</td>
+          <td>~95–98%</td>
+        </tr>
+        <tr>
+          <td>Recommend latency (laptop CPU)</td>
+          <td>15–40 s</td>
+          <td>3–8 s</td>
+        </tr>
+        <tr>
+          <td>Streaming chat</td>
+          <td>Supported, ~3–8 tok/s</td>
+          <td>Supported, much faster TTFB</td>
+        </tr>
+        <tr>
+          <td>Best for</td>
+          <td>Free-tier POC, offline demos, no-budget development</td>
+          <td>Production-quality output, low latency, high tool-call accuracy</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="callout">
+      Both providers go through the same <code>getChatModel()</code> chokepoint. No
+      agent code changes when you flip — just one env var. Embeddings (Ollama
+      <code>nomic-embed-text</code>) and vector storage (Qdrant) are provider-independent.
+    </div>
+  </section>
+
+  <section id="filemap" class="card">
+    <h2>4. File map</h2>
+    <table>
+      <thead>
+        <tr><th>Path</th><th>What it is</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>techsales-api/src/routes/ai.routes.ts</code></td><td>Routes + guard ordering</td></tr>
+        <tr><td><code>techsales-api/src/controllers/ai.controller.ts</code></td><td>7 handlers (echo, recommend, explain, search, compare, drug-coverage, chat) + stats</td></tr>
+        <tr><td><code>techsales-api/src/ai/agents/echoAgent.ts</code></td><td>Smoke-test agent (one tool, one LLM call)</td></tr>
+        <tr><td><code>techsales-api/src/ai/agents/recommendAgent.ts</code></td><td>Lead-triggered 5-tool ReAct flow</td></tr>
+        <tr><td><code>techsales-api/src/ai/agents/explainAgent.ts</code></td><td>Plan explainer — agent (markdown, technical) and member (6th-grade) modes</td></tr>
+        <tr><td><code>techsales-api/src/ai/agents/searchAgent.ts</code></td><td>NL query → structured filters via LLM, then hybrid retrieval</td></tr>
+        <tr><td><code>techsales-api/src/ai/agents/compareAgent.ts</code></td><td>2–4 plan diff narrative</td></tr>
+        <tr><td><code>techsales-api/src/ai/agents/drugCoverageAgent.ts</code></td><td>Synthetic formulary lookup + friendly answer</td></tr>
+        <tr><td><code>techsales-api/src/ai/agents/chatAgent.ts</code></td><td>Streaming ReAct over SSE, memory, full toolset</td></tr>
+        <tr><td><code>techsales-api/src/ai/tools/searchPlans.tool.ts</code></td><td>Hybrid retriever (BM25 + Qdrant ANN, RRF k=60)</td></tr>
+        <tr><td><code>techsales-api/src/ai/tools/getLeadDetails.tool.ts</code></td><td>Lead profile lookup via repository registry</td></tr>
+        <tr><td><code>techsales-api/src/ai/tools/checkDrugCoverage.tool.ts</code></td><td>Formulary tier + prior-auth lookup</td></tr>
+        <tr><td><code>techsales-api/src/ai/tools/comparePlans.tool.ts</code></td><td>Structured plan comparison</td></tr>
+        <tr><td><code>techsales-api/src/ai/tools/calcSavings.tool.ts</code></td><td>Estimated annual cost (pure JS port of FE costSavingsUtils)</td></tr>
+        <tr><td><code>techsales-api/src/ai/tools/getMemberPlan.tool.ts</code></td><td>Member's enrolled plan</td></tr>
+        <tr><td><code>techsales-api/src/ai/llm/chatModel.ts</code></td><td><b>Provider dispatcher</b> — single chokepoint</td></tr>
+        <tr><td><code>techsales-api/src/ai/llm/providers/anthropic.ts</code></td><td>ChatAnthropic wrapper</td></tr>
+        <tr><td><code>techsales-api/src/ai/llm/providers/ollama.ts</code></td><td>ChatOllama wrapper</td></tr>
+        <tr><td><code>techsales-api/src/ai/llm/callbacks.ts</code></td><td>AuditCallbackHandler — captures tokens, latency, full tool trace</td></tr>
+        <tr><td><code>techsales-api/src/ai/embeddings/ollamaEmbedder.ts</code></td><td>nomic-embed-text embedder (768-dim)</td></tr>
+        <tr><td><code>techsales-api/src/ai/vectorstore/qdrantClient.ts</code></td><td>Qdrant client wrapper</td></tr>
+        <tr><td><code>techsales-api/src/ai/vectorstore/collections.ts</code></td><td>plans · benefits · drugs · formulary · faqs schemas</td></tr>
+        <tr><td><code>techsales-api/src/ai/vectorstore/hybridRetriever.ts</code></td><td>BM25 + ANN with RRF fusion</td></tr>
+        <tr><td><code>techsales-api/src/models/aiInteraction.model.ts</code></td><td>Mongoose schema for the audit collection</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="switch" class="card">
+    <h2>5. How to switch providers</h2>
+    <p>One-line env change, no code modification:</p>
+    <table>
+      <thead>
+        <tr><th>Goal</th><th>Set in <code>techsales-api/.env</code></th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Free local POC</td>
+          <td><code>AI_LLM_PROVIDER=ollama</code> · <code>OLLAMA_LLM_MODEL=qwen2.5:7b</code></td>
+        </tr>
+        <tr>
+          <td>Production (Claude Sonnet)</td>
+          <td><code>AI_LLM_PROVIDER=anthropic</code> · <code>ANTHROPIC_API_KEY=sk-ant-…</code></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="callout">
+      Restart the API after the change. Verify via <code>GET /api/health</code> —
+      it returns <code>aiProvider: "ollama"</code> or <code>"anthropic"</code>, and
+      the frontend header pill ("AI: Ollama" / "AI: Claude") updates after the next
+      login.
+    </div>
+  </section>
+
+  <footer class="page">
+    <span>Repo: <code>C:\Users\rubar\Repositories\TechSalesApp</code></span>
+    <span><a href="architecture-diagram-full-system.html">← Back to system overview</a></span>
+  </footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+  function getInitialTheme() {
+    const stored = localStorage.getItem('mhub-arch-theme');
+    if (stored === 'light' || stored === 'dark') return stored;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  function setTheme(t) {
+    document.documentElement.setAttribute('data-theme', t);
+    localStorage.setItem('mhub-arch-theme', t);
+    if (window.mermaid) {
+      mermaid.initialize({ startOnLoad: false, theme: t === 'dark' ? 'dark' : 'default', securityLevel: 'loose' });
+      const blocks = document.querySelectorAll('.mermaid');
+      blocks.forEach((b) => {
+        if (b.dataset.src) b.textContent = b.dataset.src;
+        else b.dataset.src = b.textContent;
+      });
+      mermaid.run({ querySelector: '.mermaid' });
+    }
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    setTheme(getInitialTheme());
+  });
+</script>
+</body>
+</html>
