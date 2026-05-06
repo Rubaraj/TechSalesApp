@@ -17,7 +17,7 @@
  * Default for both is the optimistic case (`'api'` / `'mongo'`). Cleared on logout.
  */
 export type AppMode = 'api' | 'local';
-export type DataSource = 'mongo' | 'json';
+export type DataSource = 'mongo' | 'json' | 'databricks';
 /** Active LLM provider on the backend — mirrors `AI_LLM_PROVIDER`. Header badge
  * uses this so the user can tell at a glance whether responses are from local
  * Ollama (free) or cloud Claude. */
@@ -62,7 +62,7 @@ export function setMode(mode: AppMode): void {
 export function getDataSource(): DataSource | null {
   try {
     const v = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem(SOURCE_KEY) : null;
-    return v === 'mongo' || v === 'json' ? v : null;
+    return v === 'mongo' || v === 'json' || v === 'databricks' ? v : null;
   } catch {
     return null;
   }
@@ -136,7 +136,7 @@ export function clearMode(): void {
 interface HealthResponse {
   success: boolean;
   data?: {
-    mode?: 'mongo' | 'json';
+    mode?: 'mongo' | 'json' | 'databricks';
     mongoUp?: boolean;
     aiEnabled?: boolean;
     aiProvider?: 'ollama' | 'anthropic';
@@ -161,7 +161,8 @@ export async function probeBackendMode(): Promise<DataAiState> {
     if (!res.ok) return { dataSource: null, aiEnabled: false, aiProvider: null };
     const body = (await res.json()) as HealthResponse;
     const mode = body.data?.mode;
-    const dataSource = mode === 'mongo' || mode === 'json' ? mode : null;
+    const dataSource =
+      mode === 'mongo' || mode === 'json' || mode === 'databricks' ? mode : null;
     const aiEnabled = body.data?.aiEnabled === true;
     const provider = body.data?.aiProvider;
     const aiProvider = provider === 'ollama' || provider === 'anthropic' ? provider : null;

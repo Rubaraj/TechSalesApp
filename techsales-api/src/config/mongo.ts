@@ -1,5 +1,5 @@
 import mongoose, { type Connection } from 'mongoose';
-import { env } from './env.js';
+import { env, getDataBackend } from './env.js';
 import { logger } from './logger.js';
 
 // Two logically separate Mongoose Connections sharing one cluster.
@@ -9,7 +9,7 @@ import { logger } from './logger.js';
 export let appConn: Connection | undefined;
 export let lookupConn: Connection | undefined;
 
-export type ConnectMode = 'mongo' | 'json';
+export type ConnectMode = 'mongo' | 'json' | 'databricks';
 
 export interface ConnectResult {
   ok: boolean;
@@ -23,10 +23,39 @@ export interface ConnectResult {
  *
  * This is called ONCE at startup — there is no heartbeat, no per-request
  * retry. The mode is locked for the lifetime of the process. See plan §4.
+ *
+ * When `DATA_BACKEND='databricks'` is set, we skip Mongo entirely and the
+ * registry uses the Databricks SQL Warehouse instead. Required env vars
+ * (`DATABRICKS_HOST`, `DATABRICKS_HTTP_PATH`, `DATABRICKS_TOKEN`) are
+ * asserted here so a misconfigured boot fails loudly with a clear message
+ * rather than crashing on the first repo call.
  */
 export async function connectMongo(): Promise<ConnectResult> {
-  if (env.FORCE_JSON) {
-    logger.info('FORCE_JSON=true — skipping Mongo connection, using JSON store');
+  const backend = getDataBackend();
+
+  if (backend === 'databricks') {
+    const missing: string[] = [];
+    if (!env.DATABRICKS_HOST) missing.push('DATABRICKS_HOST');
+    if (!env.DATABRICKS_HTTP_PATH) missing.push('DATABRICKS_HTTP_PATH');
+    if (!env.DATABRICKS_TOKEN) missing.push('DATABRICKS_TOKEN');
+    if (missing.length > 0) {
+      logger.error(
+        { missing },
+        'DATA_BACKEND=databricks but required vars are missing; cannot start',
+      );
+      throw new Error(
+        `DATA_BACKEND=databricks requires ${missing.join(', ')} to be set in .env`,
+      );
+    }
+    logger.info(
+      { host: env.DATABRICKS_HOST, catalog: env.DATABRICKS_CATALOG },
+      'DATA_BACKEND=databricks — skipping Mongo, using Databricks SQL Warehouse',
+    );
+    return { ok: true, mode: 'databricks' };
+  }
+
+  if (backend === 'json') {
+    logger.info('DATA_BACKEND=json (or FORCE_JSON=true) — skipping Mongo, using JSON store');
     return { ok: false, mode: 'json' };
   }
 

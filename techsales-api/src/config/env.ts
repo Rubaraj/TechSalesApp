@@ -28,6 +28,22 @@ const envSchema = z.object({
   FORCE_JSON: truthy.default(false),
   JSON_PERSIST: truthy.default(true),
 
+  // ----- Data backend (Phase 1 — Databricks migration) -----
+  // Explicit data-store selector. When set, supersedes FORCE_JSON. When unset,
+  // FORCE_JSON drives the choice between 'mongo' and 'json' (legacy behavior).
+  // Use getDataBackend() helper to read — never read DATA_BACKEND directly,
+  // because the resolved value depends on FORCE_JSON when DATA_BACKEND is unset.
+  DATA_BACKEND: z.enum(['mongo', 'json', 'databricks']).optional(),
+
+  // Databricks SQL Warehouse connection (required only when DATA_BACKEND='databricks').
+  // Asserted at boot inside connectMongo()'s 'databricks' branch.
+  DATABRICKS_HOST: z.string().optional(),         // e.g. https://adb-1234.5.azuredatabricks.net
+  DATABRICKS_HTTP_PATH: z.string().optional(),    // SQL Warehouse HTTP path
+  DATABRICKS_TOKEN: z.string().optional(),        // PAT or service-principal token
+  DATABRICKS_CATALOG: z.string().default('dev_medhub'),
+  DATABRICKS_APP_SCHEMA: z.string().default('medhub_app'),
+  DATABRICKS_LOOKUP_SCHEMA: z.string().default('medhub_lookup'),
+
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
 
   // ----- AI pipeline (Phase 1+) -----
@@ -86,3 +102,15 @@ export type Env = typeof env;
 export const corsOrigins = env.CORS_ORIGIN.split(',')
   .map((s) => s.trim())
   .filter(Boolean);
+
+export type DataBackend = 'mongo' | 'json' | 'databricks';
+
+/**
+ * Resolves the active data backend. Explicit `DATA_BACKEND` wins; otherwise
+ * we fall back to the legacy `FORCE_JSON` boolean (true → 'json', else 'mongo').
+ * Single source of truth — `connectMongo()` and the registry both read this.
+ */
+export function getDataBackend(): DataBackend {
+  if (env.DATA_BACKEND) return env.DATA_BACKEND;
+  return env.FORCE_JSON ? 'json' : 'mongo';
+}

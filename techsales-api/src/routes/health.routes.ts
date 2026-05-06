@@ -7,7 +7,7 @@ import type { ServiceResponse } from '../repositories/types.js';
 const PROCESS_START = Date.now();
 
 interface HealthPayload {
-  mode: 'mongo' | 'json';
+  mode: 'mongo' | 'json' | 'databricks';
   mongoUp: boolean;
   dbs: {
     app: { name: string; readyState: number };

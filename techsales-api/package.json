@@ -19,10 +19,13 @@
     "index:reset": "tsx src/scripts/build-vector-index.ts --reset",
     "formulary:build": "tsx src/scripts/build-formulary.ts",
     "vector:query": "tsx src/scripts/query-qdrant.ts",
+    "migrate:export": "tsx scripts/databricks/002-export-from-mongo.ts",
+    "migrate:load": "tsx scripts/databricks/003-load-to-databricks.ts",
     "lint": "eslint \"src/**/*.ts\"",
     "check:carriers": "node ../scripts/check-no-real-carriers.mjs"
   },
   "dependencies": {
+    "@databricks/sql": "^1.13.0",
     "@langchain/anthropic": "^1.3.28",
     "@langchain/community": "^1.1.27",
     "@langchain/core": "^1.1.44",

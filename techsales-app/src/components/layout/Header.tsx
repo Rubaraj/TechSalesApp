@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Sun, Moon, LogOut, User, Bell, LayoutDashboard, ShoppingBag, Settings, Database, FileJson, Cpu, Sparkles } from 'lucide-react';
+import { Sun, Moon, LogOut, User, Bell, LayoutDashboard, ShoppingBag, Settings, Database, FileJson, Cpu, Sparkles, Cloud } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { getLogoByTheme } from '../../utils/logoUtils';
@@ -133,29 +133,25 @@ export function Header() {
             </div>
 
             {/* Data source badge — what's actually backing the data behind this session.
-                MongoDB = green pill, JSON = amber pill (visual cue for the degraded path). */}
-            {dataSource && (
-              <span
-                className={
-                  dataSource === 'mongo'
-                    ? 'inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
-                    : 'inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300'
-                }
-                title={
-                  dataSource === 'mongo'
-                    ? 'Data is being served from MongoDB (Pi)'
-                    : 'Data is being served from JSON file store (backend or bundled fallback)'
-                }
-                aria-label={`Data source: ${dataSource === 'mongo' ? 'MongoDB' : 'JSON'}`}
-              >
-                {dataSource === 'mongo' ? (
-                  <Database className="w-3.5 h-3.5" />
-                ) : (
-                  <FileJson className="w-3.5 h-3.5" />
-                )}
-                {dataSource === 'mongo' ? 'MongoDB' : 'JSON'}
-              </span>
-            )}
+                MongoDB = green, JSON = amber, Databricks = indigo. */}
+            {dataSource && (() => {
+              const cfg = {
+                mongo:      { cls: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',     Icon: Database, label: 'MongoDB',    title: 'Data is being served from MongoDB' },
+                json:       { cls: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',     Icon: FileJson, label: 'JSON',       title: 'Data is being served from JSON file store (backend or bundled fallback)' },
+                databricks: { cls: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300', Icon: Cloud,    label: 'Databricks', title: 'Data is being served from Databricks Delta tables' },
+              }[dataSource];
+              const { cls, Icon, label, title } = cfg;
+              return (
+                <span
+                  className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${cls}`}
+                  title={title}
+                  aria-label={`Data source: ${label}`}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  {label}
+                </span>
+              );
+            })()}
 
             {/* AI provider badge — Ollama (green, local & free) vs Claude
                 (purple, cloud). Hidden when AI is disabled or the provider
