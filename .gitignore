@@ -1,0 +1,14 @@
+# Operator-local files — never commit
+SSHDetails.md
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Archive zips kept locally
+Archive*.zip
+Build*.zip
+Buildfile_*.zip
+__MACOSX/
