@@ -12,6 +12,8 @@ import {
   getAiEnabled,
   setAiProvider as persistAiProvider,
   getAiProvider,
+  setTwilioEnabled as persistTwilioEnabled,
+  getTwilioEnabled,
   probeBackendMode,
   type DataSource,
   type AiProvider,
@@ -33,6 +35,9 @@ interface AuthContextType {
    * `/api/health.aiProvider`; refreshed at login. `null` until login or when
    * AI is disabled. Drives the header AI badge. */
   aiProvider: AiProvider | null;
+  /** Phase 2 — whether Twilio+Deepgram call pipeline is enabled. Mirrors
+   * `/api/health.twilioEnabled`; refreshed at login. */
+  twilioEnabled: boolean;
   login: (username: string, password: string) => Promise<boolean>;
   memberLogin: (policyNumber: string, dateOfBirth: string) => Promise<boolean>;
   logout: () => void;
@@ -57,6 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [dataSource, setDataSourceState] = useState<DataSource | null>(null);
   const [aiEnabled, setAiEnabledState] = useState<boolean>(false);
   const [aiProvider, setAiProviderState] = useState<AiProvider | null>(null);
+  const [twilioEnabled, setTwilioEnabledState] = useState<boolean>(false);
 
   // Check for stored auth on mount
   useEffect(() => {
@@ -91,6 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Rehydrate AI flag from sessionStorage (set at login). Default false.
     setAiEnabledState(getAiEnabled());
     setAiProviderState(getAiProvider());
+    setTwilioEnabledState(getTwilioEnabled());
 
     setIsLoading(false);
   }, []);
@@ -107,15 +114,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
    */
   const resolveBackendState = async (
     resolvedMode: 'api' | 'local',
-  ): Promise<{ dataSource: DataSource; aiEnabled: boolean; aiProvider: AiProvider | null }> => {
+  ): Promise<{
+    dataSource: DataSource;
+    aiEnabled: boolean;
+    aiProvider: AiProvider | null;
+    twilioEnabled: boolean;
+  }> => {
     if (resolvedMode === 'local') {
-      return { dataSource: 'json', aiEnabled: false, aiProvider: null };
+      return { dataSource: 'json', aiEnabled: false, aiProvider: null, twilioEnabled: false };
     }
     const probed = await probeBackendMode();
     return {
       dataSource: probed.dataSource ?? 'mongo',
       aiEnabled: probed.aiEnabled,
       aiProvider: probed.aiProvider,
+      twilioEnabled: probed.twilioEnabled,
     };
   };
 
@@ -169,14 +182,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Resolve and persist what's actually backing the data (for the header
     // badge) plus the AI feature flag (for `useAiEnabled`).
-    const { dataSource: source, aiEnabled: ai, aiProvider: provider } =
-      await resolveBackendState(resolvedMode);
+    const {
+      dataSource: source,
+      aiEnabled: ai,
+      aiProvider: provider,
+      twilioEnabled: twilio,
+    } = await resolveBackendState(resolvedMode);
     setDataSource(source);
     setDataSourceState(source);
     persistAiEnabled(ai);
     setAiEnabledState(ai);
     persistAiProvider(provider);
     setAiProviderState(provider);
+    persistTwilioEnabled(twilio);
+    setTwilioEnabledState(twilio);
 
     return true;
   };
@@ -230,28 +249,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem(AUTH_STORAGE_KEY);
     setMode(resolvedMode);
 
-    const { dataSource: source, aiEnabled: ai, aiProvider: provider } =
-      await resolveBackendState(resolvedMode);
+    const {
+      dataSource: source,
+      aiEnabled: ai,
+      aiProvider: provider,
+      twilioEnabled: twilio,
+    } = await resolveBackendState(resolvedMode);
     setDataSource(source);
     setDataSourceState(source);
     persistAiEnabled(ai);
     setAiEnabledState(ai);
     persistAiProvider(provider);
     setAiProviderState(provider);
+    persistTwilioEnabled(twilio);
+    setTwilioEnabledState(twilio);
 
     return true;
   };
 
-  const logout = () => {
+  const logout = async () => {
+    // QA H2 — End any active call (await Twilio Device destroy) BEFORE
+    // clearing auth state. Otherwise WebRTC keeps the mic hot after logout.
+    // Dynamic import avoids touching CallContext at module load.
+    try {
+      const { endActiveCallAsyncIfAny } = await import('./CallContext');
+      await endActiveCallAsyncIfAny();
+    } catch {
+      // best-effort
+    }
+    // Capture userId BEFORE clearing state so clearMode can wipe the
+    // per-user call sessionStorage key (QA H3).
+    const userIdForClear = user?.userId ?? null;
     setUser(null);
     setMember(null);
     setRole(null);
     setDataSourceState(null);
     setAiEnabledState(false);
     setAiProviderState(null);
+    setTwilioEnabledState(false);
     localStorage.removeItem(AUTH_STORAGE_KEY);
     localStorage.removeItem(MEMBER_AUTH_STORAGE_KEY);
-    clearMode();
+    clearMode(userIdForClear);
   };
 
   const hasPermission = (module: ModuleName, action: ActionType): boolean => {
@@ -289,6 +327,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         dataSource,
         aiEnabled,
         aiProvider,
+        twilioEnabled,
         login,
         memberLogin: memberLoginHandler,
         logout,

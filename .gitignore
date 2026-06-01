@@ -1,5 +1,6 @@
 # Operator-local files — never commit
 SSHDetails.md
+TechSales.config
 
 # OS / editor cruft
 .DS_Store

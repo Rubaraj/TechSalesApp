@@ -18,6 +18,8 @@ import { SearchInput } from '../../components/common/SearchInput';
 import { StatusBadge } from '../../components/common/StatusBadge';
 import { EmptyState } from '../../components/common/EmptyState';
 import { useAuth } from '../../context/AuthContext';
+import { PhoneButton } from '../../components/call/PhoneButton';
+import { formatPhoneUS } from '../../utils/phoneUtils';
 import type { Lead, LeadStatus } from '../../types';
 import { searchLeads, deleteLead, getAllLeads, type LeadFilters } from '../../services/leadService';
 import { calculateAge } from '../../utils/dateUtils';
@@ -188,15 +190,9 @@ export function LeadList() {
     });
   };
 
-  // Format phone
-  const formatPhone = (phone: string) => {
-    const cleaned = phone.replace(/\D/g, '');
-    const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
-    if (match) {
-      return `(${match[1]}) ${match[2]}-${match[3]}`;
-    }
-    return phone;
-  };
+  // Phase 2.5 — formatPhone hoisted to utils/phoneUtils. Local alias for
+  // any straggling callers in this large file.
+  const formatPhone = formatPhoneUS;
 
   return (
     <div className="p-6 space-y-6">
@@ -355,8 +351,14 @@ export function LeadList() {
               {/* Contact Info */}
               <div className="space-y-2 mb-4">
                 <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                  <Phone className="w-4 h-4 text-gray-400" />
-                  {formatPhone(lead.phone)}
+                  <Phone className="w-4 h-4 text-gray-400 shrink-0" />
+                  <span className="flex-1 truncate">{formatPhoneUS(lead.phone)}</span>
+                  <PhoneButton
+                    phone={lead.phone}
+                    leadId={lead.leadId}
+                    leadName={`${lead.firstName} ${lead.lastName}`}
+                    variant="primary"
+                  />
                 </div>
                 <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                   <Mail className="w-4 h-4 text-gray-400" />

@@ -25,6 +25,7 @@ import {
   chatHandler,
   aiStatsHandler,
 } from '../controllers/ai.controller.js';
+import { callRouter } from './call.routes.js';
 import { env } from '../config/env.js';
 
 export const aiRouter: Router = Router();
@@ -59,3 +60,6 @@ aiRouter.post('/search', asyncHandler(searchHandler));
 aiRouter.post('/compare', asyncHandler(compareHandler));
 aiRouter.post('/drug-coverage', asyncHandler(drugCoverageHandler));
 aiRouter.post('/chat', asyncHandler(chatHandler));
+
+// Phase 2 — Live Call Copilot (Twilio + Deepgram).
+aiRouter.use('/call', callRouter);

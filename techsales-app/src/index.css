@@ -206,3 +206,10 @@ input[type="date"]::-webkit-inner-spin-button,
 input[type="date"]::-webkit-clear-button {
   display: none;
 }
+
+/* QA H5 — Live Call Copilot waveform keyframes. Defined once here so the
+ * CallWaveform component doesn't re-inject a <style> tag on every render. */
+@keyframes callwave {
+  0%, 100% { transform: scaleY(0.25); }
+  50% { transform: scaleY(1); }
+}

@@ -9,6 +9,7 @@ import { enrollmentRouter } from './enrollment.routes.js';
 import { memberRouter } from './member.routes.js';
 import { targetRouter } from './target.routes.js';
 import { aiRouter } from './ai.routes.js';
+import { twilioRouter } from './twilio.routes.js';
 
 /**
  * Root API router — mounts all `/api/*` sub-routers.
@@ -26,3 +27,4 @@ apiRouter.use('/enrollments', enrollmentRouter);
 apiRouter.use('/members', memberRouter);
 apiRouter.use('/targets', targetRouter);
 apiRouter.use('/ai', aiRouter);
+apiRouter.use('/twilio', twilioRouter);

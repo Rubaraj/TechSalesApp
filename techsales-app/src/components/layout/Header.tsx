@@ -1,7 +1,10 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Sun, Moon, LogOut, User, Bell, LayoutDashboard, ShoppingBag, Settings, Database, FileJson, Cpu, Sparkles, Cloud } from 'lucide-react';
+import { Sun, Moon, LogOut, User, Bell, LayoutDashboard, ShoppingBag, Settings, Database, FileJson, Cpu, Sparkles, Cloud, Phone, PhoneOff } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
+import { useCallContext } from '../../context/CallContext';
+import { useTwilioEnabled } from '../../hooks/useTwilioEnabled';
+import { ActiveCallBadge } from '../call/ActiveCallBadge';
 import { getLogoByTheme } from '../../utils/logoUtils';
 
 // Routes that should highlight the Sales tab
@@ -25,6 +28,47 @@ export function Header() {
   const location = useLocation();
   const { resolvedTheme, toggleTheme, colorTheme } = useTheme();
   const { user, logout, dataSource, aiEnabled, aiProvider } = useAuth();
+  const { state: callState, startCall, setPanelOpen } = useCallContext();
+  const twilioOn = useTwilioEnabled();
+  const isAdminUser = user?.accessLevel === 'admin' || user?.isSuperAdmin;
+  // Show call UI only when the full Twilio + Deepgram pipeline is configured
+  // and the user is a sales agent. Web Speech fallback was removed —
+  // there's no half-functional mode left.
+  const showCallButton = twilioOn && !isAdminUser;
+
+  // Show End Call only when a real Twilio call leg is in flight — not the
+  // moment the panel opens in 'idle' (dialer-only) state. The agent shouldn't
+  // see "End Call" before they've placed a call.
+  const callInProgress =
+    callState.callStatus === 'connecting' ||
+    callState.callStatus === 'ringing' ||
+    callState.callStatus === 'connected' ||
+    callState.callStatus === 'ending';
+
+  // QA H1 — End Call must actually hang up Twilio (mic off, prospect dropped,
+  // billing stops), not just clear UI state. CallPanel's useTwilioCall listens
+  // for this event and awaits handle.destroy() then ends the CallContext.
+  // In Web Speech (browser-mic) mode there's no Twilio handle, so we fall
+  // back to a direct endCall().
+  // End Call dispatches the same DOM event the logout-flow uses; the single
+  // useTwilioCall hook in <CallRuntime/> listens and awaits handle.destroy()
+  // before ending the CallContext (so mic + WebRTC clean up first).
+  const onClickEnd = (): void => {
+    window.dispatchEvent(new CustomEvent('techsales:logout-end-call'));
+  };
+
+  // Dialer icon click: "show me the dialer/panel" — open it if no session is
+  // active, or re-expand it if the agent previously collapsed the panel.
+  // No-op when already open + active so it doesn't accidentally collapse a
+  // visible panel (the panel has its own collapse control).
+  const onClickDialer = (): void => {
+    if (!callState.isCallActive) {
+      startCall();
+    } else if (!callState.isCallPanelOpen) {
+      setPanelOpen(true);
+    }
+  };
+
 
   // Check if current path matches any sales routes
   const isSalesRoute = SALES_ROUTES.some(route => 
@@ -103,6 +147,44 @@ export function Header() {
             <Bell className="w-5 h-5 text-gray-600 dark:text-gray-300" />
             <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
           </button>
+
+          {/* Active-call badge — visible during a call, jumps back to panel. */}
+          <ActiveCallBadge />
+
+          {/* Dialer icon — always visible to sales agents when AI is enabled.
+              End Call button is rendered SEPARATELY below, only when a real
+              call leg is in flight. */}
+          {showCallButton && (
+            <button
+              type="button"
+              onClick={onClickDialer}
+              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              aria-label="Dialer"
+              title={
+                callInProgress
+                  ? 'Show the call panel'
+                  : callState.isCallActive
+                    ? 'Show the dialer panel'
+                    : 'Open dialer'
+              }
+            >
+              <Phone className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+            </button>
+          )}
+
+          {/* End Call — only visible during an actual in-flight call. */}
+          {showCallButton && callInProgress && (
+            <button
+              type="button"
+              onClick={onClickEnd}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition-colors"
+              aria-label="End call"
+              title="End the current call"
+            >
+              <PhoneOff className="w-4 h-4" />
+              <span className="hidden sm:inline">End Call</span>
+            </button>
+          )}
 
           {/* Theme toggle */}
           <button

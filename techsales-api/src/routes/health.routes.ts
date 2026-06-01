@@ -18,6 +18,8 @@ interface HealthPayload {
   aiEnabled: boolean;
   /** Active LLM provider — `ollama` (free, local) or `anthropic` (Claude). */
   aiProvider: 'ollama' | 'anthropic';
+  /** Phase 2 — whether Twilio+Deepgram call pipeline is configured + on. */
+  twilioEnabled: boolean;
 }
 
 /**
@@ -36,6 +38,7 @@ healthRouter.get('/', (_req: Request, res: Response<ServiceResponse<HealthPayloa
     uptimeSec: Math.floor((Date.now() - PROCESS_START) / 1000),
     aiEnabled: env.AI_ENABLED,
     aiProvider: env.AI_LLM_PROVIDER,
+    twilioEnabled: env.TWILIO_ENABLED,
   };
   res.json({ success: true, data: payload });
 });

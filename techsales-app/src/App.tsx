@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { CallProvider } from './context/CallContext';
 import { Layout } from './components/layout/Layout';
 import { Dashboard, Login, MemberLogin, NotFound, MemberDashboard, MemberPlanDetail, PreviousEnrollments } from './pages';
 import {
@@ -228,7 +229,9 @@ function App() {
     <BrowserRouter>
       <ThemeProvider>
         <AuthProvider>
-          <AppRoutes />
+          <CallProvider>
+            <AppRoutes />
+          </CallProvider>
         </AuthProvider>
       </ThemeProvider>
     </BrowserRouter>

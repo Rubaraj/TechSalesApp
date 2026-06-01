@@ -31,12 +31,15 @@ export interface DataAiState {
   dataSource: DataSource | null;
   aiEnabled: boolean;
   aiProvider: AiProvider | null;
+  /** Phase 2 — Twilio+Deepgram call pipeline configured. */
+  twilioEnabled: boolean;
 }
 
 const MODE_KEY = 'medhub-mode';
 const SOURCE_KEY = 'medhub-data-source';
 const AI_ENABLED_KEY = 'medhub-ai-enabled';
 const AI_PROVIDER_KEY = 'medhub-ai-provider';
+const TWILIO_ENABLED_KEY = 'medhub-twilio-enabled';
 
 // ---------- App mode ----------
 
@@ -118,14 +121,45 @@ export function setAiProvider(p: AiProvider | null): void {
   }
 }
 
+// ---------- Twilio enabled (server flag, mirrored from /api/health) ----------
+
+export function getTwilioEnabled(): boolean {
+  try {
+    const v =
+      typeof sessionStorage !== 'undefined'
+        ? sessionStorage.getItem(TWILIO_ENABLED_KEY)
+        : null;
+    return v === 'true';
+  } catch {
+    return false;
+  }
+}
+
+export function setTwilioEnabled(b: boolean): void {
+  try {
+    sessionStorage.setItem(TWILIO_ENABLED_KEY, b ? 'true' : 'false');
+  } catch {
+    // ignore
+  }
+}
+
 // ---------- Logout / clear ----------
 
-export function clearMode(): void {
+/**
+ * Clear session-scoped state on logout. Optionally clears the per-user call
+ * state key (`techsales:callState:${userId}`) — pass the current userId so
+ * the user's own call doesn't persist into a re-login (QA H3).
+ */
+export function clearMode(userId?: string | null): void {
   try {
     sessionStorage.removeItem(MODE_KEY);
     sessionStorage.removeItem(SOURCE_KEY);
     sessionStorage.removeItem(AI_ENABLED_KEY);
     sessionStorage.removeItem(AI_PROVIDER_KEY);
+    sessionStorage.removeItem(TWILIO_ENABLED_KEY);
+    if (userId) {
+      sessionStorage.removeItem(`techsales:callState:${userId}`);
+    }
   } catch {
     // ignore
   }
@@ -140,6 +174,7 @@ interface HealthResponse {
     mongoUp?: boolean;
     aiEnabled?: boolean;
     aiProvider?: 'ollama' | 'anthropic';
+    twilioEnabled?: boolean;
   };
 }
 
@@ -158,7 +193,8 @@ interface HealthResponse {
 export async function probeBackendMode(): Promise<DataAiState> {
   try {
     const res = await fetch('/api/health');
-    if (!res.ok) return { dataSource: null, aiEnabled: false, aiProvider: null };
+    if (!res.ok)
+      return { dataSource: null, aiEnabled: false, aiProvider: null, twilioEnabled: false };
     const body = (await res.json()) as HealthResponse;
     const mode = body.data?.mode;
     const dataSource =
@@ -166,8 +202,9 @@ export async function probeBackendMode(): Promise<DataAiState> {
     const aiEnabled = body.data?.aiEnabled === true;
     const provider = body.data?.aiProvider;
     const aiProvider = provider === 'ollama' || provider === 'anthropic' ? provider : null;
-    return { dataSource, aiEnabled, aiProvider };
+    const twilioEnabled = body.data?.twilioEnabled === true;
+    return { dataSource, aiEnabled, aiProvider, twilioEnabled };
   } catch {
-    return { dataSource: null, aiEnabled: false, aiProvider: null };
+    return { dataSource: null, aiEnabled: false, aiProvider: null, twilioEnabled: false };
   }
 }

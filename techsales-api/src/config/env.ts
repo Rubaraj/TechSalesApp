@@ -81,6 +81,43 @@ const envSchema = z.object({
   // Phase 6 — per-user/IP rate limiting on /api/ai/* (echo exempt).
   AI_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(30),
   AI_RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(300_000),
+
+  // ----- Phase 2 — Live Call Copilot: Twilio + Deepgram -----
+  // Master switch. When false, /api/ai/call/* returns 501 and the FE falls
+  // back to the Web Speech path. Twilio webhooks (/api/twilio/*) refuse to
+  // serve TwiML.
+  TWILIO_ENABLED: truthy.default(false),
+
+  // Twilio config — only required when TWILIO_ENABLED=true (asserted at boot).
+  TWILIO_ACCOUNT_SID: z.string().optional(),
+  TWILIO_AUTH_TOKEN: z.string().optional(),
+  TWILIO_API_KEY_SID: z.string().optional(),
+  TWILIO_API_KEY_SECRET: z.string().optional(),
+  TWILIO_TWIML_APP_SID: z.string().optional(),
+  TWILIO_OUTBOUND_CALLER_ID: z.string().optional(),
+
+  // Hard cap on a single call's duration. Enforced via TwiML <Dial timeLimit>
+  // and a server-side timer in the Media Stream WS receiver. Stops a stuck
+  // call from burning Twilio + Deepgram budget all weekend.
+  TWILIO_MAX_CALL_DURATION_SECONDS: z.coerce.number().int().positive().default(1800),
+
+  // Per-user daily Twilio-call minute budget. Refuses to mint new Voice
+  // Access Tokens once exceeded. Mirrors AI_MAX_DAILY_TOKENS pattern.
+  TWILIO_MAX_DAILY_CALL_MINUTES_PER_USER: z.coerce.number().int().positive().default(240),
+
+  // Dev escape hatch for X-Twilio-Signature verification. Module-asserted to
+  // be off when NODE_ENV === 'production' so a misconfigured prod boot fails
+  // loudly rather than silently disabling the webhook auth.
+  TWILIO_SKIP_VERIFY: truthy.default(false),
+
+  // Deepgram config.
+  DEEPGRAM_API_KEY: z.string().optional(),
+  DEEPGRAM_MODEL: z.string().default('nova-3'),
+  DEEPGRAM_LANGUAGE: z.string().default('en-US'),
+
+  // Public base URL the Pi tunnel exposes. Used for the TwiML <Stream url>
+  // and any callbacks that need a full URL. e.g. https://techsales-dev.example.com
+  PUBLIC_BASE_URL: z.string().optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);
@@ -93,6 +130,39 @@ if (!parsed.success) {
     // eslint-disable-next-line no-console
     console.error(`  - ${issue.path.join('.') || '(root)'}: ${issue.message}`);
   }
+  process.exit(1);
+}
+
+// Phase 2 — when TWILIO_ENABLED, required Twilio vars must be set. Fail at
+// boot rather than at the first call attempt. PUBLIC_BASE_URL + Deepgram are
+// also needed for any meaningful call but we surface a clearer message at
+// runtime if they're missing.
+const TWILIO_REQUIRED_KEYS = [
+  'TWILIO_ACCOUNT_SID',
+  'TWILIO_AUTH_TOKEN',
+  'TWILIO_API_KEY_SID',
+  'TWILIO_API_KEY_SECRET',
+  'TWILIO_TWIML_APP_SID',
+  'TWILIO_OUTBOUND_CALLER_ID',
+  'DEEPGRAM_API_KEY',
+  'PUBLIC_BASE_URL',
+] as const;
+if (parsed.data.TWILIO_ENABLED) {
+  const missing = TWILIO_REQUIRED_KEYS.filter((k) => !parsed.data[k]);
+  if (missing.length > 0) {
+    // eslint-disable-next-line no-console
+    console.error(
+      `[env] TWILIO_ENABLED=true but required vars missing: ${missing.join(', ')}`,
+    );
+    process.exit(1);
+  }
+}
+
+// Production must NEVER skip Twilio signature verification — module-level
+// assert so a misconfigured prod boot fails loudly.
+if (parsed.data.NODE_ENV === 'production' && parsed.data.TWILIO_SKIP_VERIFY) {
+  // eslint-disable-next-line no-console
+  console.error('[env] TWILIO_SKIP_VERIFY=true is not allowed in production');
   process.exit(1);
 }
 

@@ -23,6 +23,8 @@ import {
 import { Button, Badge } from '../../components/common';
 import { Tabs, TabPanel } from '../../components/common/Tabs';
 import { StatusBadge } from '../../components/common/StatusBadge';
+import { PhoneButton } from '../../components/call/PhoneButton';
+import { formatPhoneUS } from '../../utils/phoneUtils';
 import type { Lead, LeadStatus } from '../../types';
 import { getLeadById } from '../../services/leadService';
 import { getAllDrugs } from '../../services/drugService';
@@ -87,14 +89,8 @@ export function LeadDetail() {
     });
   };
 
-  const formatPhone = (phone: string) => {
-    const cleaned = phone.replace(/\D/g, '');
-    const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
-    if (match) {
-      return `(${match[1]}) ${match[2]}-${match[3]}`;
-    }
-    return phone;
-  };
+  // Phone formatting hoisted to utils/phoneUtils.ts (Phase 2.5).
+  // Use `formatPhoneUS` directly at call sites.
 
   if (isLoading) {
     return (
@@ -323,9 +319,17 @@ export function LeadDetail() {
             <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
               <Phone className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
-            <div>
+            <div className="min-w-0 flex-1">
               <p className="text-sm text-gray-500 dark:text-gray-400">Phone</p>
-              <p className="font-medium text-gray-900 dark:text-white">{formatPhone(lead.phone)}</p>
+              <div className="flex items-center gap-2">
+                <p className="font-medium text-gray-900 dark:text-white truncate">{formatPhoneUS(lead.phone)}</p>
+                <PhoneButton
+                  phone={lead.phone}
+                  leadId={lead.leadId}
+                  leadName={`${lead.firstName} ${lead.lastName}`}
+                  variant="primary"
+                />
+              </div>
             </div>
           </div>
         </div>

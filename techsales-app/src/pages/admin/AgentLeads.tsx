@@ -12,6 +12,8 @@ import { Button, Input, Select, Badge, Pagination } from '../../components/commo
 import { searchLeads } from '../../services/leadService';
 import { getUserById } from '../../services/userService';
 import type { Lead, LeadStatus } from '../../types';
+import { PhoneButton } from '../../components/call/PhoneButton';
+import { formatPhoneUS } from '../../utils/phoneUtils';
 
 const STATUS_OPTIONS = [
   { value: 'all', label: 'All Statuses' },
@@ -240,9 +242,15 @@ export function AgentLeads() {
                             </div>
                           )}
                           {lead.phone && (
-                            <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
-                              <Phone className="w-3 h-3" />
-                              <span>{lead.phone}</span>
+                            <div className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400">
+                              <Phone className="w-3 h-3 shrink-0" />
+                              <span className="flex-1 truncate">{formatPhoneUS(lead.phone)}</span>
+                              <PhoneButton
+                                phone={lead.phone}
+                                leadId={lead.leadId}
+                                leadName={`${lead.firstName} ${lead.lastName}`}
+                                variant="icon-only"
+                              />
                             </div>
                           )}
                         </div>

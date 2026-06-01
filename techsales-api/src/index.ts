@@ -9,6 +9,7 @@ import { bootstrapJsonStore } from './utils/bootstrap.js';
 import { requestLogger } from './middleware/requestLogger.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { apiRouter } from './routes/index.js';
+import { attachTwilioMediaStreamWs } from './ws/twilioMediaStream.ws.js';
 
 async function main(): Promise<void> {
   // 1. Decide the mode — ONE connection attempt; locked for process lifetime.
@@ -55,6 +56,12 @@ async function main(): Promise<void> {
       `Server listening on http://localhost:${env.PORT} (mode=${connectResult.mode})`,
     );
   });
+
+  // 5a. Phase 2 — attach the Twilio Media Streams WebSocket on the same HTTP
+  //     server. Only routes `/ws/twilio-media`. No-op for other upgrades.
+  if (env.TWILIO_ENABLED) {
+    attachTwilioMediaStreamWs(server);
+  }
 
   // 6. Graceful shutdown.
   const shutdown = (signal: string): void => {
