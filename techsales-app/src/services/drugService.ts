@@ -130,6 +130,28 @@ export const autocompleteDrugs = async (searchTerm: string): Promise<ServiceResp
   return { success: true, data: matches };
 };
 
+/**
+ * Phase 3b — Synchronous, case-insensitive EXACT-name lookup for the
+ * LeadForm AI auto-fill consumer. Matches against brandName, genericName,
+ * or drugLabelName. Returns the first match or null.
+ *
+ * Synchronous (no `delay()`) because it runs inside a useEffect during a
+ * live call and must complete in microseconds, not the 50-300ms artificial
+ * delay the other catalog functions use to mimic an HTTP round-trip.
+ */
+export const findDrugByName = (name: string): Drug | null => {
+  if (!name) return null;
+  const lower = name.trim().toLowerCase();
+  return (
+    drugs.find(
+      (d) =>
+        d.brandName.toLowerCase() === lower ||
+        d.genericName.toLowerCase() === lower ||
+        d.drugLabelName.toLowerCase() === lower,
+    ) ?? null
+  );
+};
+
 // Get drug classes
 export const getDrugClasses = async (): Promise<ServiceResponse<string[]>> => {
   await delay();

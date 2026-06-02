@@ -29,6 +29,14 @@ import { CallWaveform } from './CallWaveform';
 import { Dialer } from './Dialer';
 import { TranscriptBubble } from './TranscriptBubble';
 import { AudioDeviceSelector } from './AudioDeviceSelector';
+import { ComplianceAlert } from './ComplianceAlert';
+import { EntitySummary } from './EntitySummary';
+import { IncomingCallView } from './IncomingCallView';
+
+// Phase 3a — how long a dismissed compliance flag stays in the DOM (with
+// reduced opacity + line-through) before it filters out. Avoids the jarring
+// "alert vanishes mid-glance" UX.
+const COMPLIANCE_FADE_MS = 5_000;
 
 function formatDuration(ms: number): string {
   const totalSec = Math.max(0, Math.floor(ms / 1000));
@@ -64,6 +72,44 @@ export function CallPanel() {
     [now, state.callStartTime],
   );
 
+  // Phase 3a — dismissed compliance flags fade then filter. The reducer
+  // keeps them around (dismissed:true) so the timer can still see them; we
+  // hide locally once the fade window expires. callId is folded into the
+  // state so a new call wipes the set without needing a separate effect.
+  const [hiddenFlags, setHiddenFlags] = useState<{ callId: string | null; ids: Set<string> }>(() => ({
+    callId: null,
+    ids: new Set(),
+  }));
+  const activeHiddenIds = useMemo(
+    () => (hiddenFlags.callId === state.callId ? hiddenFlags.ids : new Set<string>()),
+    [hiddenFlags, state.callId],
+  );
+  useEffect(() => {
+    const timers: number[] = [];
+    for (const flag of state.complianceFlags) {
+      if (!flag.dismissed || activeHiddenIds.has(flag.id)) continue;
+      const t = window.setTimeout(() => {
+        setHiddenFlags((prev) => {
+          const sameCall = prev.callId === state.callId;
+          const ids = sameCall ? prev.ids : new Set<string>();
+          if (ids.has(flag.id)) return prev;
+          const next = new Set(ids);
+          next.add(flag.id);
+          return { callId: state.callId, ids: next };
+        });
+      }, COMPLIANCE_FADE_MS);
+      timers.push(t);
+    }
+    return () => {
+      for (const t of timers) window.clearTimeout(t);
+    };
+  }, [state.complianceFlags, state.callId, activeHiddenIds]);
+
+  const visibleComplianceFlags = useMemo(
+    () => state.complianceFlags.filter((f) => !activeHiddenIds.has(f.id)),
+    [state.complianceFlags, activeHiddenIds],
+  );
+
   if (!state.isCallActive) return null;
 
   const callInProgress =
@@ -77,7 +123,7 @@ export function CallPanel() {
   if (!state.isCallPanelOpen) {
     return (
       <aside
-        className="fixed top-16 right-0 bottom-0 w-12 z-30 flex flex-col items-center pt-3 gap-3 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 shadow-md"
+        className="fixed top-16 right-0 bottom-1/2 w-12 z-30 flex flex-col items-center pt-3 gap-3 bg-white dark:bg-gray-800 border-l border-b border-gray-200 dark:border-gray-700 shadow-md"
         aria-label="Call copilot (collapsed)"
       >
         <button
@@ -106,14 +152,20 @@ export function CallPanel() {
   }
 
   // ---- expanded panel ----
-  const showDialer = state.callStatus === 'idle';
+  // Phase 2.6 — three top-level modes: incoming ring, dialer (idle outbound),
+  // active call (post-accept or outbound connected).
+  const showIncomingRing =
+    state.direction === 'inbound' && state.callStatus === 'ringing';
+  const showDialer = state.callStatus === 'idle' && !showIncomingRing;
   const error = twilioCall.error;
 
-  const headerTitle = callInProgress
-    ? state.dialedNumber
-      ? `Call · ${state.dialedNumber}`
-      : 'Call in progress'
-    : 'Dialer';
+  const headerTitle = showIncomingRing
+    ? state.incomingCaller?.leadName ?? state.incomingCaller?.number ?? 'Incoming…'
+    : callInProgress
+      ? state.dialedNumber
+        ? `Call · ${state.dialedNumber}`
+        : 'Call in progress'
+      : 'Dialer';
 
   const handleEnd = (): void => {
     void twilioCall.hangup();
@@ -121,7 +173,8 @@ export function CallPanel() {
 
   return (
     <aside
-      className="fixed top-16 right-0 bottom-0 w-[380px] z-30 flex flex-col bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 shadow-xl"
+      className="fixed top-16 right-0 w-[380px] z-30 flex flex-col bg-white dark:bg-gray-800 border-l border-b border-gray-200 dark:border-gray-700 shadow-xl"
+      style={{ height: 'calc(50vh - 2rem)' }}
       aria-label="Call copilot"
     >
       {/* Header */}
@@ -168,8 +221,9 @@ export function CallPanel() {
           >
             <PanelRightClose className="w-4 h-4 text-gray-600 dark:text-gray-300" />
           </button>
-          {/* End button only when a real call leg exists. */}
-          {callInProgress && (
+          {/* End button only when a real call leg exists AND isn't an
+           *  inbound ring (the IncomingCallView owns Accept/Decline). */}
+          {callInProgress && !showIncomingRing && (
             <button
               onClick={handleEnd}
               className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-red-600 hover:bg-red-700 text-white text-xs font-medium transition-colors"
@@ -191,6 +245,9 @@ export function CallPanel() {
         </div>
       )}
 
+      {/* Phase 2.6 — Incoming-ring UI takes precedence over Dialer. */}
+      {showIncomingRing && <IncomingCallView />}
+
       {/* Dialer when idle; transcript otherwise. */}
       {showDialer && (
         <Dialer
@@ -200,10 +257,31 @@ export function CallPanel() {
         />
       )}
 
-      {!showDialer && (
+      {/* Phase 3a — Compliance alerts STICKY ABOVE the transcript. Highest-
+       *  priority surface; agent must see violations immediately. Capped
+       *  height so a long streak doesn't push the transcript fully off
+       *  screen — alerts scroll internally if needed. */}
+      {!showDialer && !showIncomingRing &&visibleComplianceFlags.length > 0 && (
+        <div
+          className="border-b border-red-200 dark:border-red-800/50 px-3 py-2 space-y-1.5 max-h-40 overflow-y-auto bg-red-50/50 dark:bg-red-900/10"
+          role="region"
+          aria-label="Compliance alerts"
+        >
+          {visibleComplianceFlags.map((flag) => (
+            <ComplianceAlert key={flag.id} flag={flag} />
+          ))}
+        </div>
+      )}
+
+      {/* Phase 4 — Transcript fills the call panel's remaining height.
+       *  The AI activity feed previously docked below the transcript is
+       *  GONE — Atlas (bottom 50% of the right edge) now surfaces those
+       *  events as in-chat system messages, so the call panel can give
+       *  full attention to the live diarized transcript. */}
+      {!showDialer && !showIncomingRing && (
         <div
           ref={transcriptRef}
-          className="flex-1 overflow-y-auto px-3 py-3 space-y-2"
+          className="flex-1 min-h-0 overflow-y-auto px-3 py-3 space-y-2"
           role="log"
           aria-live="polite"
           aria-label="Live transcript"
@@ -246,10 +324,8 @@ export function CallPanel() {
        *  internal `if (!audio) return null`. */}
       {isListening && <AudioDeviceSelector />}
 
-      {/* Phase 4: AI actions + info cards + compliance alerts */}
-      <div className="border-t border-gray-200 dark:border-gray-700 px-3 py-2 text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500">
-        AI actions — coming in Phase 3–4
-      </div>
+      {/* Phase 3a — Extracted entities (collapsed by default). */}
+      {!showDialer && !showIncomingRing &&<EntitySummary />}
     </aside>
   );
 }

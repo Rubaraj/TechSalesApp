@@ -14,6 +14,8 @@ import { verifyTwilioSignature } from '../middleware/verifyTwilioSignature.js';
 import {
   twilioVoiceWebhook,
   twilioStatusWebhook,
+  twilioIncomingWebhook,
+  twilioIncomingResultWebhook,
 } from '../controllers/twilio.controller.js';
 import { env } from '../config/env.js';
 
@@ -51,3 +53,9 @@ twilioRouter.use((_req, res, next) => {
 
 twilioRouter.post('/voice', verifyTwilioSignature, twilioVoiceWebhook);
 twilioRouter.post('/status', verifyTwilioSignature, twilioStatusWebhook);
+twilioRouter.post('/incoming', verifyTwilioSignature, twilioIncomingWebhook);
+twilioRouter.post(
+  '/incoming/result',
+  verifyTwilioSignature,
+  twilioIncomingResultWebhook,
+);

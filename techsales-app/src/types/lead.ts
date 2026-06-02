@@ -28,6 +28,9 @@ export interface Lead {
   taggedPharmacies: string[]; // Array of pharmacy IDs (max 3)
   taggedDrugs: TaggedDrug[];
   taggedProviders: string[]; // Array of provider IDs (max 5)
+  /** Phase 3b.1 — free-form notes captured during/after the call. AI post-
+   *  call summarizer appends categorized lines here. */
+  notes?: string;
   createdAt: string;
   createdBy: string;
   updatedAt?: string;

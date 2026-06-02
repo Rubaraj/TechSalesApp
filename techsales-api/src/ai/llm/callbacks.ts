@@ -22,7 +22,15 @@ export type AiInteractionKind =
   | 'search'
   | 'compare'
   | 'drug-coverage'
-  | 'chat';
+  | 'chat'
+  /** Phase 3a — written by callAnalysisAgent (stub provider) for each
+   *  notable event during a live call (compliance flag, info card surfaced,
+   *  entities extracted). Phase 3d's post-call summary aggregates these. */
+  | 'call_analysis'
+  /** Phase 4 — Atlas agentic copilot conversations. One audit row per agent
+   *  turn (user message → tool calls → final assistant message). Carries the
+   *  `userId` (agent) and prompt-cache token counts. */
+  | 'atlas';
 
 export interface ToolCallTrace {
   name: string;

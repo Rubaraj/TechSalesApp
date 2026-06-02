@@ -25,6 +25,13 @@ import {
   chatHandler,
   aiStatsHandler,
 } from '../controllers/ai.controller.js';
+import {
+  postAtlasChat,
+  getAtlasSession,
+  deleteAtlasSession,
+  postAtlasApproval,
+  getAtlasGreeting,
+} from '../controllers/atlas.controller.js';
 import { callRouter } from './call.routes.js';
 import { env } from '../config/env.js';
 
@@ -34,6 +41,14 @@ export const aiRouter: Router = Router();
 // regardless of whether AI is currently switched on. Pure aggregation over the
 // existing aiInteractions audit log.
 aiRouter.get('/stats', asyncHandler(aiStatsHandler));
+
+// Phase 4 — Atlas non-LLM endpoints (greeting, session load, approvals).
+// Mounted BEFORE the rate-limit + tokenCap chain so they remain responsive
+// even when an agent has burned through their daily token budget.
+aiRouter.get('/atlas/session/:userId', asyncHandler(getAtlasSession));
+aiRouter.delete('/atlas/session/:userId', asyncHandler(deleteAtlasSession));
+aiRouter.get('/atlas/greeting/:userId', asyncHandler(getAtlasGreeting));
+aiRouter.post('/atlas/approvals/:proposalId', asyncHandler(postAtlasApproval));
 
 aiRouter.use((_req: Request, res: Response, next: NextFunction) => {
   if (!env.AI_ENABLED) {
@@ -60,6 +75,9 @@ aiRouter.post('/search', asyncHandler(searchHandler));
 aiRouter.post('/compare', asyncHandler(compareHandler));
 aiRouter.post('/drug-coverage', asyncHandler(drugCoverageHandler));
 aiRouter.post('/chat', asyncHandler(chatHandler));
+
+// Phase 4 — Atlas chat (LLM-driven; gated by rate-limit + tokenCap above).
+aiRouter.post('/atlas/chat', asyncHandler(postAtlasChat));
 
 // Phase 2 — Live Call Copilot (Twilio + Deepgram).
 aiRouter.use('/call', callRouter);

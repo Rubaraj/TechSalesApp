@@ -22,12 +22,42 @@ export const getAllProviders = async (): Promise<ServiceResponse<Provider[]>> =>
 export const getProviderById = async (providerId: string): Promise<ServiceResponse<Provider>> => {
   await delay();
   const provider = providers.find(p => p.providerId === providerId && p.isActive);
-  
+
   if (!provider) {
     return { success: false, error: 'Provider not found' };
   }
-  
+
   return { success: true, data: provider };
+};
+
+/**
+ * Phase 3b.1 — Synchronous name lookup for the LeadForm AI auto-tag consumer.
+ * The backend emits `add_provider({providerName: 'Dr. Smith'})` from
+ * anchor-based extraction; we try to resolve the captured name against the
+ * 60-entry provider catalog by fuzzy (contains, case-insensitive) match on
+ * the providerName field. Returns null when no match — caller then emits
+ * a `catalog_miss` activity entry so the agent doesn't lose the info.
+ *
+ * If `zipCode` is provided, prefer a provider whose zipCode shares the first
+ * 3 digits.
+ */
+export const findProviderByName = (
+  name: string,
+  zipCode?: string,
+): Provider | null => {
+  if (!name) return null;
+  // Strip a leading "Dr. " / "Dr " before searching — catalog rows usually
+  // store names without the prefix.
+  const cleaned = name.replace(/^dr\.?\s+/i, '').trim().toLowerCase();
+  if (!cleaned) return null;
+  const matches = providers.filter(
+    (p) => p.isActive && (p.providerName ?? '').toLowerCase().includes(cleaned),
+  );
+  if (matches.length === 0) return null;
+  if (!zipCode || zipCode.length < 3) return matches[0];
+  const zipPrefix = zipCode.slice(0, 3);
+  const nearMatch = matches.find((p) => (p.zipCode ?? '').startsWith(zipPrefix));
+  return nearMatch ?? matches[0];
 };
 
 // Search providers

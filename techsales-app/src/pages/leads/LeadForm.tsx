@@ -1,15 +1,55 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, Save, Loader2, MapPin, Search, Building2, Pill, ChevronDown, User } from 'lucide-react';
 import { Button, Input, Select, Badge, DatePicker } from '../../components/common';
+import { AiChip } from '../../components/common/AiChip';
 import { PharmacySearch, DrugSearch, ProviderSearch } from '../../components/tagging';
 import { useAuth } from '../../context/AuthContext';
+import { useCallContext } from '../../context/CallContext';
 import type { Lead, LeadStatus, LeadSource, ZipStateCounty, TaggedDrug } from '../../types';
 import { getLeadById, createLead, updateLead } from '../../services/leadService';
 import { getLocationByZip, getCountiesByState } from '../../services/zipService';
 import { aiService } from '../../services/aiService';
+import { findDrugByName } from '../../services/drugService';
+import { findPharmacyByChainName } from '../../services/pharmacyService';
+import { findProviderByName } from '../../services/providerService';
 import { useAiEnabled } from '../../hooks/useAiEnabled';
 import { calculateAge } from '../../utils/dateUtils';
+
+// Phase 3b — yellow ring shown for ~2s on a freshly AI-filled field.
+const AI_RING_FADE_MS = 2_000;
+const AI_RING_CLASS = 'ring-2 ring-yellow-400 animate-pulse focus:ring-yellow-400';
+
+/**
+ * Phase 3b — Derive a 30-day-supply quantity from a parsed frequency string.
+ * Mirrors the canonical frequency forms emitted by the backend extractor.
+ * Returns 0 when frequency is missing or unrecognized so the agent fills in.
+ */
+function deriveQuantity(frequency: string | undefined): number {
+  if (!frequency) return 0;
+  switch (frequency) {
+    case 'Once daily':
+    case 'Every morning':
+    case 'Every night':
+      return 30;
+    case 'Twice daily':
+      return 60;
+    case 'Three times daily':
+      return 90;
+    case 'Four times daily':
+      return 120;
+    case 'Every other day':
+      return 15;
+    case 'Weekly':
+      return 4;
+    case 'Monthly':
+      return 1;
+    case 'As needed':
+      return 0;
+    default:
+      return 0;
+  }
+}
 
 const statusOptions = [
   { value: 'New Lead', label: 'New Lead' },
@@ -75,6 +115,7 @@ const initialFormData: FormData = {
 export function LeadForm() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const routerLocation = useLocation();
   const { user } = useAuth();
   const aiEnabled = useAiEnabled();
   const isEditing = Boolean(id);
@@ -83,6 +124,22 @@ export function LeadForm() {
   const [taggedPharmacies, setTaggedPharmacies] = useState<string[]>([]);
   const [taggedDrugs, setTaggedDrugs] = useState<TaggedDrug[]>([]);
   const [taggedProviders, setTaggedProviders] = useState<string[]>([]);
+
+  // Phase 3b — live-call AI auto-fill state.
+  // `aiRingActive` drives the 2-second yellow ring around freshly-filled inputs.
+  // `aiEverFilled` drives the persistent 'AI' chip badge — stays until the
+  //   agent edits the field, then is dropped (agent took ownership).
+  // Both are LOCAL to LeadForm and reset on unmount; CallContext owns no
+  // per-page UI state.
+  const [aiRingActive, setAiRingActive] = useState<Set<string>>(() => new Set());
+  const [aiEverFilled, setAiEverFilled] = useState<Set<string>>(() => new Set());
+  const {
+    state: callState,
+    registerPage,
+    unregisterPage,
+    consumeActionsByType,
+    appendActivity,
+  } = useCallContext();
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isLookingUpZip, setIsLookingUpZip] = useState(false);
@@ -119,7 +176,7 @@ export function LeadForm() {
             medicaidNumber: lead.medicaidId || '',
             status: lead.leadStatus,
             source: lead.source || 'Web',
-            notes: '', // Notes field doesn't exist in Lead interface
+            notes: lead.notes ?? '',
           });
           // Load tagged pharmacies and drugs
           setTaggedPharmacies(lead.taggedPharmacies || []);
@@ -318,6 +375,9 @@ export function LeadForm() {
       taggedPharmacies,
       taggedDrugs,
       taggedProviders,
+      // Phase 3b.1 — persist the notes field (Lead type extended; backend repos
+      // already passthrough; the form field was previously silently dropped).
+      notes: formData.notes || undefined,
     };
 
     let result;
@@ -344,6 +404,31 @@ export function LeadForm() {
     }
   };
 
+  // Phase 3b — mark a field as freshly AI-filled. Yellow ring fades after
+  // AI_RING_FADE_MS; the 'AI' chip persists in aiEverFilled until the agent
+  // edits the field.
+  const markAiFilled = useCallback((field: string): void => {
+    setAiRingActive((prev) => {
+      const next = new Set(prev);
+      next.add(field);
+      return next;
+    });
+    setAiEverFilled((prev) => {
+      if (prev.has(field)) return prev;
+      const next = new Set(prev);
+      next.add(field);
+      return next;
+    });
+    window.setTimeout(() => {
+      setAiRingActive((prev) => {
+        if (!prev.has(field)) return prev;
+        const next = new Set(prev);
+        next.delete(field);
+        return next;
+      });
+    }, AI_RING_FADE_MS);
+  }, []);
+
   // Handle input changes
   const handleChange = (field: keyof FormData, value: string | boolean) => {
     setFormData({ ...formData, [field]: value });
@@ -351,7 +436,194 @@ export function LeadForm() {
     if (errors[field]) {
       setErrors({});
     }
+    // Phase 3b — agent took ownership of this field; drop the AI chip.
+    setAiEverFilled((prev) => {
+      if (!prev.has(field as string)) return prev;
+      const next = new Set(prev);
+      next.delete(field as string);
+      return next;
+    });
   };
+
+  // Phase 3b — registerPage on mount, unregisterPage on unmount. The
+  // didMountOnceRef guard avoids React strict-mode's double-mount in dev
+  // wiping the page registration on the first mount cycle.
+  const didRegisterRef = useRef(false);
+  useEffect(() => {
+    if (didRegisterRef.current) return;
+    didRegisterRef.current = true;
+    registerPage({
+      route: routerLocation.pathname,
+      pageType: 'lead_form',
+      formFields: Object.keys(initialFormData),
+      capabilities: ['fill_field', 'add_drug'],
+    });
+    return () => {
+      didRegisterRef.current = false;
+      unregisterPage();
+    };
+    // routerLocation.pathname intentionally not a dep — we register once per
+    // mount, not on every nav inside the form. registerPage / unregisterPage
+    // are stable.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Phase 3b — consume AI actions from CallContext.pendingActions on every
+  // change. fill_field actions populate empty fields and mark them AI-filled;
+  // add_drug actions append the matching catalog entry. Idempotent — consumed
+  // actions move to actionLog, so this effect won't re-apply old fills.
+  useEffect(() => {
+    if (!callState.isCallActive) return;
+    if (callState.pendingActions.length === 0) return;
+
+    // 1) fill_field consumer.
+    const fillActions = consumeActionsByType('fill_field');
+    if (fillActions.length > 0) {
+      setFormData((prev) => {
+        let next = prev;
+        for (const action of fillActions) {
+          if (action.type !== 'fill_field') continue;
+          const field = action.field as keyof FormData;
+          // Empty-only rule: never overwrite. Booleans treat `false` as empty
+          // (the LeadForm default), which means an explicit unchecked box can
+          // be flipped to `true` by an AI action — acceptable trade-off.
+          const current = (next as unknown as Record<string, unknown>)[field as string];
+          const isEmpty =
+            current === '' ||
+            current === null ||
+            current === undefined ||
+            (typeof current === 'boolean' && current === false);
+          if (!isEmpty) continue;
+          // Per-field normalization to match the LeadForm's onChange shapes.
+          // Phone is stored as 10 digits (no +1); MBI is stored without dashes.
+          let normalized: string | boolean = action.value;
+          if (field === 'phone' && typeof normalized === 'string') {
+            normalized = normalized.replace(/\D/g, '').slice(-10);
+          }
+          if (field === 'mbi' && typeof normalized === 'string') {
+            normalized = normalized.replace(/-/g, '').toUpperCase();
+          }
+          next = { ...next, [field]: normalized };
+          markAiFilled(field as string);
+          // When zipCode is AI-filled, the existing handleZipLookup effect
+          // derives city/state/county next render; pre-emptively chip those
+          // fields too so the agent sees the provenance.
+          if (field === 'zipCode') {
+            markAiFilled('city');
+            markAiFilled('state');
+            markAiFilled('county');
+          }
+        }
+        return next;
+      });
+    }
+
+    // 2) add_drug consumer.
+    const drugActions = consumeActionsByType('add_drug');
+    if (drugActions.length > 0) {
+      setTaggedDrugs((prev) => {
+        let next = prev;
+        for (const action of drugActions) {
+          if (action.type !== 'add_drug') continue;
+          const drug = findDrugByName(action.drugName);
+          if (!drug) continue;
+          if (next.some((d) => d.drugId === drug.drugId)) continue;
+          // TaggedDrug — dosage / frequency come from the backend's anchor-
+          // window parse of the prospect's speech. Quantity is derived from
+          // frequency assuming a standard 30-day retail Part D supply.
+          const tagged: TaggedDrug = {
+            drugId: drug.drugId,
+            drugName: drug.brandName || drug.genericName || action.drugName,
+            dosage: action.dosage ?? '',
+            quantity: deriveQuantity(action.frequency),
+            frequency: action.frequency ?? '',
+            daysSupply: 30,
+          };
+          next = [...next, tagged];
+          markAiFilled(`drug:${drug.drugId}`);
+        }
+        return next;
+      });
+    }
+
+    // 3) Phase 3b.1 — add_pharmacy consumer. Resolve chainName → pharmacyId
+    // via the local catalog; on miss, log to activity feed as a warning.
+    const pharmacyActions = consumeActionsByType('add_pharmacy');
+    if (pharmacyActions.length > 0) {
+      setTaggedPharmacies((prev) => {
+        let next = prev;
+        for (const action of pharmacyActions) {
+          if (action.type !== 'add_pharmacy') continue;
+          const pharmacy = findPharmacyByChainName(action.pharmacyName, formData.zipCode);
+          if (!pharmacy) {
+            appendActivity({
+              id: crypto.randomUUID(),
+              timestamp: Date.now(),
+              kind: 'note',
+              icon: '⚠️',
+              text: `Pharmacy mentioned (not in catalog): ${action.pharmacyName}`,
+            });
+            continue;
+          }
+          if (next.includes(pharmacy.pharmacyId)) continue;
+          if (next.length >= 3) continue; // LeadForm cap
+          next = [...next, pharmacy.pharmacyId];
+          markAiFilled(`pharmacy:${pharmacy.pharmacyId}`);
+        }
+        return next;
+      });
+    }
+
+    // 4) Phase 3b.1 — add_provider consumer. Same shape as pharmacy.
+    const providerActions = consumeActionsByType('add_provider');
+    if (providerActions.length > 0) {
+      setTaggedProviders((prev) => {
+        let next = prev;
+        for (const action of providerActions) {
+          if (action.type !== 'add_provider') continue;
+          const provider = findProviderByName(action.providerName, formData.zipCode);
+          if (!provider) {
+            appendActivity({
+              id: crypto.randomUUID(),
+              timestamp: Date.now(),
+              kind: 'note',
+              icon: '⚠️',
+              text: `Provider mentioned (not in catalog): ${action.providerName}`,
+            });
+            continue;
+          }
+          if (next.includes(provider.providerId)) continue;
+          if (next.length >= 5) continue; // LeadForm cap
+          next = [...next, provider.providerId];
+          markAiFilled(`provider:${provider.providerId}`);
+        }
+        return next;
+      });
+    }
+
+    // 5) Phase 3b.1 — add_note consumer. APPEND, not replace. Each note is
+    // prefixed with its category for downstream parsing.
+    const noteActions = consumeActionsByType('add_note');
+    if (noteActions.length > 0) {
+      setFormData((prev) => {
+        let appended = prev.notes;
+        for (const action of noteActions) {
+          if (action.type !== 'add_note') continue;
+          const line = `[${action.category}] ${action.text}`;
+          appended = appended ? `${appended}\n${line}` : line;
+        }
+        return { ...prev, notes: appended };
+      });
+      markAiFilled('notes');
+    }
+  }, [
+    callState.pendingActions,
+    callState.isCallActive,
+    consumeActionsByType,
+    markAiFilled,
+    appendActivity,
+    formData.zipCode,
+  ]);
 
   if (isLoading) {
     return (
@@ -414,44 +686,68 @@ export function LeadForm() {
             Personal Information
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              label="First Name"
-              value={formData.firstName}
-              onChange={(e) => handleChange('firstName', e.target.value)}
-              error={hasAttemptedSubmit ? errors.firstName : undefined}
-              maxLength={15}
-              required
-            />
-            <Input
-              label="Last Name"
-              value={formData.lastName}
-              onChange={(e) => handleChange('lastName', e.target.value)}
-              error={hasAttemptedSubmit ? errors.lastName : undefined}
-              maxLength={15}
-              required
-            />
-            <Input
-              label="Email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => handleChange('email', e.target.value)}
-              error={hasAttemptedSubmit ? errors.email : undefined}
-              required
-            />
-            <Input
-              label="Phone"
-              type="tel"
-              value={formData.phone}
-              onChange={(e) => {
-                // Only allow digits, max 10
-                const digits = e.target.value.replace(/\D/g, '').slice(0, 10);
-                handleChange('phone', digits);
-              }}
-              error={hasAttemptedSubmit ? errors.phone : undefined}
-              placeholder="5555555555"
-              maxLength={10}
-              required
-            />
+            <div className="relative">
+              <Input
+                label="First Name"
+                value={formData.firstName}
+                onChange={(e) => handleChange('firstName', e.target.value)}
+                error={hasAttemptedSubmit ? errors.firstName : undefined}
+                maxLength={15}
+                required
+                className={aiRingActive.has('firstName') ? AI_RING_CLASS : ''}
+              />
+              {aiEverFilled.has('firstName') && (
+                <div className="absolute top-0 right-0"><AiChip /></div>
+              )}
+            </div>
+            <div className="relative">
+              <Input
+                label="Last Name"
+                value={formData.lastName}
+                onChange={(e) => handleChange('lastName', e.target.value)}
+                error={hasAttemptedSubmit ? errors.lastName : undefined}
+                maxLength={15}
+                required
+                className={aiRingActive.has('lastName') ? AI_RING_CLASS : ''}
+              />
+              {aiEverFilled.has('lastName') && (
+                <div className="absolute top-0 right-0"><AiChip /></div>
+              )}
+            </div>
+            <div className="relative">
+              <Input
+                label="Email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => handleChange('email', e.target.value)}
+                error={hasAttemptedSubmit ? errors.email : undefined}
+                required
+                className={aiRingActive.has('email') ? AI_RING_CLASS : ''}
+              />
+              {aiEverFilled.has('email') && (
+                <div className="absolute top-0 right-0"><AiChip /></div>
+              )}
+            </div>
+            <div className="relative">
+              <Input
+                label="Phone"
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => {
+                  // Only allow digits, max 10
+                  const digits = e.target.value.replace(/\D/g, '').slice(0, 10);
+                  handleChange('phone', digits);
+                }}
+                error={hasAttemptedSubmit ? errors.phone : undefined}
+                placeholder="5555555555"
+                maxLength={10}
+                required
+                className={aiRingActive.has('phone') ? AI_RING_CLASS : ''}
+              />
+              {aiEverFilled.has('phone') && (
+                <div className="absolute top-0 right-0"><AiChip /></div>
+              )}
+            </div>
             <DatePicker
               label="Date of Birth"
               value={formData.dateOfBirth}
@@ -516,7 +812,11 @@ export function LeadForm() {
                 placeholder="12345"
                 required
                 rightIcon={isLookingUpZip ? <Loader2 className="w-4 h-4 animate-spin text-orange-500" /> : <Search className="w-4 h-4" />}
+                className={aiRingActive.has('zipCode') ? AI_RING_CLASS : ''}
               />
+              {aiEverFilled.has('zipCode') && (
+                <div className="absolute top-0 right-0"><AiChip /></div>
+              )}
               {/* Multi-county selection dropdown */}
               {zipSuggestions.length > 1 && isMultiCountyZip && (
                 <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-48 overflow-y-auto">
@@ -539,13 +839,19 @@ export function LeadForm() {
                 </div>
               )}
             </div>
-            <Input
-              label="City"
-              value={formData.city}
-              onChange={(e) => handleChange('city', e.target.value)}
-              error={hasAttemptedSubmit ? errors.city : undefined}
-              required
-            />
+            <div className="relative">
+              <Input
+                label="City"
+                value={formData.city}
+                onChange={(e) => handleChange('city', e.target.value)}
+                error={hasAttemptedSubmit ? errors.city : undefined}
+                required
+                className={aiRingActive.has('city') ? AI_RING_CLASS : ''}
+              />
+              {aiEverFilled.has('city') && (
+                <div className="absolute top-0 right-0"><AiChip /></div>
+              )}
+            </div>
             <div className="relative">
               <Input
                 label="State"
@@ -554,12 +860,15 @@ export function LeadForm() {
                 error={hasAttemptedSubmit ? errors.state : undefined}
                 placeholder="e.g. NY, CA, TX"
                 required
+                className={aiRingActive.has('state') ? AI_RING_CLASS : ''}
               />
-              {formData.state && (
+              {aiEverFilled.has('state') ? (
+                <div className="absolute top-0 right-0"><AiChip /></div>
+              ) : formData.state ? (
                 <div className="absolute right-3 top-9 text-xs text-green-600 dark:text-green-400">
                   ✓ Auto-filled
                 </div>
-              )}
+              ) : null}
             </div>
             <div className="relative">
               {countyOptions.length > 1 ? (
@@ -589,13 +898,16 @@ export function LeadForm() {
                   value={formData.county}
                   onChange={(e) => handleChange('county', e.target.value)}
                   placeholder="Auto-filled from zip code"
+                  className={aiRingActive.has('county') ? AI_RING_CLASS : ''}
                 />
               )}
-              {formData.county && countyOptions.length <= 1 && (
+              {aiEverFilled.has('county') ? (
+                <div className="absolute top-0 right-0"><AiChip /></div>
+              ) : formData.county && countyOptions.length <= 1 ? (
                 <div className="absolute right-3 top-9 text-xs text-green-600 dark:text-green-400">
                   ✓ Auto-filled
                 </div>
-              )}
+              ) : null}
             </div>
           </div>
         </div>
@@ -606,12 +918,18 @@ export function LeadForm() {
             Medicare Information
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              label="MBI (Medicare Beneficiary Identifier)"
-              value={formData.mbi}
-              onChange={(e) => handleChange('mbi', e.target.value)}
-              placeholder="1EG4-TE5-MK72"
-            />
+            <div className="relative">
+              <Input
+                label="MBI (Medicare Beneficiary Identifier)"
+                value={formData.mbi}
+                onChange={(e) => handleChange('mbi', e.target.value)}
+                placeholder="1EG4-TE5-MK72"
+                className={aiRingActive.has('mbi') ? AI_RING_CLASS : ''}
+              />
+              {aiEverFilled.has('mbi') && (
+                <div className="absolute top-0 right-0"><AiChip /></div>
+              )}
+            </div>
             <DatePicker
               label="Part A Effective Date"
               value={formData.partAEffectiveDate}
@@ -622,31 +940,43 @@ export function LeadForm() {
               value={formData.partBEffectiveDate}
               onChange={(date) => handleChange('partBEffectiveDate', date)}
             />
-            <Input
-              label="Medicaid Number"
-              value={formData.medicaidNumber}
-              onChange={(e) => handleChange('medicaidNumber', e.target.value)}
-            />
+            <div className="relative">
+              <Input
+                label="Medicaid Number"
+                value={formData.medicaidNumber}
+                onChange={(e) => handleChange('medicaidNumber', e.target.value)}
+                className={aiRingActive.has('medicaidNumber') ? AI_RING_CLASS : ''}
+              />
+              {aiEverFilled.has('medicaidNumber') && (
+                <div className="absolute top-0 right-0"><AiChip /></div>
+              )}
+            </div>
             <div className="md:col-span-2 flex flex-wrap gap-6">
               <label className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={formData.isDualEligible}
                   onChange={(e) => handleChange('isDualEligible', e.target.checked)}
-                  className="w-5 h-5 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+                  className={`w-5 h-5 rounded border-gray-300 text-orange-600 focus:ring-orange-500 ${
+                    aiRingActive.has('isDualEligible') ? AI_RING_CLASS : ''
+                  }`}
                 />
                 <span className="text-gray-700 dark:text-gray-300">Dual Eligible (Medicare + Medicaid)</span>
                 {formData.isDualEligible && <Badge variant="warning">Dual</Badge>}
+                {aiEverFilled.has('isDualEligible') && <AiChip />}
               </label>
               <label className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={formData.isLISEligible}
                   onChange={(e) => handleChange('isLISEligible', e.target.checked)}
-                  className="w-5 h-5 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+                  className={`w-5 h-5 rounded border-gray-300 text-orange-600 focus:ring-orange-500 ${
+                    aiRingActive.has('isLISEligible') ? AI_RING_CLASS : ''
+                  }`}
                 />
                 <span className="text-gray-700 dark:text-gray-300">LIS Eligible (Low Income Subsidy)</span>
                 {formData.isLISEligible && <Badge variant="info">LIS</Badge>}
+                {aiEverFilled.has('isLISEligible') && <AiChip />}
               </label>
             </div>
           </div>
@@ -707,14 +1037,19 @@ export function LeadForm() {
 
         {/* Notes */}
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            Notes
-          </h2>
+          <div className="flex items-center gap-2 mb-4">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              Notes
+            </h2>
+            {aiEverFilled.has('notes') && <AiChip />}
+          </div>
           <textarea
             value={formData.notes}
             onChange={(e) => handleChange('notes', e.target.value)}
-            rows={4}
-            className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            rows={6}
+            className={`w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500 ${
+              aiRingActive.has('notes') ? AI_RING_CLASS : ''
+            }`}
             placeholder="Add any additional notes about this lead..."
           />
         </div>

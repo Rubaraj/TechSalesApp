@@ -22,13 +22,34 @@
  */
 import { createContext, useContext, useEffect, useRef, type ReactNode } from 'react';
 import { useCallContext } from '../../context/CallContext';
+import { useAuth } from '../../context/AuthContext';
 import { useTwilioCall, type UseTwilioCallResult } from '../../hooks/useTwilioCall';
+import { startHeartbeat } from '../../services/presenceService';
 
 const CallRuntimeContext = createContext<UseTwilioCallResult | null>(null);
 
 export function CallRuntime({ children }: { children?: ReactNode }) {
   const { state, clearPendingDial } = useCallContext();
+  const { user } = useAuth();
   const twilioCall = useTwilioCall();
+
+  // Phase 2.6 — presence heartbeat. Starts once the Device is registered
+  // (so we only declare presence when the agent is actually reachable for
+  // inbound calls). `getInCall` is a closure over a ref-shadowed view of
+  // state so the heartbeat reports current state without re-subscribing
+  // every render.
+  const inCallRef = useRef<boolean>(false);
+  inCallRef.current =
+    state.isCallActive && state.callStatus !== 'idle';
+  useEffect(() => {
+    if (!twilioCall.isReady) return;
+    if (!user?.userId) return;
+    const handle = startHeartbeat({
+      userId: user.userId,
+      getInCall: () => inCallRef.current,
+    });
+    return () => handle.stop();
+  }, [twilioCall.isReady, user?.userId]);
 
   // QA H4 — track the currently in-flight dial so a duplicate pendingDial
   // transition for the same `to` is a no-op, and a *different* `to`

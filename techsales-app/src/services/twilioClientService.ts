@@ -23,6 +23,10 @@ export interface TwilioClientHandle {
   /** Place an outbound call. Returns the Call object so the caller can wire
    *  call-level event handlers (e.g. listen for `accept` → callSid). */
   dial: (to: string) => Promise<TwilioCall>;
+  /** Phase 2.6 — Mark an externally-managed call (i.e. an inbound `Call`
+   *  obtained from `device.on('incoming')` then `.accept()`'d) as the active
+   *  call so `setMute` / `destroy` semantics apply. Idempotent. */
+  attachCall: (call: TwilioCall) => void;
   /** Disconnect any active call(s) and destroy the Device. Idempotent. */
   destroy: () => Promise<void>;
   /** Mute the agent's outgoing audio. */
@@ -43,7 +47,7 @@ interface TwilioDeviceEventMap {
   registered: () => void;
   unregistered: () => void;
   error: (err: { code?: number; message: string }) => void;
-  /** Inbound call (we don't use in Phase 2). */
+  /** Inbound call — Phase 2.6 routes this to CallContext via useTwilioCall. */
   incoming: (call: TwilioCall) => void;
 }
 
@@ -84,6 +88,12 @@ export async function initTwilioDevice(
         if (activeCall === call) activeCall = null;
       });
       return call;
+    },
+    attachCall(call: TwilioCall): void {
+      activeCall = call;
+      call.on('disconnect', () => {
+        if (activeCall === call) activeCall = null;
+      });
     },
     async destroy(): Promise<void> {
       try {

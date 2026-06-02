@@ -20,12 +20,14 @@ import {
   untagDrug,
   tagProvider,
   untagProvider,
+  lookupLeadByPhone,
 } from '../controllers/lead.controller.js';
 
 export const leadRouter: Router = Router();
 
 leadRouter.get('/search', asyncHandler(searchLeads));
 leadRouter.get('/autocomplete', asyncHandler(autocompleteLeads));
+leadRouter.get('/lookup-by-phone', asyncHandler(lookupLeadByPhone));
 leadRouter.get('/', asyncHandler(getAllLeads));
 leadRouter.post('/', asyncHandler(createLead));
 leadRouter.get('/:id', asyncHandler(getLeadById));

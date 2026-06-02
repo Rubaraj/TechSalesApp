@@ -56,6 +56,10 @@ const leadSchema = new Schema<Lead>(
     taggedPharmacies: { type: [String], default: [] },
     taggedDrugs: { type: [taggedDrugSchema], default: [] },
     taggedProviders: { type: [String], default: [] },
+    // Phase 3b.1 — notes textarea. AI post-call summarizer appends here.
+    notes: { type: String },
+    // Phase 4 (M1) — Atlas "my pipeline" filter. Backfilled from createdBy.
+    assignedTo: { type: String, index: true },
     createdAt: { type: String, required: true },
     createdBy: { type: String, required: true },
     updatedAt: { type: String },
@@ -88,6 +92,7 @@ const leadSchema = new Schema<Lead>(
 leadSchema.index({ leadStatus: 1 });
 leadSchema.index({ state: 1, county: 1 });
 leadSchema.index({ createdBy: 1 });
+leadSchema.index({ assignedTo: 1 });
 
 export type LeadDoc = HydratedDocument<Lead>;
 

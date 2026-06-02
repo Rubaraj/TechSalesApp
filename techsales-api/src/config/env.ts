@@ -50,16 +50,25 @@ const envSchema = z.object({
   // Master switch. When false, /api/ai/* returns 501 AI_DISABLED.
   AI_ENABLED: truthy.default(true),
 
+  // Phase 4 — Atlas agentic copilot master switch. When false, /api/ai/atlas/*
+  // returns 501 ATLAS_DISABLED. Independent of AI_ENABLED so admins can keep
+  // member-facing chat while turning off the internal copilot.
+  ATLAS_ENABLED: truthy.default(true),
+
   // Phase 7 — LLM provider switch. Default 'ollama' (free, local). Flip to
   // 'anthropic' when the user has Console credits. The same getChatModel()
   // factory dispatches; agent code is unchanged.
-  AI_LLM_PROVIDER: z.enum(['ollama', 'anthropic']).default('ollama'),
+  AI_LLM_PROVIDER: z.enum(['ollama', 'anthropic', 'stub']).default('ollama'),
 
   // Anthropic config (only required when AI_LLM_PROVIDER='anthropic').
   ANTHROPIC_API_KEY: z.string().optional(),
   AI_MODEL_DEFAULT: z.string().default('claude-sonnet-4-6'),
   AI_MODEL_PREMIUM: z.string().default('claude-opus-4-7'),
   AI_MAX_DAILY_TOKENS: z.coerce.number().int().nonnegative().default(5_000_000),
+
+  // Phase 4 — per-user daily token cap (Atlas-scoped; protects the $50 POC
+  // budget). 100k tokens/day @ Haiku ≈ $1/user/day max.
+  AI_MAX_DAILY_TOKENS_PER_USER: z.coerce.number().int().nonnegative().default(100_000),
 
   // Ollama config (chat models — used when AI_LLM_PROVIDER='ollama').
   // Default chat + premium chat are both qwen2.5:7b — bump premium to

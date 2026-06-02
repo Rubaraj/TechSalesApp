@@ -38,6 +38,30 @@ export class JsonLeadRepository implements IRepository<Lead> {
     return store.get().find((l) => l.leadId === leadId) ?? null;
   }
 
+  /** Phase 2.6 — Match by trailing 10 digits to bridge stored format variance. */
+  async findByPhone(phoneE164OrRaw: string): Promise<Lead | null> {
+    const matches = await this.findAllByPhone(phoneE164OrRaw);
+    return matches[0] ?? null;
+  }
+
+  /** Phase 4 (M1) — Atlas needs all phone matches for inbound routing. */
+  async findAllByPhone(phoneE164OrRaw: string): Promise<Lead[]> {
+    const last10 = phoneE164OrRaw.replace(/\D/g, '').slice(-10);
+    if (last10.length !== 10) return [];
+    const store = await this.getStore();
+    return store
+      .get()
+      .filter((l) => (l.phone ?? '').replace(/\D/g, '').slice(-10) === last10);
+  }
+
+  /** Phase 4 (M1) — Atlas "my pipeline" agent-owned filter. */
+  async findByAssignedTo(userId: string): Promise<Lead[]> {
+    const store = await this.getStore();
+    return store
+      .get()
+      .filter((l) => (l.assignedTo ?? l.createdBy) === userId);
+  }
+
   async search(params: SearchParams<Lead>): Promise<Paginated<Lead>> {
     const store = await this.getStore();
     let items = [...store.get()];

@@ -28,7 +28,7 @@ export function Header() {
   const location = useLocation();
   const { resolvedTheme, toggleTheme, colorTheme } = useTheme();
   const { user, logout, dataSource, aiEnabled, aiProvider } = useAuth();
-  const { state: callState, startCall, setPanelOpen } = useCallContext();
+  const { state: callState, startCall, setPanelOpen, endCall } = useCallContext();
   const twilioOn = useTwilioEnabled();
   const isAdminUser = user?.accessLevel === 'admin' || user?.isSuperAdmin;
   // Show call UI only when the full Twilio + Deepgram pipeline is configured
@@ -57,14 +57,24 @@ export function Header() {
     window.dispatchEvent(new CustomEvent('techsales:logout-end-call'));
   };
 
-  // Dialer icon click: "show me the dialer/panel" — open it if no session is
-  // active, or re-expand it if the agent previously collapsed the panel.
-  // No-op when already open + active so it doesn't accidentally collapse a
-  // visible panel (the panel has its own collapse control).
+  // Dialer icon click — TOGGLE behavior:
+  //   - No session active: open a fresh dialer session.
+  //   - Session active + dialer in idle state: end the session (closes the panel).
+  //   - Session active + actively on a call: re-expand the collapsed panel
+  //     instead of ending the call (safer; agent must explicitly hang up).
   const onClickDialer = (): void => {
     if (!callState.isCallActive) {
       startCall();
-    } else if (!callState.isCallPanelOpen) {
+      return;
+    }
+    // Session is active.
+    if (callState.callStatus === 'idle') {
+      // Just the empty dialer is showing — second click closes it.
+      endCall();
+      return;
+    }
+    // On a real call leg — restore the panel if collapsed; do NOT auto-hang-up.
+    if (!callState.isCallPanelOpen) {
       setPanelOpen(true);
     }
   };

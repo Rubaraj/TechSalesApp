@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CallProvider } from './context/CallContext';
+import { AtlasProvider } from './context/AtlasContext';
 import { Layout } from './components/layout/Layout';
 import { Dashboard, Login, MemberLogin, NotFound, MemberDashboard, MemberPlanDetail, PreviousEnrollments } from './pages';
 import {
@@ -230,7 +231,9 @@ function App() {
       <ThemeProvider>
         <AuthProvider>
           <CallProvider>
-            <AppRoutes />
+            <AtlasProvider>
+              <AppRoutes />
+            </AtlasProvider>
           </CallProvider>
         </AuthProvider>
       </ThemeProvider>

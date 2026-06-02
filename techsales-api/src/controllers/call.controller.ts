@@ -168,6 +168,18 @@ export async function getCallAnalyzeStream(req: Request, res: Response): Promise
     if (busEvent.type === 'error') {
       const wireEvent: CallStreamEvent = { type: 'error', error: busEvent.error };
       writeEvent(wireEvent);
+      return;
+    }
+    // Phase 3a — callAnalysisAgent events.
+    if (busEvent.type === 'actions') {
+      const wireEvent: CallStreamEvent = { type: 'actions', actions: busEvent.actions };
+      writeEvent(wireEvent);
+      return;
+    }
+    if (busEvent.type === 'entities') {
+      const wireEvent: CallStreamEvent = { type: 'entities', entities: busEvent.entities };
+      writeEvent(wireEvent);
+      return;
     }
   });
 

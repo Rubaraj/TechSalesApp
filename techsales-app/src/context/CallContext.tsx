@@ -21,15 +21,33 @@ import {
 import type {
   AiAction,
   AiActionType,
+  AiActivityEntry,
   CallMode,
   CallState,
   CallStatus,
   ComplianceFlag,
   ExtractedEntities,
+  IncomingCaller,
   InfoCard,
   PageRegistration,
+  StampedAiAction,
   TranscriptChunk,
 } from '../types/call';
+
+// Phase 3b — cap the action queues so a long call with no consumer mounted
+// doesn't accumulate unbounded. Drop-oldest when over the cap.
+const MAX_PENDING_ACTIONS = 200;
+const MAX_ACTION_LOG = 200;
+// Phase 3b.1 — AI activity feed cap. 100 entries is roughly 10 minutes of
+// brisk AI activity; drop-oldest beyond that.
+const MAX_AI_ACTIVITY = 100;
+
+function newActionId(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
 import { initialCallState } from '../types/call';
 import { useAuth } from './AuthContext';
 import { addRecent } from '../services/recentCalls';
@@ -80,6 +98,8 @@ type Action =
   | { kind: 'SET_DIALED_NUMBER'; number: string | null }
   | { kind: 'SET_PENDING_DIAL'; to: string }
   | { kind: 'CLEAR_PENDING_DIAL' }
+  | { kind: 'INCOMING_RINGING'; caller: IncomingCaller; leadId: string | null }
+  | { kind: 'INCOMING_ACCEPTED' }
   | { kind: 'APPEND_TRANSCRIPT'; chunk: TranscriptChunk }
   | { kind: 'MERGE_ENTITIES'; entities: Partial<ExtractedEntities> }
   | { kind: 'ENQUEUE_ACTIONS'; actions: AiAction[] }
@@ -89,6 +109,7 @@ type Action =
   | { kind: 'DISMISS_COMPLIANCE'; id: string }
   | { kind: 'REGISTER_PAGE'; registration: PageRegistration }
   | { kind: 'UNREGISTER_PAGE' }
+  | { kind: 'APPEND_ACTIVITY'; entry: AiActivityEntry }
   | { kind: 'HYDRATE'; state: CallState };
 
 function reducer(state: CallState, action: Action): CallState {
@@ -131,6 +152,34 @@ function reducer(state: CallState, action: Action): CallState {
       return { ...state, pendingDial: action.to };
     case 'CLEAR_PENDING_DIAL':
       return { ...state, pendingDial: null };
+    case 'INCOMING_RINGING': {
+      // Phase 2.6 — replace any idle state with an inbound ringing call.
+      // The Twilio Device fires `incoming` before any other call could have
+      // started; defensively reset the slice fresh, then open the panel.
+      const callId = `call_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+      return {
+        ...initialCallState(),
+        isCallActive: true,
+        isCallPanelOpen: true,
+        callId,
+        leadId: action.leadId,
+        callStartTime: Date.now(),
+        mode: 'twilio',
+        callStatus: 'ringing',
+        direction: 'inbound',
+        dialedNumber: action.caller.number,
+        incomingCaller: action.caller,
+        currentPage: state.currentPage,
+      };
+    }
+    case 'INCOMING_ACCEPTED':
+      // Transition from ring UI to live transcript UI. Clear incomingCaller
+      // so CallPanel falls through to the normal connected layout.
+      return {
+        ...state,
+        callStatus: 'connected',
+        incomingCaller: null,
+      };
     case 'APPEND_TRANSCRIPT': {
       // Dedupe by id: Deepgram emits multiple events per utterance (interim
       // refinements + final), all sharing the same `start`-based id. Replace
@@ -153,20 +202,34 @@ function reducer(state: CallState, action: Action): CallState {
         ...state,
         extractedEntities: { ...state.extractedEntities, ...action.entities },
       };
-    case 'ENQUEUE_ACTIONS':
-      return {
-        ...state,
-        pendingActions: [...state.pendingActions, ...action.actions],
-      };
+    case 'ENQUEUE_ACTIONS': {
+      // Phase 3b — stamp each new action with a stable _id so CONSUME_ACTIONS
+      // can match by id (not by positional index, which drifts when two
+      // consumers run between batches). Cap the queue length.
+      const stamped: StampedAiAction[] = action.actions.map((a) => ({
+        ...a,
+        _id: newActionId(),
+      }));
+      const merged = [...state.pendingActions, ...stamped];
+      const trimmed =
+        merged.length > MAX_PENDING_ACTIONS
+          ? merged.slice(merged.length - MAX_PENDING_ACTIONS)
+          : merged;
+      return { ...state, pendingActions: trimmed };
+    }
     case 'CONSUME_ACTIONS': {
-      // Move matching actions from pendingActions → actionLog.
+      // Move matching actions from pendingActions → actionLog. Match by
+      // stable _id, not positional index.
       const idSet = new Set(action.ids);
-      const consumed = state.pendingActions.filter((_, i) => idSet.has(String(i)));
-      const remaining = state.pendingActions.filter((_, i) => !idSet.has(String(i)));
+      const consumed = state.pendingActions.filter((a) => idSet.has(a._id));
+      const remaining = state.pendingActions.filter((a) => !idSet.has(a._id));
+      const log = [...state.actionLog, ...consumed];
+      const trimmedLog =
+        log.length > MAX_ACTION_LOG ? log.slice(log.length - MAX_ACTION_LOG) : log;
       return {
         ...state,
         pendingActions: remaining,
-        actionLog: [...state.actionLog, ...consumed],
+        actionLog: trimmedLog,
       };
     }
     case 'ADD_INFO_CARD':
@@ -187,6 +250,16 @@ function reducer(state: CallState, action: Action): CallState {
       return { ...state, currentPage: action.registration };
     case 'UNREGISTER_PAGE':
       return { ...state, currentPage: null };
+    case 'APPEND_ACTIVITY': {
+      // Phase 3b.1 — append a new activity entry; cap at MAX_AI_ACTIVITY
+      // by dropping the oldest. (Reducer-level cap so no consumer can leak.)
+      const merged = [...state.aiActivityLog, action.entry];
+      const trimmed =
+        merged.length > MAX_AI_ACTIVITY
+          ? merged.slice(merged.length - MAX_AI_ACTIVITY)
+          : merged;
+      return { ...state, aiActivityLog: trimmed };
+    }
     case 'HYDRATE':
       return action.state;
     default:
@@ -219,6 +292,11 @@ export interface CallContextValue {
   // via useEffect and hands to useTwilioCall.dial().
   dialNumber: (input: DialNumberInput) => void;
   clearPendingDial: () => void;
+  // Phase 2.6 — inbound call lifecycle. Producer (`useTwilioCall`'s
+  // device.on('incoming')) calls `setIncomingRinging`; the IncomingCallView
+  // calls the accept/reject helpers which are wired in CallRuntime.
+  setIncomingRinging: (caller: IncomingCaller, leadId: string | null) => void;
+  setIncomingAccepted: () => void;
   // Phase 2/3 surface — wired now so consumers can import the types but the
   // implementations are pass-throughs to the reducer; they become meaningful
   // once the SSE client and page-registration code lands.
@@ -230,6 +308,9 @@ export interface CallContextValue {
   dismissComplianceFlag: (id: string) => void;
   registerPage: (registration: PageRegistration) => void;
   unregisterPage: () => void;
+  // Phase 3b.1 — append an entry to the AI activity feed surfaced in the
+  // CallPanel's bottom half. Producer is `useCallAnalysis`.
+  appendActivity: (entry: AiActivityEntry) => void;
 }
 
 const CallContext = createContext<CallContextValue | null>(null);
@@ -420,6 +501,16 @@ export function CallProvider({ children }: { children: ReactNode }): React.JSX.E
     dispatch({ kind: 'CLEAR_PENDING_DIAL' });
   }, []);
 
+  const setIncomingRinging = useCallback(
+    (caller: IncomingCaller, leadId: string | null) =>
+      dispatch({ kind: 'INCOMING_RINGING', caller, leadId }),
+    [],
+  );
+  const setIncomingAccepted = useCallback(
+    () => dispatch({ kind: 'INCOMING_ACCEPTED' }),
+    [],
+  );
+
 
   // Phase 2/3 stubs — wire to the reducer so types stay honest. No
   // behavioural effect in Phase 1 since no producer calls them.
@@ -434,14 +525,18 @@ export function CallProvider({ children }: { children: ReactNode }): React.JSX.E
   );
   const consumeActionsByType = useCallback(
     (type: AiActionType): AiAction[] => {
+      // Phase 3b — match by stable `_id` (not positional index, which drifts
+      // when two consumers run between batches). Strip the internal _id from
+      // the returned shape so callers see plain AiActions.
       const matches: AiAction[] = [];
       const ids: string[] = [];
-      state.pendingActions.forEach((a, i) => {
+      for (const a of state.pendingActions) {
         if (a.type === type) {
-          matches.push(a);
-          ids.push(String(i));
+          const { _id, ...rest } = a;
+          matches.push(rest as AiAction);
+          ids.push(_id);
         }
-      });
+      }
       if (ids.length > 0) {
         dispatch({ kind: 'CONSUME_ACTIONS', ids, type });
       }
@@ -467,6 +562,10 @@ export function CallProvider({ children }: { children: ReactNode }): React.JSX.E
     [],
   );
   const unregisterPage = useCallback(() => dispatch({ kind: 'UNREGISTER_PAGE' }), []);
+  const appendActivity = useCallback(
+    (entry: AiActivityEntry) => dispatch({ kind: 'APPEND_ACTIVITY', entry }),
+    [],
+  );
 
   const value = useMemo<CallContextValue>(
     () => ({
@@ -482,6 +581,8 @@ export function CallProvider({ children }: { children: ReactNode }): React.JSX.E
       appendTranscript,
       dialNumber,
       clearPendingDial,
+      setIncomingRinging,
+      setIncomingAccepted,
       mergeEntities,
       enqueueActions,
       consumeActionsByType,
@@ -490,6 +591,7 @@ export function CallProvider({ children }: { children: ReactNode }): React.JSX.E
       dismissComplianceFlag,
       registerPage,
       unregisterPage,
+      appendActivity,
     }),
     [
       state,
@@ -504,6 +606,8 @@ export function CallProvider({ children }: { children: ReactNode }): React.JSX.E
       appendTranscript,
       dialNumber,
       clearPendingDial,
+      setIncomingRinging,
+      setIncomingAccepted,
       mergeEntities,
       enqueueActions,
       consumeActionsByType,
@@ -512,8 +616,105 @@ export function CallProvider({ children }: { children: ReactNode }): React.JSX.E
       dismissComplianceFlag,
       registerPage,
       unregisterPage,
+      appendActivity,
     ],
   );
+
+  // Phase 3b — DEV-ONLY debug hook. Lets you exercise the LeadForm AI auto-
+  // fill pipeline without spending Twilio credit. Open DevTools console:
+  //   __techsalesDebug.runFullTest()  — start fake call + inject 9 phrases.
+  //   __techsalesDebug.startFakeCall()
+  //   __techsalesDebug.inject('my zip is 33101')
+  //   __techsalesDebug.endFakeCall()
+  // Gated by `import.meta.env.DEV` so it's stripped from production bundles.
+  const fakeCallSidRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    type DebugApi = {
+      startFakeCall: (callSid?: string) => string;
+      inject: (text: string, speaker?: 'prospect' | 'agent') => Promise<unknown>;
+      endFakeCall: () => void;
+      runFullTest: () => Promise<void>;
+    };
+    const api: DebugApi = {
+      startFakeCall(callSid?: string): string {
+        const sid = callSid ?? `CA-debug-${Date.now().toString(36)}`;
+        fakeCallSidRef.current = sid;
+        const callId = `call_debug_${Date.now()}`;
+        dispatch({
+          kind: 'START_CALL',
+          callId,
+          leadId: null,
+          startTime: Date.now(),
+          mode: 'twilio',
+        });
+        dispatch({ kind: 'SET_CALL_SID', sid });
+        dispatch({ kind: 'SET_CALL_STATUS', status: 'connected' });
+        // eslint-disable-next-line no-console
+        console.info('[__techsalesDebug] fake call started:', sid);
+        return sid;
+      },
+      async inject(
+        text: string,
+        speaker: 'prospect' | 'agent' = 'prospect',
+      ): Promise<unknown> {
+        const sid = fakeCallSidRef.current;
+        if (!sid) {
+          // eslint-disable-next-line no-console
+          console.warn('[__techsalesDebug] no fake call — call startFakeCall() first');
+          return null;
+        }
+        const res = await fetch('/api/_debug/inject-transcript', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            callSid: sid,
+            chunks: [{ speaker, text, isFinal: true }],
+          }),
+        });
+        const data = (await res.json()) as unknown;
+        // eslint-disable-next-line no-console
+        console.info('[__techsalesDebug] injected:', text, data);
+        return data;
+      },
+      endFakeCall(): void {
+        dispatch({ kind: 'END_CALL' });
+        fakeCallSidRef.current = null;
+        // eslint-disable-next-line no-console
+        console.info('[__techsalesDebug] fake call ended');
+      },
+      async runFullTest(): Promise<void> {
+        api.startFakeCall();
+        const phrases: Array<[string, 'prospect' | 'agent']> = [
+          ['my zip is 33101', 'prospect'],
+          ['my name is John Smith', 'prospect'],
+          ['my number is 555-123-4567', 'prospect'],
+          ['send the info to john@example.com', 'prospect'],
+          ['my medicare number is 1EG4-TE5-MK73', 'prospect'],
+          ['my medicaid number is ABC123XYZ', 'prospect'],
+          ['yes I have medicaid', 'prospect'],
+          ['I get the low income subsidy', 'prospect'],
+          ['I take Eliquis', 'prospect'],
+        ];
+        for (const [text, speaker] of phrases) {
+          await new Promise((r) => setTimeout(r, 800));
+          await api.inject(text, speaker);
+        }
+        // eslint-disable-next-line no-console
+        console.info(
+          '[__techsalesDebug] full test injected. Navigate to /leads/new to see fills, then call __techsalesDebug.endFakeCall().',
+        );
+      },
+    };
+    (window as unknown as { __techsalesDebug?: DebugApi }).__techsalesDebug = api;
+    // eslint-disable-next-line no-console
+    console.info(
+      '[__techsalesDebug] hooks installed. Try: __techsalesDebug.runFullTest()',
+    );
+    return () => {
+      delete (window as unknown as { __techsalesDebug?: DebugApi }).__techsalesDebug;
+    };
+  }, []);
 
   return <CallContext.Provider value={value}>{children}</CallContext.Provider>;
 }

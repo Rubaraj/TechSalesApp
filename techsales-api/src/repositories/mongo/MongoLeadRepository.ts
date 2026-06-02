@@ -29,6 +29,45 @@ export class MongoLeadRepository implements IRepository<Lead> {
     return doc ? this.stripInternals(doc) : null;
   }
 
+  /**
+   * Phase 2.6 — Match a lead by inbound caller's phone number. Matches by
+   * the trailing 10 digits so stored variants ("2035551234" / "+12035551234"
+   * / "(203) 555-1234") all hit. Returns the first matching lead, or null.
+   */
+  async findByPhone(phoneE164OrRaw: string): Promise<Lead | null> {
+    const matches = await this.findAllByPhone(phoneE164OrRaw);
+    return matches[0] ?? null;
+  }
+
+  /**
+   * Phase 4 (M1) — Atlas inbound routing needs ALL leads matching a phone
+   * number (rare but possible — family members share a landline). Same
+   * trailing-10-digit normalization as `findByPhone`.
+   */
+  async findAllByPhone(phoneE164OrRaw: string): Promise<Lead[]> {
+    const last10 = phoneE164OrRaw.replace(/\D/g, '').slice(-10);
+    if (last10.length !== 10) return [];
+    const re = new RegExp(
+      `${last10[0]}\\D*${last10[1]}\\D*${last10[2]}\\D*${last10[3]}\\D*${last10[4]}\\D*${last10[5]}\\D*${last10[6]}\\D*${last10[7]}\\D*${last10[8]}\\D*${last10[9]}$`,
+    );
+    const docs = await this.model().find({ phone: re }).lean<Lead[]>().exec();
+    return docs.map(this.stripInternals);
+  }
+
+  /**
+   * Phase 4 (M1) — Atlas "my pipeline" tools filter leads to the current
+   * agent. Falls back to `createdBy` for legacy rows where `assignedTo` is
+   * unset (the migration script backfills these, but this OR keeps the
+   * tool usable mid-migration).
+   */
+  async findByAssignedTo(userId: string): Promise<Lead[]> {
+    const docs = await this.model()
+      .find({ $or: [{ assignedTo: userId }, { assignedTo: { $exists: false }, createdBy: userId }] })
+      .lean<Lead[]>()
+      .exec();
+    return docs.map(this.stripInternals);
+  }
+
   async search(params: SearchParams<Lead>): Promise<Paginated<Lead>> {
     const page = Math.max(1, params.page ?? 1);
     const pageSize = Math.max(1, Math.min(params.pageSize ?? 10, 100));

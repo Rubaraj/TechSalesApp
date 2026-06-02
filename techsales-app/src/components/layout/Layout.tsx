@@ -1,7 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import { Header } from './Header';
-import { CallPanel } from '../call/CallPanel';
 import { CallRuntime } from '../call/CallRuntime';
+import { AtlasPanel } from '../atlas/AtlasPanel';
 import { useCallContext } from '../../context/CallContext';
 
 export function Layout() {
@@ -41,7 +41,12 @@ export function Layout() {
           </footer>
         </div>
 
-        <CallPanel />
+        {/* Phase 4 (UI merge) — single right-edge panel. AtlasPanel hosts
+         *  both the dialer/transcript (top half when a call is active) and
+         *  the Atlas chat (bottom half / full height). The old separate
+         *  CallPanel aside is gone; CallSection.tsx is embedded inside
+         *  AtlasPanel instead. */}
+        <AtlasPanel />
       </div>
     </CallRuntime>
   );

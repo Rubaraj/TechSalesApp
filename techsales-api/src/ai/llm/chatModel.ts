@@ -24,7 +24,7 @@ export interface GetChatModelOptions {
   timeoutMs?: number;
 }
 
-export type AiProvider = 'ollama' | 'anthropic';
+export type AiProvider = 'ollama' | 'anthropic' | 'stub';
 
 /**
  * Build a fresh chat model. We deliberately do NOT cache — the
@@ -40,6 +40,15 @@ export function getChatModel(opts: GetChatModelOptions = {}): BaseChatModel {
       return getAnthropicChatModel(opts);
     case 'ollama':
       return getOllamaChatModel(opts);
+    case 'stub':
+      // Phase 3a — rule-based path doesn't call any LLM. If something tries
+      // to instantiate a chat model under the stub provider, fail loudly so
+      // the misconfiguration surfaces immediately rather than at request time.
+      throw new Error(
+        'getChatModel() called while AI_LLM_PROVIDER=stub. ' +
+          'The stub provider drives rule-based call analysis only — there is no LLM. ' +
+          'Switch AI_LLM_PROVIDER to ollama or anthropic to use chat / explain / search / etc.',
+      );
     default: {
       // exhaustiveness — env zod-enum makes this unreachable, but TS is happier.
       const x: never = env.AI_LLM_PROVIDER;
@@ -58,6 +67,9 @@ export function getActiveProvider(): AiProvider {
 export function getActiveModel(opts: { premium?: boolean } = {}): string {
   if (env.AI_LLM_PROVIDER === 'anthropic') {
     return opts.premium ? env.AI_MODEL_PREMIUM : env.AI_MODEL_DEFAULT;
+  }
+  if (env.AI_LLM_PROVIDER === 'stub') {
+    return 'stub';
   }
   return opts.premium ? env.OLLAMA_LLM_PREMIUM_MODEL : env.OLLAMA_LLM_MODEL;
 }
@@ -117,6 +129,15 @@ export async function getProviderReadinessError(): Promise<string | null> {
       );
     }
     return null;
+  }
+  if (env.AI_LLM_PROVIDER === 'stub') {
+    // Stub provider doesn't power chat/explain/etc. — return a clear error
+    // so /api/ai/* endpoints that need a real LLM 503 with a friendly message.
+    return (
+      'AI provider is "stub" — chat/explain/search/compare/drug-coverage need a real LLM. ' +
+      'Switch AI_LLM_PROVIDER to ollama or anthropic for those endpoints. ' +
+      'callAnalysisAgent (live-call analysis) works under stub via rule-based extraction.'
+    );
   }
   // ollama
   return probeOllama();

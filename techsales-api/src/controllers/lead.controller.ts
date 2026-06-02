@@ -34,6 +34,37 @@ export async function getLeadById(req: Request, res: Response<ServiceResponse<Le
   res.json({ success: true, data: lead });
 }
 
+/**
+ * Phase 2.6 — Look up a lead by phone number for inbound-call attribution.
+ * Used by the incoming-call modal to show the caller's name if known. The
+ * `phone` query param can be E.164 or any digit-y string; matching is by
+ * trailing-10 digits (handles stored format variance).
+ */
+export async function lookupLeadByPhone(
+  req: Request,
+  res: Response<ServiceResponse<Pick<Lead, 'leadId' | 'firstName' | 'lastName' | 'phone'>>>,
+): Promise<void> {
+  const phone = stringOrUndef(req.query.phone) ?? '';
+  if (!phone) {
+    res.status(400).json({ success: false, error: '`phone` query parameter is required' });
+    return;
+  }
+  const lead = await repos.lead.findByPhone(phone);
+  if (!lead) {
+    res.status(404).json({ success: false, error: 'No lead matches that phone number' });
+    return;
+  }
+  res.json({
+    success: true,
+    data: {
+      leadId: lead.leadId,
+      firstName: lead.firstName,
+      lastName: lead.lastName,
+      phone: lead.phone,
+    },
+  });
+}
+
 export async function searchLeads(
   req: Request,
   res: Response<ServiceResponse<Paginated<Lead>>>,

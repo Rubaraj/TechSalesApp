@@ -1,18 +1,21 @@
 /**
- * Twilio webhook controllers — Phase 2.
+ * Twilio webhook controllers — Phase 2 + 2.6.
  *
- *   POST /api/twilio/voice   → TwiML for an outbound dial originated by the
- *                              browser Voice SDK. Includes <Start><Stream>
- *                              with track="both_tracks" so the Media Stream
- *                              WS receiver gets both legs.
- *   POST /api/twilio/status  → Call lifecycle webhook (ringing, in-progress,
- *                              completed). Currently logs + would update the
- *                              call-minute usage in a follow-up.
+ *   POST /api/twilio/voice            → TwiML for an outbound dial originated
+ *                                       by the browser Voice SDK.
+ *   POST /api/twilio/status           → Call lifecycle webhook.
+ *   POST /api/twilio/incoming         → Phase 2.6 — TwiML for an inbound PSTN
+ *                                       call. Round-robins to an available
+ *                                       agent or plays a fallback message.
+ *   POST /api/twilio/incoming/result  → Phase 2.6 — `action=` callback on the
+ *                                       inbound `<Dial>`. Plays fallback when
+ *                                       the client didn't accept.
  */
 import type { Request, Response } from 'express';
 import { env } from '../config/env.js';
 import { logger } from '../config/logger.js';
 import { incrementMinutesForUser } from '../middleware/callMinuteCap.js';
+import { pickRoundRobin } from '../services/agentPresence.js';
 
 // E.164 — `+` followed by 1-15 digits. Reject anything else before we hand it
 // back as a <Number> child to <Dial>; otherwise an attacker forging a webhook
@@ -95,6 +98,7 @@ export function twilioVoiceWebhook(req: Request, res: Response): void {
     `<Start>` +
     `<Stream url="${escapeXml(streamUrl)}" track="both_tracks">` +
     userIdParam +
+    `<Parameter name="direction" value="outbound"/>` +
     `</Stream>` +
     `</Start>` +
     `<Dial callerId="${escapeXml(callerId)}" timeLimit="${timeLimit}">` +
@@ -103,6 +107,105 @@ export function twilioVoiceWebhook(req: Request, res: Response): void {
     `</Response>`;
 
   res.type('text/xml').send(twiml);
+}
+
+const FALLBACK_TWIML =
+  `<?xml version="1.0" encoding="UTF-8"?>` +
+  `<Response>` +
+  `<Say voice="alice">We're not available right now. Please call back later.</Say>` +
+  `<Hangup/>` +
+  `</Response>`;
+
+/**
+ * Phase 2.6 — Inbound PSTN call webhook.
+ *
+ * Twilio POSTs here when a caller dials our company phone number. We:
+ *   1. Round-robin to an available signed-in agent via `agentPresence`.
+ *   2. If none available → fallback `<Say>+<Hangup/>`.
+ *   3. Else → `<Start><Stream>` for diarization + `<Dial timeout="20"><Client>`
+ *      pointing at the agent's Voice SDK identity. The Dial's `action`
+ *      attribute fires `/api/twilio/incoming/result` when the dial settles.
+ *
+ * Speaker labels:  the Media Stream WS handler reads `direction=inbound` from
+ * the Stream's customParameters and flips the track-to-speaker mapping (the
+ * PSTN side is the parent call here, opposite of outbound — see ws handler).
+ */
+export function twilioIncomingWebhook(req: Request, res: Response): void {
+  const body = (req.body ?? {}) as Record<string, string>;
+  const callSid = body.CallSid ?? '';
+  const from = (body.From ?? '').trim();
+  const to = (body.To ?? '').trim();
+
+  const pickedUserId = pickRoundRobin();
+  logger.info(
+    { callSid, from, to, pickedUserId },
+    'Twilio incoming webhook',
+  );
+
+  if (!pickedUserId) {
+    res.type('text/xml').send(FALLBACK_TWIML);
+    return;
+  }
+
+  if (!env.PUBLIC_BASE_URL) {
+    logger.error('PUBLIC_BASE_URL not set; cannot return inbound TwiML');
+    res.type('text/xml').send(FALLBACK_TWIML);
+    return;
+  }
+
+  const wsBase = env.PUBLIC_BASE_URL.replace(/\/$/, '').replace(/^https?/, 'wss');
+  const httpBase = env.PUBLIC_BASE_URL.replace(/\/$/, '');
+  const streamUrl = `${wsBase}/ws/twilio-media`;
+  const actionUrl = `${httpBase}/api/twilio/incoming/result`;
+  const clientIdentity = `agent_${pickedUserId}`;
+
+  // 20s ring timeout. If the agent doesn't accept, `action` fires the fallback.
+  // Phase 3b — stash the prospect's caller ID so the WS handler can hand it
+  // to the callAnalysisAgent. The phone extractor uses it to suppress matches
+  // where the prospect repeats their own number.
+  const prospectNumberParam = from
+    ? `<Parameter name="prospectNumber" value="${escapeXml(from)}"/>`
+    : '';
+
+  const twiml =
+    `<?xml version="1.0" encoding="UTF-8"?>` +
+    `<Response>` +
+    `<Start>` +
+    `<Stream url="${escapeXml(streamUrl)}" track="both_tracks">` +
+    `<Parameter name="userId" value="${escapeXml(pickedUserId)}"/>` +
+    `<Parameter name="direction" value="inbound"/>` +
+    prospectNumberParam +
+    `</Stream>` +
+    `</Start>` +
+    `<Dial timeout="20" action="${escapeXml(actionUrl)}" method="POST">` +
+    `<Client>${escapeXml(clientIdentity)}</Client>` +
+    `</Dial>` +
+    `</Response>`;
+
+  res.type('text/xml').send(twiml);
+}
+
+/**
+ * Phase 2.6 — Action callback fired when the inbound `<Dial>` settles.
+ *
+ * Twilio passes `DialCallStatus`: `completed | no-answer | busy | failed |
+ * canceled`. On anything except `completed`, return the fallback TwiML so the
+ * caller doesn't hear silence. On `completed`, return empty `<Response/>` —
+ * Twilio just hangs up the parent leg.
+ */
+export function twilioIncomingResultWebhook(req: Request, res: Response): void {
+  const body = (req.body ?? {}) as Record<string, string>;
+  const status = body.DialCallStatus ?? '';
+  const callSid = body.CallSid ?? '';
+  logger.info({ callSid, status }, 'Twilio incoming result webhook');
+
+  if (status === 'completed') {
+    res
+      .type('text/xml')
+      .send('<?xml version="1.0" encoding="UTF-8"?><Response/>');
+    return;
+  }
+  res.type('text/xml').send(FALLBACK_TWIML);
 }
 
 /**

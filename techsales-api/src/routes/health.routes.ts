@@ -16,8 +16,9 @@ interface HealthPayload {
   uptimeSec: number;
   /** Whether /api/ai/* is currently accepting requests (mirrors `AI_ENABLED`). */
   aiEnabled: boolean;
-  /** Active LLM provider — `ollama` (free, local) or `anthropic` (Claude). */
-  aiProvider: 'ollama' | 'anthropic';
+  /** Active LLM provider — `ollama` (free, local), `anthropic` (Claude),
+   *  or `stub` (rule-based, Phase 3a — no real LLM). */
+  aiProvider: 'ollama' | 'anthropic' | 'stub';
   /** Phase 2 — whether Twilio+Deepgram call pipeline is configured + on. */
   twilioEnabled: boolean;
 }

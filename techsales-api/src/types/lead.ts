@@ -28,6 +28,14 @@ export interface Lead {
   taggedPharmacies: string[]; // Array of pharmacy IDs (max 3)
   taggedDrugs: TaggedDrug[];
   taggedProviders: string[]; // Array of provider IDs (max 5)
+  /** Phase 3b.1 — free-form notes captured during/after the call. The AI
+   *  post-call summarizer appends categorized lines here (e.g. "[concern]
+   *  worried about premium"). Agent can edit freely. */
+  notes?: string;
+  /** Phase 4 (M1) — the agent who owns this lead. Drives Atlas's "my pipeline"
+   *  tools. Backfilled from `createdBy` for legacy rows; new leads default to
+   *  the creator unless explicitly reassigned. */
+  assignedTo?: string;
   createdAt: string;
   createdBy: string;
   updatedAt?: string;

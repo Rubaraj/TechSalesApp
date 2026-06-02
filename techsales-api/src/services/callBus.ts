@@ -15,7 +15,11 @@
  * Phase 3+ will add `entities`, `actions`, `tool_start`, `tool_end`, etc.
  */
 import { EventEmitter } from 'node:events';
-import type { TranscriptChunk } from '../ai/types/call.types.js';
+import type {
+  TranscriptChunk,
+  AiAction,
+  ExtractedEntities,
+} from '../ai/types/call.types.js';
 
 export interface CallBusTranscriptEvent {
   type: 'transcript';
@@ -34,10 +38,24 @@ export interface CallBusErrorEvent {
   error: string;
 }
 
+/** Phase 3a — actions emitted by callAnalysisAgent. */
+export interface CallBusActionsEvent {
+  type: 'actions';
+  actions: AiAction[];
+}
+
+/** Phase 3a — accumulated entity diffs emitted by callAnalysisAgent. */
+export interface CallBusEntitiesEvent {
+  type: 'entities';
+  entities: Partial<ExtractedEntities>;
+}
+
 export type CallBusEvent =
   | CallBusTranscriptEvent
   | CallBusStatusEvent
-  | CallBusErrorEvent;
+  | CallBusErrorEvent
+  | CallBusActionsEvent
+  | CallBusEntitiesEvent;
 
 const emitters = new Map<string, EventEmitter>();
 

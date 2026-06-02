@@ -36,6 +36,26 @@ export class DatabricksLeadRepository implements IRepository<Lead> {
     return selectById<Lead>(this.table(), 'lead_id', leadId);
   }
 
+  /** Phase 2.6 — Trailing-10 digit match. Full table scan; fine at POC volume. */
+  async findByPhone(phoneE164OrRaw: string): Promise<Lead | null> {
+    const matches = await this.findAllByPhone(phoneE164OrRaw);
+    return matches[0] ?? null;
+  }
+
+  /** Phase 4 (M1) — Multi-match phone lookup for inbound routing. */
+  async findAllByPhone(phoneE164OrRaw: string): Promise<Lead[]> {
+    const last10 = phoneE164OrRaw.replace(/\D/g, '').slice(-10);
+    if (last10.length !== 10) return [];
+    const all = await this.findAll();
+    return all.filter((l) => (l.phone ?? '').replace(/\D/g, '').slice(-10) === last10);
+  }
+
+  /** Phase 4 (M1) — Atlas "my pipeline" agent-owned filter. */
+  async findByAssignedTo(userId: string): Promise<Lead[]> {
+    const all = await this.findAll();
+    return all.filter((l) => (l.assignedTo ?? l.createdBy) === userId);
+  }
+
   async search(params: SearchParams<Lead>): Promise<Paginated<Lead>> {
     const all = await this.findAll();
     return inMemorySearch<Lead>({

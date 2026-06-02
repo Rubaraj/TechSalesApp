@@ -26,6 +26,7 @@ import { logger } from '../config/logger.js';
 import { openDeepgramStream, type DeepgramStreamHandle } from '../services/deepgramService.js';
 import { forceEndCall } from '../services/twilioService.js';
 import { publish, endCall as endCallBus } from '../services/callBus.js';
+import { startCallAnalysis } from '../ai/agents/callAnalysisAgent.js';
 import type { Speaker, TranscriptChunk } from '../ai/types/call.types.js';
 
 interface TwilioConnectedEvent {
@@ -71,16 +72,35 @@ type TwilioMessage =
   | { event: string };
 
 /**
- * Twilio's Media Stream track semantics on a `<Start><Stream>` attached to
- * the parent call (the Voice SDK browser client):
- *   - `inbound`  = audio coming FROM the SDK side  →  agent's mic    →  AGENT
- *   - `outbound` = audio going TO   the SDK side   →  what agent hears
- *                                                     (the prospect)  →  PROSPECT
- * Verified by real-call observation: with the prior inverse mapping a
- * voicemail prompt ("Please leave your message…") was labeled Agent and
- * the agent's own speech was labeled Prospect.
+ * Twilio Media Stream track semantics depend on which leg is the **parent
+ * call**:
+ *
+ * OUTBOUND (browser SDK originates, dials PSTN):
+ *   - parent call = the SDK client → server
+ *   - `<Dial>` leg = the PSTN number
+ *   - `inbound` track  = audio FROM the SDK side  → agent's mic     → AGENT
+ *   - `outbound` track = audio TO   the SDK side  → what agent hears
+ *                                                    (the prospect) → PROSPECT
+ *
+ * INBOUND (PSTN originates, `<Dial><Client>` routes to browser):
+ *   - parent call = PSTN → Twilio (the prospect calling in)
+ *   - `<Dial>` leg = the browser SDK client
+ *   - `inbound` track  = audio FROM the PSTN side → PROSPECT
+ *   - `outbound` track = audio TO   the PSTN side → what prospect hears
+ *                                                    (the agent)    → AGENT
+ *
+ * The TwiML controller stamps `direction=inbound|outbound` on the Stream's
+ * customParameters; we read it here. Missing direction defaults to outbound
+ * (back-compat — Phase 2 didn't set the parameter).
  */
-function trackToSpeaker(track: 'inbound' | 'outbound'): Speaker {
+type CallDirection = 'inbound' | 'outbound';
+
+function trackToSpeaker(track: 'inbound' | 'outbound', direction: CallDirection): Speaker {
+  if (direction === 'inbound') {
+    // PSTN is the parent call → invert mapping.
+    return track === 'inbound' ? 'prospect' : 'agent';
+  }
+  // Outbound (original Phase 2 mapping).
   return track === 'inbound' ? 'agent' : 'prospect';
 }
 
@@ -88,12 +108,17 @@ interface PerCallContext {
   callSid: string;
   streamSid: string;
   startedAt: number;
+  /** Phase 2.6 — outbound (SDK-originated) or inbound (PSTN-originated). */
+  direction: CallDirection;
   streams: Partial<Record<'inbound' | 'outbound', DeepgramStreamHandle>>;
   durationTimer: NodeJS.Timeout | null;
   /** QA H5 — heartbeat timer that pings Twilio's WS every HEARTBEAT_MS and
    *  forceEndCall's the call if no pong returns within PONG_TIMEOUT_MS. */
   heartbeatTimer: NodeJS.Timeout | null;
   pongDeadline: number; // epoch ms; if Date.now() > this, heartbeat failed
+  /** Phase 3a — callAnalysisAgent stop handle. Wired on `start`; invoked from
+   *  `closeStreams()` so every call-end path tears down accumulator + dedup. */
+  callAnalysisStop: (() => void) | null;
   closed: boolean;
 }
 
@@ -118,6 +143,15 @@ function handleConnection(ws: WebSocket, req: IncomingMessage): void {
       clearInterval(ctx.heartbeatTimer);
       ctx.heartbeatTimer = null;
     }
+    // Phase 3a — single funnel for tearing down callAnalysisAgent state
+    // (accumulator + dedup set). All Twilio-end paths (Twilio stop event,
+    // WS close, WS error, forceEndCall) route here, so one call is enough.
+    try {
+      ctx.callAnalysisStop?.();
+    } catch (err) {
+      logger.warn({ err, callSid: ctx.callSid }, 'callAnalysisStop threw');
+    }
+    ctx.callAnalysisStop = null;
     for (const s of Object.values(ctx.streams)) {
       try {
         s?.close();
@@ -151,18 +185,51 @@ function handleConnection(ws: WebSocket, req: IncomingMessage): void {
 
     if (msg.event === 'start') {
       const m = msg as TwilioStartEvent;
+      const directionParam = m.start.customParameters?.direction;
+      const direction: CallDirection =
+        directionParam === 'inbound' ? 'inbound' : 'outbound';
       ctx = {
         callSid: m.start.callSid,
         streamSid: m.start.streamSid,
         startedAt: Date.now(),
+        direction,
         streams: {},
         durationTimer: null,
         heartbeatTimer: null,
         pongDeadline: Date.now() + HEARTBEAT_MS + PONG_TIMEOUT_MS,
+        callAnalysisStop: null,
         closed: false,
       };
+
+      // Phase 3a — start the rule-based call analysis agent for this call.
+      // Subscribes to bus transcripts; publishes `actions` + `entities`.
+      // Throw at this point (e.g. wrong AI_LLM_PROVIDER) is caught so the
+      // call still proceeds — we just skip AI events.
+      try {
+        const userId = m.start.customParameters?.userId;
+        // Phase 3b — for inbound calls the TwiML stashes the prospect's E.164
+        // as `prospectNumber` so the entity extractor can suppress phone
+        // matches that equal it (prospect repeating their own number).
+        const callerNumber = m.start.customParameters?.prospectNumber;
+        const handle = startCallAnalysis({
+          callSid: ctx.callSid,
+          ...(userId ? { userId } : {}),
+          ...(callerNumber ? { callerNumber } : {}),
+        });
+        ctx.callAnalysisStop = handle.stop;
+      } catch (err) {
+        logger.error(
+          { err, callSid: ctx.callSid },
+          'callAnalysisAgent: failed to start; call proceeds without AI',
+        );
+      }
       logger.info(
-        { callSid: ctx.callSid, streamSid: ctx.streamSid, tracks: m.start.tracks },
+        {
+          callSid: ctx.callSid,
+          streamSid: ctx.streamSid,
+          tracks: m.start.tracks,
+          direction,
+        },
         'Twilio media WS: start',
       );
 
@@ -170,7 +237,7 @@ function handleConnection(ws: WebSocket, req: IncomingMessage): void {
       for (const track of m.start.tracks) {
         try {
           const handle = openDeepgramStream({
-            speakerLabel: trackToSpeaker(track),
+            speakerLabel: trackToSpeaker(track, direction),
             chunkIdPrefix: `${ctx.callSid}:${track}`,
           });
           handle.onTranscript(handleTranscript);

@@ -22,12 +22,42 @@ export const getAllPharmacies = async (): Promise<ServiceResponse<Pharmacy[]>> =
 export const getPharmacyById = async (pharmacyId: string): Promise<ServiceResponse<Pharmacy>> => {
   await delay();
   const pharmacy = pharmacies.find(p => p.pharmacyId === pharmacyId && p.isActive);
-  
+
   if (!pharmacy) {
     return { success: false, error: 'Pharmacy not found' };
   }
-  
+
   return { success: true, data: pharmacy };
+};
+
+/**
+ * Phase 3b.1 — Synchronous chain-name lookup for the LeadForm AI auto-tag
+ * consumer. When the prospect says "I use CVS", we resolve to the first
+ * matching pharmacy in that chain. If a `zipCode` is provided, prefer a
+ * store whose zipCode shares the first 3 digits (loose geographic match);
+ * otherwise return the first matching chain store.
+ *
+ * Synchronous (no `delay()`) because it runs inside a useEffect during a
+ * live call and must complete in microseconds, not the artificial 50-300ms
+ * delay the other catalog functions use to mimic an HTTP round-trip.
+ */
+export const findPharmacyByChainName = (
+  chainName: string,
+  zipCode?: string,
+): Pharmacy | null => {
+  if (!chainName) return null;
+  const lower = chainName.trim().toLowerCase();
+  const matches = pharmacies.filter(
+    (p) =>
+      p.isActive &&
+      ((p.chainName ?? '').toLowerCase() === lower ||
+        (p.name ?? '').toLowerCase().includes(lower)),
+  );
+  if (matches.length === 0) return null;
+  if (!zipCode || zipCode.length < 3) return matches[0];
+  const zipPrefix = zipCode.slice(0, 3);
+  const nearMatch = matches.find((p) => (p.zipCode ?? '').startsWith(zipPrefix));
+  return nearMatch ?? matches[0];
 };
 
 // Search pharmacies

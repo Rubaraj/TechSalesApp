@@ -58,6 +58,40 @@ export const getLeadById = async (leadId: string): Promise<ServiceResponse<Lead>
   return apiGet<Lead>(`/leads/${encodeURIComponent(leadId)}`);
 };
 
+/**
+ * Phase 2.6 — Look up a lead by phone number. Used by the inbound-call view
+ * to render the caller's name (best-effort; the panel renders the raw number
+ * if no match). Local mode falls back to a naive in-memory scan.
+ */
+export interface LeadPhoneLookup {
+  leadId: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+}
+
+export const lookupLeadByPhone = async (
+  phone: string,
+): Promise<ServiceResponse<LeadPhoneLookup>> => {
+  if (getMode() === 'local') {
+    const last10 = phone.replace(/\D/g, '').slice(-10);
+    const found = leads.find((l) => (l.phone ?? '').replace(/\D/g, '').slice(-10) === last10);
+    if (!found) {
+      return { success: false, error: 'No lead matches that phone number' };
+    }
+    return {
+      success: true,
+      data: {
+        leadId: found.leadId,
+        firstName: found.firstName,
+        lastName: found.lastName,
+        phone: found.phone,
+      },
+    };
+  }
+  return apiGet<LeadPhoneLookup>(`/leads/lookup-by-phone?phone=${encodeURIComponent(phone)}`);
+};
+
 export const searchLeads = async (
   params: LeadSearchParams,
 ): Promise<ServiceResponse<LeadSearchResult>> => {
