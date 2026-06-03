@@ -1,17 +1,18 @@
 /**
- * Phase 2.5 — Compact mic + speaker device picker for in-call audio routing.
+ * Phase 4 — In-call audio device picker, extracted into a hook +
+ * presentation-agnostic rows so it can render inside Atlas's settings
+ * dropdown (replacing the old footer inside the call panel).
  *
- * Reads `device.audio.availableInputDevices` / `availableOutputDevices`
- * (Twilio Voice SDK reactive Maps). Reacts to `deviceChange` events so a
- * Bluetooth headset reconnecting (which gets a fresh deviceId) doesn't
- * leave a dangling persisted selection.
- *
- * Persistence: localStorage. Stores both `deviceId` and `label` so we can
- * fall back to a label match when the id changes (common with hot-plug).
- * Ultimate fallback: 'default' system device.
+ * The hook (`useAudioDevices`) handles:
+ *   - reading `device.audio.availableInputDevices` / `availableOutputDevices`
+ *     (Twilio Voice SDK reactive Maps),
+ *   - reacting to `deviceChange` events so a hot-plug / Bluetooth reconnect
+ *     (fresh deviceId) doesn't leave a dangling persisted selection,
+ *   - localStorage persistence with deviceId-then-label-then-default fallback
+ *     so a saved choice survives across sessions even when ids rotate.
  *
  * `setSinkId` (output device) has uneven browser support (Safari/Firefox
- * limited). Failures are caught and surfaced as a small inline warning.
+ * limited). Failures are surfaced via the hook's `error` field.
  */
 import { useEffect, useMemo, useState } from 'react';
 import { Mic, Volume2 } from 'lucide-react';
@@ -26,7 +27,7 @@ interface PersistedDevices {
   outputLabel?: string;
 }
 
-interface DeviceOption {
+export interface DeviceOption {
   id: string;
   label: string;
 }
@@ -51,10 +52,6 @@ function savePersisted(p: PersistedDevices): void {
   }
 }
 
-/**
- * Walks a (possibly-stale) deviceId/label pair against the live device list
- * and returns the best-effort match: exact id > label match > 'default'.
- */
 function resolveSelection(
   list: DeviceOption[],
   persistedId?: string,
@@ -72,14 +69,9 @@ function resolveSelection(
   return 'default';
 }
 
-/**
- * Convert a Twilio-style Map<string, MediaDeviceInfo> (or similar shape)
- * to a flat array of `{id, label}` options.
- */
 function devicesToOptions(devices: unknown): DeviceOption[] {
   if (!devices) return [];
   const out: DeviceOption[] = [];
-  // Twilio uses a Map-like with `.forEach((info, id) => ...)`.
   try {
     (devices as Map<string, MediaDeviceInfo>).forEach((info, id) => {
       out.push({ id, label: info?.label || id });
@@ -90,12 +82,19 @@ function devicesToOptions(devices: unknown): DeviceOption[] {
   return out;
 }
 
-export function AudioDeviceSelector() {
+export interface UseAudioDevicesResult {
+  available: boolean;
+  inputs: DeviceOption[];
+  outputs: DeviceOption[];
+  selectedInput: string;
+  selectedOutput: string;
+  onChangeInput: (id: string) => Promise<void>;
+  onChangeOutput: (id: string) => Promise<void>;
+  error: string | null;
+}
+
+export function useAudioDevices(): UseAudioDevicesResult {
   const runtime = useCallRuntime();
-  // getDevice() returns null until the Twilio Device has been initialized
-  // (first dial). After that we read `device.audio` for the input/output
-  // selectors. QA H1 fix — Phase 2.5 originally tried to read `runtime.device`
-  // which didn't exist; selector was dead code.
   const device = runtime.getDevice();
   const audio = (device as { audio?: unknown } | null | undefined)?.audio as
     | {
@@ -111,7 +110,6 @@ export function AudioDeviceSelector() {
   const [tick, setTick] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
-  // Re-render on deviceChange events (hot-plug, Bluetooth reconnect, etc.).
   useEffect(() => {
     if (!audio?.on || !audio?.off) return;
     const handler = (): void => setTick((t) => t + 1);
@@ -121,7 +119,6 @@ export function AudioDeviceSelector() {
 
   const inputs = useMemo(
     () => devicesToOptions(audio?.availableInputDevices),
-    // Depend on tick so we re-derive after deviceChange events.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [audio, tick],
   );
@@ -159,22 +156,67 @@ export function AudioDeviceSelector() {
     }
   };
 
-  // Hide entirely when the Twilio Device hasn't been initialized yet (no
-  // active call started). Avoids rendering empty selects.
-  if (!audio) return null;
+  return {
+    available: !!audio,
+    inputs,
+    outputs,
+    selectedInput,
+    selectedOutput,
+    onChangeInput,
+    onChangeOutput,
+    error,
+  };
+}
 
-  const selectClass =
-    'text-[11px] rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 px-1.5 py-0.5 max-w-[140px] truncate';
+/**
+ * Atlas-styled audio device picker. Renders nothing when the Twilio
+ * device hasn't been initialized (no active call). Mounts inline within
+ * the Atlas settings dropdown — uses atlas-* tokens so it matches the
+ * surrounding menu chrome.
+ */
+export function AudioDevicePickerRows(): React.JSX.Element | null {
+  const {
+    available,
+    inputs,
+    outputs,
+    selectedInput,
+    selectedOutput,
+    onChangeInput,
+    onChangeOutput,
+    error,
+  } = useAudioDevices();
+
+  if (!available) return null;
+
+  const selectStyle: React.CSSProperties = {
+    flex: 1,
+    minWidth: 0,
+    fontSize: 12,
+    background: 'var(--color-atlas-surface-3)',
+    color: 'var(--color-atlas-fg)',
+    border: '1px solid var(--color-atlas-border)',
+    borderRadius: 6,
+    padding: '4px 6px',
+  };
 
   return (
-    <div className="flex flex-col gap-1 px-3 py-2 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40">
+    <div
+      className="px-3 py-2 flex flex-col gap-1.5"
+      style={{ borderTop: '1px solid var(--color-atlas-border)' }}
+    >
+      <p
+        className="text-[9.5px] font-bold uppercase tracking-[0.08em] mb-0.5"
+        style={{ color: 'var(--color-atlas-fg-subtle)' }}
+      >
+        Audio devices
+      </p>
       <div className="flex items-center gap-2">
-        <Mic className="w-3 h-3 text-gray-500 dark:text-gray-400 shrink-0" />
+        <Mic className="w-3.5 h-3.5 shrink-0" style={{ color: 'var(--color-atlas-fg-muted)' }} />
         <select
           aria-label="Microphone"
           value={selectedInput}
           onChange={(e) => void onChangeInput(e.target.value)}
-          className={selectClass}
+          style={selectStyle}
         >
           {inputs.length === 0 && <option value="default">Default</option>}
           {inputs.map((d) => (
@@ -185,12 +227,15 @@ export function AudioDeviceSelector() {
         </select>
       </div>
       <div className="flex items-center gap-2">
-        <Volume2 className="w-3 h-3 text-gray-500 dark:text-gray-400 shrink-0" />
+        <Volume2
+          className="w-3.5 h-3.5 shrink-0"
+          style={{ color: 'var(--color-atlas-fg-muted)' }}
+        />
         <select
           aria-label="Speaker"
           value={selectedOutput}
           onChange={(e) => void onChangeOutput(e.target.value)}
-          className={selectClass}
+          style={selectStyle}
         >
           {outputs.length === 0 && <option value="default">Default</option>}
           {outputs.map((d) => (
@@ -201,8 +246,18 @@ export function AudioDeviceSelector() {
         </select>
       </div>
       {error && (
-        <p className="text-[10px] text-amber-700 dark:text-amber-400">{error}</p>
+        <p
+          className="text-[10px] mt-0.5"
+          style={{ color: 'var(--color-warning, #f59e0b)' }}
+        >
+          {error}
+        </p>
       )}
     </div>
   );
 }
+
+/** Backwards-compat alias for the dead `CallPanel.tsx`, which still
+ *  imports the old name. CallPanel itself is no longer mounted; this
+ *  keeps the type-check clean without breaking any active surface. */
+export const AudioDeviceSelector = AudioDevicePickerRows;

@@ -16,7 +16,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { atlasService, type AtlasStreamEvent } from '../services/atlasService';
 import { useAuth } from './AuthContext';
 
@@ -38,6 +38,13 @@ export interface AtlasProposal {
   /** State of the approval UI for the card; updates after Approve / Reject click. */
   status: 'pending' | 'approved' | 'rejected' | 'error';
   result?: unknown;
+  /** Phase 4 — proposals are now interleaved into the chat stream by
+   *  timestamp (replacing the old footer deck), so each one needs a `ts`. */
+  ts: number;
+  /** True when the proposal was auto-approved by Auto Pilot mode — the
+   *  ApprovalCard renders the success line directly instead of flashing
+   *  the Approve/Reject buttons in between. */
+  autoApproved?: boolean;
 }
 
 export interface AtlasNavigationSuggestion {
@@ -68,6 +75,18 @@ export interface AtlasContextValue {
   resumedFromPriorSession: boolean;
   startNewSession: () => Promise<void>;
   dismissResumeBanner: () => void;
+  /**
+   * Phase 4 (dock) — Atlas panel chrome state. Lifted into context so the
+   * Layout can reflow main content when the panel opens (push-not-overlay)
+   * and the Header's dialer button can open the panel imperatively.
+   * `isPanelOpen=true` ⇒ panel docks at the right edge and Layout pads main
+   * content by `panelWidth`. `false` ⇒ panel collapses to the bottom-right
+   * bubble and main content reflows to full width.
+   */
+  isPanelOpen: boolean;
+  setPanelOpen: (open: boolean) => void;
+  panelWidth: number;
+  setPanelWidth: (w: number) => void;
 }
 
 const AtlasContext = createContext<AtlasContextValue | null>(null);
@@ -80,10 +99,16 @@ function newId(): string {
 }
 
 const MODE_STORAGE_KEY = 'techsales:atlas-mode';
+const PANEL_OPEN_STORAGE_KEY = 'techsales:atlas-panel-open';
+const PANEL_WIDTH_STORAGE_KEY = 'techsales:atlas-panel-width';
+const PANEL_MIN_WIDTH = 360;
+const PANEL_MAX_WIDTH = 600;
+const PANEL_DEFAULT_WIDTH = 440;
 
 export function AtlasProvider({ children }: { children: ReactNode }): React.JSX.Element {
   const { user } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const params = useParams<{ id?: string }>();
   const userId = user?.userId ?? null;
 
@@ -100,8 +125,41 @@ export function AtlasProvider({ children }: { children: ReactNode }): React.JSX.
     return stored === 'silent' || stored === 'auto' ? stored : 'assist';
   });
 
+  // Panel dock state — persisted so the panel re-opens at the same width
+  // on next sign-in. Default: open at 440px. We hydrate synchronously from
+  // localStorage so the first Layout render is already correct (no flash
+  // of full-width content collapsing to docked).
+  const [isPanelOpen, setIsPanelOpen] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return true;
+    const stored = window.localStorage.getItem(PANEL_OPEN_STORAGE_KEY);
+    if (stored === null) return true;
+    return stored === '1';
+  });
+  const [panelWidth, setPanelWidthState] = useState<number>(() => {
+    if (typeof window === 'undefined') return PANEL_DEFAULT_WIDTH;
+    const stored = window.localStorage.getItem(PANEL_WIDTH_STORAGE_KEY);
+    const n = stored ? Number.parseInt(stored, 10) : NaN;
+    return Number.isFinite(n)
+      ? Math.min(PANEL_MAX_WIDTH, Math.max(PANEL_MIN_WIDTH, n))
+      : PANEL_DEFAULT_WIDTH;
+  });
+
   const abortRef = useRef<AbortController | null>(null);
   const hydratedForUserRef = useRef<string | null>(null);
+  // `mode` snapshot for use inside SSE event handlers — those closures
+  // are created at request time and won't re-render with the mode state.
+  const modeRef = useRef<AtlasMode>(mode);
+  useEffect(() => {
+    modeRef.current = mode;
+  }, [mode]);
+  // `navigate` snapshot — react-router's navigate fn is stable enough but
+  // we route through a ref so the SSE closure always sees the latest one
+  // (and so Auto Pilot navigation works even if React Router updates the
+  // function reference mid-stream).
+  const navigateRef = useRef(navigate);
+  useEffect(() => {
+    navigateRef.current = navigate;
+  }, [navigate]);
 
   const setMode = useCallback((m: AtlasMode): void => {
     setModeState(m);
@@ -109,6 +167,25 @@ export function AtlasProvider({ children }: { children: ReactNode }): React.JSX.
       window.localStorage.setItem(MODE_STORAGE_KEY, m);
     } catch {
       // private mode etc — ignore
+    }
+  }, []);
+
+  const setPanelOpen = useCallback((open: boolean): void => {
+    setIsPanelOpen(open);
+    try {
+      window.localStorage.setItem(PANEL_OPEN_STORAGE_KEY, open ? '1' : '0');
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const setPanelWidth = useCallback((w: number): void => {
+    const clamped = Math.min(PANEL_MAX_WIDTH, Math.max(PANEL_MIN_WIDTH, w));
+    setPanelWidthState(clamped);
+    try {
+      window.localStorage.setItem(PANEL_WIDTH_STORAGE_KEY, String(clamped));
+    } catch {
+      // ignore
     }
   }, []);
 
@@ -215,13 +292,66 @@ export function AtlasProvider({ children }: { children: ReactNode }): React.JSX.
           return;
         }
         if (ev.type === 'proposal_created') {
+          const ts = Date.now();
+          const isAuto = modeRef.current === 'auto';
+          // In Auto Pilot, optimistically render the success state so the
+          // chat stream skips straight to "approved & sent" without
+          // flashing the Approve/Reject buttons. We still fire the
+          // server-side approve below so the audit row is recorded.
+          const initialStatus: AtlasProposal['status'] = isAuto ? 'approved' : 'pending';
           setProposals((prev) => [
             ...prev,
-            { proposalId: ev.proposalId, kind: ev.kind, preview: ev.preview, status: 'pending' },
+            {
+              proposalId: ev.proposalId,
+              kind: ev.kind,
+              preview: ev.preview,
+              status: initialStatus,
+              ts,
+              autoApproved: isAuto,
+            },
           ]);
+          if (isAuto && userId) {
+            void atlasService
+              .approveProposal(ev.proposalId, userId, 'approve')
+              .then((res) => {
+                if (!res.success) {
+                  setProposals((prev) =>
+                    prev.map((p) =>
+                      p.proposalId === ev.proposalId
+                        ? { ...p, status: 'error', result: res.result }
+                        : p,
+                    ),
+                  );
+                }
+              })
+              .catch(() => {
+                setProposals((prev) =>
+                  prev.map((p) =>
+                    p.proposalId === ev.proposalId ? { ...p, status: 'error' } : p,
+                  ),
+                );
+              });
+          }
           return;
         }
         if (ev.type === 'navigate') {
+          // Mode-gated dispatch:
+          //   - Silent      → drop on the floor (Atlas observes only).
+          //   - Assist      → add to suggestions; ChatPane renders inline
+          //                   NavigationCard with Open / Dismiss.
+          //   - Auto Pilot  → navigate immediately. No card; the tool
+          //                   trace ("navigateTo  /leads") already shows
+          //                   in the chat as the explanation.
+          const m = modeRef.current;
+          if (m === 'silent') return;
+          if (m === 'auto') {
+            try {
+              navigateRef.current(ev.route);
+            } catch {
+              // ignore navigation errors (invalid route etc.)
+            }
+            return;
+          }
           setNavigationSuggestions((prev) => [
             ...prev,
             { id: newId(), route: ev.route, reason: ev.reason, ts: Date.now() },
@@ -364,6 +494,10 @@ export function AtlasProvider({ children }: { children: ReactNode }): React.JSX.
       resumedFromPriorSession,
       startNewSession,
       dismissResumeBanner,
+      isPanelOpen,
+      setPanelOpen,
+      panelWidth,
+      setPanelWidth,
     }),
     [
       messages,
@@ -381,6 +515,10 @@ export function AtlasProvider({ children }: { children: ReactNode }): React.JSX.
       resumedFromPriorSession,
       startNewSession,
       dismissResumeBanner,
+      isPanelOpen,
+      setPanelOpen,
+      panelWidth,
+      setPanelWidth,
     ],
   );
 

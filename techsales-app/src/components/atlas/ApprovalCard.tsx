@@ -1,9 +1,22 @@
 /**
- * Phase 4 (M4) — Approval card for Atlas-proposed write actions. Renders the
- * preview + Approve/Reject buttons. Click Approve → calls atlasService →
- * card updates with success indicator. THE biggest agentic-AI signal.
+ * Phase 4 design — Atlas write-action approval card.
+ *
+ * Matches the Claude Design reference (Reference Screenshot/Prefered method.png):
+ *  - Neutral 1px border (no orange accent on the frame itself).
+ *  - Header: orange kind-icon + "Atlas drafted an email" eyebrow +
+ *    "NEEDS APPROVAL" orange pill on the right.
+ *  - Body: compact key/value rows ("To dorothy@…", "Subject …") in
+ *    regular sans with bold inline values. NO body preview block — keeps
+ *    the card scannable; full body editing belongs in a dedicated drawer.
+ *  - Actions: full-width Edit (subtle) + Approve & send (orange filled).
+ *
+ * Status variants:
+ *  - approved  → green checkmark + one-line success ("Email sent to …")
+ *  - rejected  → muted strikethrough line ("Declined · email")
+ *  - error     → red soft tile ("Couldn't apply — try again")
+ *  - pending   → full card (above)
  */
-import { Check, X, Mail } from 'lucide-react';
+import { Check, X, Mail, Pencil, AlertTriangle, Pill, ListTodo } from 'lucide-react';
 import { useAtlas, type AtlasProposal } from '../../context/AtlasContext';
 
 interface Props {
@@ -15,88 +28,210 @@ export function ApprovalCard({ proposal }: Props): React.JSX.Element {
 
   if (proposal.status === 'approved') {
     return (
-      <div className="px-3 py-2 rounded-md bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-xs text-green-800 dark:text-green-200 flex items-center gap-2">
+      <div
+        className="msg-in flex items-center gap-2 px-2 py-1.5 text-[13px]"
+        style={{ color: 'var(--color-atlas-success, #6ad48f)' }}
+      >
         <Check className="w-4 h-4" />
-        <span>Approved · {labelFor(proposal.kind)}</span>
+        <span>{successMessageFor(proposal)}</span>
       </div>
     );
   }
   if (proposal.status === 'rejected') {
     return (
-      <div className="px-3 py-2 rounded-md bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-xs text-gray-500 line-through">
+      <div
+        className="msg-in flex items-center gap-2 px-2 py-1.5 text-[12.5px] line-through"
+        style={{ color: 'var(--color-atlas-fg-subtle)' }}
+      >
         Declined · {labelFor(proposal.kind)}
       </div>
     );
   }
   if (proposal.status === 'error') {
     return (
-      <div className="px-3 py-2 rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-xs text-red-800 dark:text-red-200">
+      <div
+        className="msg-in px-3 py-2 rounded-md text-[12.5px]"
+        style={{
+          background: 'rgba(255,107,107,0.10)',
+          border: '1px solid rgba(255,107,107,0.35)',
+          color: '#ff6b6b',
+        }}
+      >
         Couldn't apply — try again
       </div>
     );
   }
 
+  const Icon = iconFor(proposal.kind);
+
   return (
-    <div className="px-3 py-2 rounded-md bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-xs space-y-2">
-      <div className="flex items-start gap-2">
-        <Mail className="w-4 h-4 shrink-0 mt-0.5 text-blue-700 dark:text-blue-300" />
-        <div className="flex-1 min-w-0">
-          <p className="font-medium text-blue-900 dark:text-blue-100">
-            Atlas drafted a {labelFor(proposal.kind)}
-          </p>
-          {renderPreview(proposal)}
-        </div>
+    <div
+      className="msg-in flex-shrink-0 overflow-hidden"
+      style={{
+        background: 'var(--color-atlas-surface-2)',
+        border: '1px solid var(--color-atlas-border)',
+        borderRadius: 14,
+        boxShadow: 'var(--shadow-atlas-card)',
+      }}
+    >
+      {/* Header — kind icon + drafted label + NEEDS APPROVAL pill */}
+      <div className="flex items-center gap-2 px-3.5 py-2.5">
+        <Icon className="w-4 h-4" style={{ color: 'var(--color-exl-orange-bright)' }} />
+        <span style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--color-atlas-fg)' }}>
+          Atlas drafted {articleFor(proposal.kind)} {labelFor(proposal.kind)}
+        </span>
+        <span
+          className="ml-auto"
+          style={{
+            fontSize: 10,
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+            color: 'var(--color-exl-orange-bright)',
+            background: 'var(--color-exl-orange-soft)',
+            padding: '4px 9px',
+            borderRadius: 999,
+          }}
+        >
+          Needs approval
+        </span>
       </div>
-      <div className="flex items-center justify-end gap-2 pt-1">
+
+      {/* Body — compact KV rows; no preview block */}
+      <div
+        className="px-3.5 py-2.5 flex flex-col gap-1.5"
+        style={{ borderTop: '1px solid var(--color-atlas-border)' }}
+      >
+        {renderKvRows(proposal)}
+      </div>
+
+      {/* Actions */}
+      <div className="flex gap-2 px-3.5 pb-3.5 pt-1">
         <button
           onClick={() => void reject(proposal.proposalId)}
-          className="px-2.5 py-1 rounded-md text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 inline-flex items-center gap-1"
+          className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg transition-colors"
+          style={{
+            fontSize: 13,
+            fontWeight: 600,
+            background: 'var(--color-atlas-surface-3)',
+            color: 'var(--color-atlas-fg-muted)',
+            border: 'none',
+            cursor: 'pointer',
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--color-atlas-surface-4)')}
+          onMouseLeave={(e) => (e.currentTarget.style.background = 'var(--color-atlas-surface-3)')}
         >
-          <X className="w-3 h-3" />
-          Reject
+          <Pencil className="w-3.5 h-3.5" />
+          Edit
         </button>
         <button
           onClick={() => void approve(proposal.proposalId)}
-          className="px-3 py-1 rounded-md text-xs font-medium bg-blue-600 hover:bg-blue-700 text-white inline-flex items-center gap-1"
+          className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg transition-colors"
+          style={{
+            fontSize: 13,
+            fontWeight: 600,
+            background: 'var(--color-exl-orange)',
+            color: '#fff',
+            border: 'none',
+            cursor: 'pointer',
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--color-exl-orange-bright)')}
+          onMouseLeave={(e) => (e.currentTarget.style.background = 'var(--color-exl-orange)')}
         >
-          <Check className="w-3 h-3" />
-          Approve & Send
+          <Check className="w-3.5 h-3.5" />
+          {primaryActionFor(proposal.kind)}
         </button>
       </div>
     </div>
   );
 }
 
+function iconFor(kind: AtlasProposal['kind']): typeof Mail {
+  if (kind === 'email') return Mail;
+  if (kind === 'status') return ListTodo;
+  if (kind === 'drug') return Pill;
+  return AlertTriangle;
+}
+
 function labelFor(kind: AtlasProposal['kind']): string {
-  if (kind === 'email') return 'follow-up email';
+  if (kind === 'email') return 'email';
   if (kind === 'status') return 'lead status update';
   if (kind === 'drug') return 'drug tag';
   return 'action';
 }
 
-function renderPreview(proposal: AtlasProposal): React.JSX.Element | null {
-  const p = proposal.preview as { to?: string; subject?: string; body?: string } | null;
-  if (!p) return null;
+function articleFor(kind: AtlasProposal['kind']): string {
+  return kind === 'email' || kind === 'status' ? 'an' : 'a';
+}
+
+function primaryActionFor(kind: AtlasProposal['kind']): string {
+  if (kind === 'email') return 'Approve & send';
+  if (kind === 'status') return 'Approve & update';
+  if (kind === 'drug') return 'Approve & add';
+  return 'Approve';
+}
+
+function successMessageFor(proposal: AtlasProposal): string {
   if (proposal.kind === 'email') {
+    const to = (proposal.preview as { to?: string } | null)?.to;
+    return to ? `Email approved & sent to ${to}.` : 'Email approved & sent.';
+  }
+  if (proposal.kind === 'status') return 'Lead status updated.';
+  if (proposal.kind === 'drug') return 'Drug added to lead.';
+  return 'Approved.';
+}
+
+function renderKvRows(proposal: AtlasProposal): React.JSX.Element {
+  const p = (proposal.preview ?? {}) as Record<string, unknown>;
+
+  if (proposal.kind === 'email') {
+    const { to, subject } = p as { to?: string; subject?: string };
     return (
-      <div className="mt-1 space-y-0.5 text-[11px] text-blue-800 dark:text-blue-200">
-        {p.to && (
-          <p>
-            <span className="font-medium">To:</span> {p.to}
-          </p>
-        )}
-        {p.subject && (
-          <p>
-            <span className="font-medium">Subject:</span> {p.subject}
-          </p>
-        )}
-        {p.body && (
-          <pre className="mt-1 text-[11px] whitespace-pre-wrap font-sans bg-white/40 dark:bg-black/20 p-2 rounded max-h-32 overflow-y-auto">
-            {p.body}
-          </pre>
-        )}
-      </div>
+      <>
+        {to && <KvRow label="To" value={to} />}
+        {subject && <KvRow label="Subject" value={subject} />}
+      </>
     );
   }
-  return null;
+
+  if (proposal.kind === 'status') {
+    const { leadName, from, to } = p as { leadName?: string; from?: string; to?: string };
+    return (
+      <>
+        {leadName && <KvRow label="Lead" value={leadName} />}
+        {(from || to) && <KvRow label="Status" value={`${from ?? '—'} → ${to ?? '—'}`} />}
+      </>
+    );
+  }
+
+  if (proposal.kind === 'drug') {
+    const { leadName, drugName, dosage } = p as {
+      leadName?: string;
+      drugName?: string;
+      dosage?: string;
+    };
+    return (
+      <>
+        {leadName && <KvRow label="Lead" value={leadName} />}
+        {drugName && <KvRow label="Drug" value={dosage ? `${drugName} · ${dosage}` : drugName} />}
+      </>
+    );
+  }
+
+  return <span style={{ fontSize: 12.5, color: 'var(--color-atlas-fg-muted)' }}>—</span>;
+}
+
+function KvRow({ label, value }: { label: string; value: string }): React.JSX.Element {
+  return (
+    <div
+      style={{
+        fontSize: 13,
+        lineHeight: 1.45,
+        color: 'var(--color-atlas-fg-muted)',
+      }}
+    >
+      {label}{' '}
+      <b style={{ color: 'var(--color-atlas-fg)', fontWeight: 600 }}>{value}</b>
+    </div>
+  );
 }

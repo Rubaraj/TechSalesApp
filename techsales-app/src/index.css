@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
-/* Import Inter font */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+/* Import Inter font + Newsreader (Atlas AI surface only) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap');
 
 /* Custom theme variables - Default Orange Theme */
 @theme {
@@ -32,6 +32,90 @@
   --color-secondary-950: #0c0a09;
 
   --font-sans: 'Inter', system-ui, sans-serif;
+
+  /* Phase 4 design — Atlas AI surface (Newsreader serif reserved for AI
+   * greetings / headers so the copilot reads as a distinct surface, not
+   * generic CRM chrome). */
+  --font-serif: 'Newsreader', ui-serif, Georgia, 'Times New Roman', serif;
+  --font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* ============================================================
+   * Atlas / EXL Medicare Hub design tokens (dark surface set).
+   * Atlas always renders on these dark slate-navy surfaces regardless of
+   * the rest-of-app theme. Source: Design System/colors_and_type.css.
+   * ============================================================ */
+  --color-atlas-bg: #090d16;
+  --color-atlas-surface-1: #0e1320;
+  --color-atlas-surface-2: #141b2b;
+  --color-atlas-surface-3: #1b2335;
+  --color-atlas-surface-4: #232c41;
+
+  --color-atlas-fg: #f1f5f9;
+  --color-atlas-fg-muted: #98a4b8;
+  --color-atlas-fg-subtle: #5d6b85;
+
+  --color-atlas-border: rgba(255, 255, 255, 0.07);
+  --color-atlas-border-strong: rgba(255, 255, 255, 0.12);
+  --color-atlas-border-faint: rgba(255, 255, 255, 0.04);
+
+  /* Atlas's accent matches the existing EXL orange (--color-primary-600).
+   * Aliased for semantic clarity in Atlas components. */
+  --color-exl-orange: #ea580c;
+  --color-exl-orange-bright: #f97316;
+  --color-exl-orange-press: #c2410c;
+  --color-exl-orange-soft: rgba(234, 88, 12, 0.12);
+  --color-exl-orange-line: rgba(234, 88, 12, 0.32);
+
+  /* AI auto-fill amber (used by .ai-filled and AiChip) */
+  --color-ai-amber: #eab308;
+  --color-ai-amber-soft: rgba(234, 179, 8, 0.16);
+  --color-ai-amber-ink: #1a1205;
+
+  /* Motion */
+  --ease-atlas: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Theme-aware shadows (dark defaults; light variant overrides below).
+   * Used by the docked AtlasPanel, the settings dropdown, and the
+   * ApprovalCard so each elevation reads correctly in both themes. */
+  --shadow-atlas-panel: -8px 0 40px rgba(0, 0, 0, 0.50);
+  --shadow-atlas-menu: 0 16px 48px rgba(0, 0, 0, 0.55);
+  --shadow-atlas-card: 0 10px 28px rgba(0, 0, 0, 0.35);
+  --shadow-atlas-bubble: 0 10px 24px rgba(0, 0, 0, 0.35);
+}
+
+/* ============================================================
+ * Atlas light-mode token overrides.
+ *
+ * The atlas-* token set above defaults to the dark surface palette
+ * (matching the Design System's primary theme). When the app is NOT
+ * in dark mode (no .dark on documentElement, per ThemeContext), flip
+ * the surface / fg / border / shadow tokens to the light variant from
+ * Design System/colors_and_type.css so the panel and chat track the
+ * rest of the app.
+ *
+ * Accent (--color-exl-orange*) and AI amber (--color-ai-amber*) stay
+ * theme-independent — those are brand colors.
+ * ============================================================ */
+:root:not(.dark) {
+  --color-atlas-bg: #f6f8fb;
+  --color-atlas-surface-1: #ffffff;
+  --color-atlas-surface-2: #ffffff;
+  --color-atlas-surface-3: #f1f5f9;
+  --color-atlas-surface-4: #e8edf4;
+
+  --color-atlas-fg: #0f172a;
+  --color-atlas-fg-muted: #5a6677;
+  --color-atlas-fg-subtle: #94a3b8;
+
+  --color-atlas-border: #e4e9f0;
+  --color-atlas-border-strong: #cbd5e1;
+  --color-atlas-border-faint: #eef2f7;
+
+  --shadow-atlas-panel: -8px 0 40px rgba(15, 23, 42, 0.10);
+  --shadow-atlas-menu: 0 16px 48px rgba(15, 23, 42, 0.12);
+  --shadow-atlas-card: 0 10px 28px rgba(15, 23, 42, 0.10);
+  --shadow-atlas-bubble: 0 10px 24px rgba(15, 23, 42, 0.18);
 }
 
 /* Color Theme Overrides - These override the @theme values */
@@ -212,4 +296,128 @@ input[type="date"]::-webkit-clear-button {
 @keyframes callwave {
   0%, 100% { transform: scaleY(0.25); }
   50% { transform: scaleY(1); }
+}
+
+/* ============================================================
+ * Phase 4 design — Atlas keyframes + AI auto-fill border trace.
+ * Source: Design System/ui_kits/copilot-panel/kit.css.
+ * ============================================================ */
+
+/* Atlas radar/sonar mark — pulsing core + concentric pings (only
+ * animates while AtlasMark's `animate` prop is true). */
+@keyframes atlas-core {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.18); }
+}
+@keyframes atlas-ping {
+  0% { transform: scale(0.4); opacity: 0; }
+  12% { opacity: 0.9; }
+  100% { transform: scale(3); opacity: 0; }
+}
+.atlas-core {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: atlas-core 3s var(--ease-atlas) infinite;
+}
+.atlas-ping {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(0.4);
+  opacity: 0;
+  animation-name: atlas-ping;
+  animation-timing-function: var(--ease-atlas);
+  animation-iteration-count: infinite;
+}
+
+/* Three-dot "AI thinking" loader. Staggered fade + tiny bounce. */
+@keyframes atlas-blink {
+  0%, 80%, 100% { opacity: 0.25; transform: translateY(0); }
+  40% { opacity: 1; transform: translateY(-3px); }
+}
+
+/* Calm connecting ring (dialer). Slow rotation, no frantic spin. */
+@keyframes atlas-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Soft pulsing ring — wraps the dial button while a call is connecting.
+ * Quieter than a spin; reads as "patient" rather than "busy". */
+@keyframes atlas-pulse-ring {
+  0%   { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.50); }
+  100% { box-shadow: 0 0 0 8px rgba(234, 179, 8, 0.00); }
+}
+.atlas-pulse-ring {
+  animation: atlas-pulse-ring 1.6s var(--ease-atlas) infinite;
+}
+
+/* Message entrance — short rise + fade. */
+@keyframes atlas-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.msg-in {
+  animation: atlas-rise 0.32s var(--ease-atlas) both;
+}
+
+/* AI auto-fill: a light traces around the field border, runs two laps,
+ * then fades to the resting amber glow. Mask-composite cuts the
+ * conic-gradient to a 2px border ring only. */
+@property --ai-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+.ai-filled {
+  position: relative;
+  box-shadow: 0 0 0 3px var(--color-ai-amber-soft);
+  border-color: var(--color-ai-amber) !important;
+}
+.ai-filled::after {
+  content: '';
+  position: absolute;
+  inset: -1.5px;
+  border-radius: inherit;
+  padding: 2px;
+  background: conic-gradient(
+    from var(--ai-angle),
+    rgba(255, 255, 255, 0) 0deg,
+    rgba(255, 255, 255, 0) 205deg,
+    var(--color-exl-orange) 312deg,
+    #ffce7a 350deg,
+    rgba(255, 255, 255, 0) 360deg
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  animation: ai-trace 1.25s linear 2, ai-fade 0.45s var(--ease-atlas) 2.5s forwards;
+}
+@keyframes ai-trace {
+  to { --ai-angle: 360deg; }
+}
+@keyframes ai-fade {
+  to { opacity: 0; }
+}
+
+/* Atlas chat block-flow margins (NOT flex column — flex compresses tall
+ * cards like tool traces). */
+.atlas-chat-scroll > * {
+  margin-bottom: 14px;
+}
+.atlas-chat-scroll > *:last-child {
+  margin-bottom: 0;
+}
+
+/* Respect reduced motion globally for Atlas animations. */
+@media (prefers-reduced-motion: reduce) {
+  .atlas-core,
+  .atlas-ping,
+  .atlas-pulse-ring,
+  .msg-in {
+    animation: none !important;
+  }
+  .ai-filled::after {
+    animation: none;
+    opacity: 0;
+  }
 }

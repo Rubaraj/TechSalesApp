@@ -1,25 +1,20 @@
 /**
- * Phase 4 (UI merge) — Extracted body of the old `CallPanel`. Renders the
- * dialer / transcript / compliance alerts / incoming-call view without its
- * own right-docked `<aside>` wrapper, so `AtlasPanel` can embed it in the
- * top half of the unified panel.
+ * Phase 4 design — Call section embedded in AtlasPanel's top half.
  *
- * The visual semantics are preserved exactly — only the outer wrapper is
- * gone. Lifecycle hooks (useCallAnalysis SSE subscription, compliance fade
- * timers, transcript auto-scroll) all live here so the section behaves
- * identically whether mounted standalone or embedded.
+ * Restyled to use the dark atlas-* token set so the call surface reads
+ * as a continuation of the Atlas panel (single unified copilot) rather
+ * than a separate light card glued on top.
  *
  * Returns null when no call is active.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Mic, MicOff, PhoneOff, AlertTriangle } from 'lucide-react';
+import { Mic, MicOff, PhoneOff, AlertTriangle, Radio } from 'lucide-react';
 import { useCallContext } from '../../context/CallContext';
 import { useCallRuntime } from './CallRuntime';
 import { useCallAnalysis } from '../../hooks/useCallAnalysis';
 import { CallWaveform } from './CallWaveform';
 import { Dialer } from './Dialer';
 import { TranscriptBubble } from './TranscriptBubble';
-import { AudioDeviceSelector } from './AudioDeviceSelector';
 import { ComplianceAlert } from './ComplianceAlert';
 import { EntitySummary } from './EntitySummary';
 import { IncomingCallView } from './IncomingCallView';
@@ -44,7 +39,6 @@ export function CallSection(): React.JSX.Element | null {
   }, [state.isCallActive]);
 
   const twilioCall = useCallRuntime();
-  // SSE consumer for diarized transcript chunks (Deepgram → backend → SSE).
   useCallAnalysis();
 
   const transcriptRef = useRef<HTMLDivElement | null>(null);
@@ -58,7 +52,6 @@ export function CallSection(): React.JSX.Element | null {
     [now, state.callStartTime],
   );
 
-  // Compliance flag fade-then-filter (kept from CallPanel).
   const [hiddenFlags, setHiddenFlags] = useState<{
     callId: string | null;
     ids: Set<string>;
@@ -102,8 +95,7 @@ export function CallSection(): React.JSX.Element | null {
     state.callStatus === 'ending';
   const isListening = state.callStatus === 'connected';
 
-  const showIncomingRing =
-    state.direction === 'inbound' && state.callStatus === 'ringing';
+  const showIncomingRing = state.direction === 'inbound' && state.callStatus === 'ringing';
   const showDialer = state.callStatus === 'idle' && !showIncomingRing;
   const error = twilioCall.error;
 
@@ -111,7 +103,7 @@ export function CallSection(): React.JSX.Element | null {
     ? state.incomingCaller?.leadName ?? state.incomingCaller?.number ?? 'Incoming…'
     : callInProgress
       ? state.dialedNumber
-        ? `Call · ${state.dialedNumber}`
+        ? state.dialedNumber
         : 'Call in progress'
       : 'Dialer';
 
@@ -120,37 +112,74 @@ export function CallSection(): React.JSX.Element | null {
   };
 
   return (
-    <div className="flex-1 min-h-0 flex flex-col bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-      {/* Header — dialer status + mute/end controls */}
-      <div className="flex items-center justify-between px-3 py-2 border-b border-gray-200 dark:border-gray-700">
-        <div className="flex items-center gap-2 min-w-0">
-          <Mic
-            className={`w-4 h-4 shrink-0 ${
-              isListening
-                ? 'text-primary-600 dark:text-primary-400'
-                : 'text-gray-400'
-            }`}
+    <div
+      className="flex-1 min-h-0 flex flex-col"
+      style={{
+        background: 'var(--color-atlas-bg)',
+        color: 'var(--color-atlas-fg)',
+        borderBottom: '1px solid var(--color-atlas-border)',
+      }}
+    >
+      {/* Header — mic / dialer status + mute / end */}
+      <div
+        className="flex items-center justify-between px-3 py-2.5"
+        style={{ borderBottom: '1px solid var(--color-atlas-border)' }}
+      >
+        <div className="flex items-center gap-2.5 min-w-0">
+          <Radio
+            className="w-4 h-4 shrink-0"
+            style={{
+              color: isListening
+                ? 'var(--color-exl-orange-bright)'
+                : 'var(--color-atlas-fg-subtle)',
+            }}
           />
-          <div className="min-w-0">
-            <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+          <div className="min-w-0 leading-tight">
+            <p
+              className="text-[10px] font-bold uppercase tracking-[0.08em]"
+              style={{ color: 'var(--color-atlas-fg-muted)' }}
+            >
+              {showDialer ? 'Dialer' : showIncomingRing ? 'Incoming' : 'On call'}
+            </p>
+            <p
+              className="text-[13.5px] font-semibold truncate"
+              style={{
+                fontFamily: 'var(--font-mono)',
+                color: 'var(--color-atlas-fg)',
+              }}
+            >
               {headerTitle}
             </p>
-            {callInProgress && (
-              <p className="text-[11px] font-mono text-gray-500 dark:text-gray-400">
-                {formatDuration(durationMs)} · {state.callStatus}
-              </p>
-            )}
           </div>
         </div>
-        <div className="flex items-center gap-1 shrink-0">
+        <div className="flex items-center gap-1.5 shrink-0">
+          {callInProgress && (
+            <span
+              className="px-2 py-0.5 rounded-md text-[11px]"
+              style={{
+                fontFamily: 'var(--font-mono)',
+                color: 'var(--color-atlas-fg-muted)',
+                background: 'var(--color-atlas-surface-3)',
+              }}
+            >
+              {formatDuration(durationMs)}
+            </span>
+          )}
           {state.callStatus === 'connected' && (
             <button
               onClick={() => twilioCall.setMute(!state.isMuted)}
-              className={`p-1.5 rounded-md transition-colors ${
-                state.isMuted
-                  ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
-                  : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300'
-              }`}
+              className="p-1.5 rounded-md transition-colors"
+              style={{
+                background: state.isMuted ? 'rgba(255,107,107,0.16)' : 'transparent',
+                color: state.isMuted ? '#ff6b6b' : 'var(--color-atlas-fg-muted)',
+              }}
+              onMouseEnter={(e) => {
+                if (!state.isMuted)
+                  e.currentTarget.style.background = 'var(--color-atlas-surface-3)';
+              }}
+              onMouseLeave={(e) => {
+                if (!state.isMuted) e.currentTarget.style.background = 'transparent';
+              }}
               aria-label={state.isMuted ? 'Unmute' : 'Mute'}
               title={state.isMuted ? 'Unmute agent mic' : 'Mute agent mic'}
             >
@@ -160,7 +189,10 @@ export function CallSection(): React.JSX.Element | null {
           {callInProgress && !showIncomingRing && (
             <button
               onClick={handleEnd}
-              className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-red-600 hover:bg-red-700 text-white text-xs font-medium transition-colors"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold text-white transition-colors"
+              style={{ background: '#dc2626' }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = '#b91c1c')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = '#dc2626')}
               aria-label="End call"
               title="End call"
             >
@@ -172,7 +204,14 @@ export function CallSection(): React.JSX.Element | null {
       </div>
 
       {error && (
-        <div className="mx-3 mt-2 p-2 rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-xs text-red-800 dark:text-red-300 flex gap-2">
+        <div
+          className="mx-3 mt-2 p-2 rounded-md text-xs flex gap-2"
+          style={{
+            background: 'rgba(255,107,107,0.10)',
+            border: '1px solid rgba(255,107,107,0.35)',
+            color: '#ff6b6b',
+          }}
+        >
           <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
           <p>{error}</p>
         </div>
@@ -181,16 +220,16 @@ export function CallSection(): React.JSX.Element | null {
       {showIncomingRing && <IncomingCallView />}
 
       {showDialer && (
-        <Dialer
-          dial={twilioCall.dial}
-          isDialing={twilioCall.isDialing}
-          error={twilioCall.error}
-        />
+        <Dialer dial={twilioCall.dial} isDialing={twilioCall.isDialing} error={twilioCall.error} />
       )}
 
       {!showDialer && !showIncomingRing && visibleComplianceFlags.length > 0 && (
         <div
-          className="border-b border-red-200 dark:border-red-800/50 px-3 py-2 space-y-1.5 max-h-32 overflow-y-auto bg-red-50/50 dark:bg-red-900/10"
+          className="px-3 py-2 space-y-1.5 max-h-32 overflow-y-auto"
+          style={{
+            borderBottom: '1px solid rgba(255,107,107,0.35)',
+            background: 'rgba(255,107,107,0.06)',
+          }}
           role="region"
           aria-label="Compliance alerts"
         >
@@ -203,16 +242,23 @@ export function CallSection(): React.JSX.Element | null {
       {!showDialer && !showIncomingRing && (
         <div
           ref={transcriptRef}
-          className="flex-1 min-h-0 overflow-y-auto px-3 py-2 space-y-2"
+          className="flex-1 min-h-0 overflow-y-auto px-3 py-2.5 space-y-2"
           role="log"
           aria-live="polite"
           aria-label="Live transcript"
+          style={{ scrollbarWidth: 'thin' }}
         >
-          <p className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1">
+          <p
+            className="text-[10px] font-bold uppercase tracking-[0.08em] mb-1"
+            style={{ color: 'var(--color-atlas-fg-subtle)' }}
+          >
             Live Transcript
           </p>
           {state.transcript.length === 0 && (
-            <p className="text-xs italic text-gray-500 dark:text-gray-400">
+            <p
+              className="text-xs italic"
+              style={{ color: 'var(--color-atlas-fg-muted)' }}
+            >
               {isListening
                 ? 'Listening… start speaking and the transcript will appear here.'
                 : `Call ${state.callStatus}…`}
@@ -233,7 +279,10 @@ export function CallSection(): React.JSX.Element | null {
           {isListening && (
             <div className="pt-1 flex items-center gap-2">
               <CallWaveform isActive={isListening} />
-              <span className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500">
+              <span
+                className="text-[10px] font-bold uppercase tracking-[0.08em]"
+                style={{ color: 'var(--color-atlas-fg-subtle)' }}
+              >
                 listening
               </span>
             </div>
@@ -241,7 +290,6 @@ export function CallSection(): React.JSX.Element | null {
         </div>
       )}
 
-      {isListening && <AudioDeviceSelector />}
       {!showDialer && !showIncomingRing && <EntitySummary />}
     </div>
   );

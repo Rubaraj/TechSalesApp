@@ -16,9 +16,11 @@ import { findProviderByName } from '../../services/providerService';
 import { useAiEnabled } from '../../hooks/useAiEnabled';
 import { calculateAge } from '../../utils/dateUtils';
 
-// Phase 3b — yellow ring shown for ~2s on a freshly AI-filled field.
+// Phase 4 design — applies the `.ai-filled` class (conic-gradient border
+// trace animation, defined in index.css) for ~2s on a freshly AI-filled
+// field. The trace runs two laps then fades to a resting amber glow.
 const AI_RING_FADE_MS = 2_000;
-const AI_RING_CLASS = 'ring-2 ring-yellow-400 animate-pulse focus:ring-yellow-400';
+const AI_RING_CLASS = 'ai-filled';
 
 /**
  * Phase 3b — Derive a 30-day-supply quantity from a parsed frequency string.

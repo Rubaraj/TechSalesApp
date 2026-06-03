@@ -2,17 +2,19 @@ import { Outlet } from 'react-router-dom';
 import { Header } from './Header';
 import { CallRuntime } from '../call/CallRuntime';
 import { AtlasPanel } from '../atlas/AtlasPanel';
+import { useAtlas } from '../../context/AtlasContext';
 import { useCallContext } from '../../context/CallContext';
 
 export function Layout() {
-  const { state } = useCallContext();
-  // Reflow main content to make room for the right-docked call panel.
-  // 380px when expanded, 48px when collapsed, 0 when no call active.
-  const callPaddingRight = !state.isCallActive
-    ? 0
-    : state.isCallPanelOpen
-      ? 380
-      : 48;
+  // Phase 4 (dock) — Layout pads main content by the Atlas panel width
+  // whenever the right-edge panel is visible. The panel is visible if
+  // EITHER the Atlas chat is open OR a call's section is on screen
+  // (dialer-only mode, transcript, etc.). Both surfaces share the same
+  // docked panel and the same width token.
+  const { isPanelOpen, panelWidth } = useAtlas();
+  const { state: callState } = useCallContext();
+  const callHalfVisible = callState.isCallActive && callState.isCallPanelOpen;
+  const rightPad = isPanelOpen || callHalfVisible ? panelWidth : 0;
 
   // CallRuntime hosts the single useTwilioCall instance and publishes its
   // handles via CallRuntimeContext. Must wrap the entire authenticated tree
@@ -26,7 +28,7 @@ export function Layout() {
 
         <div
           className="transition-all duration-200"
-          style={{ paddingRight: callPaddingRight }}
+          style={{ paddingRight: rightPad }}
         >
           <main className="p-4 lg:p-6">
             <Outlet />
@@ -41,11 +43,6 @@ export function Layout() {
           </footer>
         </div>
 
-        {/* Phase 4 (UI merge) — single right-edge panel. AtlasPanel hosts
-         *  both the dialer/transcript (top half when a call is active) and
-         *  the Atlas chat (bottom half / full height). The old separate
-         *  CallPanel aside is gone; CallSection.tsx is embedded inside
-         *  AtlasPanel instead. */}
         <AtlasPanel />
       </div>
     </CallRuntime>

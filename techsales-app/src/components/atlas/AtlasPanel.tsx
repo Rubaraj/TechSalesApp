@@ -1,61 +1,56 @@
 /**
- * Phase 4 (M4) — Atlas right-docked copilot panel. Vertical-slice scope:
- * idle mode only (chat + approval cards + nav suggestions). Resize hook and
- * call-active layout split land in a follow-up.
+ * Phase 4 design — Atlas right-docked copilot panel.
  *
- * The panel is always mounted (when an agent is signed in) so Atlas is
- * available on every screen.
+ * Visual language: EXL Medicare Hub Design System. Dark-first surfaces
+ * (atlas-* tokens in index.css), Newsreader serif on the "Atlas" headline,
+ * single settings gear in the header (dropdown replaces the old icon
+ * cluster), inline ModeToggle, ~440px default width (drag-resizable).
+ *
+ * Layout invariant: when a call is active AND the call panel is open,
+ * the panel splits exactly 50/50 vertically — top half is CallSection
+ * (dialer / transcript), bottom half is the Atlas chat. Otherwise Atlas
+ * fills the full height.
  */
 import { useEffect, useRef, useState } from 'react';
-import { Bot, Sparkles, X, MessageSquarePlus } from 'lucide-react';
+import { Settings, Mic, MicOff, Compass, History, Plus, X } from 'lucide-react';
 import { useAtlas } from '../../context/AtlasContext';
 import { useAuth } from '../../context/AuthContext';
 import { useCallContext } from '../../context/CallContext';
 import { ChatPane } from './ChatPane';
 import { GreetingCard } from './GreetingCard';
-import { ApprovalCard } from './ApprovalCard';
-import { NavigationCard } from './NavigationCard';
 import { ModeToggle } from './ModeToggle';
 import { ResumeBanner } from './ResumeBanner';
 import { CallSection } from '../call/CallSection';
+import { AudioDevicePickerRows } from '../call/AudioDeviceSelector';
+import { AtlasMark } from './AtlasMark';
 
-const PANEL_WIDTH_KEY = 'techsales:atlas-panel-width';
-const MIN_WIDTH = 320;
+// Mirror the clamp values in AtlasContext so the live-drag preview can
+// also bound itself; the context's setter is the authoritative clamp.
+const MIN_WIDTH = 360;
 const MAX_WIDTH = 600;
-const DEFAULT_WIDTH = 400;
 
 export function AtlasPanel(): React.JSX.Element | null {
   const { user } = useAuth();
-  const { messages, startNewSession } = useAtlas();
-  const { state: callState } = useCallContext();
-  const [isOpen, setIsOpen] = useState(true);
-  // When a call is active AND the call panel is showing, Atlas drops to the
-  // bottom half of the right edge instead of taking the full height. This
-  // gives the dialer / transcript / compliance alerts the top half (per the
-  // user's "50/50 share" instruction).
+  const {
+    messages,
+    isStreaming,
+    startNewSession,
+    isPanelOpen,
+    setPanelOpen,
+    panelWidth,
+    setPanelWidth,
+  } = useAtlas();
+  const { state: callState, setMute } = useCallContext();
   const callPanelVisible = callState.isCallActive && callState.isCallPanelOpen;
-  const [width, setWidth] = useState<number>(() => {
-    if (typeof window === 'undefined') return DEFAULT_WIDTH;
-    const stored = window.localStorage.getItem(PANEL_WIDTH_KEY);
-    const n = stored ? Number.parseInt(stored, 10) : NaN;
-    return Number.isFinite(n) ? Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, n)) : DEFAULT_WIDTH;
-  });
-  const dragRef = useRef<{ startX: number; startWidth: number } | null>(null);
 
-  useEffect(() => {
-    try {
-      window.localStorage.setItem(PANEL_WIDTH_KEY, String(width));
-    } catch {
-      // ignore
-    }
-  }, [width]);
+  const dragRef = useRef<{ startX: number; startWidth: number } | null>(null);
 
   useEffect(() => {
     function onMove(e: MouseEvent): void {
       if (!dragRef.current) return;
       const delta = dragRef.current.startX - e.clientX;
       const next = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, dragRef.current.startWidth + delta));
-      setWidth(next);
+      setPanelWidth(next);
     }
     function onUp(): void {
       dragRef.current = null;
@@ -67,141 +62,263 @@ export function AtlasPanel(): React.JSX.Element | null {
       window.removeEventListener('mousemove', onMove);
       window.removeEventListener('mouseup', onUp);
     };
-  }, []);
+  }, [setPanelWidth]);
+
+  // Auto-open the Atlas chat once a call is *initiated* — i.e. callStatus
+  // moves off 'idle' (the dialer-only state). Fires exactly once per call
+  // by remembering the callId we've already opened for, so a user who
+  // closes Atlas mid-call doesn't get it re-opened on every status tick.
+  const autoOpenedForCallRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (
+      callState.isCallActive &&
+      callState.callStatus !== 'idle' &&
+      callState.callId &&
+      autoOpenedForCallRef.current !== callState.callId
+    ) {
+      autoOpenedForCallRef.current = callState.callId;
+      setPanelOpen(true);
+    }
+    // Reset the latch when the call ends so the next call can auto-open.
+    if (!callState.isCallActive && autoOpenedForCallRef.current) {
+      autoOpenedForCallRef.current = null;
+    }
+  }, [callState.isCallActive, callState.callStatus, callState.callId, setPanelOpen]);
 
   if (!user) return null;
 
-  if (!isOpen) {
-    // Collapsed bubble in the BOTTOM-right corner (Intercom-style). Was
-    // top-right; moved per UX feedback to avoid overlap with the header
-    // dialer button and follow the chat-bubble pattern agents already
-    // recognize from other tools.
-    return (
-      <button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-5 right-5 z-40 p-3.5 rounded-full bg-primary-600 hover:bg-primary-700 text-white shadow-xl transition-colors"
-        aria-label="Open Atlas copilot"
-        title="Open Atlas"
-      >
-        <Bot className="w-5 h-5" />
-        {messages.length > 0 && (
-          <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-yellow-400 ring-2 ring-white" />
-        )}
-      </button>
-    );
-  }
+  // Panel renders if EITHER the dialer/call section or the Atlas chat
+  // is wanted. Both closed ⇒ no panel; one open ⇒ that surface fills the
+  // panel; both open ⇒ 50/50 split (CallSection on top, Atlas chat below).
+  const showCallHalf = callPanelVisible;
+  const showAtlasHalf = isPanelOpen;
+  if (!showCallHalf && !showAtlasHalf) return null;
 
-  // Single unified panel. When a call is active, the panel splits 50/50:
-  // top = CallSection (dialer / transcript / mute / end), bottom = Atlas
-  // chat. When no call, Atlas chat fills the full height. The previous
-  // separate `<CallPanel/>` aside is gone — there's exactly one right-edge
-  // panel and it owns both surfaces.
   return (
     <aside
-      className="fixed top-16 right-0 bottom-0 z-30 flex flex-col bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-700 shadow-xl"
-      style={{ width }}
+      className="fixed top-16 right-0 bottom-0 z-30 flex flex-col"
+      style={{
+        width: panelWidth,
+        background: 'var(--color-atlas-surface-1)',
+        color: 'var(--color-atlas-fg)',
+        borderLeft: '1px solid var(--color-atlas-border)',
+        boxShadow: 'var(--shadow-atlas-panel)',
+      }}
       aria-label="Atlas AI copilot"
     >
-      {/* Drag handle on the left edge */}
+      {/* Drag handle */}
       <div
         onMouseDown={(e) => {
-          dragRef.current = { startX: e.clientX, startWidth: width };
+          dragRef.current = { startX: e.clientX, startWidth: panelWidth };
           document.body.style.cursor = 'ew-resize';
         }}
-        className="absolute top-0 bottom-0 -left-1 w-2 cursor-ew-resize hover:bg-primary-200/50 dark:hover:bg-primary-700/30"
+        className="absolute top-0 bottom-0 -left-1 w-2 cursor-ew-resize hover:bg-orange-300/20"
         aria-label="Resize Atlas panel"
         role="separator"
       />
 
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center">
-            <Sparkles className="w-4 h-4 text-white" />
+      {/* Atlas chrome header — only renders when the Atlas chat half is
+       *  visible. When the panel is showing the dialer alone, the CallSection
+       *  carries its own "Dialer / On call" eyebrow header and the Atlas
+       *  brand + ModeToggle + Settings gear would be misleading. */}
+      {showAtlasHalf && (
+        <div
+          className="flex items-center justify-between px-3 py-2.5 border-b"
+          style={{ borderColor: 'var(--color-atlas-border)' }}
+        >
+          <div className="flex items-center gap-2.5 min-w-0">
+            <AtlasMark size={32} animate={isStreaming} />
+            <div className="min-w-0 leading-tight">
+              <p
+                className="text-base font-medium uppercase"
+                style={{
+                  fontFamily: 'var(--font-serif)',
+                  color: 'var(--color-atlas-fg)',
+                  letterSpacing: '0.05em',
+                }}
+              >
+                Atlas
+              </p>
+              <p
+                className="text-[10px] font-bold uppercase tracking-[0.08em]"
+                style={{ color: 'var(--color-atlas-fg-muted)' }}
+              >
+                AI Assist
+              </p>
+            </div>
           </div>
-          <div className="min-w-0">
-            <p className="text-sm font-semibold text-gray-900 dark:text-white">Atlas</p>
-            <p className="text-[10px] uppercase tracking-wider text-gray-500 dark:text-gray-400">
-              AI copilot
-            </p>
+          <div className="flex items-center gap-2 shrink-0">
+            <ModeToggle />
+            <SettingsMenu
+              isMuted={state(callState)}
+              onMute={() => setMute(!callState.isMuted)}
+              onStartNew={() => {
+                if (messages.length === 0) return;
+                if (window.confirm('Start a new session? Your current conversation will be cleared.')) {
+                  void startNewSession();
+                }
+              }}
+              onClose={() => setPanelOpen(false)}
+              startNewDisabled={messages.length === 0}
+            />
           </div>
         </div>
-        <div className="flex items-center gap-1.5">
-          <ModeToggle />
-          <button
-            onClick={() => {
-              if (messages.length === 0) return;
-              if (
-                window.confirm(
-                  'Start a new session? Your current conversation will be cleared.',
-                )
-              ) {
-                void startNewSession();
-              }
-            }}
-            className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-            aria-label="New session"
-            title={messages.length === 0 ? 'Already a fresh session' : 'Start a new session'}
-            disabled={messages.length === 0}
-          >
-            <MessageSquarePlus className="w-4 h-4 text-gray-600 dark:text-gray-300" />
-          </button>
-          <button
-            onClick={() => setIsOpen(false)}
-            className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-            aria-label="Collapse panel"
-            title="Collapse"
-          >
-            <X className="w-4 h-4 text-gray-600 dark:text-gray-300" />
-          </button>
-        </div>
-      </div>
+      )}
 
-      {/* Body — single panel, split 50/50 when call active. */}
+      {/* Body — independent halves. One visible ⇒ full height; both ⇒ 50/50. */}
       <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
-        {callPanelVisible && (
-          <div className="flex-1 min-h-0 flex flex-col" style={{ flexBasis: '50%' }}>
+        {showCallHalf && (
+          <div
+            className="flex-1 min-h-0 flex flex-col"
+            style={showAtlasHalf ? { flexBasis: '50%' } : undefined}
+          >
             <CallSection />
           </div>
         )}
-        <div
-          className="flex-1 min-h-0 flex flex-col"
-          style={callPanelVisible ? { flexBasis: '50%' } : undefined}
-        >
-          {messages.length === 0 ? <GreetingCard /> : <ResumeBanner />}
-          <ChatPane />
-          <ApprovalDeck />
-          <NavigationDeck />
-        </div>
+        {showAtlasHalf && (
+          <div
+            className="flex-1 min-h-0 flex flex-col"
+            style={showCallHalf ? { flexBasis: '50%' } : undefined}
+          >
+            {messages.length === 0 ? <GreetingCard /> : <ResumeBanner />}
+            <ChatPane />
+          </div>
+        )}
       </div>
     </aside>
   );
 }
 
-// Renders the stacked approval cards Atlas has emitted this session.
-function ApprovalDeck(): React.JSX.Element | null {
-  const { proposals } = useAtlas();
-  const visible = proposals.filter((p) => p.status !== 'rejected');
-  if (visible.length === 0) return null;
+// Helper — pull `isMuted` from CallContext.state without TypeScript narrow drama.
+function state(s: { isMuted: boolean }): boolean {
+  return s.isMuted;
+}
+
+interface SettingsMenuProps {
+  isMuted: boolean;
+  onMute: () => void;
+  onStartNew: () => void;
+  onClose: () => void;
+  startNewDisabled: boolean;
+}
+
+function SettingsMenu({
+  isMuted,
+  onMute,
+  onStartNew,
+  onClose,
+  startNewDisabled,
+}: SettingsMenuProps): React.JSX.Element {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!open) return undefined;
+    function onClickOutside(e: MouseEvent): void {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener('mousedown', onClickOutside);
+    return () => document.removeEventListener('mousedown', onClickOutside);
+  }, [open]);
+
   return (
-    <div className="border-t border-gray-200 dark:border-gray-700 px-3 py-2 space-y-2 max-h-64 overflow-y-auto">
-      {visible.map((p) => (
-        <ApprovalCard key={p.proposalId} proposal={p} />
-      ))}
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="p-1.5 rounded-md transition-colors"
+        style={{
+          color: 'var(--color-atlas-fg-muted)',
+          background: open ? 'var(--color-atlas-surface-3)' : 'transparent',
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--color-atlas-surface-3)')}
+        onMouseLeave={(e) =>
+          (e.currentTarget.style.background = open ? 'var(--color-atlas-surface-3)' : 'transparent')
+        }
+        aria-label="Settings"
+        title="Settings"
+      >
+        <Settings className="w-4 h-4" />
+      </button>
+      {open && (
+        <div
+          className="absolute top-full right-0 mt-1 w-44 rounded-lg shadow-lg overflow-hidden z-50"
+          style={{
+            background: 'var(--color-atlas-surface-2)',
+            border: '1px solid var(--color-atlas-border-strong)',
+            boxShadow: 'var(--shadow-atlas-menu)',
+          }}
+        >
+          <MenuItem
+            icon={isMuted ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+            label={isMuted ? 'Unmute mic' : 'Mute mic'}
+            onClick={() => {
+              onMute();
+              setOpen(false);
+            }}
+          />
+          <MenuItem
+            icon={<Compass className="w-4 h-4" />}
+            label="Explore"
+            onClick={() => setOpen(false)}
+          />
+          <MenuItem
+            icon={<History className="w-4 h-4" />}
+            label="History"
+            onClick={() => setOpen(false)}
+          />
+          <MenuItem
+            icon={<Plus className="w-4 h-4" />}
+            label="New chat"
+            onClick={() => {
+              if (!startNewDisabled) onStartNew();
+              setOpen(false);
+            }}
+            disabled={startNewDisabled}
+          />
+          {/* Mic + speaker pickers — renders only when a Twilio device is
+           *  initialized (i.e. during/after an active call). Replaces the
+           *  old in-panel footer dropdowns. */}
+          <AudioDevicePickerRows />
+          <div style={{ borderTop: '1px solid var(--color-atlas-border)' }} />
+          <MenuItem
+            icon={<X className="w-4 h-4" />}
+            label="Close panel"
+            onClick={() => {
+              onClose();
+              setOpen(false);
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }
 
-function NavigationDeck(): React.JSX.Element | null {
-  const { navigationSuggestions, mode } = useAtlas();
-  // In Auto Pilot the suggestions are consumed elsewhere (auto-navigate);
-  // in Silent they're suppressed; in Assist they show here as cards.
-  if (mode !== 'assist' || navigationSuggestions.length === 0) return null;
+function MenuItem({
+  icon,
+  label,
+  onClick,
+  disabled = false,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  onClick: () => void;
+  disabled?: boolean;
+}): React.JSX.Element {
   return (
-    <div className="border-t border-gray-200 dark:border-gray-700 px-3 py-2 space-y-1.5 max-h-40 overflow-y-auto">
-      {navigationSuggestions.map((s) => (
-        <NavigationCard key={s.id} suggestion={s} />
-      ))}
-    </div>
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className="w-full flex items-center gap-2.5 px-3 py-2 text-[13px] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+      style={{ color: 'var(--color-atlas-fg)' }}
+      onMouseEnter={(e) => {
+        if (!disabled) e.currentTarget.style.background = 'var(--color-atlas-surface-3)';
+      }}
+      onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+    >
+      <span style={{ color: 'var(--color-atlas-fg-muted)' }}>{icon}</span>
+      {label}
+    </button>
   );
 }
+

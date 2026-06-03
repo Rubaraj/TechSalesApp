@@ -3,8 +3,10 @@ import { Sun, Moon, LogOut, User, Bell, LayoutDashboard, ShoppingBag, Settings, 
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { useCallContext } from '../../context/CallContext';
+import { useAtlas } from '../../context/AtlasContext';
 import { useTwilioEnabled } from '../../hooks/useTwilioEnabled';
 import { ActiveCallBadge } from '../call/ActiveCallBadge';
+import { AtlasMark } from '../atlas/AtlasMark';
 import { getLogoByTheme } from '../../utils/logoUtils';
 
 // Routes that should highlight the Sales tab
@@ -29,6 +31,12 @@ export function Header() {
   const { resolvedTheme, toggleTheme, colorTheme } = useTheme();
   const { user, logout, dataSource, aiEnabled, aiProvider } = useAuth();
   const { state: callState, startCall, setPanelOpen, endCall } = useCallContext();
+  const {
+    isPanelOpen: isAtlasOpen,
+    setPanelOpen: setAtlasPanelOpen,
+    isStreaming: isAtlasStreaming,
+    messages: atlasMessages,
+  } = useAtlas();
   const twilioOn = useTwilioEnabled();
   const isAdminUser = user?.accessLevel === 'admin' || user?.isSuperAdmin;
   // Show call UI only when the full Twilio + Deepgram pipeline is configured
@@ -58,22 +66,24 @@ export function Header() {
   };
 
   // Dialer icon click — TOGGLE behavior:
-  //   - No session active: open a fresh dialer session.
-  //   - Session active + dialer in idle state: end the session (closes the panel).
-  //   - Session active + actively on a call: re-expand the collapsed panel
-  //     instead of ending the call (safer; agent must explicitly hang up).
+  //   - No session active: open ONLY the dialer (no Atlas chat below it).
+  //     Atlas auto-opens once the user actually places a call — see
+  //     AtlasPanel's auto-open useEffect that fires when callStatus moves
+  //     off 'idle'.
+  //   - Session active + dialer in idle state: end the session (collapses
+  //     the dialer half; Atlas chat stays as-is).
+  //   - Session active + actively on a call: re-expand the call section if
+  //     it was collapsed; never auto-hang-up. Atlas isn't touched — its
+  //     visibility is whatever the user last left it.
   const onClickDialer = (): void => {
     if (!callState.isCallActive) {
       startCall();
       return;
     }
-    // Session is active.
     if (callState.callStatus === 'idle') {
-      // Just the empty dialer is showing — second click closes it.
       endCall();
       return;
     }
-    // On a real call leg — restore the panel if collapsed; do NOT auto-hang-up.
     if (!callState.isCallPanelOpen) {
       setPanelOpen(true);
     }
@@ -160,6 +170,34 @@ export function Header() {
 
           {/* Active-call badge — visible during a call, jumps back to panel. */}
           <ActiveCallBadge />
+
+          {/* Atlas toggle — docks / undocks the Atlas copilot panel. Mirrors
+              the dialer's toggle pattern (open → docked, push main content;
+              closed → bottom-right bubble). Always visible while signed in,
+              independent of Twilio/call eligibility. */}
+          {user && (
+            <button
+              type="button"
+              onClick={() => setAtlasPanelOpen(!isAtlasOpen)}
+              className={`relative p-1.5 rounded-lg transition-colors ${
+                isAtlasOpen
+                  ? 'bg-primary-100 dark:bg-primary-900/30 ring-1 ring-primary-300 dark:ring-primary-700'
+                  : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+              }`}
+              aria-label={isAtlasOpen ? 'Close Atlas copilot' : 'Open Atlas copilot'}
+              aria-pressed={isAtlasOpen}
+              title={isAtlasOpen ? 'Close Atlas' : 'Open Atlas copilot'}
+            >
+              <AtlasMark size={22} animate={isAtlasStreaming} />
+              {!isAtlasOpen && atlasMessages.length > 0 && (
+                <span
+                  className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full ring-2 ring-white dark:ring-gray-800"
+                  style={{ background: 'var(--color-ai-amber)' }}
+                  aria-hidden="true"
+                />
+              )}
+            </button>
+          )}
 
           {/* Dialer icon — always visible to sales agents when AI is enabled.
               End Call button is rendered SEPARATELY below, only when a real

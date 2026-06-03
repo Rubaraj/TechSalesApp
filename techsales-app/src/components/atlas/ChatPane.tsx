@@ -1,26 +1,39 @@
 /**
- * Phase 4 (M4) — Atlas chat pane. Scrollable message list + input at bottom.
- * Auto-scrolls to newest message on every update.
+ * Phase 4 design — Atlas chat pane. Block-flow message list + composer.
+ *
+ * Visual language: WHO labels ("AI ASSIST" / "AGENT") above each turn —
+ * no avatars. User turns are orange-filled bubbles right-aligned; Atlas
+ * turns are unboxed text lines (matches the editorial copilot style).
+ * Tool calls render as a collapsible mono card. The call's AI activity
+ * log is interleaved chronologically as tinted rows.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Send, Square, ChevronRight, Sparkles } from 'lucide-react';
-import { useAtlas } from '../../context/AtlasContext';
+import { Send, Square, ChevronDown, ChevronUp, Wrench, Check } from 'lucide-react';
+import {
+  useAtlas,
+  type AtlasProposal,
+  type AtlasNavigationSuggestion,
+} from '../../context/AtlasContext';
 import { useCallContext } from '../../context/CallContext';
 import type { AiActivityEntry } from '../../types/call';
+import { ApprovalCard } from './ApprovalCard';
+import { NavigationCard } from './NavigationCard';
+
+type AtlasMessage = ReturnType<typeof useAtlas>['messages'][number];
+type ToolCall = NonNullable<AtlasMessage['toolCalls']>[number];
 
 type ChatRow =
-  | { kind: 'msg'; id: string; ts: number; data: ReturnType<typeof useAtlas>['messages'][number] }
-  | { kind: 'activity'; id: string; ts: number; data: AiActivityEntry };
+  | { kind: 'msg'; id: string; ts: number; data: AtlasMessage }
+  | { kind: 'activity'; id: string; ts: number; data: AiActivityEntry }
+  | { kind: 'proposal'; id: string; ts: number; data: AtlasProposal }
+  | { kind: 'navigation'; id: string; ts: number; data: AtlasNavigationSuggestion };
 
 export function ChatPane(): React.JSX.Element {
-  const { messages, send, abort, isStreaming } = useAtlas();
+  const { messages, proposals, navigationSuggestions, mode, send, abort, isStreaming } = useAtlas();
   const { state: callState } = useCallContext();
   const [input, setInput] = useState<string>('');
   const listRef = useRef<HTMLDivElement | null>(null);
 
-  // Phase 4 — merge chat messages with the call's AI activity log so Atlas
-  // surfaces both in a single chronological stream. This replaces the
-  // separate AiActivityFeed that used to dock inside CallPanel.
   const rows = useMemo<ChatRow[]>(() => {
     const msgRows: ChatRow[] = messages.map((m) => ({
       kind: 'msg',
@@ -36,17 +49,48 @@ export function ChatPane(): React.JSX.Element {
           data: a,
         }))
       : [];
-    return [...msgRows, ...activityRows].sort((a, b) => a.ts - b.ts);
-  }, [messages, callState.aiActivityLog, callState.isCallActive]);
+    // Phase 4 — interleave Atlas write-action proposals into the chat
+    // stream chronologically. Old deck-below-composer is gone; approvals
+    // now appear as inline messages from Atlas (with Approve / Reject
+    // buttons in Silent/Assist mode, success line only in Auto Pilot).
+    const proposalRows: ChatRow[] = proposals.map((p) => ({
+      kind: 'proposal',
+      id: p.proposalId,
+      ts: p.ts,
+      data: p,
+    }));
+    // Navigation suggestions follow the same inline pattern. Only surfaced
+    // in Assist mode — Silent suppresses them entirely, Auto Pilot routes
+    // immediately via the nav listener (no card needed).
+    const navigationRows: ChatRow[] =
+      mode === 'assist'
+        ? navigationSuggestions.map((s) => ({
+            kind: 'navigation',
+            id: s.id,
+            ts: s.ts,
+            data: s,
+          }))
+        : [];
+    return [...msgRows, ...activityRows, ...proposalRows, ...navigationRows].sort(
+      (a, b) => a.ts - b.ts,
+    );
+  }, [
+    messages,
+    proposals,
+    navigationSuggestions,
+    mode,
+    callState.aiActivityLog,
+    callState.isCallActive,
+  ]);
 
   useEffect(() => {
     const el = listRef.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [rows.length]);
+  }, [rows.length, isStreaming]);
 
   const onSubmit = (e: React.FormEvent): void => {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() || isStreaming) return;
     const text = input;
     setInput('');
     void send(text);
@@ -56,149 +100,354 @@ export function ChatPane(): React.JSX.Element {
     <div className="flex-1 min-h-0 flex flex-col">
       <div
         ref={listRef}
-        className="flex-1 overflow-y-auto px-3 py-3 space-y-3"
+        className="atlas-chat-scroll flex-1 overflow-y-auto px-4 py-4"
         role="log"
         aria-live="polite"
         aria-label="Atlas conversation"
+        style={{ scrollbarWidth: 'thin', scrollbarColor: 'var(--color-atlas-surface-4) transparent' }}
       >
-        {rows.length === 0 && (
-          <p className="text-xs italic text-gray-400 dark:text-gray-500 text-center mt-4">
+        {rows.length === 0 && !isStreaming && (
+          <p
+            className="text-[12.5px] italic text-center mt-6"
+            style={{ color: 'var(--color-atlas-fg-subtle)' }}
+          >
             Ask Atlas about your pipeline, plans, drugs, or any lead.
           </p>
         )}
-        {rows.map((row) =>
-          row.kind === 'msg' ? (
-            <MessageBubble key={row.id} message={row.data} />
-          ) : (
-            <ActivityRow key={row.id} entry={row.data} />
-          ),
-        )}
-        {isStreaming && (
-          <div className="flex items-center gap-1.5 px-3 py-2">
-            <span className="w-2 h-2 rounded-full bg-primary-500 animate-pulse" />
-            <span className="w-2 h-2 rounded-full bg-primary-500 animate-pulse [animation-delay:200ms]" />
-            <span className="w-2 h-2 rounded-full bg-primary-500 animate-pulse [animation-delay:400ms]" />
-          </div>
-        )}
+        {rows.map((row) => {
+          if (row.kind === 'msg') {
+            return <MessageRow key={row.id} message={row.data} />;
+          }
+          if (row.kind === 'activity') {
+            return <ActivityRow key={row.id} entry={row.data} />;
+          }
+          if (row.kind === 'proposal') {
+            return <ApprovalCard key={row.id} proposal={row.data} />;
+          }
+          return <NavigationCard key={row.id} suggestion={row.data} />;
+        })}
+        {isStreaming && <ThinkingDots />}
       </div>
 
-      <form
+      <Composer
+        input={input}
+        setInput={setInput}
         onSubmit={onSubmit}
-        className="border-t border-gray-200 dark:border-gray-700 p-3 flex items-end gap-2"
-      >
-        <textarea
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              onSubmit(e as unknown as React.FormEvent);
-            }
-          }}
-          placeholder="Ask Atlas anything…"
-          disabled={isStreaming}
-          rows={1}
-          className="flex-1 resize-none rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-60"
-        />
-        {isStreaming ? (
-          <button
-            type="button"
-            onClick={abort}
-            className="p-2 rounded-md bg-red-600 hover:bg-red-700 text-white"
-            aria-label="Stop"
-            title="Stop Atlas"
-          >
-            <Square className="w-4 h-4" />
-          </button>
-        ) : (
-          <button
-            type="submit"
-            disabled={!input.trim()}
-            className="p-2 rounded-md bg-primary-600 hover:bg-primary-700 text-white disabled:bg-gray-300 disabled:cursor-not-allowed"
-            aria-label="Send"
-            title="Send"
-          >
-            <Send className="w-4 h-4" />
-          </button>
-        )}
-      </form>
+        onAbort={abort}
+        isStreaming={isStreaming}
+      />
     </div>
   );
 }
 
-/**
- * Phase 4 — Renders a single AI-activity-log entry inline in the Atlas
- * chat stream. These are the events Phase 3a/3b/3b.1 used to surface in
- * a separate feed; Atlas now displays them as compact system rows
- * interleaved with chat by timestamp.
- */
-function ActivityRow({ entry }: { entry: AiActivityEntry }): React.JSX.Element {
-  const tone = TONE_BY_KIND[entry.kind] ?? 'bg-gray-50 dark:bg-gray-800/40 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700';
-  return (
-    <div className={`flex items-start gap-2 px-2 py-1.5 rounded-md border ${tone} text-[11px]`}>
-      <Sparkles className="w-3 h-3 shrink-0 mt-0.5 opacity-70" />
-      <span className="flex-1 min-w-0 truncate">{entry.text}</span>
-    </div>
-  );
-}
-
-const TONE_BY_KIND: Record<AiActivityEntry['kind'], string> = {
-  compliance: 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800',
-  fill: 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200 border-yellow-200 dark:border-yellow-800',
-  drug: 'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200 border-green-200 dark:border-green-800',
-  pharmacy: 'bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200 border-blue-200 dark:border-blue-800',
-  provider: 'bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200 border-blue-200 dark:border-blue-800',
-  note: 'bg-gray-50 dark:bg-gray-800/40 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700',
-  info: 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800',
+const WHO_LABEL: React.CSSProperties = {
+  fontSize: 10.5,
+  fontWeight: 700,
+  letterSpacing: '0.08em',
+  textTransform: 'uppercase',
+  marginBottom: 6,
+  display: 'block',
 };
 
-function MessageBubble({
-  message,
-}: {
-  message: ReturnType<typeof useAtlas>['messages'][number];
-}): React.JSX.Element {
-  const isUser = message.role === 'user';
+function MessageRow({ message }: { message: AtlasMessage }): React.JSX.Element {
+  if (message.role === 'user') return <UserBubble text={message.content} />;
+  return <AiMessage message={message} />;
+}
+
+function UserBubble({ text }: { text: string }): React.JSX.Element {
   return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
+    <div className="msg-in flex flex-col items-end">
+      <span style={{ ...WHO_LABEL, color: 'var(--color-atlas-fg-subtle)', marginRight: 2 }}>
+        Agent
+      </span>
       <div
-        className={`max-w-[85%] px-3 py-2 rounded-2xl text-sm whitespace-pre-wrap ${
-          isUser
-            ? 'bg-primary-600 text-white rounded-br-sm'
-            : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-bl-sm'
-        }`}
+        style={{
+          maxWidth: '82%',
+          fontSize: 14,
+          fontWeight: 600,
+          lineHeight: 1.45,
+          padding: '10px 15px',
+          borderRadius: '14px 14px 4px 14px',
+          background: 'var(--color-exl-orange)',
+          color: '#fff',
+          boxShadow: '0 1px 2px rgba(0,0,0,0.25)',
+          whiteSpace: 'pre-wrap',
+          wordBreak: 'break-word',
+        }}
       >
-        {message.toolCalls && message.toolCalls.length > 0 && (
-          <ToolCallTrace toolCalls={message.toolCalls} />
-        )}
-        {message.content || (isUser ? null : '…')}
+        {text}
       </div>
     </div>
   );
 }
 
-function ToolCallTrace({
-  toolCalls,
-}: {
-  toolCalls: NonNullable<ReturnType<typeof useAtlas>['messages'][number]['toolCalls']>;
-}): React.JSX.Element {
-  const [open, setOpen] = useState(false);
+function AiMessage({ message }: { message: AtlasMessage }): React.JSX.Element {
   return (
-    <details className="mb-1.5 text-[11px]" open={open} onToggle={(e) => setOpen((e.target as HTMLDetailsElement).open)}>
-      <summary className="cursor-pointer flex items-center gap-1 text-gray-600 dark:text-gray-300">
-        <ChevronRight className={`w-3 h-3 transition-transform ${open ? 'rotate-90' : ''}`} />
-        🔧 {toolCalls.length} tool {toolCalls.length === 1 ? 'call' : 'calls'}
-      </summary>
-      <ul className="mt-1 space-y-1 pl-3">
-        {toolCalls.map((tc, i) => (
-          <li
+    <div className="msg-in flex flex-col items-start">
+      <span style={{ ...WHO_LABEL, color: 'var(--color-exl-orange)' }}>AI Assist</span>
+      {message.toolCalls && message.toolCalls.length > 0 && (
+        <div className="w-full mb-2 flex flex-col gap-1.5">
+          {message.toolCalls.map((tc, i) => (
+            <ToolTrace key={i} call={tc} />
+          ))}
+        </div>
+      )}
+      {message.content && (
+        <div
+          className="w-full"
+          style={{
+            fontSize: 14,
+            lineHeight: 1.55,
+            color: 'var(--color-atlas-fg)',
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-word',
+          }}
+        >
+          {message.content}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ThinkingDots(): React.JSX.Element {
+  return (
+    <div className="msg-in flex flex-col items-start">
+      <span style={{ ...WHO_LABEL, color: 'var(--color-exl-orange)' }}>AI Assist</span>
+      <div
+        className="inline-flex gap-1.5"
+        style={{
+          background: 'var(--color-atlas-surface-3)',
+          padding: '11px 15px',
+          borderRadius: '14px 14px 14px 4px',
+        }}
+      >
+        {[0, 1, 2].map((i) => (
+          <span
             key={i}
-            className="text-[11px] font-mono text-gray-500 dark:text-gray-400 break-all"
-          >
-            {tc.tool}
-            {tc.latencyMs !== undefined && <span className="ml-1 text-gray-400">({tc.latencyMs}ms)</span>}
-          </li>
+            style={{
+              width: 7,
+              height: 7,
+              borderRadius: '50%',
+              background: 'var(--color-atlas-fg-muted)',
+              animation: 'atlas-blink 1.4s var(--ease-soft) infinite both',
+              animationDelay: `${i * 0.2}s`,
+              display: 'inline-block',
+            }}
+          />
         ))}
-      </ul>
-    </details>
+      </div>
+    </div>
+  );
+}
+
+function ToolTrace({ call }: { call: ToolCall }): React.JSX.Element {
+  const [open, setOpen] = useState(false);
+  const latency = call.latencyMs !== undefined ? `${(call.latencyMs / 1000).toFixed(1)}s` : null;
+  return (
+    <div
+      className="flex-shrink-0"
+      style={{
+        border: '1px solid var(--color-atlas-border)',
+        borderRadius: 11,
+        background: 'var(--color-atlas-surface-2)',
+        overflow: 'hidden',
+      }}
+    >
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center gap-2 px-3 py-2 text-left"
+        style={{ background: 'transparent', cursor: 'pointer' }}
+      >
+        <Wrench className="w-3.5 h-3.5" style={{ color: 'var(--color-atlas-fg-muted)' }} />
+        <span
+          style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: 12.5,
+            fontWeight: 600,
+            color: 'var(--color-atlas-fg)',
+          }}
+        >
+          {call.tool}
+        </span>
+        <span
+          className="ml-auto flex items-center gap-1"
+          style={{ fontSize: 11, color: 'var(--color-atlas-success, #6ad48f)' }}
+        >
+          <Check className="w-3 h-3" />
+          {latency ?? 'ok'}
+        </span>
+        {open ? (
+          <ChevronUp className="w-3.5 h-3.5" style={{ color: 'var(--color-atlas-fg-subtle)' }} />
+        ) : (
+          <ChevronDown className="w-3.5 h-3.5" style={{ color: 'var(--color-atlas-fg-subtle)' }} />
+        )}
+      </button>
+      {open && (call.input !== undefined || call.output !== undefined) && (
+        <div
+          style={{
+            borderTop: '1px solid var(--color-atlas-border)',
+            padding: '10px 12px',
+            background: 'var(--color-atlas-bg)',
+            fontFamily: 'var(--font-mono)',
+            fontSize: 11.5,
+            lineHeight: 1.7,
+            color: 'var(--color-atlas-fg-muted)',
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-all',
+          }}
+        >
+          {call.input !== undefined && (
+            <div>
+              <span style={{ color: 'var(--color-atlas-fg-subtle)' }}>input </span>
+              {typeof call.input === 'string' ? call.input : JSON.stringify(call.input)}
+            </div>
+          )}
+          {call.output !== undefined && (
+            <div style={{ color: 'var(--color-atlas-fg-subtle)', marginTop: 4 }}>
+              {typeof call.output === 'string'
+                ? call.output.slice(0, 200)
+                : JSON.stringify(call.output).slice(0, 200)}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+const ACTIVITY_TONE: Record<
+  AiActivityEntry['kind'],
+  { bg: string; border: string; dot: string; label: string }
+> = {
+  compliance: { bg: 'rgba(255,107,107,0.10)', border: 'rgba(255,107,107,0.35)', dot: '#ff6b6b', label: 'Compliance' },
+  fill: { bg: 'rgba(234,179,8,0.12)', border: 'rgba(234,179,8,0.35)', dot: '#eab308', label: 'Auto-fill' },
+  drug: { bg: 'rgba(106,212,143,0.10)', border: 'rgba(106,212,143,0.30)', dot: '#6ad48f', label: 'Drug' },
+  pharmacy: { bg: 'rgba(79,147,247,0.10)', border: 'rgba(79,147,247,0.30)', dot: '#4f93f7', label: 'Pharmacy' },
+  provider: { bg: 'rgba(79,147,247,0.10)', border: 'rgba(79,147,247,0.30)', dot: '#4f93f7', label: 'Provider' },
+  note: { bg: 'rgba(255,255,255,0.04)', border: 'var(--color-atlas-border)', dot: 'var(--color-atlas-fg-muted)', label: 'Note' },
+  info: { bg: 'rgba(149,128,255,0.10)', border: 'rgba(149,128,255,0.30)', dot: '#9580ff', label: 'Info' },
+};
+
+function ActivityRow({ entry }: { entry: AiActivityEntry }): React.JSX.Element {
+  const tone = ACTIVITY_TONE[entry.kind] ?? ACTIVITY_TONE.info;
+  return (
+    <div
+      className="msg-in flex items-start gap-2 px-2.5 py-1.5 rounded-md"
+      style={{
+        background: tone.bg,
+        border: `1px solid ${tone.border}`,
+        fontSize: 11.5,
+        color: 'var(--color-atlas-fg)',
+      }}
+    >
+      <span
+        className="shrink-0"
+        style={{
+          width: 7,
+          height: 7,
+          borderRadius: 999,
+          background: tone.dot,
+          marginTop: 5,
+        }}
+      />
+      <div className="min-w-0 flex-1">
+        <span
+          style={{
+            fontSize: 9.5,
+            fontWeight: 700,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            color: 'var(--color-atlas-fg-subtle)',
+            marginRight: 8,
+          }}
+        >
+          {tone.label}
+        </span>
+        <span style={{ color: 'var(--color-atlas-fg)' }}>{entry.text}</span>
+      </div>
+    </div>
+  );
+}
+
+function Composer({
+  input,
+  setInput,
+  onSubmit,
+  onAbort,
+  isStreaming,
+}: {
+  input: string;
+  setInput: (v: string) => void;
+  onSubmit: (e: React.FormEvent) => void;
+  onAbort: () => void;
+  isStreaming: boolean;
+}): React.JSX.Element {
+  return (
+    <form
+      onSubmit={onSubmit}
+      className="px-3 py-2.5 flex items-end gap-2 border-t"
+      style={{
+        borderColor: 'var(--color-atlas-border)',
+        background: 'var(--color-atlas-surface-2)',
+      }}
+    >
+      <textarea
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            onSubmit(e as unknown as React.FormEvent);
+          }
+        }}
+        placeholder="Ask Atlas anything…"
+        disabled={isStreaming}
+        rows={1}
+        className="flex-1 resize-none rounded-lg px-3 py-2 text-sm focus:outline-none disabled:opacity-60"
+        style={{
+          background: 'var(--color-atlas-surface-3)',
+          color: 'var(--color-atlas-fg)',
+          border: '1px solid var(--color-atlas-border)',
+          fontFamily: 'inherit',
+          minHeight: 38,
+          maxHeight: 120,
+        }}
+      />
+      {isStreaming ? (
+        <button
+          type="button"
+          onClick={onAbort}
+          className="p-2 rounded-lg text-white transition-colors"
+          style={{ background: '#dc2626' }}
+          onMouseEnter={(e) => (e.currentTarget.style.background = '#b91c1c')}
+          onMouseLeave={(e) => (e.currentTarget.style.background = '#dc2626')}
+          aria-label="Stop"
+          title="Stop Atlas"
+        >
+          <Square className="w-4 h-4" />
+        </button>
+      ) : (
+        <button
+          type="submit"
+          disabled={!input.trim()}
+          className="p-2 rounded-lg text-white transition-colors disabled:cursor-not-allowed"
+          style={{
+            background: input.trim() ? 'var(--color-exl-orange)' : 'var(--color-atlas-surface-3)',
+            color: input.trim() ? '#fff' : 'var(--color-atlas-fg-subtle)',
+          }}
+          onMouseEnter={(e) => {
+            if (input.trim()) e.currentTarget.style.background = 'var(--color-exl-orange-bright)';
+          }}
+          onMouseLeave={(e) => {
+            if (input.trim()) e.currentTarget.style.background = 'var(--color-exl-orange)';
+          }}
+          aria-label="Send"
+          title="Send"
+        >
+          <Send className="w-4 h-4" />
+        </button>
+      )}
+    </form>
   );
 }
