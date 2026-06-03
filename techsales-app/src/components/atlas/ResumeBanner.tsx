@@ -6,11 +6,14 @@
  * inline action links: Resume (dismiss banner, keep history) or
  * + Start new (clear & wipe).
  */
+import { useState } from 'react';
 import { History, X, Plus } from 'lucide-react';
 import { useAtlas } from '../../context/AtlasContext';
+import { NewChatConfirm } from './NewChatConfirm';
 
 export function ResumeBanner(): React.JSX.Element | null {
   const { resumedFromPriorSession, messages, dismissResumeBanner, startNewSession } = useAtlas();
+  const [confirmNewChat, setConfirmNewChat] = useState(false);
 
   if (!resumedFromPriorSession || messages.length === 0) return null;
 
@@ -18,6 +21,7 @@ export function ResumeBanner(): React.JSX.Element | null {
   const label = userTurns === 1 ? '1 turn' : `${userTurns} turns`;
 
   return (
+    <>
     <div
       className="msg-in mx-3 mt-3 mb-1 flex items-center gap-2.5 px-3 py-2.5 rounded-[11px]"
       style={{
@@ -45,11 +49,7 @@ export function ResumeBanner(): React.JSX.Element | null {
           Resume
         </button>
         <button
-          onClick={() => {
-            if (window.confirm('Start a new session? Your current conversation will be cleared.')) {
-              void startNewSession();
-            }
-          }}
+          onClick={() => setConfirmNewChat(true)}
           className="inline-flex items-center gap-1 transition-opacity hover:opacity-70"
           style={{
             fontSize: 12,
@@ -73,5 +73,14 @@ export function ResumeBanner(): React.JSX.Element | null {
         </button>
       </div>
     </div>
+    <NewChatConfirm
+      isOpen={confirmNewChat}
+      onClose={() => setConfirmNewChat(false)}
+      onConfirm={() => {
+        setConfirmNewChat(false);
+        void startNewSession();
+      }}
+    />
+    </>
   );
 }

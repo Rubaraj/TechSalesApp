@@ -23,6 +23,7 @@ import { ResumeBanner } from './ResumeBanner';
 import { CallSection } from '../call/CallSection';
 import { AudioDevicePickerRows } from '../call/AudioDeviceSelector';
 import { AtlasMark } from './AtlasMark';
+import { NewChatConfirm } from './NewChatConfirm';
 
 // Mirror the clamp values in AtlasContext so the live-drag preview can
 // also bound itself; the context's setter is the authoritative clamp.
@@ -44,6 +45,9 @@ export function AtlasPanel(): React.JSX.Element | null {
   const callPanelVisible = callState.isCallActive && callState.isCallPanelOpen;
 
   const dragRef = useRef<{ startX: number; startWidth: number } | null>(null);
+  // App-styled "Start a new chat?" confirm — replaces the native
+  // window.confirm so the prompt matches the rest of the UI chrome.
+  const [confirmNewChat, setConfirmNewChat] = useState(false);
 
   useEffect(() => {
     function onMove(e: MouseEvent): void {
@@ -95,6 +99,7 @@ export function AtlasPanel(): React.JSX.Element | null {
   if (!showCallHalf && !showAtlasHalf) return null;
 
   return (
+    <>
     <aside
       className="fixed top-16 right-0 bottom-0 z-30 flex flex-col"
       style={{
@@ -154,9 +159,7 @@ export function AtlasPanel(): React.JSX.Element | null {
               onMute={() => setMute(!callState.isMuted)}
               onStartNew={() => {
                 if (messages.length === 0) return;
-                if (window.confirm('Start a new session? Your current conversation will be cleared.')) {
-                  void startNewSession();
-                }
+                setConfirmNewChat(true);
               }}
               onClose={() => setPanelOpen(false)}
               startNewDisabled={messages.length === 0}
@@ -186,6 +189,15 @@ export function AtlasPanel(): React.JSX.Element | null {
         )}
       </div>
     </aside>
+    <NewChatConfirm
+      isOpen={confirmNewChat}
+      onClose={() => setConfirmNewChat(false)}
+      onConfirm={() => {
+        setConfirmNewChat(false);
+        void startNewSession();
+      }}
+    />
+    </>
   );
 }
 
