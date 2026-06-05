@@ -42,7 +42,20 @@ export async function getLeadById(req: Request, res: Response<ServiceResponse<Le
  */
 export async function lookupLeadByPhone(
   req: Request,
-  res: Response<ServiceResponse<Pick<Lead, 'leadId' | 'firstName' | 'lastName' | 'phone'>>>,
+  res: Response<
+    ServiceResponse<
+      Pick<
+        Lead,
+        | 'leadId'
+        | 'firstName'
+        | 'lastName'
+        | 'phone'
+        | 'leadStatus'
+        | 'state'
+        | 'updatedAt'
+      >
+    >
+  >,
 ): Promise<void> {
   const phone = stringOrUndef(req.query.phone) ?? '';
   if (!phone) {
@@ -54,6 +67,11 @@ export async function lookupLeadByPhone(
     res.status(404).json({ success: false, error: 'No lead matches that phone number' });
     return;
   }
+  // Phase 4 — return enough fields for the outbound-dial IdentifiedLeadCard
+  // (name + status chip + state + last-activity timestamp). Existing callers
+  // (inbound IncomingCallView) only read leadId / name and are unaffected
+  // by the extra fields. Dual/LIS flags live on ExtractedEntities, not the
+  // persistent Lead — they're not surfaced here.
   res.json({
     success: true,
     data: {
@@ -61,6 +79,9 @@ export async function lookupLeadByPhone(
       firstName: lead.firstName,
       lastName: lead.lastName,
       phone: lead.phone,
+      leadStatus: lead.leadStatus,
+      state: lead.state,
+      updatedAt: lead.updatedAt,
     },
   });
 }

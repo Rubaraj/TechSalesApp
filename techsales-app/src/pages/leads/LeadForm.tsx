@@ -122,7 +122,20 @@ export function LeadForm() {
   const aiEnabled = useAiEnabled();
   const isEditing = Boolean(id);
 
-  const [formData, setFormData] = useState<FormData>(initialFormData);
+  // Phase 4 outbound-dial — when `/leads/new?phone=+1...` is opened (from the
+  // CreateLeadCard "Create lead" action), prefill the phone field with the
+  // dialed number's last 10 digits. Show the AI chip so the source is clear.
+  const phoneFromQuery = (() => {
+    if (isEditing) return '';
+    const params = new URLSearchParams(routerLocation.search);
+    const raw = params.get('phone') ?? '';
+    const digits = raw.replace(/\D/g, '').slice(-10);
+    return digits.length === 10 ? digits : '';
+  })();
+
+  const [formData, setFormData] = useState<FormData>(() =>
+    phoneFromQuery ? { ...initialFormData, phone: phoneFromQuery } : initialFormData,
+  );
   const [taggedPharmacies, setTaggedPharmacies] = useState<string[]>([]);
   const [taggedDrugs, setTaggedDrugs] = useState<TaggedDrug[]>([]);
   const [taggedProviders, setTaggedProviders] = useState<string[]>([]);
@@ -134,7 +147,9 @@ export function LeadForm() {
   // Both are LOCAL to LeadForm and reset on unmount; CallContext owns no
   // per-page UI state.
   const [aiRingActive, setAiRingActive] = useState<Set<string>>(() => new Set());
-  const [aiEverFilled, setAiEverFilled] = useState<Set<string>>(() => new Set());
+  const [aiEverFilled, setAiEverFilled] = useState<Set<string>>(() =>
+    phoneFromQuery ? new Set(['phone']) : new Set(),
+  );
   const {
     state: callState,
     registerPage,

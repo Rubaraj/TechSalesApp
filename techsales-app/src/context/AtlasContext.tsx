@@ -19,6 +19,7 @@ import {
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { atlasService, type AtlasStreamEvent } from '../services/atlasService';
 import { useAuth } from './AuthContext';
+import type { LeadPhoneLookup } from '../services/leadService';
 
 export type AtlasMode = 'silent' | 'assist' | 'auto';
 
@@ -54,6 +55,17 @@ export interface AtlasNavigationSuggestion {
   ts: number;
 }
 
+/**
+ * Phase 4 outbound-dial — Atlas surfaces a card in chat when the agent dials
+ * a number. `kind: 'identified'` is shown when the phone matches a known
+ * lead; `kind: 'create'` is shown when no lead matches and the agent might
+ * want to create one. Both render inline in ChatPane via the existing
+ * ChatRow union; both auto-clear when the call ends.
+ */
+export type AtlasLeadSuggestion =
+  | { id: string; kind: 'identified'; lead: LeadPhoneLookup; phone: string; ts: number }
+  | { id: string; kind: 'create'; phone: string; ts: number };
+
 export interface AtlasContextValue {
   messages: AtlasMessage[];
   isStreaming: boolean;
@@ -67,6 +79,16 @@ export interface AtlasContextValue {
   approve: (proposalId: string) => Promise<void>;
   reject: (proposalId: string) => Promise<void>;
   consumeNavigationSuggestion: (id: string) => AtlasNavigationSuggestion | null;
+  /**
+   * Phase 4 outbound-dial — lead-match / create-lead suggestions surfaced
+   * inline in Atlas chat when the agent dials a number. Populated by the
+   * `useOutboundLeadIdentification` hook, consumed by IdentifiedLeadCard /
+   * CreateLeadCard, and bulk-cleared on call end.
+   */
+  leadSuggestions: AtlasLeadSuggestion[];
+  addLeadSuggestion: (s: AtlasLeadSuggestion) => void;
+  consumeLeadSuggestion: (id: string) => AtlasLeadSuggestion | null;
+  clearLeadSuggestions: () => void;
   /** Phase 4 — Session control. `resumedFromPriorSession` is true when the
    *  current message list was hydrated from MongoDB on mount (i.e. the agent
    *  has prior history). `startNewSession` wipes both server + local state
@@ -118,6 +140,7 @@ export function AtlasProvider({ children }: { children: ReactNode }): React.JSX.
   const [navigationSuggestions, setNavigationSuggestions] = useState<
     AtlasNavigationSuggestion[]
   >([]);
+  const [leadSuggestions, setLeadSuggestions] = useState<AtlasLeadSuggestion[]>([]);
   const [resumedFromPriorSession, setResumedFromPriorSession] = useState(false);
   const [mode, setModeState] = useState<AtlasMode>(() => {
     if (typeof window === 'undefined') return 'assist';
@@ -477,6 +500,22 @@ export function AtlasProvider({ children }: { children: ReactNode }): React.JSX.
     [navigationSuggestions],
   );
 
+  const addLeadSuggestion = useCallback((s: AtlasLeadSuggestion): void => {
+    setLeadSuggestions((prev) => [...prev, s]);
+  }, []);
+  const consumeLeadSuggestion = useCallback(
+    (id: string): AtlasLeadSuggestion | null => {
+      const found = leadSuggestions.find((s) => s.id === id);
+      if (!found) return null;
+      setLeadSuggestions((prev) => prev.filter((s) => s.id !== id));
+      return found;
+    },
+    [leadSuggestions],
+  );
+  const clearLeadSuggestions = useCallback((): void => {
+    setLeadSuggestions([]);
+  }, []);
+
   const value = useMemo<AtlasContextValue>(
     () => ({
       messages,
@@ -491,6 +530,10 @@ export function AtlasProvider({ children }: { children: ReactNode }): React.JSX.
       approve,
       reject,
       consumeNavigationSuggestion,
+      leadSuggestions,
+      addLeadSuggestion,
+      consumeLeadSuggestion,
+      clearLeadSuggestions,
       resumedFromPriorSession,
       startNewSession,
       dismissResumeBanner,
@@ -504,6 +547,7 @@ export function AtlasProvider({ children }: { children: ReactNode }): React.JSX.
       isStreaming,
       proposals,
       navigationSuggestions,
+      leadSuggestions,
       mode,
       setMode,
       send,
@@ -512,6 +556,9 @@ export function AtlasProvider({ children }: { children: ReactNode }): React.JSX.
       approve,
       reject,
       consumeNavigationSuggestion,
+      addLeadSuggestion,
+      consumeLeadSuggestion,
+      clearLeadSuggestions,
       resumedFromPriorSession,
       startNewSession,
       dismissResumeBanner,

@@ -4,8 +4,14 @@ import { CallRuntime } from '../call/CallRuntime';
 import { AtlasPanel } from '../atlas/AtlasPanel';
 import { useAtlas } from '../../context/AtlasContext';
 import { useCallContext } from '../../context/CallContext';
+import { useOutboundLeadIdentification } from '../../hooks/useOutboundLeadIdentification';
 
 export function Layout() {
+  // Phase 4 outbound-dial — watches pendingDial and surfaces an
+  // IdentifiedLeadCard / CreateLeadCard in Atlas chat on each new dial.
+  useOutboundLeadIdentification();
+
+
   // Phase 4 (dock) — Layout pads main content by the Atlas panel width
   // whenever the right-edge panel is visible. The panel is visible if
   // EITHER the Atlas chat is open OR a call's section is on screen

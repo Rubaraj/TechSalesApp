@@ -89,6 +89,7 @@ type Action =
       startTime: number;
       mode: CallMode;
     }
+  | { kind: 'BIND_LEAD'; leadId: string }
   | { kind: 'END_CALL' }
   | { kind: 'TOGGLE_PANEL' }
   | { kind: 'SET_PANEL_OPEN'; open: boolean }
@@ -131,6 +132,13 @@ function reducer(state: CallState, action: Action): CallState {
         // when the call begins remains registered.
         currentPage: state.currentPage,
       };
+    case 'BIND_LEAD':
+      // Phase 4 outbound-dial — late-bind a leadId onto the active call when
+      // the agent clicks "Open lead" on an IdentifiedLeadCard. No-op if no
+      // call is active. Existing add_note / fill_field paths consume
+      // state.leadId, so this is enough to attribute post-call notes.
+      if (!state.isCallActive) return state;
+      return { ...state, leadId: action.leadId };
     case 'END_CALL':
       return {
         ...initialCallState(),
@@ -279,6 +287,9 @@ export interface CallContextValue {
   // Phase 1/2 surface
   startCall: (opts?: { leadId?: string; mode?: CallMode }) => void;
   endCall: () => void;
+  /** Phase 4 outbound-dial — bind a leadId onto the currently-active call.
+   *  No-op when no call is active. */
+  bindCurrentCallToLead: (leadId: string) => void;
   togglePanel: () => void;
   setPanelOpen: (open: boolean) => void;
   setCallSid: (sid: string | null) => void;
@@ -438,6 +449,10 @@ export function CallProvider({ children }: { children: ReactNode }): React.JSX.E
   }, []);
 
   const endCall = useCallback(() => dispatch({ kind: 'END_CALL' }), []);
+  const bindCurrentCallToLead = useCallback(
+    (leadId: string) => dispatch({ kind: 'BIND_LEAD', leadId }),
+    [],
+  );
   const togglePanel = useCallback(() => dispatch({ kind: 'TOGGLE_PANEL' }), []);
   const setPanelOpen = useCallback(
     (open: boolean) => dispatch({ kind: 'SET_PANEL_OPEN', open }),
@@ -572,6 +587,7 @@ export function CallProvider({ children }: { children: ReactNode }): React.JSX.E
       state,
       startCall,
       endCall,
+      bindCurrentCallToLead,
       togglePanel,
       setPanelOpen,
       setCallSid,
@@ -597,6 +613,7 @@ export function CallProvider({ children }: { children: ReactNode }): React.JSX.E
       state,
       startCall,
       endCall,
+      bindCurrentCallToLead,
       togglePanel,
       setPanelOpen,
       setCallSid,

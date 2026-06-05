@@ -13,11 +13,14 @@ import {
   useAtlas,
   type AtlasProposal,
   type AtlasNavigationSuggestion,
+  type AtlasLeadSuggestion,
 } from '../../context/AtlasContext';
 import { useCallContext } from '../../context/CallContext';
 import type { AiActivityEntry } from '../../types/call';
 import { ApprovalCard } from './ApprovalCard';
 import { NavigationCard } from './NavigationCard';
+import { IdentifiedLeadCard } from './IdentifiedLeadCard';
+import { CreateLeadCard } from './CreateLeadCard';
 
 type AtlasMessage = ReturnType<typeof useAtlas>['messages'][number];
 type ToolCall = NonNullable<AtlasMessage['toolCalls']>[number];
@@ -26,10 +29,20 @@ type ChatRow =
   | { kind: 'msg'; id: string; ts: number; data: AtlasMessage }
   | { kind: 'activity'; id: string; ts: number; data: AiActivityEntry }
   | { kind: 'proposal'; id: string; ts: number; data: AtlasProposal }
-  | { kind: 'navigation'; id: string; ts: number; data: AtlasNavigationSuggestion };
+  | { kind: 'navigation'; id: string; ts: number; data: AtlasNavigationSuggestion }
+  | { kind: 'lead'; id: string; ts: number; data: AtlasLeadSuggestion };
 
 export function ChatPane(): React.JSX.Element {
-  const { messages, proposals, navigationSuggestions, mode, send, abort, isStreaming } = useAtlas();
+  const {
+    messages,
+    proposals,
+    navigationSuggestions,
+    leadSuggestions,
+    mode,
+    send,
+    abort,
+    isStreaming,
+  } = useAtlas();
   const { state: callState } = useCallContext();
   const [input, setInput] = useState<string>('');
   const listRef = useRef<HTMLDivElement | null>(null);
@@ -71,13 +84,27 @@ export function ChatPane(): React.JSX.Element {
             data: s,
           }))
         : [];
-    return [...msgRows, ...activityRows, ...proposalRows, ...navigationRows].sort(
-      (a, b) => a.ts - b.ts,
-    );
+    // Phase 4 outbound-dial — IdentifiedLeadCard / CreateLeadCard cards
+    // surfaced when the agent dials a number. Always shown regardless of
+    // Atlas mode (this is plain UX, not an agentic suggestion).
+    const leadRows: ChatRow[] = leadSuggestions.map((s) => ({
+      kind: 'lead',
+      id: s.id,
+      ts: s.ts,
+      data: s,
+    }));
+    return [
+      ...msgRows,
+      ...activityRows,
+      ...proposalRows,
+      ...navigationRows,
+      ...leadRows,
+    ].sort((a, b) => a.ts - b.ts);
   }, [
     messages,
     proposals,
     navigationSuggestions,
+    leadSuggestions,
     mode,
     callState.aiActivityLog,
     callState.isCallActive,
@@ -124,7 +151,14 @@ export function ChatPane(): React.JSX.Element {
           if (row.kind === 'proposal') {
             return <ApprovalCard key={row.id} proposal={row.data} />;
           }
-          return <NavigationCard key={row.id} suggestion={row.data} />;
+          if (row.kind === 'navigation') {
+            return <NavigationCard key={row.id} suggestion={row.data} />;
+          }
+          // lead — discriminated by row.data.kind
+          if (row.data.kind === 'identified') {
+            return <IdentifiedLeadCard key={row.id} suggestion={row.data} />;
+          }
+          return <CreateLeadCard key={row.id} suggestion={row.data} />;
         })}
         {isStreaming && <ThinkingDots />}
       </div>

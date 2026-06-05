@@ -68,6 +68,11 @@ export interface LeadPhoneLookup {
   firstName: string;
   lastName: string;
   phone: string;
+  // Phase 4 — optional extras returned by the BE for the outbound-dial
+  // IdentifiedLeadCard. May be missing in old responses or local fallback.
+  leadStatus?: string;
+  state?: string;
+  updatedAt?: string;
 }
 
 export const lookupLeadByPhone = async (
@@ -86,6 +91,12 @@ export const lookupLeadByPhone = async (
         firstName: found.firstName,
         lastName: found.lastName,
         phone: found.phone,
+        leadStatus: found.leadStatus,
+        state: found.state,
+        // dual/LIS flags live on BE Lead but not FE Lead — local-mode
+        // fallback can't surface them; the card renders without them
+        // (UI handles the undefined gracefully).
+        updatedAt: found.updatedAt,
       },
     };
   }
