@@ -26,7 +26,7 @@ export interface AtlasChatRequest {
     route: string;
     leadId?: string;
     callSid?: string;
-    mode: 'silent' | 'assist' | 'auto';
+    mode: 'assist' | 'auto';
   };
 }
 

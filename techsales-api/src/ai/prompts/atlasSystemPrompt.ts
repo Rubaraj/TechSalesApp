@@ -20,7 +20,7 @@ export interface AtlasPromptInput {
     durationSec: number;
     recentTranscript?: string;
   };
-  mode: 'silent' | 'assist' | 'auto';
+  mode: 'assist' | 'auto';
   today: string;
   pipelineSummary?: { total: number; byStatus: Record<string, number> };
 }
@@ -129,11 +129,9 @@ function buildDynamic(input: AtlasPromptInput): string {
   }
   lines.push(
     `Autonomy mode: ${input.mode.toUpperCase()}. ` +
-      (input.mode === 'silent'
-        ? 'Answer chat only; do not call navigate_to.'
-        : input.mode === 'assist'
-          ? 'You may call navigate_to but the FE will render it as a click-to-go suggestion.'
-          : 'You may call navigate_to and the FE will auto-navigate with an Undo toast.'),
+      (input.mode === 'assist'
+        ? 'You may call navigate_to but the FE will render it as a click-to-go suggestion.'
+        : 'You may call navigate_to and the FE will auto-navigate with an Undo toast.'),
   );
   lines.push(
     `When responding, address ${input.user.firstName} by first name once or twice — peer-to-peer tone.`,

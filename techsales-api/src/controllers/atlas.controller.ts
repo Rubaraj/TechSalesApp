@@ -31,7 +31,12 @@ const ContextSchema = z.object({
   route: z.string().default('/dashboard'),
   leadId: z.string().optional(),
   callSid: z.string().optional(),
-  mode: z.enum(['silent', 'assist', 'auto']).default('assist'),
+  // 'silent' was merged into 'assist' — still accepted from stale clients
+  // (mode persists in localStorage) and coerced rather than 400ing.
+  mode: z
+    .enum(['silent', 'assist', 'auto'])
+    .default('assist')
+    .transform((m): 'assist' | 'auto' => (m === 'silent' ? 'assist' : m)),
 });
 
 const ChatBodySchema = z.object({

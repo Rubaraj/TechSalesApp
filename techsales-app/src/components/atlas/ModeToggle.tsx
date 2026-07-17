@@ -1,16 +1,18 @@
 /**
- * Phase 4 design — Atlas autonomy mode toggle (Silent · Assist · Auto Pilot).
+ * Phase 4 design — Atlas autonomy mode toggle (Assist · Auto Pilot).
  *
  * Segmented control matching the Claude Design "segmented" variant:
  * dark surface-3 track, orange-filled active pill with subtle shadow,
- * muted inactive labels, icon + label per segment. The mode set itself
- * (silent / assist / auto) is the same — only the chrome changed.
+ * muted inactive labels, icon + label per segment. Silent mode was
+ * merged into Assist (the settings-gear Mute covers "quiet down");
+ * suggestion cards are dismissible, so an observe-only mode added
+ * nothing but a third state to test.
  *
  * Label abbreviation: "Auto" (not "Auto Pilot") keeps the segmented
  * control inside the Atlas panel header even at the 360px min width.
  * Full mode name is preserved in the title/tooltip for clarity.
  */
-import { VolumeX, Hand, Rocket } from 'lucide-react';
+import { Hand, Rocket } from 'lucide-react';
 import { useAtlas, type AtlasMode } from '../../context/AtlasContext';
 
 interface ModeDef {
@@ -18,17 +20,10 @@ interface ModeDef {
   label: string;
   fullLabel: string;
   hint: string;
-  Icon: typeof VolumeX;
+  Icon: typeof Hand;
 }
 
 const MODES: ModeDef[] = [
-  {
-    id: 'silent',
-    label: 'Silent',
-    fullLabel: 'Silent',
-    hint: 'Silent — Atlas watches but never speaks up or takes action.',
-    Icon: VolumeX,
-  },
   {
     id: 'assist',
     label: 'Assist',

@@ -21,7 +21,7 @@ import { atlasService, type AtlasStreamEvent } from '../services/atlasService';
 import { useAuth } from './AuthContext';
 import type { LeadPhoneLookup } from '../services/leadService';
 
-export type AtlasMode = 'silent' | 'assist' | 'auto';
+export type AtlasMode = 'assist' | 'auto';
 
 export interface AtlasMessage {
   id: string;
@@ -145,7 +145,8 @@ export function AtlasProvider({ children }: { children: ReactNode }): React.JSX.
   const [mode, setModeState] = useState<AtlasMode>(() => {
     if (typeof window === 'undefined') return 'assist';
     const stored = window.localStorage.getItem(MODE_STORAGE_KEY);
-    return stored === 'silent' || stored === 'auto' ? stored : 'assist';
+    // Legacy 'silent' (pre-merge) maps to 'assist'.
+    return stored === 'auto' ? stored : 'assist';
   });
 
   // Panel dock state — persisted so the panel re-opens at the same width
@@ -359,14 +360,12 @@ export function AtlasProvider({ children }: { children: ReactNode }): React.JSX.
         }
         if (ev.type === 'navigate') {
           // Mode-gated dispatch:
-          //   - Silent      → drop on the floor (Atlas observes only).
           //   - Assist      → add to suggestions; ChatPane renders inline
           //                   NavigationCard with Open / Dismiss.
           //   - Auto Pilot  → navigate immediately. No card; the tool
           //                   trace ("navigateTo  /leads") already shows
           //                   in the chat as the explanation.
           const m = modeRef.current;
-          if (m === 'silent') return;
           if (m === 'auto') {
             try {
               navigateRef.current(ev.route);
