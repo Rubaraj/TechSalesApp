@@ -68,12 +68,16 @@ export class JsonLeadRepository implements IRepository<Lead> {
 
     if (params.searchTerm && params.searchTerm.trim()) {
       items = searchByFields(items, params.searchTerm, [
+        'leadId',
         'firstName',
         'lastName',
         'email',
         'phone',
         'city',
+        'county',
+        'zipCode',
         'medicareNumber',
+        'medicaidId',
       ] as (keyof Lead)[]);
     }
 

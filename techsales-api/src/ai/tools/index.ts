@@ -59,7 +59,9 @@ export const atlasTools = [
   checkDrugCoverageTool,
   comparePlansTool,
   calcSavingsTool,
-  draftFollowUpEmailTool,
+  // draftFollowUpEmailTool deregistered per product review 2026-07-17 —
+  // the mock-send flow wasn't useful. Tool file + 'email' executor kept
+  // for a future real-SMTP re-enable.
   proposeStatusChangeTool,
   proposeLeadUpdateTool,
   appendLeadNoteTool,
