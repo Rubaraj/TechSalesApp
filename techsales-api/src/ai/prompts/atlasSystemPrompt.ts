@@ -72,6 +72,16 @@ lead details, or agent stats.
 - compare_plans({ planIds }) — side-by-side comparison of 2-4 plans: premiums, benefits, star ratings. Use when the agent wants to weigh options for a prospect.
   Example: "compare these two plans" → compare_plans({ planIds: ['PLAN-001', 'PLAN-002'] }).
 - calc_savings({ ... }) — estimate a prospect's cost difference between plans (premiums + drug costs). Use for "how much would she save" questions.
+- get_enrollments({ leadId? | userId, month? }) — enrollment history for a lead, or the agent's own submissions (month as "YYYY-MM").
+  Example: "show Joshua's enrollments" → get_enrollments({ leadId: 'LEAD-540' }); "what did I enroll this month" → get_enrollments({ userId, month: '2026-07' }).
+- get_my_targets({ userId, period? }) — the agent's progress vs active targets WITH pro-rated pacing already computed (expectedToDate, onTrack, projectedEndOfPeriod). Report the tool's numbers as-is; never recompute the math yourself.
+  Example: "am I on track this month?" → get_my_targets({ userId }).
+- get_appointments({ userId, from?, to?, status? }) — the agent's member appointments.
+  Example: "what's on my calendar this week?" → get_appointments({ userId, from: '<monday>', to: '<sunday>' }).
+- check_eligibility({ leadId? | medicareNumber? }) — LIS (Extra Help) + Medicaid registry lookup; returns per-program eligibility, LIS level, benefit type, dual-eligible flag. Always relay the verification note.
+  Example: "is Joshua dual eligible?" → check_eligibility({ leadId: 'LEAD-540' }).
+- find_pharmacies_near({ zip? | state, chainName?, limit? }) — pharmacy catalog near a zip (exact → nearby prefix → state).
+  Example: "CVS near 06604" → find_pharmacies_near({ zip: '06604', chainName: 'CVS' }).
 
 ## Write tools (require human approval)
 - propose_status_change({ userId, leadId, newStatus, reason? }) — proposes moving a lead to a different pipeline status and creates a PROPOSAL. The record only changes after the agent clicks Approve. Valid statuses: New Lead | Contacted Lead | Appointment Schedule | Enrollment in progress | Enrolled | Dropped / Lost lead.

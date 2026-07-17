@@ -17,6 +17,11 @@ import { proposeStatusChangeTool } from './proposeStatusChange.tool.js';
 import { proposeLeadUpdateTool } from './proposeLeadUpdate.tool.js';
 import { appendLeadNoteTool } from './appendLeadNote.tool.js';
 import { navigateToTool } from './navigateTo.tool.js';
+import { getEnrollmentsTool } from './getEnrollments.tool.js';
+import { getMyTargetsTool } from './getMyTargets.tool.js';
+import { getAppointmentsTool } from './getAppointments.tool.js';
+import { checkEligibilityTool } from './checkEligibility.tool.js';
+import { findPharmaciesNearTool } from './findPharmaciesNear.tool.js';
 
 export {
   searchPlansTool,
@@ -32,6 +37,11 @@ export {
   proposeLeadUpdateTool,
   appendLeadNoteTool,
   navigateToTool,
+  getEnrollmentsTool,
+  getMyTargetsTool,
+  getAppointmentsTool,
+  checkEligibilityTool,
+  findPharmaciesNearTool,
 };
 
 export const tools = [
@@ -59,6 +69,12 @@ export const atlasTools = [
   checkDrugCoverageTool,
   comparePlansTool,
   calcSavingsTool,
+  // Phase C — book & schedule reads.
+  getEnrollmentsTool,
+  getMyTargetsTool,
+  getAppointmentsTool,
+  checkEligibilityTool,
+  findPharmaciesNearTool,
   // draftFollowUpEmailTool deregistered per product review 2026-07-17 —
   // the mock-send flow wasn't useful. Tool file + 'email' executor kept
   // for a future real-SMTP re-enable.
