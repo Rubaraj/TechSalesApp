@@ -14,6 +14,8 @@ import { getMyPipelineTool } from './getMyPipeline.tool.js';
 import { searchLeadsTool } from './searchLeads.tool.js';
 import { draftFollowUpEmailTool } from './draftFollowUpEmail.tool.js';
 import { proposeStatusChangeTool } from './proposeStatusChange.tool.js';
+import { proposeLeadUpdateTool } from './proposeLeadUpdate.tool.js';
+import { appendLeadNoteTool } from './appendLeadNote.tool.js';
 import { navigateToTool } from './navigateTo.tool.js';
 
 export {
@@ -27,6 +29,8 @@ export {
   searchLeadsTool,
   draftFollowUpEmailTool,
   proposeStatusChangeTool,
+  proposeLeadUpdateTool,
+  appendLeadNoteTool,
   navigateToTool,
 };
 
@@ -57,5 +61,7 @@ export const atlasTools = [
   calcSavingsTool,
   draftFollowUpEmailTool,
   proposeStatusChangeTool,
+  proposeLeadUpdateTool,
+  appendLeadNoteTool,
   navigateToTool,
 ] as const;

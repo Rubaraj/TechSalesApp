@@ -34,7 +34,7 @@ export interface AtlasMessage {
 
 export interface AtlasProposal {
   proposalId: string;
-  kind: 'email' | 'status' | 'drug';
+  kind: 'email' | 'status' | 'drug' | 'lead_update' | 'note';
   preview: unknown;
   /** State of the approval UI for the card; updates after Approve / Reject click. */
   status: 'pending' | 'approved' | 'rejected' | 'error';

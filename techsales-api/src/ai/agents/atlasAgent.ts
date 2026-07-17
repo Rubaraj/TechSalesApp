@@ -48,7 +48,7 @@ export type AtlasStreamEvent =
   | {
       type: 'proposal_created';
       proposalId: string;
-      kind: 'email' | 'status' | 'drug';
+      kind: 'email' | 'status' | 'drug' | 'lead_update' | 'note';
       preview: unknown;
     }
   | { type: 'navigate'; route: string; reason: string }
@@ -124,7 +124,8 @@ function extractSideChannelEvent(
   if (
     typeof obj.proposalId === 'string' &&
     typeof obj.kind === 'string' &&
-    (obj.kind === 'email' || obj.kind === 'status' || obj.kind === 'drug')
+    (obj.kind === 'email' || obj.kind === 'status' || obj.kind === 'drug' ||
+      obj.kind === 'lead_update' || obj.kind === 'note')
   ) {
     return {
       type: 'proposal_created',
@@ -477,7 +478,8 @@ function extractSideFromStub(output: unknown): AtlasStreamEvent | null {
   if (
     typeof obj.proposalId === 'string' &&
     typeof obj.kind === 'string' &&
-    (obj.kind === 'email' || obj.kind === 'status' || obj.kind === 'drug')
+    (obj.kind === 'email' || obj.kind === 'status' || obj.kind === 'drug' ||
+      obj.kind === 'lead_update' || obj.kind === 'note')
   ) {
     return {
       type: 'proposal_created',

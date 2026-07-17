@@ -15,6 +15,7 @@ import { z } from 'zod';
 import { env } from '../config/env.js';
 import { logger } from '../config/logger.js';
 import { repos } from '../repositories/registry.js';
+import { proposalExecutors } from '../services/proposalExecutors.js';
 import {
   streamAtlasAgent,
   type AtlasStreamEvent,
@@ -226,65 +227,13 @@ export async function postAtlasApproval(
   let result: Record<string, unknown> | undefined;
 
   if (decision === 'approve') {
+    // Phase B — executors live in the kind→executor registry; adding a write
+    // capability no longer touches this controller.
     try {
-      if (proposal.kind === 'email') {
-        // POC: mock-send. Log to console + record the payload as the result.
-        const payload = proposal.payload as {
-          to?: string;
-          subject?: string;
-          body?: string;
-          leadId?: string;
-        };
-        logger.info(
-          { proposalId, to: payload.to, leadId: payload.leadId },
-          'Atlas: email APPROVED (mock send)',
-        );
-        result = {
-          mocked: true,
-          to: payload.to,
-          subject: payload.subject,
-          sentAt: new Date().toISOString(),
-        };
-      } else if (proposal.kind === 'status') {
-        const payload = proposal.payload as { leadId?: string; newStatus?: string };
-        if (payload.leadId && payload.newStatus) {
-          const updated = await repos.lead.update(payload.leadId, {
-            leadStatus: payload.newStatus as never,
-            updatedBy: userId,
-          });
-          result = { leadId: payload.leadId, updated: !!updated };
-        }
-      } else if (proposal.kind === 'drug') {
-        // Append the drug to the lead's taggedDrugs (mirrors the LeadForm
-        // add_drug consumer: append, never replace, dedup by drugId).
-        const payload = proposal.payload as {
-          leadId?: string;
-          drug?: { drugId?: string; drugName?: string; dosage?: string; quantity?: number; frequency?: string };
-        };
-        if (payload.leadId && payload.drug?.drugId) {
-          const lead = await repos.lead.findById(payload.leadId);
-          const existing = lead?.taggedDrugs ?? [];
-          const alreadyTagged = existing.some((d) => d.drugId === payload.drug!.drugId);
-          if (lead && !alreadyTagged) {
-            const updated = await repos.lead.update(payload.leadId, {
-              taggedDrugs: [
-                ...existing,
-                {
-                  drugId: payload.drug.drugId,
-                  drugName: payload.drug.drugName,
-                  dosage: payload.drug.dosage ?? 'unspecified',
-                  quantity: payload.drug.quantity ?? 30,
-                  frequency: payload.drug.frequency ?? 'unspecified',
-                },
-              ] as never,
-              updatedBy: userId,
-            } as never);
-            result = { leadId: payload.leadId, drugId: payload.drug.drugId, applied: !!updated };
-          } else {
-            result = { leadId: payload.leadId, drugId: payload.drug.drugId, applied: false, alreadyTagged };
-          }
-        }
-      }
+      const executor = proposalExecutors[proposal.kind];
+      result = executor
+        ? await executor(proposal.payload as Record<string, unknown>, userId)
+        : { error: `no executor for kind "${proposal.kind}"` };
     } catch (err) {
       logger.error({ err, proposalId }, 'Atlas approval execution failed');
       result = { error: String(err) };

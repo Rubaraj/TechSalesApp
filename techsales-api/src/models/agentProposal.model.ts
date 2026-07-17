@@ -12,7 +12,7 @@
 import { Schema, type HydratedDocument, type Model } from 'mongoose';
 import { appConn } from '../config/mongo.js';
 
-export type AgentProposalKind = 'email' | 'status' | 'drug';
+export type AgentProposalKind = 'email' | 'status' | 'drug' | 'lead_update' | 'note';
 export type AgentProposalDecision = 'approve' | 'reject';
 
 export interface AgentProposal {
@@ -32,7 +32,11 @@ const proposalSchema = new Schema<AgentProposal>(
   {
     proposalId: { type: String, required: true, unique: true, index: true },
     userId: { type: String, required: true, index: true },
-    kind: { type: String, enum: ['email', 'status', 'drug'], required: true },
+    kind: {
+      type: String,
+      enum: ['email', 'status', 'drug', 'lead_update', 'note'],
+      required: true,
+    },
     payload: { type: Schema.Types.Mixed, default: {} },
     createdAt: { type: Date, default: () => new Date() },
     executedAt: { type: Date },

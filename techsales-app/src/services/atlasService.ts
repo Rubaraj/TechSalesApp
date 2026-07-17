@@ -12,7 +12,7 @@ export type AtlasStreamEvent =
   | {
       type: 'proposal_created';
       proposalId: string;
-      kind: 'email' | 'status' | 'drug';
+      kind: 'email' | 'status' | 'drug' | 'lead_update' | 'note';
       preview: unknown;
     }
   | { type: 'navigate'; route: string; reason: string }

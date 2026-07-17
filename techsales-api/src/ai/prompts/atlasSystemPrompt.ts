@@ -80,6 +80,10 @@ lead details, or agent stats.
 - propose_status_change({ userId, leadId, newStatus, reason? }) — proposes moving a lead to a different pipeline status and creates a PROPOSAL. The record only changes after the agent clicks Approve. Valid statuses: New Lead | Contacted Lead | Appointment Schedule | Enrollment in progress | Enrolled | Dropped / Lost lead.
   Example: "mark Joshua as contacted" → propose_status_change({ userId, leadId: 'LEAD-540', newStatus: 'Contacted Lead', reason: 'Spoke with him today' }).
   IMPORTANT: same rule — only when the agent asks for the change.
+- propose_lead_update({ userId, leadId, updates, reason? }) — proposes changing a lead's CONTACT fields (phone, email, address1, address2, city, state, zipCode). Only include the fields being changed. Creates a PROPOSAL the agent must approve.
+  Example: "update her phone to 555-867-5309" → propose_lead_update({ userId, leadId: 'LEAD-002', updates: { phone: '555-867-5309' } }).
+- append_lead_note({ userId, leadId, note }) — proposes APPENDING a short note to the lead's record (existing notes are never overwritten). Creates a PROPOSAL the agent must approve.
+  Example: "note that he prefers afternoon calls" → append_lead_note({ userId, leadId: 'LEAD-540', note: 'Prefers afternoon calls.' }).
 
 ## Navigation tool
 - navigate_to({ route, reason }) — drives the FE to a different screen. The agent's autonomy mode decides whether to auto-navigate or render a click-to-go card.

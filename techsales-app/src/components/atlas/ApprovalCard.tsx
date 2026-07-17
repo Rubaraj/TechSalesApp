@@ -16,7 +16,7 @@
  *  - error     → red soft tile ("Couldn't apply — try again")
  *  - pending   → full card (above)
  */
-import { Check, X, Mail, Pencil, AlertTriangle, Pill, ListTodo } from 'lucide-react';
+import { Check, X, Mail, Pencil, AlertTriangle, Pill, ListTodo, PenLine, StickyNote } from 'lucide-react';
 import { useAtlas, type AtlasProposal } from '../../context/AtlasContext';
 
 interface Props {
@@ -150,6 +150,8 @@ function iconFor(kind: AtlasProposal['kind']): typeof Mail {
   if (kind === 'email') return Mail;
   if (kind === 'status') return ListTodo;
   if (kind === 'drug') return Pill;
+  if (kind === 'lead_update') return PenLine;
+  if (kind === 'note') return StickyNote;
   return AlertTriangle;
 }
 
@@ -157,6 +159,8 @@ function labelFor(kind: AtlasProposal['kind']): string {
   if (kind === 'email') return 'email';
   if (kind === 'status') return 'lead status update';
   if (kind === 'drug') return 'drug tag';
+  if (kind === 'lead_update') return 'contact info update';
+  if (kind === 'note') return 'lead note';
   return 'action';
 }
 
@@ -168,6 +172,8 @@ function primaryActionFor(kind: AtlasProposal['kind']): string {
   if (kind === 'email') return 'Approve & send';
   if (kind === 'status') return 'Approve & update';
   if (kind === 'drug') return 'Approve & add';
+  if (kind === 'lead_update') return 'Approve & update';
+  if (kind === 'note') return 'Approve & add note';
   return 'Approve';
 }
 
@@ -178,8 +184,20 @@ function successMessageFor(proposal: AtlasProposal): string {
   }
   if (proposal.kind === 'status') return 'Lead status updated.';
   if (proposal.kind === 'drug') return 'Drug added to lead.';
+  if (proposal.kind === 'lead_update') return 'Contact info updated.';
+  if (proposal.kind === 'note') return 'Note added to lead.';
   return 'Approved.';
 }
+
+const FIELD_LABELS: Record<string, string> = {
+  phone: 'Phone',
+  email: 'Email',
+  address1: 'Address',
+  address2: 'Address 2',
+  city: 'City',
+  state: 'State',
+  zipCode: 'Zip',
+};
 
 function renderKvRows(proposal: AtlasProposal): React.JSX.Element {
   const p = (proposal.preview ?? {}) as Record<string, unknown>;
@@ -214,6 +232,36 @@ function renderKvRows(proposal: AtlasProposal): React.JSX.Element {
       <>
         {leadName && <KvRow label="Lead" value={leadName} />}
         {drugName && <KvRow label="Drug" value={dosage ? `${drugName} · ${dosage}` : drugName} />}
+      </>
+    );
+  }
+
+  if (proposal.kind === 'lead_update') {
+    const { leadName, changes } = p as {
+      leadName?: string;
+      changes?: Record<string, { from?: unknown; to?: unknown }>;
+    };
+    return (
+      <>
+        {leadName && <KvRow label="Lead" value={leadName} />}
+        {changes &&
+          Object.entries(changes).map(([field, c]) => (
+            <KvRow
+              key={field}
+              label={FIELD_LABELS[field] ?? field}
+              value={`${String(c.from ?? '—')} → ${String(c.to ?? '—')}`}
+            />
+          ))}
+      </>
+    );
+  }
+
+  if (proposal.kind === 'note') {
+    const { leadName, note } = p as { leadName?: string; note?: string };
+    return (
+      <>
+        {leadName && <KvRow label="Lead" value={leadName} />}
+        {note && <KvRow label="Note" value={note} />}
       </>
     );
   }
