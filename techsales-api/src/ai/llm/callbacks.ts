@@ -223,9 +223,19 @@ export class AuditCallbackHandler extends BaseCallbackHandler {
     if (!pending) return;
     this.pendingTools.delete(runId);
     let parsedOutput: unknown = output;
-    if (typeof output === 'string') {
+    // LangGraph wraps tool results in a ToolMessage — unwrap so the audit
+    // trace records the tool's actual payload, not the serialized wrapper.
+    if (
+      parsedOutput &&
+      typeof parsedOutput === 'object' &&
+      'content' in parsedOutput &&
+      typeof (parsedOutput as { content: unknown }).content === 'string'
+    ) {
+      parsedOutput = (parsedOutput as { content: string }).content;
+    }
+    if (typeof parsedOutput === 'string') {
       try {
-        parsedOutput = JSON.parse(output);
+        parsedOutput = JSON.parse(parsedOutput);
       } catch {
         // leave as string
       }

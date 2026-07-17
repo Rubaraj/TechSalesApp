@@ -244,6 +244,18 @@ export async function* streamAtlasAgent(
         const startedAt = pending?.startedAt ?? Date.now();
         pendingTools.delete(event.run_id);
         let output: unknown = (data as { output?: unknown }).output;
+        // LangGraph streamEvents wraps tool results in a ToolMessage whose
+        // `content` holds the tool's raw string return. Unwrap it, or the
+        // side-channel extraction below never sees `navigate`/`proposalId`
+        // and Assist-mode cards silently never render.
+        if (
+          output &&
+          typeof output === 'object' &&
+          'content' in output &&
+          typeof (output as { content: unknown }).content === 'string'
+        ) {
+          output = (output as { content: string }).content;
+        }
         if (typeof output === 'string') {
           try {
             output = JSON.parse(output);
