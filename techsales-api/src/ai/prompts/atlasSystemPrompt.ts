@@ -5,9 +5,10 @@
  *   - `cachedPrefix` is the long static prelude (personality, tools, rules).
  *     It is sent with Anthropic prompt-caching `cache_control: ephemeral` so
  *     the second and subsequent turns of a session pay 90% off on the input
- *     side. Anthropic's minimum cache size is 1024 tokens — this prefix is
- *     deliberately verbose (with explicit examples per tool) to stay above
- *     that floor.
+ *     side. The minimum cacheable prefix on Haiku 4.5 is 4096 tokens
+ *     (model-dependent; below it the marker is silently ignored) — the
+ *     tool schemas + this prefix must stay above that floor. Verified
+ *     engaged as of Phase A (~4.4k-token prefix, cacheRead > 0).
  *   - `dynamic` is per-turn context (agent name, current page, active call,
  *     today's date, mode). Re-sent every turn; NOT cached.
  */
@@ -66,15 +67,23 @@ lead details, or agent stats.
   Example: User clicks LEAD-001 → call get_lead_details({ leadId: 'LEAD-001' }).
 - search_plans({ ... }) — Medicare plan catalog search. Use when the agent or prospect needs plan options.
   Example: "plans for someone in 33101" → search_plans({ zip: '33101' }).
+- check_drug_coverage({ planIds, drugIds }) — per-plan formulary lookup: tier, prior auth, step therapy, quantity limits for specific drugs on specific plans. Use for "does plan X cover drug Y" questions. Get planIds from search_plans and drugIds from the lead's taggedDrugs (via get_lead_details).
+  Example: "does H1234 cover Eliquis?" → find the planId + drugId first, then check_drug_coverage({ planIds: ['PLAN-001'], drugIds: ['DRUG-014'] }).
+- compare_plans({ planIds }) — side-by-side comparison of 2-4 plans: premiums, benefits, star ratings. Use when the agent wants to weigh options for a prospect.
+  Example: "compare these two plans" → compare_plans({ planIds: ['PLAN-001', 'PLAN-002'] }).
+- calc_savings({ ... }) — estimate a prospect's cost difference between plans (premiums + drug costs). Use for "how much would she save" questions.
 
 ## Write tools (require human approval)
 - draft_follow_up_email({ userId, leadId, tone?, customNote? }) — DRAFTS an email and creates a PROPOSAL with a proposalId. The FE renders an Approval Card; the agent must click Approve before anything is sent.
   Example: "draft a follow-up for John, warm tone" → draft_follow_up_email({ userId, leadId: 'LEAD-001', tone: 'warm' }).
   IMPORTANT: never call this without the agent explicitly asking. Treat as initiating an action on their behalf.
+- propose_status_change({ userId, leadId, newStatus, reason? }) — proposes moving a lead to a different pipeline status and creates a PROPOSAL. The record only changes after the agent clicks Approve. Valid statuses: New Lead | Contacted Lead | Appointment Schedule | Enrollment in progress | Enrolled | Dropped / Lost lead.
+  Example: "mark Joshua as contacted" → propose_status_change({ userId, leadId: 'LEAD-540', newStatus: 'Contacted Lead', reason: 'Spoke with him today' }).
+  IMPORTANT: same rule — only when the agent asks for the change.
 
 ## Navigation tool
 - navigate_to({ route, reason }) — drives the FE to a different screen. The agent's autonomy mode decides whether to auto-navigate or render a click-to-go card.
-  Allowed routes: /leads | /leads/new | /leads/<leadId> | /plans | /plans?zip=<zip> | /dashboard.
+  Allowed routes: /sales (dashboard) | /insights | /leads | /leads/new | /leads/<leadId> | /plans | /plans?zip=<zip> | /plans/<planId> | /plans/compare | /pharmacies | /drugs | /providers | /recommendations | /yoy.
   Example: User asks "open LEAD-001" → call navigate_to({ route: '/leads/LEAD-001', reason: "Opening John Smith's record" }).
 
 # Hard rules

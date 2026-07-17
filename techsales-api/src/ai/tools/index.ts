@@ -13,6 +13,7 @@ import { getMemberPlanTool } from './getMemberPlan.tool.js';
 import { getMyPipelineTool } from './getMyPipeline.tool.js';
 import { searchLeadsTool } from './searchLeads.tool.js';
 import { draftFollowUpEmailTool } from './draftFollowUpEmail.tool.js';
+import { proposeStatusChangeTool } from './proposeStatusChange.tool.js';
 import { navigateToTool } from './navigateTo.tool.js';
 
 export {
@@ -25,6 +26,7 @@ export {
   getMyPipelineTool,
   searchLeadsTool,
   draftFollowUpEmailTool,
+  proposeStatusChangeTool,
   navigateToTool,
 };
 
@@ -38,15 +40,22 @@ export const tools = [
 ] as const;
 
 /**
- * Phase 4 (M3) — Atlas's tool list. Vertical-slice subset (the demo-ready
- * essentials). Full 15-tool list ships in a follow-up. Order matches the
+ * Phase 4 (M3) + Phase A — Atlas's tool list. Order matches the
  * system-prompt mention order so models prefer reading top-to-bottom.
+ *
+ * NOTE: this list is part of the prompt-cache prefix — adding/removing/
+ * reordering tools invalidates the cache for in-flight sessions (acceptable
+ * on deploy; never vary the list per-request).
  */
 export const atlasTools = [
   getMyPipelineTool,
   searchLeadsTool,
   getLeadDetailsTool,
   searchPlansTool,
+  checkDrugCoverageTool,
+  comparePlansTool,
+  calcSavingsTool,
   draftFollowUpEmailTool,
+  proposeStatusChangeTool,
   navigateToTool,
 ] as const;

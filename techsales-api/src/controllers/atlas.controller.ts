@@ -255,8 +255,35 @@ export async function postAtlasApproval(
           result = { leadId: payload.leadId, updated: !!updated };
         }
       } else if (proposal.kind === 'drug') {
-        const payload = proposal.payload as { leadId?: string; drug?: unknown };
-        result = { leadId: payload.leadId, drug: payload.drug, applied: true };
+        // Append the drug to the lead's taggedDrugs (mirrors the LeadForm
+        // add_drug consumer: append, never replace, dedup by drugId).
+        const payload = proposal.payload as {
+          leadId?: string;
+          drug?: { drugId?: string; drugName?: string; dosage?: string; quantity?: number; frequency?: string };
+        };
+        if (payload.leadId && payload.drug?.drugId) {
+          const lead = await repos.lead.findById(payload.leadId);
+          const existing = lead?.taggedDrugs ?? [];
+          const alreadyTagged = existing.some((d) => d.drugId === payload.drug!.drugId);
+          if (lead && !alreadyTagged) {
+            const updated = await repos.lead.update(payload.leadId, {
+              taggedDrugs: [
+                ...existing,
+                {
+                  drugId: payload.drug.drugId,
+                  drugName: payload.drug.drugName,
+                  dosage: payload.drug.dosage ?? 'unspecified',
+                  quantity: payload.drug.quantity ?? 30,
+                  frequency: payload.drug.frequency ?? 'unspecified',
+                },
+              ] as never,
+              updatedBy: userId,
+            } as never);
+            result = { leadId: payload.leadId, drugId: payload.drug.drugId, applied: !!updated };
+          } else {
+            result = { leadId: payload.leadId, drugId: payload.drug.drugId, applied: false, alreadyTagged };
+          }
+        }
       }
     } catch (err) {
       logger.error({ err, proposalId }, 'Atlas approval execution failed');

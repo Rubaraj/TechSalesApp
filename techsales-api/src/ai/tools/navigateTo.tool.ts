@@ -16,7 +16,9 @@ const inputSchema = z.object({
     .min(1)
     .describe(
       'Frontend route to open. Must match an allowed pattern: ' +
-        '"/leads" | "/leads/new" | "/leads/<leadId>" | "/plans" | "/plans?zip=<zip>" | "/dashboard".',
+        '"/sales" (dashboard) | "/insights" | "/leads" | "/leads/new" | "/leads/<leadId>" | ' +
+        '"/plans" | "/plans?zip=<zip>" | "/plans/<planId>" | "/plans/compare" | ' +
+        '"/pharmacies" | "/drugs" | "/providers" | "/recommendations" | "/yoy".',
     ),
   reason: z
     .string()
@@ -29,12 +31,24 @@ const inputSchema = z.object({
 
 type ToolInput = z.infer<typeof inputSchema>;
 
+// Must stay in sync with the agent-facing routes registered in
+// techsales-app/src/App.tsx. (`/dashboard` was allowlisted pre-Phase A but
+// never existed in the router — the real dashboard routes are /sales and
+// /insights.)
 const ALLOWED_ROUTE_PATTERNS = [
+  /^\/sales$/,
+  /^\/insights$/,
   /^\/leads$/,
   /^\/leads\/new$/,
-  /^\/leads\/[A-Z0-9-]+$/,
+  /^\/leads\/[A-Za-z0-9-]+$/,
   /^\/plans(\?.*)?$/,
-  /^\/dashboard$/,
+  /^\/plans\/[A-Za-z0-9-]+$/,
+  /^\/plans\/compare$/,
+  /^\/pharmacies$/,
+  /^\/drugs$/,
+  /^\/providers$/,
+  /^\/recommendations$/,
+  /^\/yoy$/,
 ];
 
 function isAllowed(route: string): boolean {
@@ -48,12 +62,20 @@ export const navigateToTool = tool(
         error: 'route not in allowlist',
         attempted: input.route,
         allowed: [
+          '/sales',
+          '/insights',
           '/leads',
           '/leads/new',
           '/leads/<leadId>',
           '/plans',
           '/plans?zip=<zip>',
-          '/dashboard',
+          '/plans/<planId>',
+          '/plans/compare',
+          '/pharmacies',
+          '/drugs',
+          '/providers',
+          '/recommendations',
+          '/yoy',
         ],
       });
     }
