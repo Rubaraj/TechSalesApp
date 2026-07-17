@@ -16,8 +16,20 @@ export type AtlasStreamEvent =
       preview: unknown;
     }
   | { type: 'navigate'; route: string; reason: string }
+  /** Rich-chat — a tool result the FE renders as a purpose-built card. */
+  | { type: 'display_card'; card: AtlasCardType; tool: string; data: unknown }
   | { type: 'final'; content: string; interactionId: string }
   | { type: 'error'; error: string };
+
+export type AtlasCardType =
+  | 'comparison'
+  | 'lead_list'
+  | 'pacing'
+  | 'eligibility'
+  | 'plan_results'
+  | 'enrollments'
+  | 'appointments'
+  | 'savings';
 
 export interface AtlasChatRequest {
   userId: string;
@@ -108,7 +120,13 @@ export interface AtlasGreeting {
 }
 
 export interface AtlasSession {
-  messages: Array<{ role: 'user' | 'assistant' | 'system'; content: string; ts: number }>;
+  messages: Array<{
+    role: 'user' | 'assistant' | 'system';
+    content: string;
+    ts: number;
+    /** Rich-chat — display cards persisted alongside the assistant turn. */
+    cards?: Array<{ card: AtlasCardType; tool: string; data: unknown; ts: number }>;
+  }>;
 }
 
 async function getGreeting(userId: string): Promise<AtlasGreeting | null> {

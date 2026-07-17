@@ -18,6 +18,9 @@ export interface AtlasChatMessage {
   /** Phase 4 (M3) — when the assistant message included tool calls, the
    *  agent records them here for replay + debugging. */
   toolCalls?: Array<{ name: string; input: unknown; output: unknown; latencyMs: number }>;
+  /** Rich-chat — display cards emitted during this assistant turn, persisted
+   *  so cards survive panel reloads (session GET returns full docs). */
+  cards?: Array<{ card: string; tool: string; data: unknown; ts: number }>;
   ts: number;
 }
 
@@ -38,11 +41,24 @@ const toolCallSchema = new Schema(
   { _id: false },
 );
 
+const cardSchema = new Schema(
+  {
+    card: { type: String, required: true },
+    tool: { type: String, required: true },
+    data: { type: Schema.Types.Mixed },
+    ts: { type: Number, required: true },
+  },
+  { _id: false },
+);
+
 const messageSchema = new Schema<AtlasChatMessage>(
   {
     role: { type: String, enum: ['user', 'assistant', 'system'], required: true },
-    content: { type: String, required: true },
+    // Not required: a card-only assistant turn persists with content ''.
+    // (Update-path writes skip validators anyway — this is defensive.)
+    content: { type: String, required: false, default: '' },
     toolCalls: { type: [toolCallSchema], default: undefined },
+    cards: { type: [cardSchema], default: undefined },
     ts: { type: Number, required: true },
   },
   { _id: false },

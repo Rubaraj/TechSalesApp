@@ -90,7 +90,8 @@ export const calcSavingsTool = tool(
       void input.medicaidEligible;
       void input.lisLevel;
       const rows = input.plans.map(compute);
-      return JSON.stringify(rows);
+      // Envelope (rich-chat upgrade): object wrapper for the FE savings card.
+      return JSON.stringify({ rows });
     } catch (err) {
       return JSON.stringify({ ok: false, error: String(err) });
     }

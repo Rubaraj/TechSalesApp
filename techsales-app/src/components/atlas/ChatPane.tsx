@@ -14,13 +14,16 @@ import {
   type AtlasProposal,
   type AtlasNavigationSuggestion,
   type AtlasLeadSuggestion,
+  type AtlasDisplayCard,
 } from '../../context/AtlasContext';
+import { AtlasDisplayCardView } from './cards/cardRegistry';
 import { useCallContext } from '../../context/CallContext';
 import type { AiActivityEntry } from '../../types/call';
 import { ApprovalCard } from './ApprovalCard';
 import { NavigationCard } from './NavigationCard';
 import { IdentifiedLeadCard } from './IdentifiedLeadCard';
 import { CreateLeadCard } from './CreateLeadCard';
+import { AtlasMarkdown } from './AtlasMarkdown';
 
 type AtlasMessage = ReturnType<typeof useAtlas>['messages'][number];
 type ToolCall = NonNullable<AtlasMessage['toolCalls']>[number];
@@ -30,7 +33,8 @@ type ChatRow =
   | { kind: 'activity'; id: string; ts: number; data: AiActivityEntry }
   | { kind: 'proposal'; id: string; ts: number; data: AtlasProposal }
   | { kind: 'navigation'; id: string; ts: number; data: AtlasNavigationSuggestion }
-  | { kind: 'lead'; id: string; ts: number; data: AtlasLeadSuggestion };
+  | { kind: 'lead'; id: string; ts: number; data: AtlasLeadSuggestion }
+  | { kind: 'card'; id: string; ts: number; data: AtlasDisplayCard };
 
 export function ChatPane(): React.JSX.Element {
   const {
@@ -38,6 +42,7 @@ export function ChatPane(): React.JSX.Element {
     proposals,
     navigationSuggestions,
     leadSuggestions,
+    cards,
     mode,
     send,
     abort,
@@ -93,18 +98,28 @@ export function ChatPane(): React.JSX.Element {
       ts: s.ts,
       data: s,
     }));
+    // Rich-chat — display cards interleave chronologically like proposals.
+    // Mode-independent (they're result renderings, not agentic suggestions).
+    const cardRows: ChatRow[] = cards.map((c) => ({
+      kind: 'card',
+      id: c.id,
+      ts: c.ts,
+      data: c,
+    }));
     return [
       ...msgRows,
       ...activityRows,
       ...proposalRows,
       ...navigationRows,
       ...leadRows,
+      ...cardRows,
     ].sort((a, b) => a.ts - b.ts);
   }, [
     messages,
     proposals,
     navigationSuggestions,
     leadSuggestions,
+    cards,
     mode,
     callState.aiActivityLog,
     callState.isCallActive,
@@ -153,6 +168,9 @@ export function ChatPane(): React.JSX.Element {
           }
           if (row.kind === 'navigation') {
             return <NavigationCard key={row.id} suggestion={row.data} />;
+          }
+          if (row.kind === 'card') {
+            return <AtlasDisplayCardView key={row.id} card={row.data} />;
           }
           // lead — discriminated by row.data.kind
           if (row.data.kind === 'identified') {
@@ -233,11 +251,9 @@ function AiMessage({ message }: { message: AtlasMessage }): React.JSX.Element {
             fontSize: 14,
             lineHeight: 1.55,
             color: 'var(--color-atlas-fg)',
-            whiteSpace: 'pre-wrap',
-            wordBreak: 'break-word',
           }}
         >
-          {message.content}
+          <AtlasMarkdown text={message.content} />
         </div>
       )}
     </div>

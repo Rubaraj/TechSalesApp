@@ -108,7 +108,9 @@ export const searchPlansTool = tool(
       };
     });
 
-    return JSON.stringify(out);
+    // Envelope (rich-chat upgrade): object wrapper so the side-channel
+    // extractor and FE cards get a stable `{total, plans}` shape.
+    return JSON.stringify({ total: out.length, plans: out });
   },
   {
     name: 'search_plans',

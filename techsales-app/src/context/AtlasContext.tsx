@@ -66,11 +66,27 @@ export type AtlasLeadSuggestion =
   | { id: string; kind: 'identified'; lead: LeadPhoneLookup; phone: string; ts: number }
   | { id: string; kind: 'create'; phone: string; ts: number };
 
+/**
+ * Rich-chat — a tool result rendered as a purpose-built card in the chat
+ * stream (comparison grid, lead list, pacing bars, …). Emitted by the
+ * backend's `display_card` SSE event; also rehydrated from persisted
+ * session messages.
+ */
+export interface AtlasDisplayCard {
+  id: string;
+  card: string;
+  tool: string;
+  data: unknown;
+  ts: number;
+}
+
 export interface AtlasContextValue {
   messages: AtlasMessage[];
   isStreaming: boolean;
   proposals: AtlasProposal[];
   navigationSuggestions: AtlasNavigationSuggestion[];
+  /** Rich-chat — display cards interleaved into the chat stream by ts. */
+  cards: AtlasDisplayCard[];
   mode: AtlasMode;
   setMode: (m: AtlasMode) => void;
   send: (text: string) => Promise<void>;
@@ -141,6 +157,7 @@ export function AtlasProvider({ children }: { children: ReactNode }): React.JSX.
     AtlasNavigationSuggestion[]
   >([]);
   const [leadSuggestions, setLeadSuggestions] = useState<AtlasLeadSuggestion[]>([]);
+  const [cards, setCards] = useState<AtlasDisplayCard[]>([]);
   const [resumedFromPriorSession, setResumedFromPriorSession] = useState(false);
   const [mode, setModeState] = useState<AtlasMode>(() => {
     if (typeof window === 'undefined') return 'assist';
@@ -217,6 +234,7 @@ export function AtlasProvider({ children }: { children: ReactNode }): React.JSX.
   useEffect(() => {
     if (!userId) {
       setMessages([]);
+      setCards([]);
       setResumedFromPriorSession(false);
       hydratedForUserRef.current = null;
       return;
@@ -224,15 +242,34 @@ export function AtlasProvider({ children }: { children: ReactNode }): React.JSX.
     if (hydratedForUserRef.current === userId) return;
     hydratedForUserRef.current = userId;
     void atlasService.getSession(userId).then((session) => {
-      const hydrated: AtlasMessage[] = session.messages
-        .filter((m) => m.role === 'user' || m.role === 'assistant')
-        .map((m) => ({
+      const hydrated: AtlasMessage[] = [];
+      const hydratedCards: AtlasDisplayCard[] = [];
+      for (const m of session.messages) {
+        if (m.role !== 'user' && m.role !== 'assistant') continue;
+        hydrated.push({
           id: newId(),
-          role: m.role as 'user' | 'assistant',
+          role: m.role,
           content: m.content,
           ts: m.ts,
-        }));
+        });
+        // Rich-chat — restore cards persisted on the assistant turn. Live
+        // cards arrive mid-stream (before the message's persist-time ts), so
+        // derive ts from the parent message + epsilon to keep the same
+        // message-then-card order after reload.
+        if (m.cards) {
+          m.cards.forEach((c, i) => {
+            hydratedCards.push({
+              id: newId(),
+              card: c.card,
+              tool: c.tool,
+              data: c.data,
+              ts: m.ts + 1 + i,
+            });
+          });
+        }
+      }
       setMessages(hydrated);
+      setCards(hydratedCards);
       // Surface the "continuing from prior session" banner only when there's
       // actual prior history. New sign-ins / first-time users skip straight
       // to the greeting card.
@@ -380,6 +417,21 @@ export function AtlasProvider({ children }: { children: ReactNode }): React.JSX.
           ]);
           return;
         }
+        if (ev.type === 'display_card') {
+          // Rich-chat — tool result rendered as a purpose-built card,
+          // interleaved into the stream at receipt time.
+          setCards((prev) => [
+            ...prev,
+            {
+              id: newId(),
+              card: ev.card,
+              tool: ev.tool,
+              data: ev.data,
+              ts: Date.now(),
+            },
+          ]);
+          return;
+        }
         if (ev.type === 'error') {
           setMessages((prev) => {
             const next = [...prev];
@@ -431,6 +483,7 @@ export function AtlasProvider({ children }: { children: ReactNode }): React.JSX.
     setMessages([]);
     setProposals([]);
     setNavigationSuggestions([]);
+    setCards([]);
     setResumedFromPriorSession(false);
   }, []);
 
@@ -447,6 +500,7 @@ export function AtlasProvider({ children }: { children: ReactNode }): React.JSX.
     setMessages([]);
     setProposals([]);
     setNavigationSuggestions([]);
+    setCards([]);
     setResumedFromPriorSession(false);
     try {
       await atlasService.clearSession(userId);
@@ -521,6 +575,7 @@ export function AtlasProvider({ children }: { children: ReactNode }): React.JSX.
       isStreaming,
       proposals,
       navigationSuggestions,
+      cards,
       mode,
       setMode,
       send,
@@ -546,6 +601,7 @@ export function AtlasProvider({ children }: { children: ReactNode }): React.JSX.
       isStreaming,
       proposals,
       navigationSuggestions,
+      cards,
       leadSuggestions,
       mode,
       setMode,

@@ -113,6 +113,7 @@ export async function postAtlasChat(req: Request, res: Response): Promise<void> 
   }
 
   let finalContent = '';
+  const turnCards: Array<{ card: string; tool: string; data: unknown; ts: number }> = [];
 
   try {
     const stream = streamAtlasAgent(
@@ -140,18 +141,25 @@ export async function postAtlasChat(req: Request, res: Response): Promise<void> 
       if (event.type === 'final') {
         finalContent = event.content;
       }
+      // Rich-chat — collect display cards so they persist with the turn.
+      if (event.type === 'display_card') {
+        turnCards.push({ card: event.card, tool: event.tool, data: event.data, ts: Date.now() });
+      }
       writeEvent(event);
     }
   } catch (err) {
     writeEvent({ type: 'error', error: err instanceof Error ? err.message : String(err) });
   }
 
-  // Persist the assistant turn.
-  if (finalContent) {
+  // Persist the assistant turn. Card-only turns (no text) persist too —
+  // the agent's historyToMessages filters empty-content messages before
+  // they reach the model.
+  if (finalContent || turnCards.length > 0) {
     await appendSessionMessage(userId, {
       role: 'assistant',
       content: finalContent,
       ts: Date.now(),
+      ...(turnCards.length > 0 ? { cards: turnCards } : {}),
     });
   }
 

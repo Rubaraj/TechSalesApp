@@ -52,8 +52,37 @@ export type AtlasStreamEvent =
       preview: unknown;
     }
   | { type: 'navigate'; route: string; reason: string }
+  /** Rich-chat upgrade — a tool result the FE renders as a purpose-built card. */
+  | { type: 'display_card'; card: AtlasCardType; tool: string; data: unknown }
   | { type: 'final'; content: string; interactionId: string }
   | { type: 'error'; error: string };
+
+export type AtlasCardType =
+  | 'comparison'
+  | 'lead_list'
+  | 'pacing'
+  | 'eligibility'
+  | 'plan_results'
+  | 'enrollments'
+  | 'appointments'
+  | 'savings';
+
+/**
+ * Server-side tool→card registry. Deliberately NOT a tag on tool outputs:
+ * the extractor already knows the tool name, and keeping outputs untouched
+ * means zero extra ReAct-observation tokens.
+ */
+const CARD_TOOL_MAP: Record<string, AtlasCardType> = {
+  search_plans: 'plan_results',
+  compare_plans: 'comparison',
+  search_leads: 'lead_list',
+  get_my_pipeline: 'lead_list',
+  get_my_targets: 'pacing',
+  check_eligibility: 'eligibility',
+  get_enrollments: 'enrollments',
+  get_appointments: 'appointments',
+  calc_savings: 'savings',
+};
 
 export interface StreamAtlasAgentInput {
   userId: string;
@@ -88,7 +117,14 @@ function historyToMessages(
 ): Array<HumanMessage | AIMessage> {
   const trimmed = history
     .slice(-20)
-    .filter((m) => m.role === 'user' || m.role === 'assistant');
+    // Card-only assistant turns persist with content: '' — the Anthropic API
+    // rejects empty text blocks, so one such turn in history would 400 every
+    // later turn of the session. Filter them out of the model's view.
+    .filter(
+      (m) =>
+        (m.role === 'user' || m.role === 'assistant') &&
+        m.content.trim().length > 0,
+    );
   return trimmed.map((m) =>
     m.role === 'user' ? new HumanMessage(m.content) : new AIMessage(m.content),
   );
@@ -101,22 +137,28 @@ interface PendingTool {
 }
 
 /**
- * Attempt to extract a structured payload from a tool's JSON output. Several
- * Atlas tools return shapes like `{ navigate: {...} }` or `{ proposalId, kind,
- * preview }` that we want to surface as dedicated SSE events. Returns null
- * when the output doesn't match a special shape.
+ * Extract structured payloads from a tool's JSON output for dedicated SSE
+ * event types. Shared by the real ReAct path AND the stub path (previously
+ * two divergent copies). Returns an array — a single tool output can carry
+ * a display card alongside future shapes.
+ *
+ *   - `{ navigate: {route, reason} }`          → 'navigate'
+ *   - `{ proposalId, kind, preview }`          → 'proposal_created'
+ *   - toolName in CARD_TOOL_MAP + clean object → 'display_card'
  */
-function extractSideChannelEvent(
+function extractSideChannelEvents(
+  toolName: string,
   output: unknown,
-): AtlasStreamEvent | null {
-  if (!output || typeof output !== 'object') return null;
+): AtlasStreamEvent[] {
+  if (!output || typeof output !== 'object') return [];
   const obj = output as Record<string, unknown>;
+  const events: AtlasStreamEvent[] = [];
 
   // Navigation
   if (obj.navigate && typeof obj.navigate === 'object') {
     const nav = obj.navigate as { route?: unknown; reason?: unknown };
     if (typeof nav.route === 'string' && typeof nav.reason === 'string') {
-      return { type: 'navigate', route: nav.route, reason: nav.reason };
+      events.push({ type: 'navigate', route: nav.route, reason: nav.reason });
     }
   }
 
@@ -127,15 +169,22 @@ function extractSideChannelEvent(
     (obj.kind === 'email' || obj.kind === 'status' || obj.kind === 'drug' ||
       obj.kind === 'lead_update' || obj.kind === 'note')
   ) {
-    return {
+    events.push({
       type: 'proposal_created',
       proposalId: obj.proposalId,
       kind: obj.kind,
       preview: obj.preview ?? null,
-    };
+    });
   }
 
-  return null;
+  // Display card — registry lookup; skip error envelopes (every card tool
+  // self-catches to `{error}` / `{ok:false, error}`).
+  const cardType = CARD_TOOL_MAP[toolName];
+  if (cardType && !Array.isArray(obj) && obj.error === undefined) {
+    events.push({ type: 'display_card', card: cardType, tool: toolName, data: obj });
+  }
+
+  return events;
 }
 
 export async function* streamAtlasAgent(
@@ -271,8 +320,9 @@ export async function* streamAtlasAgent(
           latencyMs: Date.now() - startedAt,
         };
         // Side-channel: surface special tool results as their own event types.
-        const side = extractSideChannelEvent(output);
-        if (side) yield side;
+        for (const side of extractSideChannelEvents(name, output)) {
+          yield side;
+        }
         continue;
       }
 
@@ -377,7 +427,10 @@ function pickStubIntent(
     const zipMatch = userMessage.match(/\b(\d{5})\b/);
     return {
       tool: searchPlansTool as unknown as typeof getMyPipelineTool,
-      args: zipMatch ? { zipCode: zipMatch[1] } : {},
+      // search_plans' schema REQUIRES `query` — the old {zipCode}/{} args
+      // failed zod validation, so stub plan search always errored (rich-chat
+      // review finding). Pass the user message as the query.
+      args: { query: userMessage, topK: 5 },
       intro: `Looking up plans${zipMatch ? ` in ${zipMatch[1]}` : ''}, ${firstName}…\n\n`,
       outro: `\n\nLet me know if you want me to compare benefits or check drug coverage on any of these.`,
     };
@@ -462,41 +515,13 @@ async function streamText(text: string, chunkMs = 18): Promise<AsyncIterable<str
   return gen();
 }
 
-/**
- * Side-channel extractor (mirror of the one used in the real ReAct path).
- * Pulls `proposal_created` / `navigate` payloads out of a tool's JSON output.
- */
-function extractSideFromStub(output: unknown): AtlasStreamEvent | null {
-  if (!output || typeof output !== 'object') return null;
-  const obj = output as Record<string, unknown>;
-  if (obj.navigate && typeof obj.navigate === 'object') {
-    const nav = obj.navigate as { route?: unknown; reason?: unknown };
-    if (typeof nav.route === 'string' && typeof nav.reason === 'string') {
-      return { type: 'navigate', route: nav.route, reason: nav.reason };
-    }
-  }
-  if (
-    typeof obj.proposalId === 'string' &&
-    typeof obj.kind === 'string' &&
-    (obj.kind === 'email' || obj.kind === 'status' || obj.kind === 'drug' ||
-      obj.kind === 'lead_update' || obj.kind === 'note')
-  ) {
-    return {
-      type: 'proposal_created',
-      proposalId: obj.proposalId,
-      kind: obj.kind,
-      preview: obj.preview ?? null,
-    };
-  }
-  return null;
-}
-
 async function* runStubAtlas(
   input: StreamAtlasAgentInput,
   signal?: AbortSignal,
 ): AsyncIterable<AtlasStreamEvent> {
   const intent = pickStubIntent(input.userMessage, input.context);
   let finalText = '';
+  let stubCardEmitted = false;
 
   // 1. Stream the intro line.
   if (intent.intro) {
@@ -534,18 +559,21 @@ async function* runStubAtlas(
       output: toolOutput,
       latencyMs: Date.now() - startedAt,
     };
-    // Side-channel events (proposal_created, navigate).
-    const side = extractSideFromStub(toolOutput);
-    if (side) yield side;
+    // Side-channel events (proposal_created, navigate, display_card) —
+    // unified extractor shared with the real ReAct path.
+    for (const side of extractSideChannelEvents(toolName, toolOutput)) {
+      yield side;
+      if (side.type === 'display_card') stubCardEmitted = true;
+    }
   }
 
-  // 3. Stream a short summary of the result (for tools that return data, not
-  //    proposals or navigation events). Skipped for proposal/navigate because
-  //    the FE renders dedicated cards for those.
+  // 3. Stream a short summary of the result. Skipped for proposal/navigate
+  //    AND when a display card was emitted — the card renders the rows;
+  //    repeating them as a text list would duplicate content.
   if (toolOutput && typeof toolOutput === 'object') {
     const obj = toolOutput as Record<string, unknown>;
     const isProposalOrNav = !!obj.proposalId || !!obj.navigate;
-    if (!isProposalOrNav) {
+    if (!isProposalOrNav && !stubCardEmitted) {
       const summary = summarizeStubOutput(toolOutput, input.userMessage);
       if (summary) {
         const summaryStream = await streamText(summary);
