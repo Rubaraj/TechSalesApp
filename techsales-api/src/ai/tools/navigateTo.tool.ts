@@ -18,6 +18,7 @@ const inputSchema = z.object({
       'Frontend route to open. Must match an allowed pattern: ' +
         '"/sales" (dashboard) | "/insights" | "/leads" | "/leads/new" | "/leads/<leadId>" | ' +
         '"/plans" | "/plans?zip=<zip>" | "/plans/<planId>" | "/plans/compare" | ' +
+        '"/plans/compare?ids=<planId,planId>" | ' +
         '"/pharmacies" | "/drugs" | "/providers" | "/recommendations" | "/yoy".',
     ),
   reason: z
@@ -43,7 +44,7 @@ const ALLOWED_ROUTE_PATTERNS = [
   /^\/leads\/[A-Za-z0-9-]+$/,
   /^\/plans(\?.*)?$/,
   /^\/plans\/[A-Za-z0-9-]+$/,
-  /^\/plans\/compare$/,
+  /^\/plans\/compare(\?ids=[A-Za-z0-9,-]+)?$/,
   /^\/pharmacies$/,
   /^\/drugs$/,
   /^\/providers$/,

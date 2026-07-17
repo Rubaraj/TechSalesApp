@@ -87,7 +87,12 @@ export const comparePlansTool = tool(
           benefits,
         });
       }
-      return JSON.stringify(out);
+      // compareUrl deep-links the FE compare page pre-loaded with these
+      // plans (the page auto-runs on ?ids=). Offer it via navigate_to.
+      return JSON.stringify({
+        plans: out,
+        compareUrl: `/plans/compare?ids=${input.planIds.join(',')}`,
+      });
     } catch (err) {
       return JSON.stringify({ ok: false, error: String(err) });
     }
@@ -96,8 +101,9 @@ export const comparePlansTool = tool(
     name: 'compare_plans',
     description:
       'Side-by-side comparison of 2-4 plans. Returns each plan\'s name, carrier, ' +
-      'monthly premium, plan type, and a top-10 list of benefit categories with ' +
-      'availability flags.',
+      'monthly premium, plan type, a top-10 list of benefit categories with ' +
+      'availability flags, and a compareUrl — after summarizing, offer to open ' +
+      'the full comparison page by calling navigate_to with that compareUrl.',
     schema: inputSchema,
   },
 );

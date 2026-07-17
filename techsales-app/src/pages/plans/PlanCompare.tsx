@@ -4,11 +4,16 @@
  * Lets the user pick 2-4 plans (checkbox list, client-side filterable) and
  * runs `aiService.compare` to get a structured comparison + AI narrative.
  *
+ * Deep-linkable: `/plans/compare?ids=PLAN-001,PLAN-025` preselects the
+ * plans and auto-runs the comparison — this is the URL Atlas's
+ * compare_plans flow navigates to. Selections keep the URL in sync so any
+ * comparison is shareable.
+ *
  * Returns an "AI required" placeholder when AI is disabled — full
  * keyword-only comparison fallback is out of scope for Phase 4.
  */
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   ArrowLeft,
   Sparkles,
@@ -16,6 +21,7 @@ import {
   AlertTriangle,
   Search,
   Scale,
+  Star,
 } from 'lucide-react';
 import { Button, Badge } from '../../components/common';
 import { SearchInput } from '../../components/common/SearchInput';
@@ -24,20 +30,27 @@ import { ComparisonGrid, type ComparisonRow } from '../../components/comparison/
 import { useAuth } from '../../context/AuthContext';
 import { useAiEnabled } from '../../hooks/useAiEnabled';
 import { aiService, type CompareResponseData } from '../../services/aiService';
-import { searchPlans, type PlanWithPremium } from '../../services/planService';
+import { searchPlans, getPlanWithDetails, type PlanWithPremium } from '../../services/planService';
+
+const MAX_PLANS = 4;
 
 export function PlanCompare() {
   const navigate = useNavigate();
   const aiEnabled = useAiEnabled();
   const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [plans, setPlans] = useState<PlanWithPremium[]>([]);
   const [isLoadingPlans, setIsLoadingPlans] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selected, setSelected] = useState<string[]>([]);
   const [data, setData] = useState<CompareResponseData | null>(null);
+  const [starByPlan, setStarByPlan] = useState<Record<string, number | null>>({});
   const [isComparing, setIsComparing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // One-shot deep-link consumption: ?ids=A,B preselects and auto-compares.
+  const deepLinkConsumed = useRef(false);
 
   useEffect(() => {
     const load = async () => {
@@ -55,24 +68,59 @@ export function PlanCompare() {
     void load();
   }, [searchTerm]);
 
+  useEffect(() => {
+    if (deepLinkConsumed.current) return;
+    deepLinkConsumed.current = true;
+    const ids = (searchParams.get('ids') ?? '')
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .slice(0, MAX_PLANS);
+    if (ids.length >= 2) {
+      setSelected(ids);
+      void runCompare(ids);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const syncUrl = (ids: string[]) => {
+    setSearchParams(ids.length >= 2 ? { ids: ids.join(',') } : {}, { replace: true });
+  };
+
   const toggleSelect = (planId: string) => {
     setSelected((prev) => {
-      if (prev.includes(planId)) return prev.filter((p) => p !== planId);
-      if (prev.length >= 4) return prev;
-      return [...prev, planId];
+      const next = prev.includes(planId)
+        ? prev.filter((p) => p !== planId)
+        : prev.length >= MAX_PLANS
+          ? prev
+          : [...prev, planId];
+      syncUrl(next);
+      return next;
     });
   };
 
-  const runCompare = async () => {
-    if (selected.length < 2) return;
+  const runCompare = async (planIds?: string[]) => {
+    const ids = planIds ?? selected;
+    if (ids.length < 2) return;
     setIsComparing(true);
     setError(null);
-    const res = await aiService.compare(selected, {
-      ...(user?.userId ? { userId: user.userId } : {}),
-    });
+    syncUrl(ids);
+    const [res, details] = await Promise.all([
+      aiService.compare(ids, {
+        ...(user?.userId ? { userId: user.userId } : {}),
+      }),
+      Promise.all(ids.map((id) => getPlanWithDetails(id))),
+    ]);
     setIsComparing(false);
     if (res.success && res.data) {
       setData(res.data);
+      const stars: Record<string, number | null> = {};
+      ids.forEach((id, i) => {
+        const d = details[i];
+        stars[id] =
+          d.success && d.data?.starRating ? (d.data.starRating.overallRating ?? null) : null;
+      });
+      setStarByPlan(stars);
     } else {
       setError(res.error ?? 'Compare request failed.');
     }
@@ -95,24 +143,40 @@ export function PlanCompare() {
     const planList = resp.comparison.plans;
     const rows: ComparisonRow[] = [];
     rows.push({
-      label: 'Plan Name',
-      values: planList.map((p) => p.planName ?? p.planId),
-    });
-    rows.push({
       label: 'Carrier',
       values: planList.map((p) => p.carrier ?? '—'),
+      alwaysShow: true,
     });
     rows.push({
       label: 'Plan Type',
       values: planList.map((p) =>
         p.planType ? <Badge variant="primary">{p.planType}</Badge> : '—',
       ),
+      compareValues: planList.map((p) => p.planType ?? null),
+      alwaysShow: true,
     });
     rows.push({
       label: 'Monthly Premium',
       values: planList.map((p) =>
         typeof p.premium === 'number' ? `$${p.premium.toFixed(2)}` : '—',
       ),
+      compareValues: planList.map((p) => p.premium ?? null),
+      alwaysShow: true,
+    });
+    rows.push({
+      label: 'Star Rating',
+      values: planList.map((p) => {
+        const rating = starByPlan[p.planId];
+        if (typeof rating !== 'number' || rating <= 0) return '—';
+        return (
+          <span className="inline-flex items-center gap-1">
+            <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+            {rating.toFixed(1)}
+          </span>
+        );
+      }),
+      compareValues: planList.map((p) => starByPlan[p.planId] ?? null),
+      alwaysShow: true,
     });
 
     // Build a unique benefit category list across all plans (preserve order).
@@ -121,15 +185,13 @@ export function PlanCompare() {
       for (const b of p.benefits) allCats.add(b.category);
     }
     for (const cat of allCats) {
-      rows.push({
-        label: cat,
-        values: planList.map((p) => {
-          const match = p.benefits.find((b) => b.category === cat);
-          if (!match) return '—';
-          if (match.isAvailable === false) return 'Not covered';
-          return 'Covered';
-        }),
+      const cells = planList.map((p) => {
+        const match = p.benefits.find((b) => b.category === cat);
+        if (!match) return '—';
+        if (match.isAvailable === false) return 'Not covered';
+        return 'Covered';
       });
+      rows.push({ label: cat, values: cells, compareValues: cells });
     }
     return rows;
   };
@@ -153,7 +215,7 @@ export function PlanCompare() {
             Pick 2–4 plans, then ask the AI to surface the key differences.
           </p>
         </div>
-        <Button onClick={runCompare} disabled={selected.length < 2 || isComparing}>
+        <Button onClick={() => void runCompare()} disabled={selected.length < 2 || isComparing}>
           {isComparing ? (
             <Loader2 className="w-4 h-4 animate-spin" />
           ) : (
@@ -181,7 +243,7 @@ export function PlanCompare() {
           <div className="max-h-[420px] overflow-y-auto divide-y divide-gray-100 dark:divide-gray-700">
             {plans.map((plan) => {
               const checked = selected.includes(plan.planId);
-              const disabled = !checked && selected.length >= 4;
+              const disabled = !checked && selected.length >= MAX_PLANS;
               return (
                 <label
                   key={plan.planId}
@@ -232,8 +294,10 @@ export function PlanCompare() {
         <div className="space-y-4">
           <ComparisonGrid
             columns={data.comparison.plans.map((p) => p.planName ?? p.planId)}
+            columnLinks={data.comparison.plans.map((p) => `/plans/${p.planId}`)}
             items={buildRows(data)}
             highlightChanges
+            collapseUnchanged
           />
 
           <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">

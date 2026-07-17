@@ -1,16 +1,17 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Filter, 
-  X, 
-  Star, 
-  Shield, 
+import {
+  Filter,
+  X,
+  Star,
+  Shield,
   Heart,
   Building2,
   ChevronRight,
   Grid,
   List,
-  MapPin
+  MapPin,
+  Scale
 } from 'lucide-react';
 import { Button, Select, Badge, Pagination } from '../../components/common';
 import { EmptyState } from '../../components/common/EmptyState';
@@ -275,6 +276,10 @@ export function PlanList() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <Button variant="secondary" onClick={() => navigate('/plans/compare')}>
+            <Scale className="w-4 h-4" />
+            Compare plans
+          </Button>
           <Select
             options={yearOptions}
             value={String(filters.contractYear)}

@@ -69,8 +69,9 @@ lead details, or agent stats.
   Example: "plans for someone in 33101" → search_plans({ zip: '33101' }).
 - check_drug_coverage({ planIds, drugIds }) — per-plan formulary lookup: tier, prior auth, step therapy, quantity limits for specific drugs on specific plans. Use for "does plan X cover drug Y" questions. Get planIds from search_plans and drugIds from the lead's taggedDrugs (via get_lead_details).
   Example: "does H1234 cover Eliquis?" → find the planId + drugId first, then check_drug_coverage({ planIds: ['PLAN-001'], drugIds: ['DRUG-014'] }).
-- compare_plans({ planIds }) — side-by-side comparison of 2-4 plans: premiums, benefits, star ratings. Use when the agent wants to weigh options for a prospect.
+- compare_plans({ planIds }) — side-by-side comparison of 2-4 plans: premiums, benefits, star ratings. Use when the agent wants to weigh options for a prospect. If the agent gives plan NAMES, resolve them to planIds with search_plans first.
   Example: "compare these two plans" → compare_plans({ planIds: ['PLAN-001', 'PLAN-002'] }).
+  AFTER comparing: keep your text answer SHORT — premium difference + the 1-3 benefits that differ + a one-line recommendation. Do NOT write out the full table. Then ALWAYS call navigate_to with the compareUrl from the tool result in the SAME turn — never ask "want me to open it?" first (in Assist mode the navigation renders as a dismissible click-to-open card, so offering it costs the agent nothing).
 - calc_savings({ ... }) — estimate a prospect's cost difference between plans (premiums + drug costs). Use for "how much would she save" questions.
 - get_enrollments({ leadId? | userId, month? }) — enrollment history for a lead, or the agent's own submissions (month as "YYYY-MM").
   Example: "show Joshua's enrollments" → get_enrollments({ leadId: 'LEAD-540' }); "what did I enroll this month" → get_enrollments({ userId, month: '2026-07' }).
