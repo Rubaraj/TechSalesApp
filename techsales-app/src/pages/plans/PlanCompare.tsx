@@ -1,8 +1,9 @@
 /**
  * Phase 4 — `/plans/compare` page.
  *
- * Lets the user pick 2-4 plans (checkbox list, client-side filterable) and
- * runs `aiService.compare` to get a structured comparison + AI narrative.
+ * Compact selection UX: chosen plans render as removable chips on a single
+ * row, and an "Add plan" combobox opens a floating result dropdown only
+ * while searching — the comparison grid owns the page, not the picker.
  *
  * Deep-linkable: `/plans/compare?ids=PLAN-001,PLAN-025` preselects the
  * plans and auto-runs the comparison — this is the URL Atlas's
@@ -19,20 +20,31 @@ import {
   Sparkles,
   Loader2,
   AlertTriangle,
-  Search,
   Scale,
   Star,
+  Plus,
+  X,
 } from 'lucide-react';
 import { Button, Badge } from '../../components/common';
-import { SearchInput } from '../../components/common/SearchInput';
 import { EmptyState } from '../../components/common/EmptyState';
 import { ComparisonGrid, type ComparisonRow } from '../../components/comparison/ComparisonGrid';
 import { useAuth } from '../../context/AuthContext';
 import { useAiEnabled } from '../../hooks/useAiEnabled';
 import { aiService, type CompareResponseData } from '../../services/aiService';
-import { searchPlans, getPlanWithDetails, type PlanWithPremium } from '../../services/planService';
+import {
+  searchPlans,
+  getPlanById,
+  getPlanWithDetails,
+  type PlanWithPremium,
+} from '../../services/planService';
 
 const MAX_PLANS = 4;
+
+interface SelectedPlan {
+  planId: string;
+  planName: string;
+  monthlyPremium?: number;
+}
 
 export function PlanCompare() {
   const navigate = useNavigate();
@@ -40,33 +52,47 @@ export function PlanCompare() {
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [plans, setPlans] = useState<PlanWithPremium[]>([]);
-  const [isLoadingPlans, setIsLoadingPlans] = useState(true);
+  const [results, setResults] = useState<PlanWithPremium[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selected, setSelected] = useState<string[]>([]);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [selected, setSelected] = useState<SelectedPlan[]>([]);
   const [data, setData] = useState<CompareResponseData | null>(null);
   const [starByPlan, setStarByPlan] = useState<Record<string, number | null>>({});
   const [isComparing, setIsComparing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const pickerRef = useRef<HTMLDivElement>(null);
   // One-shot deep-link consumption: ?ids=A,B preselects and auto-compares.
   const deepLinkConsumed = useRef(false);
 
+  // Combobox search — only fetches while the picker is in use.
   useEffect(() => {
     const load = async () => {
-      setIsLoadingPlans(true);
+      setIsSearching(true);
       const res = await searchPlans({
         searchTerm: searchTerm || undefined,
         page: 1,
-        pageSize: 50,
+        pageSize: 30,
       });
       if (res.success && res.data) {
-        setPlans(res.data.data);
+        setResults(res.data.data);
       }
-      setIsLoadingPlans(false);
+      setIsSearching(false);
     };
     void load();
   }, [searchTerm]);
+
+  // Close the dropdown on outside click.
+  useEffect(() => {
+    const onDown = (e: MouseEvent) => {
+      if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
+        setPickerOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', onDown);
+    return () => document.removeEventListener('mousedown', onDown);
+  }, []);
 
   useEffect(() => {
     if (deepLinkConsumed.current) return;
@@ -77,8 +103,23 @@ export function PlanCompare() {
       .filter(Boolean)
       .slice(0, MAX_PLANS);
     if (ids.length >= 2) {
-      setSelected(ids);
-      void runCompare(ids);
+      void (async () => {
+        const loaded = await Promise.all(ids.map((id) => getPlanById(id)));
+        setSelected(
+          ids.map((id, i) => {
+            const p = loaded[i];
+            return {
+              planId: id,
+              planName: p.success && p.data ? p.data.planName : id,
+              monthlyPremium:
+                p.success && p.data
+                  ? (p.data as { monthlyPremium?: number }).monthlyPremium
+                  : undefined,
+            };
+          }),
+        );
+        void runCompare(ids);
+      })();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -87,20 +128,30 @@ export function PlanCompare() {
     setSearchParams(ids.length >= 2 ? { ids: ids.join(',') } : {}, { replace: true });
   };
 
-  const toggleSelect = (planId: string) => {
+  const addPlan = (plan: PlanWithPremium) => {
     setSelected((prev) => {
-      const next = prev.includes(planId)
-        ? prev.filter((p) => p !== planId)
-        : prev.length >= MAX_PLANS
-          ? prev
-          : [...prev, planId];
-      syncUrl(next);
+      if (prev.some((s) => s.planId === plan.planId) || prev.length >= MAX_PLANS) return prev;
+      const next = [
+        ...prev,
+        { planId: plan.planId, planName: plan.planName, monthlyPremium: plan.monthlyPremium },
+      ];
+      syncUrl(next.map((s) => s.planId));
+      return next;
+    });
+    setSearchTerm('');
+    setPickerOpen(false);
+  };
+
+  const removePlan = (planId: string) => {
+    setSelected((prev) => {
+      const next = prev.filter((s) => s.planId !== planId);
+      syncUrl(next.map((s) => s.planId));
       return next;
     });
   };
 
   const runCompare = async (planIds?: string[]) => {
-    const ids = planIds ?? selected;
+    const ids = planIds ?? selected.map((s) => s.planId);
     if (ids.length < 2) return;
     setIsComparing(true);
     setError(null);
@@ -196,6 +247,11 @@ export function PlanCompare() {
     return rows;
   };
 
+  const canAddMore = selected.length < MAX_PLANS;
+  const dropdownResults = results.filter(
+    (p) => !selected.some((s) => s.planId === p.planId),
+  );
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
@@ -212,7 +268,7 @@ export function PlanCompare() {
             Plan Compare
           </h1>
           <p className="text-gray-500 dark:text-gray-400">
-            Pick 2–4 plans, then ask the AI to surface the key differences.
+            Add 2–4 plans, then ask the AI to surface the key differences.
           </p>
         </div>
         <Button onClick={() => void runCompare()} disabled={selected.length < 2 || isComparing}>
@@ -225,60 +281,92 @@ export function PlanCompare() {
         </Button>
       </div>
 
-      {/* Plan picker */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 space-y-4">
-        <SearchInput
-          value={searchTerm}
-          onChange={setSearchTerm}
-          placeholder="Filter plans by name, contract, or carrier…"
-        />
-        {isLoadingPlans ? (
-          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-            <Loader2 className="w-5 h-5 mx-auto animate-spin mb-2" />
-            Loading plans…
-          </div>
-        ) : plans.length === 0 ? (
-          <EmptyState icon={Search} title="No plans found" description="Try a different search." />
-        ) : (
-          <div className="max-h-[420px] overflow-y-auto divide-y divide-gray-100 dark:divide-gray-700">
-            {plans.map((plan) => {
-              const checked = selected.includes(plan.planId);
-              const disabled = !checked && selected.length >= MAX_PLANS;
-              return (
-                <label
-                  key={plan.planId}
-                  className={`flex items-center gap-3 py-3 px-2 cursor-pointer transition-colors ${
-                    checked
-                      ? 'bg-primary-50 dark:bg-primary-900/20'
-                      : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'
-                  } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={checked}
-                    disabled={disabled}
-                    onChange={() => toggleSelect(plan.planId)}
-                    className="w-4 h-4 text-primary-600 rounded"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900 dark:text-white truncate">
-                      {plan.planName}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {plan.contractNumber}-{plan.pbp} · {plan.planType} · {plan.product}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                      ${plan.monthlyPremium?.toFixed(2) ?? '0.00'}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">/mo</p>
-                  </div>
-                </label>
-              );
-            })}
-          </div>
-        )}
+      {/* Compact plan selector — chips + combobox, one row tall */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-3">
+        <div className="flex flex-wrap items-center gap-2">
+          {selected.map((s) => (
+            <span
+              key={s.planId}
+              className="inline-flex items-center gap-1.5 pl-3 pr-1.5 py-1.5 rounded-full bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-800 text-sm text-primary-800 dark:text-primary-200"
+            >
+              <span className="font-medium">{s.planName}</span>
+              {typeof s.monthlyPremium === 'number' && (
+                <span className="text-xs opacity-70">${s.monthlyPremium.toFixed(2)}/mo</span>
+              )}
+              <button
+                onClick={() => removePlan(s.planId)}
+                className="p-0.5 rounded-full hover:bg-primary-100 dark:hover:bg-primary-800/60 transition-colors"
+                title="Remove"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </span>
+          ))}
+
+          {canAddMore && (
+            <div className="relative flex-1 min-w-[220px]" ref={pickerRef}>
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-dashed border-gray-300 dark:border-gray-600 focus-within:border-primary-400 dark:focus-within:border-primary-500 transition-colors">
+                <Plus className="w-4 h-4 text-gray-400 shrink-0" />
+                <input
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setPickerOpen(true);
+                  }}
+                  onFocus={() => setPickerOpen(true)}
+                  placeholder={
+                    selected.length === 0
+                      ? 'Add a plan — search by name, carrier, or type…'
+                      : 'Add another plan…'
+                  }
+                  className="w-full bg-transparent text-sm text-gray-900 dark:text-white placeholder-gray-400 outline-none py-0.5"
+                />
+              </div>
+
+              {pickerOpen && (
+                <div className="absolute z-20 mt-2 w-full max-h-72 overflow-y-auto rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg">
+                  {isSearching ? (
+                    <div className="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                      <Loader2 className="w-4 h-4 mx-auto animate-spin mb-1" />
+                      Searching…
+                    </div>
+                  ) : dropdownResults.length === 0 ? (
+                    <div className="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                      No matching plans.
+                    </div>
+                  ) : (
+                    dropdownResults.map((plan) => (
+                      <button
+                        key={plan.planId}
+                        onClick={() => addPlan(plan)}
+                        className="w-full flex items-center justify-between gap-3 px-3 py-2.5 text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                      >
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                            {plan.planName}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            {plan.contractNumber}-{plan.pbp} · {plan.planType} · {plan.product}
+                          </p>
+                        </div>
+                        <span className="text-sm font-semibold text-gray-900 dark:text-white shrink-0">
+                          ${plan.monthlyPremium?.toFixed(2) ?? '0.00'}
+                          <span className="text-xs font-normal text-gray-500 dark:text-gray-400">/mo</span>
+                        </span>
+                      </button>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {!canAddMore && (
+            <span className="text-xs text-gray-400 dark:text-gray-500 pl-1">
+              Max {MAX_PLANS} plans
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Error */}
@@ -314,6 +402,15 @@ export function PlanCompare() {
             AI may be inaccurate — verify details with official SBC documents.
           </p>
         </div>
+      )}
+
+      {/* First-run hint when nothing selected and nothing compared yet */}
+      {!data && selected.length === 0 && (
+        <EmptyState
+          icon={Scale}
+          title="Nothing to compare yet"
+          description="Add two or more plans above to see a side-by-side comparison."
+        />
       )}
     </div>
   );
