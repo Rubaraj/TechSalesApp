@@ -21,27 +21,15 @@ export type ProposalExecutor = (
   userId: string,
 ) => Promise<Record<string, unknown> | undefined>;
 
-/**
- * Lead fields Atlas may propose changing. Anything else is dropped.
- * Deliberately excluded: leadStatus (dedicated propose_status_change flow),
- * dob/gender/leadId/assignedTo/createdBy (identity + system fields — those
- * change through the lead form with fuller validation, not via chat).
- */
+/** Lead fields Atlas may propose changing. Anything else is dropped. */
 const LEAD_UPDATE_ALLOWED_FIELDS = [
-  'firstName',
-  'lastName',
   'phone',
   'email',
   'address1',
   'address2',
   'city',
   'state',
-  'county',
   'zipCode',
-  'medicareNumber',
-  'medicaidId',
-  'partADate',
-  'partBDate',
 ] as const;
 
 const executeEmail: ProposalExecutor = async (payload) => {

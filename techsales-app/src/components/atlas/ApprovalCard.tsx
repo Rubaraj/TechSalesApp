@@ -190,20 +190,13 @@ function successMessageFor(proposal: AtlasProposal): string {
 }
 
 const FIELD_LABELS: Record<string, string> = {
-  firstName: 'First name',
-  lastName: 'Last name',
   phone: 'Phone',
   email: 'Email',
   address1: 'Address',
   address2: 'Address 2',
   city: 'City',
   state: 'State',
-  county: 'County',
   zipCode: 'Zip',
-  medicareNumber: 'Medicare #',
-  medicaidId: 'Medicaid ID',
-  partADate: 'Part A date',
-  partBDate: 'Part B date',
 };
 
 function renderKvRows(proposal: AtlasProposal): React.JSX.Element {

@@ -83,16 +83,12 @@ export class MongoLeadRepository implements IRepository<Lead> {
     if (params.searchTerm && params.searchTerm.trim()) {
       const re = new RegExp(escapeRegex(params.searchTerm.trim()), 'i');
       query.$or = [
-        { leadId: re },
         { firstName: re },
         { lastName: re },
         { email: re },
         { phone: re },
         { city: re },
-        { county: re },
-        { zipCode: re },
         { medicareNumber: re },
-        { medicaidId: re },
       ];
     }
 

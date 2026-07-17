@@ -13,8 +13,7 @@ const inputSchema = z.object({
     .string()
     .optional()
     .describe(
-      'Free-text search across leadId / firstName / lastName / email / phone / city / ' +
-        'county / zipCode / medicareNumber / medicaidId.',
+      'Free-text search across firstName / lastName / email / phone / city / medicareNumber.',
     ),
   status: z
     .enum([
