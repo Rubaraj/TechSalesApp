@@ -1,0 +1,20 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" />
+<link rel="stylesheet" href="_card.css" />
+<style>
+  body{ padding:18px 20px; }
+  .row{ display:flex; gap:14px; align-items:baseline; }
+  .tag{ font-family:var(--font-mono); font-size:10px; color:var(--fg-subtle); width:92px; flex:none; }
+  .serif{ font-family:var(--font-serif); }
+</style></head>
+<body>
+  <div class="cap" style="margin-bottom:14px;">Newsreader \u2014 editorial serif for the Atlas AI surface</div>
+  <div style="display:flex; flex-direction:column; gap:13px;">
+    <div class="row"><span class="tag">greeting 22/500</span>
+      <span class="serif" style="font-size:23px;font-weight:500;color:var(--fg)">Good afternoon, Mike.</span></div>
+    <div class="row"><span class="tag">AI header 17/600</span>
+      <span class="serif" style="font-size:17px;font-weight:600;color:var(--fg)">Here\u2019s what I found in the lead book</span></div>
+    <div class="row"><span class="tag">italic 15/400</span>
+      <span class="serif" style="font-size:15px;font-style:italic;color:var(--fg-muted)">Atlas is scanning your follow-ups\u2026</span></div>
+  </div>
+  <div style="margin-top:14px;font-family:var(--font-mono);font-size:10px;color:var(--fg-subtle)">Used only on Atlas greetings / AI headers \u2014 everything else stays Inter. Swap to Fraunces via --font-serif.</div>
+</body></html>

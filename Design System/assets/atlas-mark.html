@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Atlas mark — radar</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  html,body{margin:0;height:100%;}
+  body{ background:var(--bg); font-family:var(--font-sans);
+    display:flex; align-items:center; justify-content:center; gap:46px; }
+
+  /* ── Atlas mark — radar / sonar ping ──────────────────────────
+     A pulsing core emits concentric pings inside a faint dish.
+     "Atlas is scanning for your next lead." Calm, on-brand.    */
+  .atlas{ position:relative; display:grid; place-items:center; --s:40px; }
+  .atlas .halo{ position:absolute; inset:0; margin:auto; width:128%; height:128%; border-radius:50%;
+    background:radial-gradient(circle, var(--atlas-glow) 0%, transparent 68%); z-index:0;
+    animation:halo 4s var(--ease) infinite; }
+  .atlas .tile{ position:relative; z-index:1; width:var(--s); height:var(--s);
+    border-radius:calc(var(--s)*.3); overflow:hidden;
+    background:radial-gradient(120% 120% at 28% 22%, #ffc486 0%, var(--atlas-from) 36%, var(--atlas-to) 100%);
+    box-shadow:0 6px 18px var(--atlas-glow), inset 0 1px 0 rgba(255,255,255,.45), inset 0 0 0 1px rgba(255,255,255,.1); }
+  .atlas .sweep{ position:absolute; top:0; bottom:0; width:55%;
+    background:linear-gradient(105deg, transparent, rgba(255,255,255,.5), transparent);
+    transform:translateX(-180%) skewX(-12deg); animation:sweep 5.2s var(--ease) infinite; }
+  .atlas svg{ position:absolute; inset:0; margin:auto; width:74%; height:74%; }
+  .ping{ transform-box:fill-box; transform-origin:center; transform:scale(.4); opacity:0; }
+  .p1{ animation:ping 3s var(--ease) infinite; }
+  .p2{ animation:ping 3s var(--ease) infinite 1s; }
+  .p3{ animation:ping 3s var(--ease) infinite 2s; }
+  .core{ transform-box:fill-box; transform-origin:center; animation:corePulse 3s var(--ease) infinite; }
+
+  @keyframes halo{ 0%,100%{opacity:.32; transform:scale(.92);} 50%{opacity:.66; transform:scale(1.12);} }
+  @keyframes sweep{ 0%{transform:translateX(-180%) skewX(-12deg);} 46%,100%{transform:translateX(320%) skewX(-12deg);} }
+  @keyframes ping{ 0%{transform:scale(.4); opacity:0;} 12%{opacity:.9;} 100%{transform:scale(3.0); opacity:0;} }
+  @keyframes corePulse{ 0%,100%{transform:scale(1);} 50%{transform:scale(1.18);} }
+  @media (prefers-reduced-motion: reduce){ .atlas .halo,.atlas .sweep,.ping,.core{ animation:none; } .ping{opacity:.5; transform:scale(1.7);} }
+
+  .s-sm{ --s:28px; } .s-md{ --s:40px; } .s-lg{ --s:64px; }
+  .lockup{ display:flex; align-items:center; gap:13px; }
+  .lockup .name{ font-size:18px; font-weight:700; color:var(--fg); line-height:1; letter-spacing:-.01em; }
+  .lockup .role{ font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--fg-muted); margin-top:4px; }
+  .col{ display:flex; flex-direction:column; }
+</style>
+</head>
+<body>
+  <template id="mk">
+    <div class="atlas">
+      <div class="halo"></div>
+      <div class="tile">
+        <div class="sweep"></div>
+        <svg viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="9" stroke="rgba(255,255,255,.35)" stroke-width="1"/>
+          <circle class="ping p1" cx="12" cy="12" r="4" stroke="#fff" stroke-width="1.4"/>
+          <circle class="ping p2" cx="12" cy="12" r="4" stroke="#fff" stroke-width="1.4"/>
+          <circle class="ping p3" cx="12" cy="12" r="4" stroke="#fff" stroke-width="1.4"/>
+          <circle class="core" cx="12" cy="12" r="2.4" fill="#fff"/>
+        </svg>
+      </div>
+    </div>
+  </template>
+
+  <div class="mount s-sm"></div>
+  <div class="mount s-md"></div>
+  <div class="mount s-lg"></div>
+  <div class="lockup">
+    <div class="mount s-md"></div>
+    <div class="col"><span class="name">Atlas</span><span class="role">AI Copilot</span></div>
+  </div>
+
+  <script>
+    const tpl = document.getElementById('mk').content;
+    document.querySelectorAll('.mount').forEach(m => m.appendChild(tpl.cloneNode(true)));
+  </script>
+</body>
+</html>

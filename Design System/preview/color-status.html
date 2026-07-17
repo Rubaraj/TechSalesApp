@@ -1,0 +1,27 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" />
+<link rel="stylesheet" href="_card.css" />
+<style>
+  .grid{ display:grid; grid-template-columns:repeat(6,1fr); gap:12px; }
+  .st{ display:flex; flex-direction:column; gap:8px; }
+  .dot{ width:100%; height:40px; border-radius:9px; }
+  .nm{ font-size:11.5px; font-weight:600; color:var(--fg); }
+  .badge{ align-self:flex-start; font-size:11px; font-weight:700; padding:3px 9px;
+    border-radius:999px; }
+</style></head>
+<body>
+  <div class="cap" style="margin-bottom:12px;">Pipeline status spectrum</div>
+  <div class="grid">
+    <div class="st"><div class="dot" style="background:var(--st-new)"></div>
+      <span class="badge" style="color:var(--st-new);background:rgba(79,147,247,.14)">New Lead</span></div>
+    <div class="st"><div class="dot" style="background:var(--st-contacted)"></div>
+      <span class="badge" style="color:var(--st-contacted);background:rgba(155,124,246,.14)">Contacted</span></div>
+    <div class="st"><div class="dot" style="background:var(--st-appointment)"></div>
+      <span class="badge" style="color:var(--st-appointment);background:rgba(34,195,224,.14)">Appointment</span></div>
+    <div class="st"><div class="dot" style="background:var(--st-enrollment)"></div>
+      <span class="badge" style="color:var(--st-enrollment);background:rgba(245,158,11,.14)">Enrollment</span></div>
+    <div class="st"><div class="dot" style="background:var(--st-enrolled)"></div>
+      <span class="badge" style="color:var(--st-enrolled);background:rgba(43,189,110,.14)">Enrolled</span></div>
+    <div class="st"><div class="dot" style="background:var(--st-dropped)"></div>
+      <span class="badge" style="color:var(--st-dropped);background:rgba(244,83,107,.14)">Dropped</span></div>
+  </div>
+</body></html>

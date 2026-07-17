@@ -1,0 +1,32 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" />
+<link rel="stylesheet" href="_card.css" />
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body{ padding:16px; display:flex; flex-direction:column; gap:13px; max-width:420px; }
+  /* continuing-conversation banner */
+  .banner{ display:flex; align-items:center; gap:10px; background:var(--exl-orange-soft);
+    border:1px solid var(--exl-orange-line); border-radius:11px; padding:10px 13px; }
+  .banner svg{ width:15px; height:15px; color:var(--exl-orange); flex:none; }
+  .banner .txt{ font-size:12.5px; color:var(--fg); }
+  .banner .acts{ margin-left:auto; display:flex; gap:10px; font-size:12px; font-weight:600; }
+  .banner .acts a{ color:var(--exl-orange); cursor:pointer; }
+  /* greeting card */
+  .greet{ display:flex; align-items:center; gap:13px; background:var(--surface-2);
+    border:1px solid var(--border); border-radius:14px; padding:15px; }
+  .mark{ width:40px; height:40px; flex:none; border-radius:11px; display:grid; place-items:center;
+    background:linear-gradient(145deg,var(--atlas-from),var(--atlas-to)); color:#fff; }
+  .mark svg{ width:22px; height:22px; }
+  .greet .h{ font-size:16px; font-weight:700; }
+  .greet .s{ font-size:12.5px; color:var(--fg-muted); margin-top:2px; }
+</style></head>
+<body>
+  <div class="banner"><i data-lucide="history"></i>
+    <span class="txt">Continuing your previous conversation · 1 turn</span>
+    <span class="acts"><a>Resume</a><a>+ Start new</a></span></div>
+  <div class="greet">
+    <div class="mark"><i data-lucide="sparkles"></i></div>
+    <div><div class="h">Good afternoon, Mike.</div>
+      <div class="s">6 leads need follow-up today. Ask me to line them up.</div></div>
+  </div>
+  <script>lucide.createIcons();</script>
+</body></html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" />
+<link rel="stylesheet" href="_card.css" />
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body{ padding:20px; display:flex; gap:26px; align-items:flex-end; }
+  .f{ display:flex; flex-direction:column; gap:7px; width:230px; }
+  .lab{ font-size:12px; font-weight:600; color:var(--fg-muted); }
+  .input{ position:relative; background:var(--surface-3); border:1px solid var(--border);
+    border-radius:10px; padding:11px 13px; font-size:14px; color:var(--fg); }
+  /* the AI auto-filled state */
+  .input.filled{ border-color:var(--tag-dual);
+    box-shadow:0 0 0 3px rgba(234,179,8,.18); animation:pulse 1.1s var(--ease) 1; }
+  @keyframes pulse{ 0%{ box-shadow:0 0 0 0 rgba(234,179,8,.5); } 100%{ box-shadow:0 0 0 3px rgba(234,179,8,.18); } }
+  .chip{ position:absolute; top:-9px; right:10px; display:flex; align-items:center; gap:4px;
+    background:var(--tag-dual); color:#1a1205; font-size:10px; font-weight:800; letter-spacing:.03em;
+    padding:2px 7px; border-radius:999px; box-shadow:var(--shadow-sm); }
+  .chip svg{ width:11px; height:11px; }
+</style></head>
+<body>
+  <div class="f"><span class="lab">Full name</span>
+    <div class="input">Dorothy Roberts</div></div>
+  <div class="f"><span class="lab">MBI</span>
+    <div class="input filled"><span class="chip"><i data-lucide="sparkles"></i>AI</span>4QV-20-1TSU</div></div>
+  <div class="f"><span class="lab">State</span>
+    <div class="input filled"><span class="chip"><i data-lucide="sparkles"></i>AI</span>New Mexico</div></div>
+  <script>lucide.createIcons();</script>
+</body></html>

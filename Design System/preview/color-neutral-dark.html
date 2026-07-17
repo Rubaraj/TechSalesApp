@@ -1,0 +1,25 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" />
+<link rel="stylesheet" href="_card.css" />
+<style>
+  .ramp{ display:flex; gap:0; border-radius:12px; overflow:hidden; border:1px solid var(--border); }
+  .step{ flex:1; height:72px; display:flex; align-items:flex-end; padding:8px 10px;
+    font-family:var(--font-mono); font-size:10px; color:var(--fg-muted); }
+  .lbl{ display:flex; justify-content:space-between; margin-top:9px; }
+  .lbl span{ flex:1; font-size:11px; color:var(--fg-muted); }
+</style></head>
+<body>
+  <div class="cap" style="margin-bottom:10px;">Dark neutral surfaces — elevation by step</div>
+  <div class="ramp">
+    <div class="step" style="background:#090d16">bg</div>
+    <div class="step" style="background:#0e1320">surf-1</div>
+    <div class="step" style="background:#141b2b">surf-2</div>
+    <div class="step" style="background:#1b2335">surf-3</div>
+    <div class="step" style="background:#232c41">surf-4</div>
+    <div class="step" style="background:#98a4b8;color:#0e1320">fg-muted</div>
+    <div class="step" style="background:#f1f5f9;color:#0e1320">fg</div>
+  </div>
+  <div class="lbl">
+    <span>canvas</span><span>panel</span><span>card</span><span>input</span>
+    <span>active</span><span>text 2</span><span>text 1</span>
+  </div>
+</body></html>

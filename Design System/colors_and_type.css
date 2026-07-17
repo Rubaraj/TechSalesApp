@@ -1,0 +1,222 @@
+/* ============================================================
+   EXL Medicare Hub — Design System
+   colors_and_type.css
+   Foundational + semantic tokens for the Atlas copilot product.
+   Dark is the PRIMARY theme (matches production); light is the
+   supported variant. Apply [data-theme="light"] to the root to
+   switch. Accent (#ea580c) is theme-independent.
+   ============================================================ */
+
+/* Product sans is Inter (matches the live codebase). Newsreader is the editorial
+   serif reserved for the Atlas AI surface (greetings/headers) so the copilot reads
+   as a distinct surface, not generic CRM chrome. Mono = system monospace, as shipped. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap');
+
+:root {
+  /* ---- Brand ---- */
+  --exl-orange:        #ea580c;  /* primary action / brand accent */
+  --exl-orange-bright: #f97316;  /* hover */
+  --exl-orange-press:  #c2410c;  /* active/press */
+  --exl-orange-soft:   rgba(234, 88, 12, 0.12);
+  --exl-orange-line:   rgba(234, 88, 12, 0.32);
+  --on-accent:         #ffffff;
+
+  /* ---- Atlas AI gradient (sparkle mark, accents) ---- */
+  --atlas-from: #fb923c;
+  --atlas-to:   #ea580c;
+  --atlas-glow: rgba(234, 88, 12, 0.35);
+
+  /* ============================================================
+     DARK THEME (default / primary)
+     ============================================================ */
+  --bg:          #090d16;  /* app canvas */
+  --surface-1:   #0e1320;  /* docked panel / header */
+  --surface-2:   #141b2b;  /* cards */
+  --surface-3:   #1b2335;  /* raised / hover / inputs */
+  --surface-4:   #232c41;  /* pressed / active rows */
+
+  --border:        rgba(255, 255, 255, 0.07);
+  --border-strong: rgba(255, 255, 255, 0.12);
+  --border-faint:  rgba(255, 255, 255, 0.04);
+
+  --fg:        #f1f5f9;  /* primary text */
+  --fg-muted:  #98a4b8;  /* secondary text / labels */
+  --fg-subtle: #5d6b85;  /* tertiary / placeholder / disabled */
+  --fg-inverse:#0f172a;
+
+  /* ---- Pipeline status spectrum ---- */
+  --st-new:         #4f93f7;  /* New Lead — blue */
+  --st-contacted:   #9b7cf6;  /* Contacted — violet */
+  --st-appointment: #22c3e0;  /* Appointment — cyan */
+  --st-enrollment:  #f59e0b;  /* Enrollment in progress — amber */
+  --st-enrolled:    #2bbd6e;  /* Enrolled — green */
+  --st-dropped:     #f4536b;  /* Dropped / Lost — rose */
+
+  /* ---- Data tags ---- */
+  --tag-dual:    #eab308;  /* Dual Eligible — yellow */
+  --tag-pharm:   #2bbd6e;  /* Pharmacies — green */
+  --tag-drugs:   #f59e0b;  /* Drugs — amber */
+  --tag-neutral-bg: rgba(255,255,255,0.06);
+  --tag-neutral-fg: #b6c0d4;
+
+  /* ---- Semantic ---- */
+  --success: #2bbd6e;
+  --warning: #f59e0b;
+  --danger:  #ef4444;
+  --info:    #4f93f7;
+  --danger-soft:  rgba(239, 68, 68, 0.14);
+  --success-soft: rgba(43, 189, 110, 0.14);
+  --warning-soft: rgba(245, 158, 11, 0.14);
+
+  /* ---- Elevation (dark) ---- */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.45);
+  --shadow-lg: 0 16px 48px rgba(0,0,0,0.55);
+  --shadow-panel: -8px 0 40px rgba(0,0,0,0.5);
+  --ring-accent: 0 0 0 3px var(--exl-orange-soft);
+  --ring-focus:  0 0 0 3px rgba(79, 147, 247, 0.35);
+
+  /* ============================================================
+     RADII  ·  SPACING  ·  MOTION
+     ============================================================ */
+  --r-xs: 6px;
+  --r-sm: 8px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-xl: 18px;
+  --r-2xl: 24px;
+  --r-pill: 999px;
+
+  --sp-1: 4px;   --sp-2: 8px;   --sp-3: 12px;  --sp-4: 16px;
+  --sp-5: 20px;  --sp-6: 24px;  --sp-8: 32px;  --sp-10: 40px;
+  --sp-12: 48px; --sp-16: 64px;
+
+  --ease:        cubic-bezier(0.32, 0.72, 0, 1);   /* primary easing */
+  --ease-soft:   cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 360ms;
+
+  /* ============================================================
+     TYPOGRAPHY
+     ============================================================ */
+  --font-sans:  'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-serif: 'Newsreader', ui-serif, Georgia, 'Times New Roman', serif;  /* Atlas greetings / AI headers */
+  --font-mono:  ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace; /* timers, MBI, leadId, dialer */
+
+  /* Type scale (px) */
+  --t-display: 30px;  /* page titles — "Lead Management" */
+  --t-h1:      24px;
+  --t-h2:      20px;
+  --t-h3:      17px;  /* panel titles — "Atlas" */
+  --t-body:    15px;  /* default UI text */
+  --t-sm:      13px;  /* secondary / meta */
+  --t-xs:      12px;  /* captions / tags */
+  --t-micro:   11px;  /* uppercase eyebrows — "AI COPILOT" */
+
+  --lh-tight: 1.15;
+  --lh-snug:  1.35;
+  --lh-body:  1.55;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide:  0.08em;  /* uppercase eyebrows */
+}
+
+/* ============================================================
+   LIGHT THEME (supported variant)
+   ============================================================ */
+[data-theme="light"] {
+  --bg:          #f6f8fb;
+  --surface-1:   #ffffff;
+  --surface-2:   #ffffff;
+  --surface-3:   #f1f5f9;
+  --surface-4:   #e8edf4;
+
+  --border:        #e4e9f0;
+  --border-strong: #cbd5e1;
+  --border-faint:  #eef2f7;
+
+  --fg:        #0f172a;
+  --fg-muted:  #5a6677;
+  --fg-subtle: #94a3b8;
+  --fg-inverse:#f8fafc;
+
+  --st-new:         #2563eb;
+  --st-contacted:   #7c3aed;
+  --st-appointment: #0891b2;
+  --st-enrollment:  #d97706;
+  --st-enrolled:    #16a34a;
+  --st-dropped:     #e11d48;
+
+  --tag-dual:    #b45309;
+  --tag-pharm:   #16a34a;
+  --tag-drugs:   #d97706;
+  --tag-neutral-bg: #eef2f7;
+  --tag-neutral-fg: #475569;
+
+  --info:    #2563eb;
+  --success: #16a34a;
+  --danger:  #dc2626;
+  --warning: #d97706;
+
+  --shadow-sm: 0 1px 2px rgba(15,23,42,0.06);
+  --shadow-md: 0 6px 20px rgba(15,23,42,0.08);
+  --shadow-lg: 0 20px 50px rgba(15,23,42,0.12);
+  --shadow-panel: -8px 0 40px rgba(15,23,42,0.10);
+}
+
+/* ============================================================
+   SEMANTIC ELEMENT STYLES — opt in with class .ds or use vars
+   ============================================================ */
+.ds, .ds * { box-sizing: border-box; }
+
+.ds {
+  font-family: var(--font-sans);
+  color: var(--fg);
+  background: var(--bg);
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.ds h1, .h1 {
+  font-size: var(--t-display);
+  font-weight: 800;
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--fg);
+  margin: 0;
+}
+.ds h2, .h2 {
+  font-size: var(--t-h2);
+  font-weight: 700;
+  line-height: var(--lh-snug);
+  letter-spacing: var(--tracking-tight);
+  margin: 0;
+}
+.ds h3, .h3 {
+  font-size: var(--t-h3);
+  font-weight: 700;
+  line-height: var(--lh-snug);
+  margin: 0;
+}
+.eyebrow {
+  font-size: var(--t-micro);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--fg-muted);
+}
+.ds p, .p { margin: 0; }
+.meta { font-size: var(--t-sm); color: var(--fg-muted); }
+.mono { font-family: var(--font-mono); font-feature-settings: "tnum" 1; }
+.code {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xs);
+  padding: 1px 6px;
+}

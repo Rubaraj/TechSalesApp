@@ -1,0 +1,21 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" />
+<link rel="stylesheet" href="_card.css" />
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  .stack{ display:flex; flex-direction:column; gap:13px; max-width:520px; }
+  .field{ display:flex; align-items:center; gap:10px; background:var(--surface-3);
+    border:1px solid var(--border); border-radius:10px; padding:11px 14px; color:var(--fg-subtle); }
+  .field svg{ width:17px; height:17px; }
+  .field.focus{ border-color:var(--exl-orange-line); box-shadow:var(--ring-accent); color:var(--fg); }
+  .field input{ all:unset; flex:1; font-family:inherit; font-size:14px; color:var(--fg); }
+  .field input::placeholder{ color:var(--fg-subtle); }
+</style></head>
+<body>
+  <div class="stack">
+    <div class="field"><i data-lucide="search"></i>
+      <input placeholder="Search by name, email, phone…" /></div>
+    <div class="field focus"><i data-lucide="sparkles" style="color:var(--exl-orange)"></i>
+      <input value="Ask Atlas anything…" /></div>
+  </div>
+  <script>lucide.createIcons();</script>
+</body></html>

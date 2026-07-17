@@ -1,0 +1,18 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" />
+<link rel="stylesheet" href="_card.css" />
+<style>
+  .grid{ display:flex; gap:22px; }
+  .e{ display:flex; flex-direction:column; gap:10px; align-items:center; }
+  .box{ width:120px; height:62px; border-radius:12px; background:var(--surface-2);
+    border:1px solid var(--border); }
+  .nm{ font-size:11px; color:var(--fg-muted); }
+</style></head>
+<body>
+  <div class="cap" style="margin-bottom:14px;">Elevation — soft in dark, depth via surface steps</div>
+  <div class="grid">
+    <div class="e"><div class="box" style="box-shadow:var(--shadow-sm)"></div><span class="nm">sm</span></div>
+    <div class="e"><div class="box" style="box-shadow:var(--shadow-md)"></div><span class="nm">md · cards</span></div>
+    <div class="e"><div class="box" style="box-shadow:var(--shadow-lg)"></div><span class="nm">lg · overlays</span></div>
+    <div class="e"><div class="box" style="box-shadow:0 0 0 3px var(--exl-orange-soft),0 0 0 1px var(--exl-orange-line)"></div><span class="nm">ring · accent</span></div>
+  </div>
+</body></html>

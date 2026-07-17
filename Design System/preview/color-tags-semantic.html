@@ -1,0 +1,32 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" />
+<link rel="stylesheet" href="_card.css" />
+<style>
+  .sec{ margin-bottom:14px; }
+  .pills{ display:flex; gap:10px; flex-wrap:wrap; }
+  .pill{ font-size:12px; font-weight:700; padding:4px 11px; border-radius:999px;
+    border:1px solid currentColor; }
+  .pill.soft{ border:none; }
+  .sem{ display:flex; gap:10px; }
+  .sw{ width:48px; height:36px; border-radius:8px; }
+</style></head>
+<body>
+  <div class="sec">
+    <div class="cap" style="margin-bottom:9px;">Data tags</div>
+    <div class="pills">
+      <span class="pill" style="color:var(--tag-dual)">Dual Eligible</span>
+      <span class="pill" style="color:var(--tag-pharm)">1 Pharmacies</span>
+      <span class="pill" style="color:var(--tag-drugs)">3 Drugs</span>
+      <span class="pill soft" style="background:var(--tag-neutral-bg);color:var(--tag-neutral-fg)">Referral</span>
+      <span class="pill soft" style="background:var(--tag-neutral-bg);color:var(--tag-neutral-fg)">Web</span>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="cap" style="margin-bottom:9px;">Semantic</div>
+    <div class="sem">
+      <div><div class="sw" style="background:var(--success)"></div><div class="tk-label">success</div></div>
+      <div><div class="sw" style="background:var(--warning)"></div><div class="tk-label">warning</div></div>
+      <div><div class="sw" style="background:var(--danger)"></div><div class="tk-label">danger</div></div>
+      <div><div class="sw" style="background:var(--info)"></div><div class="tk-label">info</div></div>
+    </div>
+  </div>
+</body></html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" />
+<link rel="stylesheet" href="_card.css" />
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  .row{ gap:12px; margin-bottom:14px; }
+  button{ font-family:inherit; font-weight:600; font-size:14px; cursor:pointer;
+    border-radius:10px; display:inline-flex; align-items:center; gap:7px;
+    padding:9px 16px; border:1px solid transparent; transition:all var(--dur-fast) var(--ease); }
+  .pri{ background:var(--exl-orange); color:#fff; }
+  .pri:hover{ background:var(--exl-orange-bright); }
+  .ghost{ background:transparent; color:var(--fg); border-color:var(--border-strong); }
+  .ghost:hover{ background:var(--surface-3); }
+  .soft{ background:var(--surface-3); color:var(--fg); }
+  .call{ background:transparent; color:var(--fg-muted); border-color:var(--border-strong);
+    padding:6px 12px; font-size:13px; }
+  .icn{ width:34px; height:34px; padding:0; justify-content:center; background:transparent;
+    color:var(--fg-muted); border-color:transparent; }
+  .icn:hover{ background:var(--surface-3); color:var(--fg); }
+  .icn.del:hover{ color:var(--danger); }
+  .icn.edit:hover{ color:var(--info); }
+  svg{ width:17px; height:17px; }
+</style></head>
+<body>
+  <div class="row">
+    <button class="pri"><i data-lucide="plus"></i> New Lead</button>
+    <button class="pri"><i data-lucide="phone"></i> Call</button>
+    <button class="ghost">View Details</button>
+    <button class="soft">Filters</button>
+    <button class="call"><i data-lucide="phone"></i> Call</button>
+  </div>
+  <div class="row">
+    <span class="cap" style="margin-right:4px;">icon actions</span>
+    <button class="icn"><i data-lucide="eye"></i></button>
+    <button class="icn edit"><i data-lucide="pencil"></i></button>
+    <button class="icn del"><i data-lucide="trash-2"></i></button>
+    <button class="icn"><i data-lucide="bell"></i></button>
+    <button class="icn"><i data-lucide="send"></i></button>
+  </div>
+  <script>lucide.createIcons();</script>
+</body></html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="utf-8" />
+<link rel="stylesheet" href="_card.css" />
+<style>
+  body{ background:#f6f8fb; }
+  .cap{ color:#94a3b8; }
+  .ramp{ display:flex; gap:0; border-radius:12px; overflow:hidden; border:1px solid #e4e9f0; }
+  .step{ flex:1; height:72px; display:flex; align-items:flex-end; padding:8px 10px;
+    font-family:var(--font-mono); font-size:10px; color:#5a6677; }
+  .lbl{ display:flex; margin-top:9px; }
+  .lbl span{ flex:1; font-size:11px; color:#5a6677; }
+</style></head>
+<body>
+  <div class="cap" style="margin-bottom:10px;">Light neutral surfaces — supported variant</div>
+  <div class="ramp">
+    <div class="step" style="background:#f6f8fb">bg</div>
+    <div class="step" style="background:#ffffff">surf-1</div>
+    <div class="step" style="background:#f1f5f9">surf-3</div>
+    <div class="step" style="background:#e8edf4">surf-4</div>
+    <div class="step" style="background:#cbd5e1">border</div>
+    <div class="step" style="background:#5a6677;color:#fff">fg-muted</div>
+    <div class="step" style="background:#0f172a;color:#fff">fg</div>
+  </div>
+  <div class="lbl">
+    <span>canvas</span><span>surface</span><span>sunken</span><span>active</span>
+    <span>border</span><span>text 2</span><span>text 1</span>
+  </div>
+</body></html>

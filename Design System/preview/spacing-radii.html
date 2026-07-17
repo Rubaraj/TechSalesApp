@@ -1,0 +1,21 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" />
+<link rel="stylesheet" href="_card.css" />
+<style>
+  .grid{ display:flex; gap:16px; align-items:flex-end; }
+  .r{ display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .box{ width:66px; height:48px; background:var(--surface-3);
+    border:1px solid var(--border-strong); }
+  .nm{ font-size:11px; color:var(--fg-muted); }
+  .vl{ font-family:var(--font-mono); font-size:10px; color:var(--fg-subtle); }
+</style></head>
+<body>
+  <div class="cap" style="margin-bottom:12px;">Corner radii</div>
+  <div class="grid">
+    <div class="r"><div class="box" style="border-radius:6px"></div><span class="nm">xs</span><span class="vl">6</span></div>
+    <div class="r"><div class="box" style="border-radius:8px"></div><span class="nm">sm</span><span class="vl">8</span></div>
+    <div class="r"><div class="box" style="border-radius:10px"></div><span class="nm">md</span><span class="vl">10</span></div>
+    <div class="r"><div class="box" style="border-radius:14px"></div><span class="nm">lg · card</span><span class="vl">14</span></div>
+    <div class="r"><div class="box" style="border-radius:18px"></div><span class="nm">xl</span><span class="vl">18</span></div>
+    <div class="r"><div class="box" style="border-radius:999px"></div><span class="nm">pill</span><span class="vl">999</span></div>
+  </div>
+</body></html>

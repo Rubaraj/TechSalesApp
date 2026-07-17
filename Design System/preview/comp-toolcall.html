@@ -1,0 +1,30 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" />
+<link rel="stylesheet" href="_card.css" />
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body{ padding:16px; }
+  .trace{ max-width:400px; border:1px solid var(--border); border-radius:11px;
+    background:var(--surface-1); overflow:hidden; }
+  .t-head{ display:flex; align-items:center; gap:8px; padding:9px 12px; cursor:pointer; }
+  .t-head svg{ width:14px; height:14px; color:var(--fg-muted); }
+  .t-head .nm{ font-size:12.5px; font-weight:600; color:var(--fg); font-family:var(--font-mono); }
+  .t-head .ok{ margin-left:auto; display:flex; align-items:center; gap:5px; font-size:11px;
+    color:var(--success); }
+  .t-head .ok svg{ width:13px; height:13px; color:var(--success); }
+  .t-body{ border-top:1px solid var(--border); padding:10px 12px; background:var(--bg);
+    font-family:var(--font-mono); font-size:11.5px; line-height:1.6; color:var(--fg-muted); }
+  .t-body .k{ color:var(--st-appointment); }
+  .t-body .s{ color:var(--st-enrolled); }
+</style></head>
+<body>
+  <div class="trace">
+    <div class="t-head"><i data-lucide="wrench"></i>
+      <span class="nm">search_leads</span>
+      <span class="ok"><i data-lucide="check"></i> 0.4s</span></div>
+    <div class="t-body">
+      <div><span class="k">state</span>: <span class="s">"FL"</span>, <span class="k">status</span>: <span class="s">"follow_up"</span></div>
+      <div>→ 0 results</div>
+    </div>
+  </div>
+  <script>lucide.createIcons();</script>
+</body></html>

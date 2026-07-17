@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>EXL wordmark + Medicare Hub lockup</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  html,body{margin:0;height:100%;}
+  body{
+    background:var(--bg);
+    display:flex; align-items:center; justify-content:center; gap:48px;
+    font-family:var(--font-sans);
+  }
+  /* ── EXL wordmark (typographic stand-in for the official PNG) ──
+     Drop assets/exl-logo.png in to replace this. ──────────────── */
+  .exl{
+    font-weight:800;
+    letter-spacing:-0.04em;
+    color:var(--exl-orange);
+    line-height:1;
+    font-size:38px;
+  }
+  .exl.lg{ font-size:54px; }
+
+  /* Header product lockup, as in production */
+  .lockup{ display:flex; align-items:center; gap:16px; }
+  .divider{ width:1px; height:38px; background:var(--border-strong); }
+  .product{ display:flex; flex-direction:column; gap:3px; }
+  .product .title{ font-size:20px; font-weight:800; color:var(--fg); line-height:1; }
+  .product .sub{ font-size:12.5px; color:var(--fg-muted); line-height:1; }
+  .stamp{ position:fixed; bottom:14px; left:0; right:0; text-align:center;
+    font-size:11px; color:var(--fg-subtle); }
+</style>
+</head>
+<body>
+  <div class="exl lg">EXL</div>
+
+  <div class="lockup">
+    <div class="exl">EXL</div>
+    <div class="divider"></div>
+    <div class="product">
+      <span class="title">Medicare Hub</span>
+      <span class="sub">Built for agents. Trusted by seniors.</span>
+    </div>
+  </div>
+
+  <div class="stamp">Typographic stand-in — replace with official EXL logo PNG in assets/</div>
+</body>
+</html>

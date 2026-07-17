@@ -1,0 +1,43 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" />
+<link rel="stylesheet" href="_card.css" />
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body{ padding:16px; }
+  .card{ max-width:380px; background:var(--surface-2); border:1px solid var(--border);
+    border-radius:14px; overflow:hidden; box-shadow:var(--shadow-md); }
+  .head{ display:flex; align-items:center; gap:8px; padding:11px 14px;
+    border-bottom:1px solid var(--border); }
+  .head svg{ width:15px; height:15px; color:var(--exl-orange); }
+  .head .t{ font-size:12px; font-weight:700; }
+  .head .badge{ margin-left:auto; font-size:10px; font-weight:700; text-transform:uppercase;
+    letter-spacing:.06em; color:var(--exl-orange); background:var(--exl-orange-soft);
+    padding:3px 8px; border-radius:999px; }
+  .body{ padding:13px 14px; display:flex; flex-direction:column; gap:7px; }
+  .meta{ font-size:12px; color:var(--fg-muted); }
+  .meta b{ color:var(--fg); font-weight:600; }
+  .preview{ font-size:13px; color:var(--fg); line-height:1.5; background:var(--surface-3);
+    border-radius:9px; padding:10px 12px; }
+  .actions{ display:flex; gap:9px; padding:0 14px 14px; }
+  .actions button{ all:unset; cursor:pointer; flex:1; text-align:center; font-family:inherit;
+    font-size:13px; font-weight:600; padding:9px; border-radius:9px; display:flex;
+    align-items:center; justify-content:center; gap:6px; }
+  .approve{ background:var(--exl-orange); color:#fff; }
+  .reject{ background:var(--surface-3); color:var(--fg-muted); }
+  .actions svg{ width:15px; height:15px; }
+</style></head>
+<body>
+  <div class="card">
+    <div class="head"><i data-lucide="mail"></i><span class="t">Atlas drafted an email</span>
+      <span class="badge">Needs approval</span></div>
+    <div class="body">
+      <div class="meta">To <b>dorothy.roberts356@hotmail.com</b></div>
+      <div class="meta">Subject <b>Your Medicare enrollment — next steps</b></div>
+      <div class="preview">Hi Dorothy, following up on our call. I've attached the dual-eligible plan options we discussed…</div>
+    </div>
+    <div class="actions">
+      <button class="reject"><i data-lucide="x"></i> Edit</button>
+      <button class="approve"><i data-lucide="check"></i> Approve &amp; send</button>
+    </div>
+  </div>
+  <script>lucide.createIcons();</script>
+</body></html>
