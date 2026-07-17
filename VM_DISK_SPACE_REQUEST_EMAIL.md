@@ -10,9 +10,10 @@
 Hi [Name / IT Support],
 
 I'm requesting additional disk space on my development VM **[VM name/ID]**. The C: drive
-is currently full, and I still have several required components left to install for an
-active proof-of-concept. Could the drive be expanded by **an additional 100 GB**
-(or to 256 GB total, whichever is standard)?
+is nearly full — only **6 GB free** — and I still have several required components left
+to install for an active proof-of-concept, which alone need more space than remains.
+Could the drive be expanded by **an additional 100 GB** (or to 256 GB total, whichever
+is standard)?
 
 **About the POC (high level):**
 
@@ -35,12 +36,12 @@ infrastructure.
 | MongoDB 8 Community | Application database — leads, users, enrollments, plan reference data, AI audit logs | ~3 GB incl. data growth |
 | **Docker Desktop** (not yet installed) | Container runtime for the AI infrastructure below; on Windows this includes a WSL2 backend | ~10 GB |
 | **Qdrant** (Docker, not yet installed) | Vector database for semantic search over plan/benefit/drug documents (RAG) | ~2 GB |
-| **Ollama + local models** (Docker, not yet installed) | Local LLM (qwen2.5:7b) and embedding model (nomic-embed-text) so AI features run on-VM without external API dependency | ~8–10 GB (model files) |
 
-The remaining installs (Docker, Qdrant, Ollama models) account for roughly **20–25 GB**
-on their own, and Docker's WSL2 virtual disk grows with image builds and container data,
-which is what makes the current free space insufficient. The additional headroom covers
-that growth plus logs, npm caches, and future model updates.
+The LLM itself runs via a hosted API (key already provisioned), so no large model files
+need to be stored locally. The remaining installs (Docker Desktop, Qdrant) account for
+roughly **12–15 GB** on their own, and Docker's WSL2 virtual disk grows with image
+builds and container data, which is what makes the current free space insufficient. The
+additional headroom covers that growth plus database growth, logs, and npm caches.
 
 Please let me know if you need any further details or a formal justification form.
 
