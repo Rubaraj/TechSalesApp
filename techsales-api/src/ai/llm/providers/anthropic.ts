@@ -22,6 +22,9 @@ export function getAnthropicChatModel(opts: GetChatModelOptions = {}): BaseChatM
     apiKey: env.ANTHROPIC_API_KEY,
     model,
     temperature: opts.temperature ?? 0.2,
+    // Anthropic-compatible gateway support (OpenRouter): the SDK appends
+    // /v1/messages, so the override is the bare host + /api prefix.
+    ...(env.ANTHROPIC_BASE_URL ? { anthropicApiUrl: env.ANTHROPIC_BASE_URL } : {}),
     clientOptions: {
       timeout: opts.timeoutMs ?? env.AI_REQUEST_TIMEOUT_MS,
     },

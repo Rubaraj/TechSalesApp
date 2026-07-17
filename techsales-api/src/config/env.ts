@@ -62,6 +62,9 @@ const envSchema = z.object({
 
   // Anthropic config (only required when AI_LLM_PROVIDER='anthropic').
   ANTHROPIC_API_KEY: z.string().optional(),
+  // Optional override for Anthropic-compatible gateways (e.g. OpenRouter's
+  // /api/v1/messages passthrough). Leave unset for api.anthropic.com.
+  ANTHROPIC_BASE_URL: z.string().optional(),
   AI_MODEL_DEFAULT: z.string().default('claude-sonnet-4-6'),
   AI_MODEL_PREMIUM: z.string().default('claude-opus-4-7'),
   AI_MAX_DAILY_TOKENS: z.coerce.number().int().nonnegative().default(5_000_000),
