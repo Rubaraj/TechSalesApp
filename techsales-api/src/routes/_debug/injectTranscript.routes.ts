@@ -19,7 +19,7 @@ import { Router, type Request, type Response } from 'express';
 import { z } from 'zod';
 import { env } from '../../config/env.js';
 import { logger } from '../../config/logger.js';
-import { publish } from '../../services/callBus.js';
+import { publish, endCall as endCallBus } from '../../services/callBus.js';
 import {
   startCallAnalysis,
   stopCallAnalysisByCallSid,
@@ -43,6 +43,10 @@ const BodySchema = z.object({
    *  the chunks publish into a callBus with no agent subscribed — only the
    *  SSE bridge sees them. */
   startAgent: z.boolean().optional(),
+  /** QA pipeline — attribute the replayed call to an agent + set direction
+   *  so the persisted callRecord and supervisor feed carry them. */
+  userId: z.string().optional(),
+  direction: z.enum(['inbound', 'outbound']).optional(),
 });
 
 export const injectTranscriptRouter: Router = Router();
@@ -67,12 +71,16 @@ injectTranscriptRouter.post('/inject-transcript', async (req: Request, res: Resp
     });
     return;
   }
-  const { callSid, chunks, delayMs = 0, startAgent = true } = parsed.data;
+  const { callSid, chunks, delayMs = 0, startAgent = true, userId, direction } = parsed.data;
 
   let stopAgent: (() => void) | null = null;
   if (startAgent) {
     try {
-      const handle = startCallAnalysis({ callSid });
+      const handle = startCallAnalysis({
+        callSid,
+        ...(userId ? { userId } : {}),
+        ...(direction ? { direction } : {}),
+      });
       stopAgent = handle.stop;
     } catch (err) {
       logger.error({ err }, 'inject-transcript: failed to start agent');
@@ -139,9 +147,11 @@ injectTranscriptRouter.post('/stop-call', (req: Request, res: Response) => {
     logger.warn({ err, callSid }, 'stop-call: agent stop threw');
   }
   // Small delay so the add_note publish settles into the SSE bridge before
-  // we close the stream with 'ended'.
+  // we close the stream with 'ended'. Then tear the emitter down —
+  // previously omitted, which leaked one EventEmitter per debug call.
   setTimeout(() => {
     publish(callSid, { type: 'status', status: 'ended', at: Date.now() });
+    endCallBus(callSid);
   }, 50);
   res.json({ success: true });
 });

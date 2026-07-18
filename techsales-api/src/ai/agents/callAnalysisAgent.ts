@@ -24,8 +24,13 @@ import { logger } from '../../config/logger.js';
 import {
   subscribe,
   publish,
+  publishGlobal,
+  registerCall,
+  unregisterCall,
   type CallBusEvent,
 } from '../../services/callBus.js';
+import { persistCallRecord } from '../audit/persistCallRecord.js';
+import type { CallLine, CallTag } from '../../models/callRecord.model.js';
 import {
   emptyExtractedEntities,
   type ExtractedEntities,
@@ -54,6 +59,17 @@ const unsubscribers = new Map<string, () => void>();
 /** Phase 3b.1 — userId per callSid so the post-call summary audit knows
  *  who to attribute (set if provided at startCallAnalysis). */
 const userIds = new Map<string, string>();
+/** QA pipeline — per-call metadata the WS handler doesn't thread anywhere
+ *  else; owned here because the persist hook lives in stop(). */
+const callMeta = new Map<string, { direction: 'inbound' | 'outbound'; startedAt: number }>();
+/** QA pipeline — tags the rule-based analysis produced during the call
+ *  (compliance / info / entity / note), persisted with the transcript. */
+const callTags = new Map<string, CallTag[]>();
+
+function addTag(callSid: string, kind: CallTag['kind'], data: Record<string, unknown>): void {
+  const tags = callTags.get(callSid);
+  if (tags) tags.push({ kind, ts: Date.now(), data });
+}
 
 // --- Public API -----------------------------------------------------------
 
@@ -64,6 +80,9 @@ export interface StartCallAnalysisInput {
    *  the entity extractor to suppress phone matches that equal it (prospect
    *  repeating their own number). Outbound: leave undefined. */
   callerNumber?: string;
+  /** QA pipeline — call direction for the persisted record + supervisor
+   *  feed. Defaults to 'outbound' when the caller doesn't know. */
+  direction?: 'inbound' | 'outbound';
 }
 
 export interface CallAnalysisHandle {
@@ -83,21 +102,31 @@ export interface CallAnalysisHandle {
  */
 export function startCallAnalysis(input: StartCallAnalysisInput): CallAnalysisHandle {
   const { callSid, userId, callerNumber } = input;
+  const direction = input.direction ?? 'outbound';
 
   accumulators.set(callSid, emptyExtractedEntities());
   shownTopics.set(callSid, new Set());
   transcriptHistory.set(callSid, []);
+  callTags.set(callSid, []);
+  callMeta.set(callSid, { direction, startedAt: Date.now() });
   if (callerNumber) callerNumbers.set(callSid, callerNumber);
   if (userId) userIds.set(callSid, userId);
   logger.info(
-    { callSid, userId, callerNumber },
+    { callSid, userId, callerNumber, direction },
     'callAnalysisAgent: started (stub provider)',
   );
+
+  // Supervisor feed — this call is now live.
+  registerCall(callSid, { ...(userId ? { userId } : {}), direction, startedAt: Date.now() });
 
   const unsubscribe = subscribe(callSid, (event: CallBusEvent) => {
     if (event.type !== 'transcript') return;
     if (!event.chunk.isFinal) return;
     try {
+      // QA pipeline — accumulate BOTH speakers' final chunks (real ts/speaker
+      // preserved) so the persisted record and the QA evaluator see the whole
+      // conversation, not just the prospect side.
+      transcriptHistory.get(callSid)?.push(event.chunk);
       runStub(callSid, event.chunk, userId);
     } catch (err) {
       logger.error({ err, callSid }, 'callAnalysisAgent: runStub threw');
@@ -130,6 +159,39 @@ export function stopCallAnalysisByCallSid(callSid: string): void {
   } catch (err) {
     logger.error({ err, callSid }, 'callAnalysisAgent: post-call summary threw');
   }
+
+  // QA pipeline — snapshot per-call state BEFORE the deletes below, then
+  // persist + notify the supervisor feed fire-and-forget.
+  const history = transcriptHistory.get(callSid) ?? [];
+  const tags = callTags.get(callSid) ?? [];
+  const meta = callMeta.get(callSid);
+  if (meta) {
+    const lines: CallLine[] = history.map((c) => ({
+      speaker: c.speaker ?? 'unknown',
+      text: c.text,
+      ts: c.timestamp,
+    }));
+    const tagCounts: Record<string, number> = {};
+    for (const t of tags) tagCounts[t.kind] = (tagCounts[t.kind] ?? 0) + 1;
+    publishGlobal({
+      type: 'call_ended',
+      callSid,
+      ...(userId ? { userId } : {}),
+      flagged: tags.some((t) => t.kind === 'compliance'),
+      tagCounts,
+      durationSec: Math.max(0, Math.round((Date.now() - meta.startedAt) / 1000)),
+    });
+    void persistCallRecord({
+      callSid,
+      ...(userId ? { userId } : {}),
+      direction: meta.direction,
+      startedAt: meta.startedAt,
+      lines,
+      tags,
+    });
+  }
+  unregisterCall(callSid);
+
   const unsubscribe = unsubscribers.get(callSid);
   if (unsubscribe) {
     unsubscribe();
@@ -140,6 +202,8 @@ export function stopCallAnalysisByCallSid(callSid: string): void {
   callerNumbers.delete(callSid);
   transcriptHistory.delete(callSid);
   userIds.delete(callSid);
+  callMeta.delete(callSid);
+  callTags.delete(callSid);
   logger.info({ callSid }, 'callAnalysisAgent: stopped');
 }
 
@@ -170,6 +234,17 @@ function runAgentSideAnalysis(
   publish(callSid, { type: 'actions', actions });
 
   for (const v of violations) {
+    // QA pipeline — tag for the persisted record + live supervisor feed.
+    addTag(callSid, 'compliance', { phrase: v.phrase, rule: v.rule, suggestion: v.suggestion });
+    publishGlobal({
+      type: 'compliance_flag',
+      callSid,
+      ...(userId ? { userId } : {}),
+      phrase: v.phrase,
+      rule: v.rule,
+      suggestion: v.suggestion,
+      ts: Date.now(),
+    });
     void auditCallAnalysisEvent({
       callSid,
       userId,
@@ -187,19 +262,8 @@ async function runProspectSideAnalysis(
   const current = accumulators.get(callSid) ?? emptyExtractedEntities();
   const callerNumber = callerNumbers.get(callSid);
 
-  // Phase 3b.1 — accumulate FINAL prospect chunks for the post-call note
-  // summarizer. We only accumulate the text + speaker; the summarizer doesn't
-  // need the timestamp or id.
-  const history = transcriptHistory.get(callSid);
-  if (history) {
-    history.push({
-      id: `hist:${callSid}:${history.length}`,
-      text,
-      timestamp: Date.now(),
-      isFinal: true,
-      speaker: 'prospect',
-    });
-  }
+  // (QA pipeline note: transcript accumulation moved up into the subscribe
+  // callback so BOTH speakers are captured with their real timestamps.)
 
   // Entity extraction (zip / drugs / plan-type mentions + Phase 3b additions).
   const diff = await extractFromProspectChunk(
@@ -211,6 +275,7 @@ async function runProspectSideAnalysis(
     const merged: ExtractedEntities = { ...current, ...diff };
     accumulators.set(callSid, merged);
     publish(callSid, { type: 'entities', entities: diff });
+    addTag(callSid, 'entity', diff as Record<string, unknown>);
     void auditCallAnalysisEvent({
       callSid,
       userId,
@@ -278,6 +343,7 @@ async function runProspectSideAnalysis(
         ...(term.links ? { links: term.links } : {}),
       };
       publish(callSid, { type: 'actions', actions: [action] });
+      addTag(callSid, 'info', { topic: term.topic, title: term.title });
       void auditCallAnalysisEvent({
         callSid,
         userId,
@@ -371,7 +437,12 @@ function runPostCallNoteSummary(callSid: string, userId?: string): void {
   const history = transcriptHistory.get(callSid);
   if (!history || history.length === 0) return;
 
-  const notes = summarizeTranscript(history);
+  // QA pipeline — history now holds BOTH speakers; the note summarizer's
+  // contract is prospect-side only, so filter here.
+  const prospectHistory = history.filter((c) => c.speaker === 'prospect');
+  if (prospectHistory.length === 0) return;
+
+  const notes = summarizeTranscript(prospectHistory);
   if (notes.length === 0) return;
 
   const actions: AiAction[] = notes.map((n) => ({
@@ -380,6 +451,7 @@ function runPostCallNoteSummary(callSid: string, userId?: string): void {
     category: n.category,
   }));
   publish(callSid, { type: 'actions', actions });
+  for (const n of notes) addTag(callSid, 'note', { category: n.category, text: n.text });
   logger.info(
     { callSid, noteCount: notes.length },
     'callAnalysisAgent: post-call notes emitted',
@@ -403,4 +475,6 @@ export function __resetAllForTests(): void {
   shownTopics.clear();
   callerNumbers.clear();
   transcriptHistory.clear();
+  callMeta.clear();
+  callTags.clear();
 }

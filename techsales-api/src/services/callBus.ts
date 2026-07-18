@@ -96,3 +96,75 @@ export function endCall(callSid: string): void {
 export function activeCallCount(): number {
   return emitters.size;
 }
+
+// --- Supervisor global bus (QA/Supervisor pipelines) ------------------------
+//
+// A second, process-wide channel for the Ambient Supervisor CoPilot: an
+// active-call registry + targeted lifecycle/compliance events. Deliberately
+// NOT a fan-out of every per-call publish — transcript text stays off the
+// supervisor wire; only lifecycle, compliance flags, and QA completions
+// are broadcast.
+
+export interface ActiveCallMeta {
+  userId?: string;
+  direction: 'inbound' | 'outbound';
+  /** epoch ms */
+  startedAt: number;
+}
+
+export type SupervisorEvent =
+  | {
+      type: 'snapshot';
+      calls: Array<{ callSid: string } & ActiveCallMeta>;
+    }
+  | ({ type: 'call_started'; callSid: string } & ActiveCallMeta)
+  | {
+      type: 'call_ended';
+      callSid: string;
+      userId?: string;
+      flagged: boolean;
+      tagCounts: Record<string, number>;
+      durationSec: number;
+    }
+  | {
+      type: 'compliance_flag';
+      callSid: string;
+      userId?: string;
+      phrase: string;
+      rule: string;
+      suggestion?: string;
+      ts: number;
+    }
+  | { type: 'qa_completed'; callSid: string; overallScore: number };
+
+const activeCalls = new Map<string, ActiveCallMeta>();
+const globalEmitter = new EventEmitter();
+// One listener per open supervisor SSE connection.
+globalEmitter.setMaxListeners(100);
+
+export function publishGlobal(event: SupervisorEvent): void {
+  globalEmitter.emit('event', event);
+}
+
+export function subscribeGlobal(handler: (event: SupervisorEvent) => void): () => void {
+  globalEmitter.on('event', handler);
+  return () => {
+    globalEmitter.off('event', handler);
+  };
+}
+
+/** Register an active call (agent start) and broadcast call_started. */
+export function registerCall(callSid: string, meta: ActiveCallMeta): void {
+  activeCalls.set(callSid, meta);
+  publishGlobal({ type: 'call_started', callSid, ...meta });
+}
+
+/** Remove from the registry. call_ended is published by the analysis agent
+ *  (it owns flagged/tagCounts) — this only forgets the entry. Idempotent. */
+export function unregisterCall(callSid: string): void {
+  activeCalls.delete(callSid);
+}
+
+export function getActiveCalls(): Array<{ callSid: string } & ActiveCallMeta> {
+  return Array.from(activeCalls.entries()).map(([callSid, meta]) => ({ callSid, ...meta }));
+}

@@ -14,6 +14,7 @@ import { PlanResultsCard } from './PlanResultsCard';
 import { EnrollmentsCard } from './EnrollmentsCard';
 import { AppointmentsCard } from './AppointmentsCard';
 import { SavingsCard } from './SavingsCard';
+import { QaScorecardCard } from './QaScorecardCard';
 
 const CARD_RENDERERS: Record<string, ComponentType<{ card: AtlasDisplayCard }>> = {
   comparison: ComparisonCard,
@@ -24,6 +25,7 @@ const CARD_RENDERERS: Record<string, ComponentType<{ card: AtlasDisplayCard }>> 
   enrollments: EnrollmentsCard,
   appointments: AppointmentsCard,
   savings: SavingsCard,
+  qa_review: QaScorecardCard,
 };
 
 export function AtlasDisplayCardView({ card }: { card: AtlasDisplayCard }): React.JSX.Element | null {

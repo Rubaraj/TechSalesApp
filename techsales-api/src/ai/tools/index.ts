@@ -18,6 +18,9 @@ import { proposeLeadUpdateTool } from './proposeLeadUpdate.tool.js';
 import { appendLeadNoteTool } from './appendLeadNote.tool.js';
 import { navigateToTool } from './navigateTo.tool.js';
 import { getEnrollmentsTool } from './getEnrollments.tool.js';
+import { runQaReviewTool } from './runQaReview.tool.js';
+import { getTeamCallsTool } from './getTeamCalls.tool.js';
+import { getQaReviewTool } from './getQaReview.tool.js';
 import { getMyTargetsTool } from './getMyTargets.tool.js';
 import { getAppointmentsTool } from './getAppointments.tool.js';
 import { checkEligibilityTool } from './checkEligibility.tool.js';
@@ -37,6 +40,9 @@ export {
   proposeLeadUpdateTool,
   appendLeadNoteTool,
   navigateToTool,
+  runQaReviewTool,
+  getTeamCallsTool,
+  getQaReviewTool,
   getEnrollmentsTool,
   getMyTargetsTool,
   getAppointmentsTool,
@@ -81,5 +87,9 @@ export const atlasTools = [
   proposeStatusChangeTool,
   proposeLeadUpdateTool,
   appendLeadNoteTool,
+  // QA/Supervisor pipelines — admin-only (each tool self-checks accessLevel).
+  getTeamCallsTool,
+  getQaReviewTool,
+  runQaReviewTool,
   navigateToTool,
 ] as const;

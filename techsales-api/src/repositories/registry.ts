@@ -16,6 +16,9 @@ import { MongoTargetRepository } from './mongo/MongoTargetRepository.js';
 import { JsonTargetRepository } from './json/JsonTargetRepository.js';
 import { MongoAiInteractionRepository } from './mongo/MongoAiInteractionRepository.js';
 import { JsonAiInteractionRepository } from './json/JsonAiInteractionRepository.js';
+import { MongoCallRecordRepository } from './mongo/MongoCallRecordRepository.js';
+import { JsonCallRecordRepository } from './json/JsonCallRecordRepository.js';
+import { DatabricksCallRecordRepository } from './databricks/DatabricksCallRecordRepository.js';
 import { DatabricksLeadRepository } from './databricks/DatabricksLeadRepository.js';
 import { DatabricksUserRepository } from './databricks/DatabricksUserRepository.js';
 import { DatabricksRoleRepository } from './databricks/DatabricksRoleRepository.js';
@@ -63,6 +66,10 @@ export type AiInteractionRepo =
   | MongoAiInteractionRepository
   | JsonAiInteractionRepository
   | DatabricksAiInteractionRepository;
+export type CallRecordRepo =
+  | MongoCallRecordRepository
+  | JsonCallRecordRepository
+  | DatabricksCallRecordRepository;
 
 export interface Repos {
   health: HealthRepo;
@@ -74,6 +81,7 @@ export interface Repos {
   member: MemberRepo;
   target: TargetRepo;
   aiInteraction: AiInteractionRepo;
+  callRecord: CallRecordRepo;
 }
 
 interface RegistryState {
@@ -202,6 +210,21 @@ const buildAiInteractionRepo = (mode: ConnectMode): AiInteractionRepo => {
   }
 };
 
+const buildCallRecordRepo = (mode: ConnectMode): CallRecordRepo => {
+  switch (mode) {
+    case 'mongo':
+      return new MongoCallRecordRepository();
+    case 'json':
+      return new JsonCallRecordRepository();
+    case 'databricks':
+      return new DatabricksCallRecordRepository();
+    default: {
+      const _exhaustive: never = mode;
+      throw new Error(`Unknown backend: ${String(_exhaustive)}`);
+    }
+  }
+};
+
 export function initRegistry(connectResult: ConnectResult): void {
   if (state) {
     throw new Error('initRegistry called twice — registry is a singleton.');
@@ -219,6 +242,7 @@ export function initRegistry(connectResult: ConnectResult): void {
       member: buildMemberRepo(mode),
       target: buildTargetRepo(mode),
       aiInteraction: buildAiInteractionRepo(mode),
+      callRecord: buildCallRecordRepo(mode),
     },
   };
   logger.info({ mode }, 'Repository registry initialized');

@@ -29,7 +29,8 @@ export type AtlasCardType =
   | 'plan_results'
   | 'enrollments'
   | 'appointments'
-  | 'savings';
+  | 'savings'
+  | 'qa_review';
 
 export interface AtlasChatRequest {
   userId: string;

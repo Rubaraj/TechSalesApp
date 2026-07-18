@@ -65,7 +65,8 @@ export type AtlasCardType =
   | 'plan_results'
   | 'enrollments'
   | 'appointments'
-  | 'savings';
+  | 'savings'
+  | 'qa_review';
 
 /**
  * Server-side tool→card registry. Deliberately NOT a tag on tool outputs:
@@ -82,6 +83,8 @@ const CARD_TOOL_MAP: Record<string, AtlasCardType> = {
   get_enrollments: 'enrollments',
   get_appointments: 'appointments',
   calc_savings: 'savings',
+  run_qa_review: 'qa_review',
+  get_qa_review: 'qa_review',
 };
 
 export interface StreamAtlasAgentInput {

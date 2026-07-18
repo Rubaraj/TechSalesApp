@@ -30,7 +30,10 @@ export type AiInteractionKind =
   /** Phase 4 — Atlas agentic copilot conversations. One audit row per agent
    *  turn (user message → tool calls → final assistant message). Carries the
    *  `userId` (agent) and prompt-cache token counts. */
-  | 'atlas';
+  | 'atlas'
+  /** QA pipeline — one row per on-demand call QA review (userId = the
+   *  supervisor who requested it; input carries the callSid). */
+  | 'call_qa';
 
 export interface ToolCallTrace {
   name: string;

@@ -98,7 +98,8 @@ export function getAnthropicChatModel(opts: GetChatModelOptions = {}): BaseChatM
         'or change AI_LLM_PROVIDER to "ollama" for the free local path.',
     );
   }
-  const model = opts.premium ? env.AI_MODEL_PREMIUM : env.AI_MODEL_DEFAULT;
+  const model =
+    opts.modelOverride ?? (opts.premium ? env.AI_MODEL_PREMIUM : env.AI_MODEL_DEFAULT);
   return new ChatAnthropic({
     apiKey: env.ANTHROPIC_API_KEY,
     model,

@@ -22,6 +22,9 @@ export interface GetChatModelOptions {
   temperature?: number;
   /** Override per-request timeout (ms). Used by Anthropic; Ollama ignores it. */
   timeoutMs?: number;
+  /** QA pipeline — pin a specific model id for this call (beats premium/default).
+   *  Used with env.AI_MODEL_QA so QA reviews run on a cheap tier. */
+  modelOverride?: string;
 }
 
 export type AiProvider = 'ollama' | 'anthropic' | 'stub';

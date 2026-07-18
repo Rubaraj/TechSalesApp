@@ -33,6 +33,8 @@ import {
   getAtlasGreeting,
 } from '../controllers/atlas.controller.js';
 import { callRouter } from './call.routes.js';
+import { listQaCalls, getQaCall, postQaReview } from '../controllers/callQa.controller.js';
+import { getSupervisorStream } from '../controllers/supervisor.controller.js';
 import { env } from '../config/env.js';
 
 export const aiRouter: Router = Router();
@@ -49,6 +51,13 @@ aiRouter.get('/atlas/session/:userId', asyncHandler(getAtlasSession));
 aiRouter.delete('/atlas/session/:userId', asyncHandler(deleteAtlasSession));
 aiRouter.get('/atlas/greeting/:userId', asyncHandler(getAtlasGreeting));
 aiRouter.post('/atlas/approvals/:proposalId', asyncHandler(postAtlasApproval));
+
+// QA pipeline + Supervisor CoPilot — always-on admin reads (LLM-free),
+// mounted BEFORE the AI_ENABLED guard like /stats. The review POST (spends
+// tokens) is mounted after the guard chain below.
+aiRouter.get('/qa/calls', asyncHandler(listQaCalls));
+aiRouter.get('/qa/calls/:callSid', asyncHandler(getQaCall));
+aiRouter.get('/supervisor/stream', asyncHandler(getSupervisorStream));
 
 aiRouter.use((_req: Request, res: Response, next: NextFunction) => {
   if (!env.AI_ENABLED) {
@@ -78,6 +87,9 @@ aiRouter.post('/chat', asyncHandler(chatHandler));
 
 // Phase 4 — Atlas chat (LLM-driven; gated by rate-limit + tokenCap above).
 aiRouter.post('/atlas/chat', asyncHandler(postAtlasChat));
+
+// QA pipeline — on-demand LLM review (token-spending; behind the guard chain).
+aiRouter.post('/qa/review/:callSid', asyncHandler(postQaReview));
 
 // Phase 2 — Live Call Copilot (Twilio + Deepgram).
 aiRouter.use('/call', callRouter);

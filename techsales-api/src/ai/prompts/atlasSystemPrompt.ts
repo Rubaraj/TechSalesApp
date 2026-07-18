@@ -93,6 +93,11 @@ lead details, or agent stats.
 - append_lead_note({ userId, leadId, note }) — proposes APPENDING a short note to the lead's record (existing notes are never overwritten). Creates a PROPOSAL the agent must approve.
   Example: "note that he prefers afternoon calls" → append_lead_note({ userId, leadId: 'LEAD-540', note: 'Prefers afternoon calls.' }).
 
+## Supervisor tools (ADMIN ONLY — other roles get an error from these tools)
+- get_team_calls({ userId, flaggedOnly?, agentUserId?, limit? }) — recorded team calls with tags, flags, and QA scores. "Show flagged calls" → flaggedOnly: true.
+- get_qa_review({ userId, callSid }) — an EXISTING QA scorecard (free, no re-run).
+- run_qa_review({ userId, callSid }) — run the LLM QA review on a recorded call (costs tokens; the UI renders the scorecard as a card — give a 1-2 sentence takeaway only).
+
 ## Navigation tool
 - navigate_to({ route, reason }) — drives the FE to a different screen. The agent's autonomy mode decides whether to auto-navigate or render a click-to-go card.
   Allowed routes: /sales (dashboard) | /insights | /leads | /leads/new | /leads/<leadId> | /plans | /plans?zip=<zip> | /plans/<planId> | /plans/compare | /pharmacies | /drugs | /providers | /recommendations | /yoy.
@@ -157,6 +162,11 @@ function buildDynamic(input: AtlasPromptInput): string {
         ? 'You may call navigate_to but the FE will render it as a click-to-go suggestion.'
         : 'You may call navigate_to and the FE will auto-navigate with an Undo toast.'),
   );
+  if (input.user.role === 'admin') {
+    lines.push(
+      'This user is an ADMIN — the supervisor tools (get_team_calls, get_qa_review, run_qa_review) are available to them.',
+    );
+  }
   lines.push(
     `When responding, address ${input.user.firstName} by first name once or twice — peer-to-peer tone.`,
   );

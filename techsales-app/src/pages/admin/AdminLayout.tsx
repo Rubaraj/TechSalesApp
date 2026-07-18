@@ -1,11 +1,12 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { Users, Shield, Building2, Settings, Target } from 'lucide-react';
+import { Users, Shield, Building2, Settings, Target, Radio } from 'lucide-react';
 
 const adminNavItems = [
   { to: '/admin/users', icon: Users, label: 'User Management' },
   { to: '/admin/roles', icon: Shield, label: 'Role Management' },
   { to: '/admin/departments', icon: Building2, label: 'Departments' },
   { to: '/admin/targets', icon: Target, label: 'Target Management' },
+  { to: '/admin/supervision', icon: Radio, label: 'Supervision' },
   { to: '/admin/settings', icon: Settings, label: 'System Settings' },
 ];
 

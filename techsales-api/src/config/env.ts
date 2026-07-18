@@ -67,6 +67,9 @@ const envSchema = z.object({
   ANTHROPIC_BASE_URL: z.string().optional(),
   AI_MODEL_DEFAULT: z.string().default('claude-sonnet-4-6'),
   AI_MODEL_PREMIUM: z.string().default('claude-opus-4-7'),
+  /** QA pipeline — model for on-demand call QA reviews. Empty → falls
+   *  through to AI_MODEL_DEFAULT. Set to a cheap model (haiku tier). */
+  AI_MODEL_QA: z.string().optional(),
   AI_MAX_DAILY_TOKENS: z.coerce.number().int().nonnegative().default(5_000_000),
 
   // Phase 4 — per-user daily token cap (Atlas-scoped; protects the $50 POC

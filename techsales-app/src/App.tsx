@@ -16,6 +16,8 @@ import {
   AgentEnrollments,
   AgentLeads,
   AllEnrollments,
+  Supervision,
+  SupervisionCallDetail,
 } from './pages/admin';
 import { LeadList, LeadDetail, LeadForm } from './pages/leads';
 import { PlanList, PlanDetail, PlanCompare } from './pages/plans';
@@ -65,6 +67,25 @@ function PublicRoute({ children }: { children: ReactNode }) {
   }
 
   if (isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
+}
+
+// Admin route wrapper (admin access level or super admin only)
+function AdminRoute({ children }: { children: ReactNode }) {
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="w-12 h-12 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user || (user.accessLevel !== 'admin' && !user.isSuperAdmin)) {
     return <Navigate to="/" replace />;
   }
 
@@ -211,6 +232,22 @@ function AppRoutes() {
           <Route path="departments" element={<DepartmentManagement />} />
           <Route path="settings" element={<SystemSettings />} />
           <Route path="targets" element={<TargetManagement />} />
+          <Route
+            path="supervision"
+            element={
+              <AdminRoute>
+                <Supervision />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="supervision/:callSid"
+            element={
+              <AdminRoute>
+                <SupervisionCallDetail />
+              </AdminRoute>
+            }
+          />
         </Route>
         
         {/* Productivity Dashboard (standalone admin route) */}

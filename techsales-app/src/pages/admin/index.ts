@@ -8,4 +8,6 @@ export { TargetManagement } from './TargetManagement';
 export { AgentEnrollments } from './AgentEnrollments';
 export { AgentLeads } from './AgentLeads';
 export { AllEnrollments } from './AllEnrollments';
+export { Supervision } from './Supervision';
+export { SupervisionCallDetail } from './SupervisionCallDetail';
 

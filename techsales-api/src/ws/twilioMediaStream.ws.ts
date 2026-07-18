@@ -215,6 +215,7 @@ function handleConnection(ws: WebSocket, req: IncomingMessage): void {
           callSid: ctx.callSid,
           ...(userId ? { userId } : {}),
           ...(callerNumber ? { callerNumber } : {}),
+          direction: ctx.direction,
         });
         ctx.callAnalysisStop = handle.stop;
       } catch (err) {

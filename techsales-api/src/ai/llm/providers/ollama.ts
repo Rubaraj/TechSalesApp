@@ -14,7 +14,8 @@ import { env } from '../../../config/env.js';
 import type { GetChatModelOptions } from '../chatModel.js';
 
 export function getOllamaChatModel(opts: GetChatModelOptions = {}): BaseChatModel {
-  const model = opts.premium ? env.OLLAMA_LLM_PREMIUM_MODEL : env.OLLAMA_LLM_MODEL;
+  const model =
+    opts.modelOverride ?? (opts.premium ? env.OLLAMA_LLM_PREMIUM_MODEL : env.OLLAMA_LLM_MODEL);
   return new ChatOllama({
     baseUrl: env.OLLAMA_URL,
     model,
