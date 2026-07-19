@@ -256,12 +256,15 @@ export function useTwilioCall(): UseTwilioCallResult {
 
   const hangup = useCallback(async (): Promise<void> => {
     setCallStatus('ending');
-    const handle = handleRef.current;
-    if (handle) {
-      await handle.destroy();
-      handleRef.current = null;
-      setIsReady(false);
-    }
+    // Hang up the CALL, not the Device. Destroying the Device here (the old
+    // behavior) unregistered the agent's Twilio identity with no re-init
+    // path — the next inbound call hit Twilio "busy"/fallback until a page
+    // refresh, and the stopped presence heartbeat left inCall=true for the
+    // 60s TTL. The Device now lives for the session; `destroy` runs only on
+    // logout/unmount.
+    handleRef.current?.hangupCall();
+    // The call's `disconnect` event drives status 'ended'; endCall() here is
+    // the idempotent fallback in case the SDK swallows that event.
     endCall();
   }, [endCall, setCallStatus]);
 

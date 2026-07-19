@@ -15,6 +15,10 @@ const HEARTBEAT_INTERVAL_MS = 30_000;
 
 export interface HeartbeatHandle {
   stop: () => void;
+  /** Post a beat immediately (out of band of the interval) — used when the
+   *  in-call state flips so round-robin availability updates instantly
+   *  instead of waiting up to HEARTBEAT_INTERVAL_MS. */
+  beatNow: () => void;
 }
 
 interface StartHeartbeatInput {
@@ -47,5 +51,6 @@ export function startHeartbeat(input: StartHeartbeatInput): HeartbeatHandle {
       stopped = true;
       window.clearInterval(intervalId);
     },
+    beatNow: tick,
   };
 }

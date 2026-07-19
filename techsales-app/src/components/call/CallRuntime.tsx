@@ -41,6 +41,7 @@ export function CallRuntime({ children }: { children?: ReactNode }) {
   const inCallRef = useRef<boolean>(false);
   inCallRef.current =
     state.isCallActive && state.callStatus !== 'idle';
+  const heartbeatRef = useRef<{ beatNow: () => void } | null>(null);
   useEffect(() => {
     if (!twilioCall.isReady) return;
     if (!user?.userId) return;
@@ -48,8 +49,21 @@ export function CallRuntime({ children }: { children?: ReactNode }) {
       userId: user.userId,
       getInCall: () => inCallRef.current,
     });
-    return () => handle.stop();
+    heartbeatRef.current = handle;
+    return () => {
+      heartbeatRef.current = null;
+      handle.stop();
+    };
   }, [twilioCall.isReady, user?.userId]);
+
+  // When the in-call state flips (call started/ended), post a beat NOW so
+  // round-robin availability updates immediately — without this, an agent
+  // who just hung up stays inCall=true to the router until the next 30s
+  // tick, and back-to-back inbound calls hit the "no agents" fallback.
+  const inCallNow = state.isCallActive && state.callStatus !== 'idle';
+  useEffect(() => {
+    heartbeatRef.current?.beatNow();
+  }, [inCallNow]);
 
   // QA H4 — track the currently in-flight dial so a duplicate pendingDial
   // transition for the same `to` is a no-op, and a *different* `to`

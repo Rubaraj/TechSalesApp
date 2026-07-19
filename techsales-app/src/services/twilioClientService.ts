@@ -27,6 +27,10 @@ export interface TwilioClientHandle {
    *  obtained from `device.on('incoming')` then `.accept()`'d) as the active
    *  call so `setMute` / `destroy` semantics apply. Idempotent. */
   attachCall: (call: TwilioCall) => void;
+  /** Disconnect the active call ONLY — the Device stays alive and
+   *  registered so the next inbound/outbound call works without a re-init.
+   *  This is the normal "End call" path; `destroy` is for logout/unmount. */
+  hangupCall: () => void;
   /** Disconnect any active call(s) and destroy the Device. Idempotent. */
   destroy: () => Promise<void>;
   /** Mute the agent's outgoing audio. */
@@ -94,6 +98,17 @@ export async function initTwilioDevice(
       call.on('disconnect', () => {
         if (activeCall === call) activeCall = null;
       });
+    },
+    hangupCall(): void {
+      if (!activeCall) return;
+      try {
+        activeCall.disconnect();
+      } catch {
+        // ignore
+      }
+      // The call's own `disconnect` listener clears `activeCall`; clear
+      // defensively too in case the SDK swallowed the event.
+      activeCall = null;
     },
     async destroy(): Promise<void> {
       try {
