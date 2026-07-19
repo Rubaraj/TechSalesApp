@@ -19,6 +19,7 @@
 import { useEffect, useRef } from 'react';
 import { callService } from '../services/callService';
 import { useCallContext } from '../context/CallContext';
+import { useAuth } from '../context/AuthContext';
 import type {
   AiAction,
   AiActivityEntry,
@@ -124,13 +125,16 @@ export function useCallAnalysis(): void {
     appendActivity,
     setAnalysisWarning,
   } = useCallContext();
+  const { user } = useAuth();
+  const userId = user?.userId ?? '';
   const callSid = state.callSid;
   const abortRef = useRef<AbortController | null>(null);
   const warnedRef = useRef(false);
 
   useEffect(() => {
     // Only subscribe when we have a Twilio call SID and are in Twilio mode.
-    if (!callSid || state.mode !== 'twilio') return undefined;
+    // userId is required by the API's per-user call-minute cap.
+    if (!callSid || !userId || state.mode !== 'twilio') return undefined;
 
     const controller = new AbortController();
     abortRef.current = controller;
@@ -225,7 +229,7 @@ export function useCallAnalysis(): void {
     };
 
     void callService
-      .openAnalyzeStream({ callSid, onEvent, signal: controller.signal })
+      .openAnalyzeStream({ callSid, userId, onEvent, signal: controller.signal })
       .catch((err: unknown) => {
         if ((err as { name?: string })?.name === 'AbortError') return;
         console.error('Call analyze stream errored:', err);
@@ -242,6 +246,7 @@ export function useCallAnalysis(): void {
     };
   }, [
     callSid,
+    userId,
     state.mode,
     appendTranscript,
     addInfoCard,

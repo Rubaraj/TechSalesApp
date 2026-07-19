@@ -51,6 +51,9 @@ async function fetchToken(input: FetchTokenInput): Promise<FetchTokenResult> {
 
 interface OpenAnalyzeStreamInput {
   callSid: string;
+  /** Required by the per-user call-minute cap (the API rejects anonymous
+   *  streams in production). */
+  userId: string;
   onEvent: (event: CallStreamEvent) => void;
   signal?: AbortSignal;
 }
@@ -60,7 +63,9 @@ interface OpenAnalyzeStreamInput {
  * dispatches each event via `onEvent`. Mirrors `aiService.ts:chat` exactly.
  */
 async function openAnalyzeStream(opts: OpenAnalyzeStreamInput): Promise<void> {
-  const url = `${BASE}/ai/call/analyze?callSid=${encodeURIComponent(opts.callSid)}`;
+  const url =
+    `${BASE}/ai/call/analyze?callSid=${encodeURIComponent(opts.callSid)}` +
+    `&userId=${encodeURIComponent(opts.userId)}`;
   const fetchInit: RequestInit = {
     method: 'GET',
     headers: { Accept: 'text/event-stream' },
