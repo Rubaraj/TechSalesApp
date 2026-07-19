@@ -22,6 +22,7 @@ export const APP_TABLES = {
   targets: 'targets',
   aiInteractions: 'ai_interactions',
   callRecords: 'call_records',
+  complianceRules: 'compliance_rules',
 } as const;
 
 export const LOOKUP_TABLES = {

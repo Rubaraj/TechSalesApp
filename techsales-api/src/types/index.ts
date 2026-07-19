@@ -40,6 +40,8 @@ export * from './target.js';
 // Enrollment Form types
 export * from './enrollmentForm.js';
 
+export * from './complianceRule.js';
+
 // Common types
 export interface ApiResponse<T> {
   success: boolean;

@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { Users, Shield, Building2, Settings, Target, Radio } from 'lucide-react';
+import { Users, Shield, Building2, Settings, Target, Radio, ShieldAlert } from 'lucide-react';
 
 const adminNavItems = [
   { to: '/admin/users', icon: Users, label: 'User Management' },
@@ -7,6 +7,7 @@ const adminNavItems = [
   { to: '/admin/departments', icon: Building2, label: 'Departments' },
   { to: '/admin/targets', icon: Target, label: 'Target Management' },
   { to: '/admin/supervision', icon: Radio, label: 'Supervision' },
+  { to: '/admin/compliance', icon: ShieldAlert, label: 'Compliance Rules' },
   { to: '/admin/settings', icon: Settings, label: 'System Settings' },
 ];
 

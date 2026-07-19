@@ -18,6 +18,7 @@ import {
   AllEnrollments,
   Supervision,
   SupervisionCallDetail,
+  ComplianceRulesManagement,
 } from './pages/admin';
 import { LeadList, LeadDetail, LeadForm } from './pages/leads';
 import { PlanList, PlanDetail, PlanCompare } from './pages/plans';
@@ -245,6 +246,14 @@ function AppRoutes() {
             element={
               <AdminRoute>
                 <SupervisionCallDetail />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="compliance"
+            element={
+              <AdminRoute>
+                <ComplianceRulesManagement />
               </AdminRoute>
             }
           />

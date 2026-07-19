@@ -204,6 +204,8 @@ export function useCallAnalysis(): void {
               phrase: action.phrase,
               rule: action.rule,
               suggestion: action.suggestion,
+              ...(action.severity ? { severity: action.severity } : {}),
+              ...(action.ruleName ? { ruleName: action.ruleName } : {}),
               timestamp: ts,
             };
             addComplianceFlag(flag);

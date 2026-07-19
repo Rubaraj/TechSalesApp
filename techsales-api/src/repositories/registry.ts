@@ -19,6 +19,9 @@ import { JsonAiInteractionRepository } from './json/JsonAiInteractionRepository.
 import { MongoCallRecordRepository } from './mongo/MongoCallRecordRepository.js';
 import { JsonCallRecordRepository } from './json/JsonCallRecordRepository.js';
 import { DatabricksCallRecordRepository } from './databricks/DatabricksCallRecordRepository.js';
+import { MongoComplianceRuleRepository } from './mongo/MongoComplianceRuleRepository.js';
+import { JsonComplianceRuleRepository } from './json/JsonComplianceRuleRepository.js';
+import { DatabricksComplianceRuleRepository } from './databricks/DatabricksComplianceRuleRepository.js';
 import { DatabricksLeadRepository } from './databricks/DatabricksLeadRepository.js';
 import { DatabricksUserRepository } from './databricks/DatabricksUserRepository.js';
 import { DatabricksRoleRepository } from './databricks/DatabricksRoleRepository.js';
@@ -70,6 +73,10 @@ export type CallRecordRepo =
   | MongoCallRecordRepository
   | JsonCallRecordRepository
   | DatabricksCallRecordRepository;
+export type ComplianceRuleRepo =
+  | MongoComplianceRuleRepository
+  | JsonComplianceRuleRepository
+  | DatabricksComplianceRuleRepository;
 
 export interface Repos {
   health: HealthRepo;
@@ -82,6 +89,7 @@ export interface Repos {
   target: TargetRepo;
   aiInteraction: AiInteractionRepo;
   callRecord: CallRecordRepo;
+  complianceRule: ComplianceRuleRepo;
 }
 
 interface RegistryState {
@@ -225,6 +233,21 @@ const buildCallRecordRepo = (mode: ConnectMode): CallRecordRepo => {
   }
 };
 
+const buildComplianceRuleRepo = (mode: ConnectMode): ComplianceRuleRepo => {
+  switch (mode) {
+    case 'mongo':
+      return new MongoComplianceRuleRepository();
+    case 'json':
+      return new JsonComplianceRuleRepository();
+    case 'databricks':
+      return new DatabricksComplianceRuleRepository();
+    default: {
+      const _exhaustive: never = mode;
+      throw new Error(`Unknown backend: ${String(_exhaustive)}`);
+    }
+  }
+};
+
 export function initRegistry(connectResult: ConnectResult): void {
   if (state) {
     throw new Error('initRegistry called twice — registry is a singleton.');
@@ -243,6 +266,7 @@ export function initRegistry(connectResult: ConnectResult): void {
       target: buildTargetRepo(mode),
       aiInteraction: buildAiInteractionRepo(mode),
       callRecord: buildCallRecordRepo(mode),
+      complianceRule: buildComplianceRuleRepo(mode),
     },
   };
   logger.info({ mode }, 'Repository registry initialized');

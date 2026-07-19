@@ -133,6 +133,7 @@ export type SupervisorEvent =
       phrase: string;
       rule: string;
       suggestion?: string;
+      severity?: 'info' | 'warn' | 'critical';
       ts: number;
     }
   | { type: 'qa_completed'; callSid: string; overallScore: number }

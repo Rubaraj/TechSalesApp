@@ -37,7 +37,11 @@ import {
   type AiAction,
   type TranscriptChunk,
 } from '../types/call.types.js';
-import { scanForViolations } from '../tools/complianceCheck.tool.js';
+import {
+  scanForViolations,
+  loadActiveRules,
+  getCompiledRulesSync,
+} from '../tools/complianceCheck.tool.js';
 import { lookupMedicareTerm } from '../tools/medicareKnowledge.tool.js';
 import { extractFromProspectChunk } from '../rules/entityExtractor.js';
 import { summarizeTranscript } from '../rules/noteSummarizer.js';
@@ -118,6 +122,10 @@ export function startCallAnalysis(input: StartCallAnalysisInput): CallAnalysisHa
 
   // Supervisor feed — this call is now live.
   registerCall(callSid, { ...(userId ? { userId } : {}), direction, startedAt: Date.now() });
+
+  // Warm/refresh the compiled compliance-rule cache before the first chunk
+  // arrives (speech + Deepgram latency gives this plenty of head start).
+  void loadActiveRules();
 
   const unsubscribe = subscribe(callSid, (event: CallBusEvent) => {
     if (event.type !== 'transcript') return;
@@ -227,7 +235,7 @@ function runAgentSideAnalysis(
   text: string,
   userId?: string,
 ): void {
-  const violations = scanForViolations(text);
+  const violations = scanForViolations(text, getCompiledRulesSync());
   if (violations.length === 0) return;
 
   const actions: AiAction[] = violations.map((v) => ({
@@ -235,12 +243,20 @@ function runAgentSideAnalysis(
     phrase: v.phrase,
     rule: v.rule,
     suggestion: v.suggestion,
+    severity: v.severity,
+    ruleName: v.ruleName,
   }));
   publish(callSid, { type: 'actions', actions });
 
   for (const v of violations) {
     // QA pipeline — tag for the persisted record + live supervisor feed.
-    addTag(callSid, 'compliance', { phrase: v.phrase, rule: v.rule, suggestion: v.suggestion });
+    addTag(callSid, 'compliance', {
+      phrase: v.phrase,
+      rule: v.rule,
+      suggestion: v.suggestion,
+      severity: v.severity,
+      ruleName: v.ruleName,
+    });
     publishGlobal({
       type: 'compliance_flag',
       callSid,
@@ -248,13 +264,14 @@ function runAgentSideAnalysis(
       phrase: v.phrase,
       rule: v.rule,
       suggestion: v.suggestion,
+      severity: v.severity,
       ts: Date.now(),
     });
     void auditCallAnalysisEvent({
       callSid,
       userId,
       kind: 'compliance_flag',
-      payload: { phrase: v.phrase, rule: v.rule },
+      payload: { phrase: v.phrase, rule: v.rule, severity: v.severity },
     });
   }
 }
