@@ -105,7 +105,7 @@ try {
   Start-Sleep -Seconds 4
   $health = Invoke-Pi 'curl -s -m 10 http://localhost:4000/api/health'
   Write-Host "  [OK] techsales-api restarted; health: $health"
-  $gwHealth = Invoke-Pi 'curl -s -m 10 http://localhost:8080/techsales/api/health | head -c 120'
+  $gwHealth = Invoke-Pi 'curl -s -m 10 http://localhost:8081/techsales/api/health | head -c 120'
   Write-Host "  [OK] via gateway: $gwHealth"
 } finally {
   Remove-SSHSession -SessionId $sess.SessionId | Out-Null

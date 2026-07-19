@@ -6,15 +6,16 @@ One stable public hostname for every home-lab project, served from the Pi:
 Internet ── Cloudflare (rubarajan.dev DNS + TLS)
               │  named tunnel (token-managed, systemd: cloudflared)
               ▼
-Pi: cloudflared ──► Caddy :8080
+Pi: cloudflared ──► Caddy :8081
                       ├─ /               → this directory's index.html (/srv/api-gateway)
                       ├─ /techsales/*    → 127.0.0.1:4000  (TechSales API, prefix stripped)
                       └─ /<project>/*    → future projects
 ```
 
 Cloudflare-side config is a single public hostname (`api.rubarajan.dev` →
-`http://localhost:8080`) that never changes — all routing lives in the
-Caddyfile here, under version control.
+`http://localhost:8081`) that never changes — all routing lives in the
+Caddyfile here, under version control. (Port 8081 because the budget-app
+Docker stack already owns 8080 on the Pi.)
 
 ## Adding a new project
 
