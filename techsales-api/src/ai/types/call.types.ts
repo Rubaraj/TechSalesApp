@@ -100,6 +100,10 @@ export const emptyExtractedEntities = (): ExtractedEntities => ({
   stateCounty: null,
 });
 
+export type ProspectEmotion = 'positive' | 'neutral' | 'confused' | 'frustrated' | 'upset';
+
+export type CoachingFocus = 'compliance' | 'empathy' | 'clarity' | 'pacing';
+
 /** SSE event union sent over `GET /api/ai/call/analyze`. */
 export type CallStreamEvent =
   | { type: 'open'; callSid: string }
@@ -107,4 +111,12 @@ export type CallStreamEvent =
   | { type: 'call_status'; status: 'connected' | 'ended' | 'not_hosted' }
   | { type: 'actions'; actions: AiAction[] }
   | { type: 'entities'; entities: Partial<ExtractedEntities> }
+  | { type: 'emotion'; emotion: ProspectEmotion; confidence: number; ts: number }
+  | {
+      type: 'coaching';
+      source: 'rule' | 'ai';
+      tip: string;
+      focus: CoachingFocus;
+      ts: number;
+    }
   | { type: 'error'; error: string };

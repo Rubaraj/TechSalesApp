@@ -11,6 +11,7 @@
  */
 import type { Request, Response } from 'express';
 import { repos } from '../repositories/registry.js';
+import { resolveAgentName, resolveAgentNames } from '../services/agentNameCache.js';
 import {
   runQaReview,
   QaReviewConflictError,
@@ -35,7 +36,12 @@ export async function listQaCalls(req: Request, res: Response): Promise<void> {
     ...(req.query.agentUserId ? { userId: String(req.query.agentUserId) } : {}),
     ...(req.query.limit ? { limit: Number(req.query.limit) } : {}),
   });
-  res.json({ success: true, data: { total: calls.length, calls } });
+  const names = await resolveAgentNames(calls.map((c) => c.userId));
+  const enriched = calls.map((c) => ({
+    ...c,
+    ...(c.userId && names.has(c.userId) ? { agentName: names.get(c.userId) } : {}),
+  }));
+  res.json({ success: true, data: { total: enriched.length, calls: enriched } });
 }
 
 export async function getQaCall(req: Request, res: Response): Promise<void> {
@@ -49,7 +55,8 @@ export async function getQaCall(req: Request, res: Response): Promise<void> {
     res.status(404).json({ success: false, error: 'Call record not found' });
     return;
   }
-  res.json({ success: true, data: record });
+  const agentName = await resolveAgentName(record.userId);
+  res.json({ success: true, data: { ...record, ...(agentName ? { agentName } : {}) } });
 }
 
 export async function postQaReview(req: Request, res: Response): Promise<void> {

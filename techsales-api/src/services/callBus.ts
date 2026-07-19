@@ -135,7 +135,17 @@ export type SupervisorEvent =
       suggestion?: string;
       ts: number;
     }
-  | { type: 'qa_completed'; callSid: string; overallScore: number };
+  | { type: 'qa_completed'; callSid: string; overallScore: number }
+  | {
+      type: 'emotion_shift';
+      callSid: string;
+      userId?: string;
+      emotion: ProspectEmotion;
+      prevEmotion: ProspectEmotion | null;
+      ts: number;
+    };
+
+export type ProspectEmotion = 'positive' | 'neutral' | 'confused' | 'frustrated' | 'upset';
 
 const activeCalls = new Map<string, ActiveCallMeta>();
 const globalEmitter = new EventEmitter();

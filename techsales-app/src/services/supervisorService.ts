@@ -26,19 +26,32 @@ export async function listCalls(opts: {
   return body.success ? (body.data?.calls ?? []) : [];
 }
 
-export async function getCall(userId: string, callSid: string): Promise<CallRecordDetail | null> {
-  const res = await fetch(
-    `${BASE}/ai/qa/calls/${encodeURIComponent(callSid)}?userId=${encodeURIComponent(userId)}`,
-  );
-  if (!res.ok) return null;
+export interface GetCallResult {
+  /** Null on any failure — check `status` for why. */
+  record: CallRecordDetail | null;
+  /** HTTP status; 0 = network error (fetch threw), 200 on success. */
+  status: number;
+}
+
+export async function getCall(userId: string, callSid: string): Promise<GetCallResult> {
+  let res: Response;
+  try {
+    res = await fetch(
+      `${BASE}/ai/qa/calls/${encodeURIComponent(callSid)}?userId=${encodeURIComponent(userId)}`,
+    );
+  } catch {
+    return { record: null, status: 0 };
+  }
+  if (!res.ok) return { record: null, status: res.status };
   const body = (await res.json()) as { success: boolean; data?: CallRecordDetail };
-  return body.success ? (body.data ?? null) : null;
+  if (!body.success || !body.data) return { record: null, status: 500 };
+  return { record: body.data, status: 200 };
 }
 
 export async function runQaReview(
   userId: string,
   callSid: string,
-): Promise<{ scorecard: QaReview } | { error: string }> {
+): Promise<{ scorecard: QaReview } | { error: string; status: number }> {
   const res = await fetch(`${BASE}/ai/qa/review/${encodeURIComponent(callSid)}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -49,29 +62,47 @@ export async function runQaReview(
     data?: { scorecard: QaReview; reviewedAt: string; model: string };
     error?: string;
   };
-  if (!body.success || !body.data) return { error: body.error ?? `Review failed (${res.status})` };
+  if (!body.success || !body.data) {
+    return { error: body.error ?? `Review failed (${res.status})`, status: res.status };
+  }
   return { scorecard: { ...body.data.scorecard, reviewedAt: body.data.reviewedAt, model: body.data.model } };
+}
+
+/** Terminal stream failure — do NOT reconnect (401/403). */
+export class SupervisorStreamAuthError extends Error {
+  constructor(status: number) {
+    super(`Supervisor stream unauthorized (${status})`);
+    this.name = 'SupervisorStreamAuthError';
+  }
 }
 
 export interface OpenSupervisorStreamInput {
   userId: string;
   onEvent: (event: SupervisorEvent) => void;
+  /** Fired once the SSE response is confirmed (headers ok) — the moment the
+   *  caller may consider the stream genuinely connected. */
+  onOpen?: () => void;
   signal?: AbortSignal;
 }
 
 /** Long-lived SSE reader; resolves when the stream closes. Caller handles
- *  reconnect (see Supervision page's backoff loop). */
+ *  reconnect (see Supervision page's backoff loop). Throws
+ *  SupervisorStreamAuthError on 401/403 (terminal — don't retry). */
 export async function openSupervisorStream(opts: OpenSupervisorStreamInput): Promise<void> {
   const url = `${BASE}/ai/supervisor/stream?userId=${encodeURIComponent(opts.userId)}`;
   const fetchInit: RequestInit = { method: 'GET', headers: { Accept: 'text/event-stream' } };
   if (opts.signal) fetchInit.signal = opts.signal;
   const res = await fetch(url, fetchInit);
 
+  if (res.status === 401 || res.status === 403) {
+    throw new SupervisorStreamAuthError(res.status);
+  }
   const contentType = res.headers.get('content-type') ?? '';
   if (!res.ok || !contentType.includes('text/event-stream')) {
     throw new Error(`Supervisor stream failed (${res.status})`);
   }
   if (!res.body) throw new Error('Supervisor stream had no body');
+  opts.onOpen?.();
 
   const reader = res.body.getReader();
   const decoder = new TextDecoder('utf-8');

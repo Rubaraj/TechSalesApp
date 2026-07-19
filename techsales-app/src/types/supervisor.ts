@@ -9,7 +9,9 @@ export interface CallLine {
   ts: number;
 }
 
-export type CallTagKind = 'compliance' | 'info' | 'entity' | 'note';
+export type CallTagKind = 'compliance' | 'info' | 'entity' | 'note' | 'emotion' | 'coaching';
+
+export type ProspectEmotion = 'positive' | 'neutral' | 'confused' | 'frustrated' | 'upset';
 
 export interface CallTag {
   kind: CallTagKind;
@@ -44,6 +46,8 @@ export interface QaReview extends QaScorecard {
 export interface CallRecordSummary {
   callSid: string;
   userId?: string;
+  /** Display name resolved server-side (TTL cache); fall back to userId. */
+  agentName?: string;
   direction: 'inbound' | 'outbound';
   startedAt: string;
   endedAt: string;
@@ -96,4 +100,13 @@ export type SupervisorEvent =
       suggestion?: string;
       ts: number;
     }
-  | { type: 'qa_completed'; callSid: string; overallScore: number };
+  | { type: 'qa_completed'; callSid: string; overallScore: number }
+  | {
+      type: 'emotion_shift';
+      callSid: string;
+      userId?: string;
+      agentName?: string;
+      emotion: ProspectEmotion;
+      prevEmotion: ProspectEmotion | null;
+      ts: number;
+    };

@@ -173,14 +173,10 @@ export function stopCallAnalysisByCallSid(callSid: string): void {
     }));
     const tagCounts: Record<string, number> = {};
     for (const t of tags) tagCounts[t.kind] = (tagCounts[t.kind] ?? 0) + 1;
-    publishGlobal({
-      type: 'call_ended',
-      callSid,
-      ...(userId ? { userId } : {}),
-      flagged: tags.some((t) => t.kind === 'compliance'),
-      tagCounts,
-      durationSec: Math.max(0, Math.round((Date.now() - meta.startedAt) / 1000)),
-    });
+    // Persist FIRST, publish call_ended in .then — the supervisor FE refetches
+    // the call log the moment call_ended arrives, so the event must imply the
+    // row exists. persistCallRecord never rejects (errors logged + swallowed),
+    // so call_ended always fires; the call path stays non-blocking.
     void persistCallRecord({
       callSid,
       ...(userId ? { userId } : {}),
@@ -188,6 +184,15 @@ export function stopCallAnalysisByCallSid(callSid: string): void {
       startedAt: meta.startedAt,
       lines,
       tags,
+    }).then(() => {
+      publishGlobal({
+        type: 'call_ended',
+        callSid,
+        ...(userId ? { userId } : {}),
+        flagged: tags.some((t) => t.kind === 'compliance'),
+        tagCounts,
+        durationSec: Math.max(0, Math.round((Date.now() - meta.startedAt) / 1000)),
+      });
     });
   }
   unregisterCall(callSid);

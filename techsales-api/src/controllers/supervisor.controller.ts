@@ -16,6 +16,7 @@ import {
   getActiveCalls,
   type SupervisorEvent,
 } from '../services/callBus.js';
+import { resolveAgentName } from '../services/agentNameCache.js';
 import { env } from '../config/env.js';
 
 async function isAdmin(userId: string | undefined): Promise<boolean> {
@@ -44,16 +45,11 @@ export async function getSupervisorStream(req: Request, res: Response): Promise<
     res.write(`data: ${JSON.stringify(data)}\n\n`);
   };
 
-  // Per-connection agent-name cache so enrichment doesn't hammer the repo.
-  const nameCache = new Map<string, string>();
+  // Shared TTL'd agent-name cache (services/agentNameCache) — survives
+  // reconnects, expires so User Management edits show up within minutes.
   const agentName = async (id?: string): Promise<string | undefined> => {
     if (!id) return undefined;
-    const cached = nameCache.get(id);
-    if (cached) return cached;
-    const user = await repos.user.findById(id).catch(() => null);
-    const name = user ? `${user.firstName} ${user.lastName}`.trim() : id;
-    nameCache.set(id, name);
-    return name;
+    return (await resolveAgentName(id)) ?? id;
   };
 
   const enrich = async (

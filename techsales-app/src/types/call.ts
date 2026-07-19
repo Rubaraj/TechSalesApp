@@ -173,10 +173,25 @@ export interface ComplianceFlag {
 /** SSE event the backend emits over /api/ai/call/analyze. Phase 2 delivers
  *  `open`, `transcript`, `call_status`, `error`. Phase 3+ extends with
  *  `actions`, `entities`, `tool_start`, `tool_end`, `thinking`. */
+export type ProspectEmotion = 'positive' | 'neutral' | 'confused' | 'frustrated' | 'upset';
+
+export type CoachingFocus = 'compliance' | 'empathy' | 'clarity' | 'pacing';
+
+export interface CoachingTip {
+  id: string;
+  source: 'rule' | 'ai';
+  tip: string;
+  focus: CoachingFocus;
+  ts: number;
+  dismissed?: boolean;
+}
+
 export type CallStreamEvent =
   | { type: 'open'; callSid: string }
   | { type: 'transcript'; chunk: TranscriptChunk }
   | { type: 'call_status'; status: 'connected' | 'ended' | 'not_hosted' }
+  | { type: 'emotion'; emotion: ProspectEmotion; confidence: number; ts: number }
+  | { type: 'coaching'; source: 'rule' | 'ai'; tip: string; focus: CoachingFocus; ts: number }
   | { type: 'actions'; actions: AiAction[] }
   | { type: 'entities'; entities: Partial<ExtractedEntities> }
   | { type: 'tool_start'; tool: string; input: unknown }

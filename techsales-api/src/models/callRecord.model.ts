@@ -17,7 +17,7 @@ export interface CallLine {
   ts: number;
 }
 
-export type CallTagKind = 'compliance' | 'info' | 'entity' | 'note';
+export type CallTagKind = 'compliance' | 'info' | 'entity' | 'note' | 'emotion' | 'coaching';
 
 export interface CallTag {
   kind: CallTagKind;
@@ -71,7 +71,11 @@ const lineSchema = new Schema<CallLine>(
 
 const tagSchema = new Schema<CallTag>(
   {
-    kind: { type: String, enum: ['compliance', 'info', 'entity', 'note'], required: true },
+    kind: {
+      type: String,
+      enum: ['compliance', 'info', 'entity', 'note', 'emotion', 'coaching'],
+      required: true,
+    },
     ts: { type: Number, required: true },
     data: { type: Schema.Types.Mixed },
   },

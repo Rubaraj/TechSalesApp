@@ -1,8 +1,10 @@
 /**
  * Supervision call detail — transcript viewer with inline tag markers +
- * on-demand QA review scorecard panel.
+ * on-demand QA review scorecard panel. Distinguishes not-found (call may
+ * still be persisting) from server errors, both with Retry; re-running a
+ * QA review requires an arm-then-confirm second click.
  */
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -11,28 +13,13 @@ import {
   AlertTriangle,
   CheckCircle2,
   XCircle,
-  ShieldAlert,
   Info,
-  StickyNote,
-  Tag,
+  RefreshCw,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { getCall, runQaReview } from '../../services/supervisorService';
 import type { CallRecordDetail, CallTag, QaReview } from '../../types/supervisor';
-
-const TAG_ICONS: Record<string, typeof Info> = {
-  compliance: ShieldAlert,
-  info: Info,
-  entity: Tag,
-  note: StickyNote,
-};
-
-const TAG_TONES: Record<string, string> = {
-  compliance: 'border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-900/15 text-red-700 dark:text-red-300',
-  info: 'border-purple-300 dark:border-purple-800 bg-purple-50 dark:bg-purple-900/15 text-purple-700 dark:text-purple-300',
-  entity: 'border-blue-300 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/15 text-blue-700 dark:text-blue-300',
-  note: 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/30 text-gray-700 dark:text-gray-300',
-};
+import { TAG_INLINE_TONES, TAG_ICONS, formatWhen, scoreTone } from './supervisionUi';
 
 function tagLabel(tag: CallTag): string {
   if (tag.kind === 'compliance') {
@@ -40,9 +27,29 @@ function tagLabel(tag: CallTag): string {
   }
   if (tag.kind === 'info') return `Info card: ${String(tag.data.title ?? tag.data.topic ?? '')}`;
   if (tag.kind === 'note') return `${String(tag.data.category ?? 'note')}: ${String(tag.data.text ?? '')}`;
+  if (tag.kind === 'emotion') {
+    return `Emotion shift: ${String(tag.data.from ?? '?')} → ${String(tag.data.to ?? '?')}`;
+  }
+  if (tag.kind === 'coaching') return `Coach tip: ${String(tag.data.tip ?? '')}`;
   const keys = Object.keys(tag.data).filter((k) => tag.data[k] !== undefined);
   return `Extracted: ${keys.join(', ')}`;
 }
+
+/** Map review-endpoint failures to operator-friendly copy. */
+function reviewErrorCopy(error: string, status: number): string {
+  if (status === 409) return 'A QA review is already running for this call — give it a few seconds.';
+  if (status === 503) return 'The AI provider is not configured on the backend (stub mode).';
+  if (error.includes('401')) {
+    return 'LLM provider unreachable (auth failed) — check the OpenRouter key / start the VM.';
+  }
+  return `Review failed: ${error}`;
+}
+
+type LoadState =
+  | { phase: 'loading' }
+  | { phase: 'ready'; record: CallRecordDetail }
+  | { phase: 'missing' }
+  | { phase: 'error' };
 
 export function SupervisionCallDetail() {
   const { callSid } = useParams<{ callSid: string }>();
@@ -50,23 +57,36 @@ export function SupervisionCallDetail() {
   const navigate = useNavigate();
   const userId = user?.userId ?? '';
 
-  const [record, setRecord] = useState<CallRecordDetail | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [load, setLoad] = useState<LoadState>({ phase: 'loading' });
   const [isReviewing, setIsReviewing] = useState(false);
   const [reviewError, setReviewError] = useState<string | null>(null);
+  const [rerunArmed, setRerunArmed] = useState(false);
+  const armTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Loading state flips only inside async continuations (lint: no sync
-  // setState in effects); isLoading starts true so first render shows it.
-  const load = useCallback(() => {
+  const fetchRecord = useCallback(() => {
     if (!userId || !callSid) return;
-    getCall(userId, callSid)
-      .then(setRecord)
-      .finally(() => setIsLoading(false));
+    getCall(userId, callSid).then((result) => {
+      if (result.record) {
+        setLoad({ phase: 'ready', record: result.record });
+      } else {
+        setLoad(result.status === 404 ? { phase: 'missing' } : { phase: 'error' });
+      }
+    });
   }, [userId, callSid]);
 
   useEffect(() => {
-    load();
-  }, [load]);
+    fetchRecord();
+  }, [fetchRecord]);
+
+  useEffect(
+    () => () => {
+      if (armTimer.current) clearTimeout(armTimer.current);
+    },
+    [],
+  );
+
+  const record = load.phase === 'ready' ? load.record : null;
+  const qa = record?.qaReview ?? null;
 
   const startTs = record?.lines[0]?.ts ?? 0;
   const mmss = (ts: number): string => {
@@ -93,18 +113,26 @@ export function SupervisionCallDetail() {
 
   const runReview = async (): Promise<void> => {
     if (!userId || !callSid) return;
+    // Existing scorecard → require a second click within 3s to overwrite.
+    if (qa && !rerunArmed) {
+      setRerunArmed(true);
+      armTimer.current = setTimeout(() => setRerunArmed(false), 3000);
+      return;
+    }
+    if (armTimer.current) clearTimeout(armTimer.current);
+    setRerunArmed(false);
     setIsReviewing(true);
     setReviewError(null);
     const result = await runQaReview(userId, callSid);
     setIsReviewing(false);
     if ('error' in result) {
-      setReviewError(result.error);
+      setReviewError(reviewErrorCopy(result.error, result.status));
     } else {
-      load();
+      fetchRecord();
     }
   };
 
-  if (isLoading) {
+  if (load.phase === 'loading') {
     return (
       <div className="py-16 text-center text-gray-500 dark:text-gray-400">
         <Loader2 className="w-6 h-6 mx-auto animate-spin mb-2" />
@@ -112,13 +140,35 @@ export function SupervisionCallDetail() {
       </div>
     );
   }
-  if (!record) {
+  if (load.phase === 'missing' || load.phase === 'error') {
     return (
-      <div className="py-16 text-center text-gray-500 dark:text-gray-400">Call not found.</div>
+      <div className="py-16 text-center text-gray-500 dark:text-gray-400 space-y-3">
+        <p>
+          {load.phase === 'missing'
+            ? 'Call not found — if it just ended, the record may still be finishing.'
+            : "Couldn't load the call (server error)."}
+        </p>
+        <div className="flex items-center justify-center gap-3">
+          <button
+            onClick={() => {
+              setLoad({ phase: 'loading' });
+              fetchRecord();
+            }}
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium bg-orange-600 hover:bg-orange-500 text-white transition-colors"
+          >
+            <RefreshCw className="w-4 h-4" /> Retry
+          </button>
+          <button
+            onClick={() => navigate('/admin/supervision')}
+            className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+          >
+            Back to Supervision
+          </button>
+        </div>
+      </div>
     );
   }
-
-  const qa = record.qaReview;
+  if (!record) return null;
 
   return (
     <div className="space-y-6">
@@ -130,12 +180,10 @@ export function SupervisionCallDetail() {
           >
             <ArrowLeft className="w-4 h-4" /> Back to Supervision
           </button>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-            {record.callSid}
-          </h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{record.callSid}</h2>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {record.userId ?? 'unknown agent'} · {record.direction} · {record.durationSec}s ·{' '}
-            {new Date(record.startedAt).toLocaleString()}
+            {record.agentName ?? record.userId ?? 'unknown agent'} · {record.direction} ·{' '}
+            {record.durationSec}s · {formatWhen(record.startedAt)}
             {record.flagged && (
               <span className="ml-2 inline-flex items-center gap-1 text-red-600 dark:text-red-400 font-semibold">
                 <AlertTriangle className="w-3.5 h-3.5" /> flagged
@@ -146,10 +194,22 @@ export function SupervisionCallDetail() {
         <button
           onClick={() => void runReview()}
           disabled={isReviewing}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg text-white font-medium bg-orange-600 hover:bg-orange-500 disabled:opacity-60 transition-colors"
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-white font-medium transition-colors disabled:opacity-60 ${
+            rerunArmed ? 'bg-red-600 hover:bg-red-500' : 'bg-orange-600 hover:bg-orange-500'
+          }`}
         >
-          {isReviewing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-          {qa ? 'Re-run QA review' : 'Run QA review'}
+          {isReviewing ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Sparkles className="w-4 h-4" />
+          )}
+          {isReviewing
+            ? 'Reviewing…'
+            : rerunArmed
+              ? 'Click again to overwrite'
+              : qa
+                ? 'Re-run QA review'
+                : 'Run QA review'}
         </button>
       </div>
 
@@ -179,7 +239,12 @@ export function SupervisionCallDetail() {
                         : 'text-blue-600 dark:text-blue-400'
                     }`}
                   >
-                    {line.speaker === 'agent' ? 'Agent' : line.speaker === 'prospect' ? 'Prospect' : '—'}:
+                    {line.speaker === 'agent'
+                      ? 'Agent'
+                      : line.speaker === 'prospect'
+                        ? 'Prospect'
+                        : '—'}
+                    :
                   </span>
                   <span className="text-gray-800 dark:text-gray-200">{line.text}</span>
                 </div>
@@ -188,7 +253,7 @@ export function SupervisionCallDetail() {
                   return (
                     <div
                       key={ti}
-                      className={`flex items-start gap-1.5 ml-12 mt-1 px-2.5 py-1.5 rounded-lg border text-xs ${TAG_TONES[tag.kind] ?? TAG_TONES.note}`}
+                      className={`flex items-start gap-1.5 ml-12 mt-1 px-2.5 py-1.5 rounded-lg border text-xs ${TAG_INLINE_TONES[tag.kind] ?? TAG_INLINE_TONES.note}`}
                     >
                       <Icon className="w-3.5 h-3.5 shrink-0 mt-[1px]" />
                       <span>{tagLabel(tag)}</span>
@@ -219,14 +284,12 @@ export function SupervisionCallDetail() {
 }
 
 function Scorecard({ qa }: { qa: QaReview }): React.JSX.Element {
-  const overallTone =
-    qa.overallScore >= 80 ? 'text-green-600 dark:text-green-400' : qa.overallScore >= 60 ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400';
   return (
     <div className="space-y-5">
       <div className="text-center">
-        <div className={`text-5xl font-bold ${overallTone}`}>{qa.overallScore}</div>
+        <div className={`text-5xl font-bold ${scoreTone(qa.overallScore)}`}>{qa.overallScore}</div>
         <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-          overall · reviewed {new Date(qa.reviewedAt).toLocaleString()} · {qa.model}
+          overall · reviewed {formatWhen(qa.reviewedAt)} · {qa.model}
         </div>
       </div>
 

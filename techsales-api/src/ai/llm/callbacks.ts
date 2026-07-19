@@ -33,7 +33,13 @@ export type AiInteractionKind =
   | 'atlas'
   /** QA pipeline — one row per on-demand call QA review (userId = the
    *  supervisor who requested it; input carries the callSid). */
-  | 'call_qa';
+  | 'call_qa'
+  /** Live-call intelligence — one row per emotion sample of a call's
+   *  prospect speech (userId = the call's agent). */
+  | 'call_emotion'
+  /** Live-call intelligence — one row per AI coaching tip generated for
+   *  the agent mid-call (userId = the call's agent). */
+  | 'call_coaching';
 
 export interface ToolCallTrace {
   name: string;

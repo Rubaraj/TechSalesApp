@@ -1,12 +1,16 @@
 /**
  * Ambient Supervisor CoPilot — admin Supervision tab.
  *
- * Top: LIVE section — active calls + a scrolling compliance-alert feed via
- * the supervisor SSE stream (auto-reconnect with backoff).
- * Below: Call Log — persisted call records with tag chips, flagged badges,
- * and QA scores; rows open the transcript/QA detail page.
+ * Top: LIVE section — active calls (with elapsed ticker) + a scrolling
+ * compliance-alert feed via the supervisor SSE stream. Reconnect uses real
+ * exponential backoff; `streamUp` turns on only once the stream is actually
+ * connected; 401/403 is terminal (no retry loop).
+ * Below: Call Log — persisted call records with agent names, tag chips,
+ * flagged badges, and QA scores; rows open the transcript/QA detail page.
+ * The alert feed is hydrated from persisted compliance tags on load so it
+ * survives navigation/reload.
  */
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Radio,
@@ -15,13 +19,17 @@ import {
   ShieldAlert,
   RefreshCw,
   ChevronRight,
+  ShieldX,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import {
   listCalls,
   openSupervisorStream,
+  SupervisorStreamAuthError,
 } from '../../services/supervisorService';
+import type { CallRecordSummary, SupervisorEvent } from '../../types/supervisor';
 import { API_BASE } from '../../api/apiBase';
+import { TAG_CHIP_TONES, formatWhen, formatElapsed } from './supervisionUi';
 
 /** Which backend this live feed is actually watching — events only flow from
  *  the process that hosts the calls (the Pi in production). Making the host
@@ -33,7 +41,6 @@ const STREAM_HOST = (() => {
     return window.location.host;
   }
 })();
-import type { CallRecordSummary, SupervisorEvent } from '../../types/supervisor';
 
 interface LiveCall {
   callSid: string;
@@ -44,19 +51,39 @@ interface LiveCall {
 
 interface LiveAlert {
   id: string;
+  callSid: string;
   agentName?: string;
   phrase: string;
   rule: string;
   suggestion?: string;
   ts: number;
+  /** Rebuilt from persisted tags on load (vs. arrived live this session). */
+  historic?: boolean;
 }
 
-const TAG_TONES: Record<string, string> = {
-  compliance: 'text-red-600 bg-red-50 dark:bg-red-900/20 dark:text-red-400',
-  entity: 'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400',
-  info: 'text-purple-600 bg-purple-50 dark:bg-purple-900/20 dark:text-purple-400',
-  note: 'text-gray-600 bg-gray-100 dark:bg-gray-700/40 dark:text-gray-300',
-};
+const MAX_ALERTS = 30;
+
+/** Rebuild alert entries from the persisted compliance tags already present
+ *  in the fetched call log, so the feed survives navigation/reload. */
+function alertsFromRecords(calls: CallRecordSummary[]): LiveAlert[] {
+  const out: LiveAlert[] = [];
+  for (const c of calls) {
+    for (const t of c.tags ?? []) {
+      if (t.kind !== 'compliance') continue;
+      out.push({
+        id: `${c.callSid}-${t.ts}`,
+        callSid: c.callSid,
+        agentName: c.agentName ?? c.userId,
+        phrase: String(t.data.phrase ?? ''),
+        rule: String(t.data.rule ?? ''),
+        suggestion: t.data.suggestion ? String(t.data.suggestion) : undefined,
+        ts: t.ts,
+        historic: true,
+      });
+    }
+  }
+  return out.sort((a, b) => b.ts - a.ts).slice(0, MAX_ALERTS);
+}
 
 export function Supervision() {
   const { user } = useAuth();
@@ -66,37 +93,79 @@ export function Supervision() {
   const [liveCalls, setLiveCalls] = useState<LiveCall[]>([]);
   const [alerts, setAlerts] = useState<LiveAlert[]>([]);
   const [streamUp, setStreamUp] = useState(false);
+  const [streamDenied, setStreamDenied] = useState(false);
   const [calls, setCalls] = useState<CallRecordSummary[]>([]);
   const [flaggedOnly, setFlaggedOnly] = useState(false);
+  const [agentFilter, setAgentFilter] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [now, setNow] = useState(() => Date.now());
+
+  // Last-write-wins guard: only the newest in-flight list request may land.
+  const fetchSeq = useRef(0);
+  const hydratedAlerts = useRef(false);
 
   // Loading state flips only inside async continuations (lint: no sync
   // setState in effects); the refresh button sets it in its own handler.
   const refreshLog = useCallback(() => {
     if (!userId) return;
-    listCalls({ userId, flaggedOnly, limit: 50 })
-      .then(setCalls)
-      .catch(() => setCalls([]))
-      .finally(() => setIsLoading(false));
-  }, [userId, flaggedOnly]);
+    const seq = ++fetchSeq.current;
+    listCalls({
+      userId,
+      flaggedOnly,
+      ...(agentFilter ? { agentUserId: agentFilter } : {}),
+      limit: 50,
+    })
+      .then((result) => {
+        if (seq !== fetchSeq.current) return; // stale response
+        setCalls(result);
+        // One-time hydration of the alert feed from persisted tags (only for
+        // the unfiltered view so the feed isn't narrowed by filters).
+        if (!hydratedAlerts.current && !flaggedOnly && !agentFilter) {
+          hydratedAlerts.current = true;
+          setAlerts((prev) => {
+            const merged = [...prev, ...alertsFromRecords(result)];
+            const seen = new Set<string>();
+            return merged
+              .filter((a) => (seen.has(a.id) ? false : (seen.add(a.id), true)))
+              .sort((a, b) => b.ts - a.ts)
+              .slice(0, MAX_ALERTS);
+          });
+        }
+      })
+      .catch(() => {
+        if (seq === fetchSeq.current) setCalls([]);
+      })
+      .finally(() => {
+        if (seq === fetchSeq.current) setIsLoading(false);
+      });
+  }, [userId, flaggedOnly, agentFilter]);
 
   useEffect(() => {
     refreshLog();
   }, [refreshLog]);
 
-  // Live SSE with reconnect + backoff.
+  // 1s ticker for live-call durations — runs only while calls are active.
+  useEffect(() => {
+    if (liveCalls.length === 0) return undefined;
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, [liveCalls.length]);
+
+  // Live SSE with real exponential backoff + honest streamUp.
   const refreshRef = useRef(refreshLog);
   useEffect(() => {
     refreshRef.current = refreshLog;
   }, [refreshLog]);
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userId) return undefined;
     const ac = new AbortController();
-    let backoff = 1000;
     let stopped = false;
+    let delay = 1000;
 
     const onEvent = (event: SupervisorEvent): void => {
+      // First event = genuinely connected: reset the backoff ladder.
+      delay = 1000;
       if (event.type === 'snapshot') {
         setLiveCalls(event.calls.map((c) => ({ ...c })));
         return;
@@ -104,7 +173,12 @@ export function Supervision() {
       if (event.type === 'call_started') {
         setLiveCalls((prev) => [
           ...prev.filter((c) => c.callSid !== event.callSid),
-          { callSid: event.callSid, agentName: event.agentName, direction: event.direction, startedAt: event.startedAt },
+          {
+            callSid: event.callSid,
+            agentName: event.agentName,
+            direction: event.direction,
+            startedAt: event.startedAt,
+          },
         ]);
         return;
       }
@@ -114,17 +188,20 @@ export function Supervision() {
         return;
       }
       if (event.type === 'compliance_flag') {
-        setAlerts((prev) => [
-          {
-            id: `${event.callSid}-${event.ts}`,
-            agentName: event.agentName,
-            phrase: event.phrase,
-            rule: event.rule,
-            suggestion: event.suggestion,
-            ts: event.ts,
-          },
-          ...prev,
-        ].slice(0, 30));
+        setAlerts((prev) =>
+          [
+            {
+              id: `${event.callSid}-${event.ts}`,
+              callSid: event.callSid,
+              agentName: event.agentName,
+              phrase: event.phrase,
+              rule: event.rule,
+              suggestion: event.suggestion,
+              ts: event.ts,
+            },
+            ...prev,
+          ].slice(0, MAX_ALERTS),
+        );
         return;
       }
       if (event.type === 'qa_completed') {
@@ -132,23 +209,38 @@ export function Supervision() {
       }
     };
 
-    const connect = (): void => {
+    const scheduleReconnect = (): void => {
       if (stopped) return;
-      openSupervisorStream({ userId, onEvent, signal: ac.signal })
-        .then(() => {
-          setStreamUp(false);
-          if (!stopped) setTimeout(connect, backoff);
-        })
-        .catch(() => {
-          setStreamUp(false);
-          if (!stopped) {
-            setTimeout(connect, backoff);
-            backoff = Math.min(backoff * 2, 15000);
-          }
-        });
-      setStreamUp(true);
-      backoff = 1000;
+      const wait = delay;
+      delay = Math.min(delay * 2, 15000);
+      setTimeout(connect, wait);
     };
+
+    function connect(): void {
+      if (stopped) return;
+      openSupervisorStream({
+        userId,
+        onEvent,
+        onOpen: () => {
+          if (!stopped) setStreamUp(true);
+        },
+        signal: ac.signal,
+      })
+        .then(() => {
+          // Clean close — reconnect on the current ladder step.
+          setStreamUp(false);
+          scheduleReconnect();
+        })
+        .catch((err: unknown) => {
+          setStreamUp(false);
+          if (stopped || (err as { name?: string })?.name === 'AbortError') return;
+          if (err instanceof SupervisorStreamAuthError) {
+            setStreamDenied(true); // terminal — no retry loop
+            return;
+          }
+          scheduleReconnect();
+        });
+    }
     connect();
 
     return () => {
@@ -163,93 +255,120 @@ export function Supervision() {
     return counts;
   };
 
+  /** Distinct agents present in the current log for the filter dropdown. */
+  const agentOptions = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const c of calls) {
+      if (c.userId) map.set(c.userId, c.agentName ?? c.userId);
+    }
+    return [...map.entries()].sort((a, b) => a[1].localeCompare(b[1]));
+  }, [calls]);
+
   return (
     <div className="space-y-6">
       {/* LIVE section */}
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
         <div className="flex items-center gap-2 mb-4">
-          <Radio className={`w-5 h-5 ${streamUp ? 'text-green-500 animate-pulse' : 'text-gray-400'}`} />
+          <Radio
+            className={`w-5 h-5 ${streamUp ? 'text-green-500 animate-pulse' : 'text-gray-400'}`}
+          />
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Live</h2>
           <span className="text-sm text-gray-500 dark:text-gray-400">
-            {streamUp ? 'streaming' : 'reconnecting…'}
+            {streamDenied ? 'not authorized' : streamUp ? 'streaming' : 'reconnecting…'}
           </span>
           <span className="ml-auto text-[11px] font-mono px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400">
             {STREAM_HOST}
           </span>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-4">
-          {/* Active calls */}
-          <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">
-              Active calls ({liveCalls.length})
-            </h3>
-            {liveCalls.length === 0 ? (
-              <p className="text-sm text-gray-400 dark:text-gray-500 italic">No calls in progress.</p>
-            ) : (
-              <div className="space-y-2">
-                {liveCalls.map((c) => (
-                  <div
-                    key={c.callSid}
-                    className="flex items-center gap-3 p-3 rounded-lg border border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-900/10"
-                  >
-                    <PhoneCall className="w-4 h-4 text-green-600 dark:text-green-400" />
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                        {c.agentName ?? 'Unknown agent'}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {c.direction} · started {new Date(c.startedAt).toLocaleTimeString()}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+        {streamDenied ? (
+          <div className="flex items-center gap-2 p-4 rounded-lg border border-red-200 dark:border-red-800 bg-red-50/60 dark:bg-red-900/15 text-sm text-red-700 dark:text-red-300">
+            <ShieldX className="w-4 h-4 shrink-0" />
+            Your account is not authorized for the supervisor stream.
           </div>
+        ) : (
+          <div className="grid md:grid-cols-2 gap-4">
+            {/* Active calls */}
+            <div>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">
+                Active calls ({liveCalls.length})
+              </h3>
+              {liveCalls.length === 0 ? (
+                <p className="text-sm text-gray-400 dark:text-gray-500 italic">
+                  No calls in progress.
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  {liveCalls.map((c) => (
+                    <div
+                      key={c.callSid}
+                      className="flex items-center gap-3 p-3 rounded-lg border border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-900/10"
+                      title={`started ${new Date(c.startedAt).toLocaleTimeString()}`}
+                    >
+                      <PhoneCall className="w-4 h-4 text-green-600 dark:text-green-400" />
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                          {c.agentName ?? 'Unknown agent'}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {c.direction} ·{' '}
+                          <span className="font-mono">{formatElapsed(c.startedAt, now)}</span>
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
-          {/* Compliance alert feed */}
-          <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">
-              Compliance alerts
-            </h3>
-            {alerts.length === 0 ? (
-              <p className="text-sm text-gray-400 dark:text-gray-500 italic">
-                No live compliance flags.
-              </p>
-            ) : (
-              <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
-                {alerts.map((a) => (
-                  <div
-                    key={a.id}
-                    className="p-3 rounded-lg border border-red-200 dark:border-red-800 bg-red-50/60 dark:bg-red-900/15"
-                  >
-                    <div className="flex items-center gap-2">
-                      <ShieldAlert className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0" />
-                      <span className="text-sm font-semibold text-gray-900 dark:text-white truncate">
-                        {a.agentName ?? 'Agent'}: “{a.phrase}”
-                      </span>
-                      <span className="ml-auto text-[11px] text-gray-500 shrink-0">
-                        {new Date(a.ts).toLocaleTimeString()}
-                      </span>
-                    </div>
-                    <p className="text-xs text-red-700 dark:text-red-300 mt-1">{a.rule}</p>
-                    {a.suggestion && (
-                      <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
-                        Suggest: {a.suggestion}
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
+            {/* Compliance alert feed */}
+            <div>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">
+                Compliance alerts
+              </h3>
+              {alerts.length === 0 ? (
+                <p className="text-sm text-gray-400 dark:text-gray-500 italic">
+                  No compliance flags yet.
+                </p>
+              ) : (
+                <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+                  {alerts.map((a) => (
+                    <button
+                      key={a.id}
+                      onClick={() => navigate(`/admin/supervision/${encodeURIComponent(a.callSid)}`)}
+                      className={`w-full text-left p-3 rounded-lg border transition-colors cursor-pointer ${
+                        a.historic
+                          ? 'border-red-100 dark:border-red-900/60 bg-red-50/30 dark:bg-red-900/5 hover:bg-red-50/60 dark:hover:bg-red-900/15'
+                          : 'border-red-200 dark:border-red-800 bg-red-50/60 dark:bg-red-900/15 hover:bg-red-100/70 dark:hover:bg-red-900/25'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <ShieldAlert className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0" />
+                        <span className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                          {a.agentName ?? 'Agent'}: “{a.phrase}”
+                        </span>
+                        <span className="ml-auto text-[11px] text-gray-500 shrink-0">
+                          {formatWhen(a.ts)}
+                        </span>
+                      </div>
+                      <p className="text-xs text-red-700 dark:text-red-300 mt-1">{a.rule}</p>
+                      {a.suggestion && (
+                        <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
+                          Suggest: {a.suggestion}
+                        </p>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Call Log */}
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-        <div className="flex items-center gap-3 mb-4">
+        <div className="flex items-center gap-3 mb-4 flex-wrap">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Call log</h2>
           <label className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400 cursor-pointer">
             <input
@@ -260,6 +379,18 @@ export function Supervision() {
             />
             Flagged only
           </label>
+          <select
+            value={agentFilter}
+            onChange={(e) => setAgentFilter(e.target.value)}
+            className="text-sm px-2 py-1 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+          >
+            <option value="">All agents</option>
+            {agentOptions.map(([id, name]) => (
+              <option key={id} value={id}>
+                {name}
+              </option>
+            ))}
+          </select>
           <button
             onClick={() => {
               setIsLoading(true);
@@ -289,10 +420,10 @@ export function Supervision() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                        {new Date(c.startedAt).toLocaleString()}
+                        {formatWhen(c.startedAt)}
                       </span>
                       <span className="text-xs text-gray-500">
-                        {c.userId ?? '—'} · {c.direction} · {c.durationSec}s
+                        {c.agentName ?? c.userId ?? '—'} · {c.direction} · {c.durationSec}s
                       </span>
                       {c.flagged && (
                         <span className="inline-flex items-center gap-1 text-[11px] font-bold text-red-600 dark:text-red-400">
@@ -304,7 +435,7 @@ export function Supervision() {
                       {Object.entries(counts).map(([kind, n]) => (
                         <span
                           key={kind}
-                          className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${TAG_TONES[kind] ?? TAG_TONES.note}`}
+                          className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${TAG_CHIP_TONES[kind] ?? TAG_CHIP_TONES.note}`}
                         >
                           {kind} · {n}
                         </span>
