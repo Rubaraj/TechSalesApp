@@ -74,7 +74,10 @@ Write-Host '  [OK] uploaded tarball to Pi:/tmp'
 
 $sess = New-SSHSession -ComputerName $piHost -Credential $cred -AcceptKey -ConnectionTimeout 15
 function Invoke-Pi([string]$cmd, [int]$timeout = 600) {
-  $res = Invoke-SSHCommand -SessionId $sess.SessionId -Command $cmd -TimeOut $timeout
+  # Non-tty SSH exec channel: sudo must read the password from stdin. Rewrite
+  # each `sudo ` occurrence to a stdin-fed variant (never echoed to output).
+  $wired = $cmd -replace 'sudo ', "echo '$piPassword' | sudo -S -p '' "
+  $res = Invoke-SSHCommand -SessionId $sess.SessionId -Command $wired -TimeOut $timeout
   if ($res.ExitStatus -ne 0) {
     throw "Pi command failed (exit $($res.ExitStatus)): $cmd`n$($res.Output -join "`n")`n$($res.Error -join "`n")"
   }
