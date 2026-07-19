@@ -112,6 +112,7 @@ type Action =
   | { kind: 'REGISTER_PAGE'; registration: PageRegistration }
   | { kind: 'UNREGISTER_PAGE' }
   | { kind: 'APPEND_ACTIVITY'; entry: AiActivityEntry }
+  | { kind: 'SET_ANALYSIS_WARNING'; warning: string | null }
   | { kind: 'HYDRATE'; state: CallState };
 
 function reducer(state: CallState, action: Action): CallState {
@@ -269,6 +270,11 @@ function reducer(state: CallState, action: Action): CallState {
           : merged;
       return { ...state, aiActivityLog: trimmed };
     }
+    case 'SET_ANALYSIS_WARNING':
+      // Never let a stale warning replace a fresh transcript: once chunks
+      // have arrived, the pipe is proven and the warning is noise.
+      if (action.warning && state.transcript.length > 0) return state;
+      return { ...state, analysisWarning: action.warning };
     case 'HYDRATE':
       return action.state;
     default:
@@ -323,6 +329,9 @@ export interface CallContextValue {
   // Phase 3b.1 — append an entry to the AI activity feed surfaced in the
   // CallPanel's bottom half. Producer is `useCallAnalysis`.
   appendActivity: (entry: AiActivityEntry) => void;
+  /** Surface (or clear) a live-analysis problem — e.g. the analyze stream
+   *  failed, or this backend isn't hosting the call's media. */
+  setAnalysisWarning: (warning: string | null) => void;
 }
 
 const CallContext = createContext<CallContextValue | null>(null);
@@ -582,6 +591,10 @@ export function CallProvider({ children }: { children: ReactNode }): React.JSX.E
     (entry: AiActivityEntry) => dispatch({ kind: 'APPEND_ACTIVITY', entry }),
     [],
   );
+  const setAnalysisWarning = useCallback(
+    (warning: string | null) => dispatch({ kind: 'SET_ANALYSIS_WARNING', warning }),
+    [],
+  );
 
   const value = useMemo<CallContextValue>(
     () => ({
@@ -609,6 +622,7 @@ export function CallProvider({ children }: { children: ReactNode }): React.JSX.E
       registerPage,
       unregisterPage,
       appendActivity,
+      setAnalysisWarning,
     }),
     [
       state,
@@ -635,6 +649,7 @@ export function CallProvider({ children }: { children: ReactNode }): React.JSX.E
       registerPage,
       unregisterPage,
       appendActivity,
+      setAnalysisWarning,
     ],
   );
 

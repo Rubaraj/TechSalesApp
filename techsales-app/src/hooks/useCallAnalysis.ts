@@ -122,9 +122,11 @@ export function useCallAnalysis(): void {
     enqueueActions,
     mergeEntities,
     appendActivity,
+    setAnalysisWarning,
   } = useCallContext();
   const callSid = state.callSid;
   const abortRef = useRef<AbortController | null>(null);
+  const warnedRef = useRef(false);
 
   useEffect(() => {
     // Only subscribe when we have a Twilio call SID and are in Twilio mode.
@@ -137,6 +139,23 @@ export function useCallAnalysis(): void {
       if (event.type === 'transcript') {
         const chunk: TranscriptChunk = { ...event.chunk };
         appendTranscript(chunk);
+        if (warnedRef.current) {
+          // Transcript is flowing after all — retract the warning.
+          warnedRef.current = false;
+          setAnalysisWarning(null);
+        }
+        return;
+      }
+
+      if (event.type === 'call_status' && event.status === 'not_hosted') {
+        // The backend we're connected to isn't receiving this call's media
+        // (in-memory callBus is per-process). Without this, the panel would
+        // sit on "Listening…" forever with no explanation.
+        warnedRef.current = true;
+        setAnalysisWarning(
+          'Live analysis unavailable — this backend is not receiving the call audio. ' +
+            'Point VITE_API_BASE_URL at the production API (api.rubarajan.dev) and reload.',
+        );
         return;
       }
 
@@ -210,6 +229,11 @@ export function useCallAnalysis(): void {
       .catch((err: unknown) => {
         if ((err as { name?: string })?.name === 'AbortError') return;
         console.error('Call analyze stream errored:', err);
+        // Surface instead of failing silently (501 disabled, 429 caps, …).
+        warnedRef.current = true;
+        setAnalysisWarning(
+          `Live analysis stream failed: ${err instanceof Error ? err.message : String(err)}`,
+        );
       });
 
     return () => {
@@ -225,5 +249,6 @@ export function useCallAnalysis(): void {
     enqueueActions,
     mergeEntities,
     appendActivity,
+    setAnalysisWarning,
   ]);
 }

@@ -56,6 +56,8 @@ export interface UseTwilioCallResult {
 interface CallLike {
   on: (event: string, handler: (...args: unknown[]) => void) => void;
   parameters?: { CallSid?: string; From?: string };
+  /** Custom TwiML <Parameter>s — carries parentCallSid on inbound calls. */
+  customParameters?: Map<string, string>;
   accept: () => void;
   reject: () => void;
 }
@@ -86,7 +88,12 @@ export function useTwilioCall(): UseTwilioCallResult {
     (call: CallLike): void => {
       call.on('ringing', () => setCallStatus('ringing'));
       call.on('accept', () => {
-        const sid = call.parameters?.CallSid;
+        // Inbound: media/analysis run on the PARENT (PSTN) leg, whose sid the
+        // backend passes via the <Client><Parameter parentCallSid>. Our own
+        // child-leg CallSid would never match the transcript stream. Outbound
+        // has no custom parameter and keeps the SDK's own CallSid.
+        const sid =
+          call.customParameters?.get('parentCallSid') ?? call.parameters?.CallSid;
         if (sid) setCallSid(sid);
         setCallStatus('connected');
       });

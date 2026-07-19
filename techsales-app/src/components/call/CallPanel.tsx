@@ -289,7 +289,12 @@ export function CallPanel() {
           <p className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1">
             Live Transcript
           </p>
-          {state.transcript.length === 0 && (
+          {state.analysisWarning && (
+            <div className="rounded-lg border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20 px-2.5 py-2 text-xs text-amber-800 dark:text-amber-300">
+              {state.analysisWarning}
+            </div>
+          )}
+          {state.transcript.length === 0 && !state.analysisWarning && (
             <p className="text-xs italic text-gray-500 dark:text-gray-400">
               {isListening
                 ? 'Listening… start speaking and the transcript will appear here.'

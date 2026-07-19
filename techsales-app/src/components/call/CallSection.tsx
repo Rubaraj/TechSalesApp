@@ -254,7 +254,12 @@ export function CallSection(): React.JSX.Element | null {
           >
             Live Transcript
           </p>
-          {state.transcript.length === 0 && (
+          {state.analysisWarning && (
+            <div className="rounded-lg border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20 px-2.5 py-2 text-xs text-amber-800 dark:text-amber-300">
+              {state.analysisWarning}
+            </div>
+          )}
+          {state.transcript.length === 0 && !state.analysisWarning && (
             <p
               className="text-xs italic"
               style={{ color: 'var(--color-atlas-fg-muted)' }}

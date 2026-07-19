@@ -178,7 +178,14 @@ export function twilioIncomingWebhook(req: Request, res: Response): void {
     `</Stream>` +
     `</Start>` +
     `<Dial timeout="20" action="${escapeXml(actionUrl)}" method="POST">` +
-    `<Client>${escapeXml(clientIdentity)}</Client>` +
+    // Expanded <Client> form so the browser leg receives the PARENT (PSTN)
+    // CallSid as a custom parameter. The media stream publishes transcripts
+    // under the parent sid; without this bridge the FE would subscribe with
+    // its own child-leg sid and never match (inbound-only quirk).
+    `<Client>` +
+    `<Identity>${escapeXml(clientIdentity)}</Identity>` +
+    `<Parameter name="parentCallSid" value="${escapeXml(callSid)}"/>` +
+    `</Client>` +
     `</Dial>` +
     `</Response>`;
 

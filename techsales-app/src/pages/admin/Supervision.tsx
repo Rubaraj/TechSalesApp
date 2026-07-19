@@ -21,6 +21,18 @@ import {
   listCalls,
   openSupervisorStream,
 } from '../../services/supervisorService';
+import { API_BASE } from '../../api/apiBase';
+
+/** Which backend this live feed is actually watching — events only flow from
+ *  the process that hosts the calls (the Pi in production). Making the host
+ *  visible turns a silent wrong-backend session into an obvious one. */
+const STREAM_HOST = (() => {
+  try {
+    return new URL(API_BASE, window.location.origin).host;
+  } catch {
+    return window.location.host;
+  }
+})();
 import type { CallRecordSummary, SupervisorEvent } from '../../types/supervisor';
 
 interface LiveCall {
@@ -160,6 +172,9 @@ export function Supervision() {
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Live</h2>
           <span className="text-sm text-gray-500 dark:text-gray-400">
             {streamUp ? 'streaming' : 'reconnecting…'}
+          </span>
+          <span className="ml-auto text-[11px] font-mono px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400">
+            {STREAM_HOST}
           </span>
         </div>
 

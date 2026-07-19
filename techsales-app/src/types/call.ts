@@ -176,7 +176,7 @@ export interface ComplianceFlag {
 export type CallStreamEvent =
   | { type: 'open'; callSid: string }
   | { type: 'transcript'; chunk: TranscriptChunk }
-  | { type: 'call_status'; status: 'connected' | 'ended' }
+  | { type: 'call_status'; status: 'connected' | 'ended' | 'not_hosted' }
   | { type: 'actions'; actions: AiAction[] }
   | { type: 'entities'; entities: Partial<ExtractedEntities> }
   | { type: 'tool_start'; tool: string; input: unknown }
@@ -250,6 +250,10 @@ export interface CallState {
   /** Phase 3b.1 — chronological feed of every AI action, surfaced in the
    *  CallPanel's bottom 50%. Cap at 100; reset on END_CALL. */
   aiActivityLog: AiActivityEntry[];
+  /** Why live analysis isn't flowing (analyze-SSE failed, or this backend
+   *  isn't hosting the call's media — split-brain). Null when healthy.
+   *  Rendered as an amber banner above the transcript; reset on END_CALL. */
+  analysisWarning: string | null;
 }
 
 export const initialCallState = (): CallState => ({
@@ -274,4 +278,5 @@ export const initialCallState = (): CallState => ({
   complianceFlags: [],
   infoCards: [],
   aiActivityLog: [],
+  analysisWarning: null,
 });

@@ -12,7 +12,7 @@
 import type { Request, Response } from 'express';
 import type { ServiceResponse } from '../repositories/types.js';
 import { mintVoiceAccessToken } from '../services/twilioService.js';
-import { subscribe, type CallBusEvent } from '../services/callBus.js';
+import { subscribe, getActiveCalls, type CallBusEvent } from '../services/callBus.js';
 import { repos } from '../repositories/registry.js';
 import type { CallStreamEvent } from '../ai/types/call.types.js';
 import { env } from '../config/env.js';
@@ -143,6 +143,20 @@ export async function getCallAnalyzeStream(req: Request, res: Response): Promise
   writeEvent(openEvent);
   const heartbeat = setInterval(writeHeartbeat, 15_000);
 
+  // Split-brain detection: transcripts flow only through THIS process's
+  // in-memory callBus. If the call isn't registered here after a grace
+  // window (media may land moments after the FE subscribes), tell the FE
+  // it's watching the wrong backend instead of leaving it on "Listening…"
+  // forever. Stream stays open — the call can still start here later.
+  const notHostedCheck = setTimeout(() => {
+    const hostedHere = getActiveCalls().some((c) => c.callSid === callSid);
+    if (!hostedHere) {
+      const warn: CallStreamEvent = { type: 'call_status', status: 'not_hosted' };
+      writeEvent(warn);
+      logger.warn({ callSid }, 'analyze SSE: call not hosted by this process');
+    }
+  }, 6_000);
+
   // Forward every callBus event for this call to the SSE wire. Translates
   // bus shape → wire shape (the bus has internal 'status' events; the wire
   // has 'call_status').
@@ -185,6 +199,7 @@ export async function getCallAnalyzeStream(req: Request, res: Response): Promise
 
   const cleanup = (): void => {
     clearInterval(heartbeat);
+    clearTimeout(notHostedCheck);
     unsubscribe();
     logger.debug({ callSid }, 'call analyze SSE closed');
   };

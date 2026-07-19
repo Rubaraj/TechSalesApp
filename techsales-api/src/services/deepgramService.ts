@@ -47,6 +47,12 @@ export function openDeepgramStream(input: OpenDeepgramStreamInput): DeepgramStre
 
   let socket: Awaited<ReturnType<typeof dg.listen.v1.connect>> | null = null;
   let closed = false;
+  // `socket` being set only means the connect PROMISE resolved — the
+  // underlying WS may still be CONNECTING (sendMedia throws "Socket is not
+  // open" and the frame is lost). `opened` flips only on the `open` event;
+  // send() buffers until then so the first words of a call aren't dropped.
+  let opened = false;
+  let overflowWarned = false;
   let pending: Buffer[] = [];
   let chunkCounter = 0;
 
@@ -146,6 +152,7 @@ export function openDeepgramStream(input: OpenDeepgramStreamInput): DeepgramStre
           }
         }
         pending = [];
+        opened = true;
       });
       s.connect();
     })
@@ -159,9 +166,20 @@ export function openDeepgramStream(input: OpenDeepgramStreamInput): DeepgramStre
   return {
     send(buffer: Buffer) {
       if (closed) return;
-      if (!socket) {
-        // Buffer until socket connects. Cap to ~500 frames (~10s of audio at 50fps).
-        if (pending.length < 500) pending.push(buffer);
+      if (!socket || !opened) {
+        // Buffer until the WS is actually OPEN (not just promise-resolved).
+        // Cap ~500 frames (~10s of audio at 50fps), drop-oldest beyond.
+        if (pending.length >= 500) {
+          if (!overflowWarned) {
+            overflowWarned = true;
+            logger.warn(
+              { prefix: input.chunkIdPrefix },
+              'Deepgram pending buffer overflow — dropping oldest frames',
+            );
+          }
+          pending.shift();
+        }
+        pending.push(buffer);
         return;
       }
       try {

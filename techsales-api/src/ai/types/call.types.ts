@@ -104,7 +104,7 @@ export const emptyExtractedEntities = (): ExtractedEntities => ({
 export type CallStreamEvent =
   | { type: 'open'; callSid: string }
   | { type: 'transcript'; chunk: TranscriptChunk }
-  | { type: 'call_status'; status: 'connected' | 'ended' }
+  | { type: 'call_status'; status: 'connected' | 'ended' | 'not_hosted' }
   | { type: 'actions'; actions: AiAction[] }
   | { type: 'entities'; entities: Partial<ExtractedEntities> }
   | { type: 'error'; error: string };
