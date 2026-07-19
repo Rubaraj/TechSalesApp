@@ -133,8 +133,9 @@ if (-not ($accountSid -and $authToken -and $appSid)) {
 if ($RestartApi) {
   $listen = Get-NetTCPConnection -LocalPort 4000 -State Listen -ErrorAction SilentlyContinue
   if ($listen) {
-    foreach ($pid in ($listen.OwningProcess | Sort-Object -Unique)) {
-      try { Stop-Process -Id $pid -Force -ErrorAction Stop; Write-Host "  [OK] killed API PID $pid" } catch { }
+    # $pid is a read-only automatic variable in PowerShell; use $procId
+    foreach ($procId in ($listen.OwningProcess | Sort-Object -Unique)) {
+      try { Stop-Process -Id $procId -Force -ErrorAction Stop; Write-Host "  [OK] killed API PID $procId" } catch { }
     }
   }
   $apiDir = Join-Path $repoRoot 'techsales-api'
