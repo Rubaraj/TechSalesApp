@@ -16,6 +16,8 @@
  *
  * Default for both is the optimistic case (`'api'` / `'mongo'`). Cleared on logout.
  */
+import { API_BASE } from './apiBase';
+
 export type AppMode = 'api' | 'local';
 export type DataSource = 'mongo' | 'json' | 'databricks';
 /** Active LLM provider on the backend — mirrors `AI_LLM_PROVIDER`. Header badge
@@ -192,7 +194,7 @@ interface HealthResponse {
  */
 export async function probeBackendMode(): Promise<DataAiState> {
   try {
-    const res = await fetch('/api/health');
+    const res = await fetch(`${API_BASE}/health`);
     if (!res.ok)
       return { dataSource: null, aiEnabled: false, aiProvider: null, twilioEnabled: false };
     const body = (await res.json()) as HealthResponse;

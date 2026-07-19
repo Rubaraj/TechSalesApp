@@ -1,7 +1,7 @@
 import express, { type Express } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import { env, corsOrigins } from './config/env.js';
+import { env, corsOriginSetting } from './config/env.js';
 import { logger } from './config/logger.js';
 import { connectMongo } from './config/mongo.js';
 import { initRegistry } from './repositories/registry.js';
@@ -30,10 +30,15 @@ async function main(): Promise<void> {
   // 4. Build the Express app.
   const app: Express = express();
   app.disable('x-powered-by');
+  // Behind the Pi gateway (cloudflared → Caddy → Express) both proxy hops are
+  // loopback; without this, express-rate-limit rejects X-Forwarded-For and
+  // every client shares one 127.0.0.1 rate bucket. 'loopback' (not 1) because
+  // there are TWO local hops.
+  app.set('trust proxy', 'loopback');
   app.use(helmet());
   app.use(
     cors({
-      origin: corsOrigins.length === 0 ? false : corsOrigins,
+      origin: corsOriginSetting,
       credentials: false,
     }),
   );

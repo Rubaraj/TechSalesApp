@@ -18,6 +18,7 @@ import {
   type DataSource,
   type AiProvider,
 } from '../api/mode';
+import { API_BASE } from '../api/apiBase';
 
 interface AuthContextType {
   user: User | null;
@@ -138,7 +139,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let apiUser: User | null = null;
     let apiAttempted = true;
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch(`${API_BASE}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
@@ -209,7 +210,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let apiMember: Member | null = null;
     let apiAttempted = true;
     try {
-      const res = await fetch('/api/auth/member-login', {
+      const res = await fetch(`${API_BASE}/auth/member-login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ policyNumber, dateOfBirth }),

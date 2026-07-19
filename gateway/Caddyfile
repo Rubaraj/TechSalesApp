@@ -1,0 +1,28 @@
+# api.rubarajan.dev — multi-project API gateway (runs on the Pi).
+#
+# cloudflared (named tunnel) forwards api.rubarajan.dev -> localhost:8080.
+# Caddy routes one path prefix per project and STRIPS it (handle_path), so
+# each backend sees its routes unprefixed and needs zero code changes.
+# WebSocket upgrades and SSE streaming are proxied natively.
+#
+# Adding a project: one handle_path block + an entry in index.html.
+# Deploy: sudo cp Caddyfile /etc/caddy/Caddyfile && sudo systemctl reload caddy
+:8080 {
+	# TechSalesApp backend (Express on :4000).
+	# Public: https://api.rubarajan.dev/techsales/api/... and
+	#         wss://api.rubarajan.dev/techsales/ws/twilio-media
+	handle_path /techsales/* {
+		reverse_proxy 127.0.0.1:4000
+	}
+
+	# future projects:
+	# handle_path /myproject/* {
+	# 	reverse_proxy 127.0.0.1:PORT
+	# }
+
+	# Root: static project directory page.
+	handle {
+		root * /srv/api-gateway
+		file_server
+	}
+}

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>api.rubarajan.dev</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body {
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+      max-width: 640px; margin: 8vh auto; padding: 0 1.25rem;
+      line-height: 1.6;
+    }
+    h1 { font-size: 1.4rem; margin-bottom: 0.25rem; }
+    p.sub { opacity: 0.65; margin-top: 0; }
+    ul { list-style: none; padding: 0; }
+    li {
+      border: 1px solid rgba(128,128,128,0.35); border-radius: 10px;
+      padding: 0.9rem 1.1rem; margin: 0.75rem 0;
+    }
+    li b { font-size: 1.05rem; }
+    li p { margin: 0.25rem 0 0.5rem; opacity: 0.75; font-size: 0.92rem; }
+    a { color: #e8590c; text-decoration: none; margin-right: 1rem; font-size: 0.9rem; }
+    a:hover { text-decoration: underline; }
+    footer { margin-top: 3rem; font-size: 0.8rem; opacity: 0.5; }
+  </style>
+</head>
+<body>
+  <h1>api.rubarajan.dev</h1>
+  <p class="sub">Personal API gateway — one path prefix per project.</p>
+  <ul>
+    <li>
+      <b>TechSales API</b>
+      <p>Medicare sales POC — leads, plans, AI copilot (Atlas), call QA &amp; supervision.</p>
+      <a href="/techsales/api/health">health</a>
+      <span style="opacity:0.5;font-size:0.85rem">base: /techsales/api</span>
+    </li>
+    <!-- next project: copy the <li> above, add a handle_path block in the Caddyfile -->
+  </ul>
+  <footer>Served from the home lab &middot; Cloudflare Tunnel &middot; Caddy</footer>
+</body>
+</html>

@@ -3,7 +3,7 @@
  * adapted to Atlas's expanded event union (proposal_created, navigate).
  */
 
-const BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? '/api';
+import { API_BASE as BASE } from '../api/apiBase';
 
 export type AtlasStreamEvent =
   | { type: 'token'; content: string }

@@ -8,8 +8,7 @@ import type {
   QaReview,
   SupervisorEvent,
 } from '../types/supervisor';
-
-const BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? '/api';
+import { API_BASE as BASE } from '../api/apiBase';
 
 export async function listCalls(opts: {
   userId: string;

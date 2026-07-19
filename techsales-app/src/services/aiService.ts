@@ -24,8 +24,7 @@ import type {
   ChatStreamEvent,
 } from '../types/ai';
 import { recommendationCache } from './recommendationCache';
-
-const BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? '/api';
+import { API_BASE as BASE } from '../api/apiBase';
 
 export interface RecommendOptions {
   userId?: string;

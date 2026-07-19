@@ -51,6 +51,7 @@ function newActionId(): string {
 import { initialCallState } from '../types/call';
 import { useAuth } from './AuthContext';
 import { addRecent } from '../services/recentCalls';
+import { API_BASE } from '../api/apiBase';
 
 const STORAGE_KEY_PREFIX = 'techsales:callState';
 const MAX_PERSISTED_TRANSCRIPT = 50;
@@ -681,7 +682,7 @@ export function CallProvider({ children }: { children: ReactNode }): React.JSX.E
           console.warn('[__techsalesDebug] no fake call — call startFakeCall() first');
           return null;
         }
-        const res = await fetch('/api/_debug/inject-transcript', {
+        const res = await fetch(`${API_BASE}/_debug/inject-transcript`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

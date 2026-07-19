@@ -8,8 +8,7 @@
  * don't have to be rewritten when streaming arrives.
  */
 import type { ServiceResponse } from '../services/baseService';
-
-const BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? '/api';
+import { API_BASE as BASE } from './apiBase';
 
 export async function aiPost<T>(path: string, body: unknown): Promise<ServiceResponse<T>> {
   const res = await fetch(`${BASE}/ai${normalizePath(path)}`, {

@@ -1,15 +1,15 @@
 import type { ServiceResponse } from '../services/baseService';
+import { API_BASE as BASE } from './apiBase';
 
 /**
  * Minimal HTTP client per plan §7.
  *
  * - Base URL is `/api` by default (Vite proxy handles routing in dev). Override
- *   via `VITE_API_BASE_URL` for non-proxy deployments.
+ *   via `VITE_API_BASE_URL` for non-proxy deployments (see api/apiBase.ts).
  * - No `Authorization` header — auth is out of scope (plan §6 "Auth — deliberately minimal").
  * - Returns the parsed JSON body verbatim. Network errors propagate as thrown
  *   `TypeError`s (the AuthContext catches them at login time to flip mode).
  */
-const BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? '/api';
 
 export async function api<T>(path: string, init?: RequestInit): Promise<ServiceResponse<T>> {
   const res = await fetch(`${BASE}${path}`, {

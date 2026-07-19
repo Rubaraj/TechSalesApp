@@ -188,6 +188,17 @@ export const corsOrigins = env.CORS_ORIGIN.split(',')
   .map((s) => s.trim())
   .filter(Boolean);
 
+/**
+ * cors() `origin` value. `CORS_ORIGIN=*` reflects any origin — safe here only
+ * because the API sets `credentials: false` and uses no cookies. Otherwise an
+ * explicit comma-separated allowlist; empty disables cross-origin entirely.
+ */
+export const corsOriginSetting: boolean | string[] = corsOrigins.includes('*')
+  ? true
+  : corsOrigins.length === 0
+    ? false
+    : corsOrigins;
+
 export type DataBackend = 'mongo' | 'json' | 'databricks';
 
 /**
