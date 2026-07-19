@@ -145,22 +145,26 @@ export async function getCallAnalyzeStream(req: Request, res: Response): Promise
 
   // Split-brain detection: transcripts flow only through THIS process's
   // in-memory callBus. If the call isn't registered here after a grace
-  // window (media may land moments after the FE subscribes), tell the FE
-  // it's watching the wrong backend instead of leaving it on "Listening…"
-  // forever. Stream stays open — the call can still start here later.
+  // window, tell the FE it's watching the wrong backend instead of leaving
+  // it on "Listening…" forever. On OUTBOUND calls the FE subscribes on SDK
+  // `accept`, which can beat Twilio's voice webhook + media WS by several
+  // seconds (observed 1-7s) — so the grace is generous AND any bus event
+  // for this call cancels the warning entirely.
+  let sawCallEvent = false;
   const notHostedCheck = setTimeout(() => {
     const hostedHere = getActiveCalls().some((c) => c.callSid === callSid);
-    if (!hostedHere) {
+    if (!sawCallEvent && !hostedHere) {
       const warn: CallStreamEvent = { type: 'call_status', status: 'not_hosted' };
       writeEvent(warn);
       logger.warn({ callSid }, 'analyze SSE: call not hosted by this process');
     }
-  }, 6_000);
+  }, 15_000);
 
   // Forward every callBus event for this call to the SSE wire. Translates
   // bus shape → wire shape (the bus has internal 'status' events; the wire
   // has 'call_status').
   const unsubscribe = subscribe(callSid, (busEvent: CallBusEvent) => {
+    sawCallEvent = true; // any event proves this process hosts the call
     if (busEvent.type === 'transcript') {
       const wireEvent: CallStreamEvent = { type: 'transcript', chunk: busEvent.chunk };
       writeEvent(wireEvent);

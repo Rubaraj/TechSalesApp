@@ -153,15 +153,22 @@ export function useCallAnalysis(): void {
         return;
       }
 
-      if (event.type === 'call_status' && event.status === 'not_hosted') {
-        // The backend we're connected to isn't receiving this call's media
-        // (in-memory callBus is per-process). Without this, the panel would
-        // sit on "Listening…" forever with no explanation.
-        warnedRef.current = true;
-        setAnalysisWarning(
-          'Live analysis unavailable — this backend is not receiving the call audio. ' +
-            'Point VITE_API_BASE_URL at the production API (api.rubarajan.dev) and reload.',
-        );
+      if (event.type === 'call_status') {
+        if (event.status === 'not_hosted') {
+          // The backend we're connected to isn't receiving this call's media
+          // (in-memory callBus is per-process). Without this, the panel would
+          // sit on "Listening…" forever with no explanation.
+          warnedRef.current = true;
+          setAnalysisWarning(
+            'Live analysis unavailable — this backend is not receiving the call audio. ' +
+              'Point VITE_API_BASE_URL at the production API (api.rubarajan.dev) and reload.',
+          );
+        } else if (event.status === 'connected' && warnedRef.current) {
+          // Media stream is live on this backend — retract any early warning
+          // (arrives before the first transcript chunk).
+          warnedRef.current = false;
+          setAnalysisWarning(null);
+        }
         return;
       }
 
