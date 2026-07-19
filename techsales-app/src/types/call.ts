@@ -278,6 +278,11 @@ export interface CallState {
    *  isn't hosting the call's media — split-brain). Null when healthy.
    *  Rendered as an amber banner above the transcript; reset on END_CALL. */
   analysisWarning: string | null;
+  /** Live intelligence — latest prospect emotion sample (header badge). */
+  prospectEmotion: { emotion: ProspectEmotion; confidence: number; ts: number } | null;
+  /** Live intelligence — coaching tips, newest first, cap 5. An 'ai' tip
+   *  replaces the newest 'rule' tip (richer version of the same trigger). */
+  coachingTips: CoachingTip[];
 }
 
 export const initialCallState = (): CallState => ({
@@ -303,4 +308,6 @@ export const initialCallState = (): CallState => ({
   infoCards: [],
   aiActivityLog: [],
   analysisWarning: null,
+  prospectEmotion: null,
+  coachingTips: [],
 });

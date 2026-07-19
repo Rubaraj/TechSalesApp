@@ -21,7 +21,11 @@ import {
   PanelRightClose,
   PhoneOff,
   AlertTriangle,
+  HeartPulse,
+  Lightbulb,
+  X,
 } from 'lucide-react';
+import type { ProspectEmotion } from '../../types/call';
 import { useCallContext } from '../../context/CallContext';
 import { useCallRuntime } from './CallRuntime';
 import { useCallAnalysis } from '../../hooks/useCallAnalysis';
@@ -45,8 +49,19 @@ function formatDuration(ms: number): string {
   return `${mm}:${ss}`;
 }
 
+/** Live intelligence — header badge tones per prospect emotion. */
+const EMOTION_TONES: Record<ProspectEmotion, string> = {
+  positive: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300',
+  neutral: 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300',
+  confused: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300',
+  frustrated: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300',
+  upset: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300',
+};
+
 export function CallPanel() {
-  const { state, togglePanel } = useCallContext();
+  const { state, togglePanel, dismissCoachingTip } = useCallContext();
+  // Newest non-dismissed coaching tip (reducer caps + orders newest-first).
+  const visibleCoachTip = state.coachingTips.find((t) => !t.dismissed) ?? null;
 
   const [now, setNow] = useState<number>(() => Date.now());
   useEffect(() => {
@@ -197,6 +212,16 @@ export function CallPanel() {
               </p>
             )}
           </div>
+          {/* Live intelligence — prospect emotion badge (LLM-sampled). */}
+          {callInProgress && state.prospectEmotion && (
+            <span
+              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide shrink-0 ${EMOTION_TONES[state.prospectEmotion.emotion]}`}
+              title={`Prospect sounds ${state.prospectEmotion.emotion} (${Math.round(state.prospectEmotion.confidence * 100)}% confidence)`}
+            >
+              <HeartPulse className="w-3 h-3" />
+              {state.prospectEmotion.emotion}
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-1 shrink-0">
           {state.callStatus === 'connected' && (
@@ -270,6 +295,35 @@ export function CallPanel() {
           {visibleComplianceFlags.map((flag) => (
             <ComplianceAlert key={flag.id} flag={flag} />
           ))}
+        </div>
+      )}
+
+      {/* Live intelligence — newest coaching tip, sticky below compliance.
+       *  'rule' tips are the instant canned suggestion; the richer 'ai' tip
+       *  replaces them when it lands (reducer handles the swap). */}
+      {!showDialer && !showIncomingRing && visibleCoachTip && (
+        <div
+          className="border-b border-violet-200 dark:border-violet-800/50 px-3 py-2 bg-violet-50/60 dark:bg-violet-900/10"
+          role="region"
+          aria-label="Coaching tip"
+        >
+          <div className="flex items-start gap-2">
+            <Lightbulb className="w-4 h-4 shrink-0 mt-0.5 text-violet-600 dark:text-violet-400" />
+            <div className="min-w-0 flex-1">
+              <p className="text-xs text-violet-900 dark:text-violet-200">{visibleCoachTip.tip}</p>
+              <p className="text-[10px] uppercase tracking-wider text-violet-500 dark:text-violet-400 mt-0.5">
+                Coach · {visibleCoachTip.focus}
+                {visibleCoachTip.source === 'rule' ? ' · from rule' : ''}
+              </p>
+            </div>
+            <button
+              onClick={() => dismissCoachingTip(visibleCoachTip.id)}
+              className="p-0.5 rounded hover:bg-violet-100 dark:hover:bg-violet-900/40 text-violet-400"
+              aria-label="Dismiss coaching tip"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
       )}
 

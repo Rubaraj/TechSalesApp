@@ -124,6 +124,8 @@ export function useCallAnalysis(): void {
     mergeEntities,
     appendActivity,
     setAnalysisWarning,
+    setProspectEmotion,
+    addCoachingTip,
   } = useCallContext();
   const { user } = useAuth();
   const userId = user?.userId ?? '';
@@ -226,6 +228,22 @@ export function useCallAnalysis(): void {
         return;
       }
 
+      if (event.type === 'emotion') {
+        setProspectEmotion(event.emotion, event.confidence, event.ts);
+        return;
+      }
+
+      if (event.type === 'coaching') {
+        addCoachingTip({
+          id: makeId(),
+          source: event.source,
+          tip: event.tip,
+          focus: event.focus,
+          ts: event.ts,
+        });
+        return;
+      }
+
       // 'open' / 'call_status' / 'error' / 'tool_*' / 'thinking' could be
       // surfaced via context later.
     };
@@ -257,5 +275,7 @@ export function useCallAnalysis(): void {
     mergeEntities,
     appendActivity,
     setAnalysisWarning,
+    setProspectEmotion,
+    addCoachingTip,
   ]);
 }

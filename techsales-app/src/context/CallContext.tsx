@@ -25,11 +25,13 @@ import type {
   CallMode,
   CallState,
   CallStatus,
+  CoachingTip,
   ComplianceFlag,
   ExtractedEntities,
   IncomingCaller,
   InfoCard,
   PageRegistration,
+  ProspectEmotion,
   StampedAiAction,
   TranscriptChunk,
 } from '../types/call';
@@ -113,6 +115,9 @@ type Action =
   | { kind: 'UNREGISTER_PAGE' }
   | { kind: 'APPEND_ACTIVITY'; entry: AiActivityEntry }
   | { kind: 'SET_ANALYSIS_WARNING'; warning: string | null }
+  | { kind: 'SET_PROSPECT_EMOTION'; emotion: ProspectEmotion; confidence: number; ts: number }
+  | { kind: 'ADD_COACHING_TIP'; tip: CoachingTip }
+  | { kind: 'DISMISS_COACHING_TIP'; id: string }
   | { kind: 'HYDRATE'; state: CallState };
 
 function reducer(state: CallState, action: Action): CallState {
@@ -275,6 +280,26 @@ function reducer(state: CallState, action: Action): CallState {
       // have arrived, the pipe is proven and the warning is noise.
       if (action.warning && state.transcript.length > 0) return state;
       return { ...state, analysisWarning: action.warning };
+    case 'SET_PROSPECT_EMOTION':
+      return {
+        ...state,
+        prospectEmotion: { emotion: action.emotion, confidence: action.confidence, ts: action.ts },
+      };
+    case 'ADD_COACHING_TIP': {
+      // An 'ai' tip supersedes the newest 'rule' tip (same trigger, richer).
+      let tips = state.coachingTips;
+      if (action.tip.source === 'ai' && tips[0]?.source === 'rule') {
+        tips = tips.slice(1);
+      }
+      return { ...state, coachingTips: [action.tip, ...tips].slice(0, 5) };
+    }
+    case 'DISMISS_COACHING_TIP':
+      return {
+        ...state,
+        coachingTips: state.coachingTips.map((t) =>
+          t.id === action.id ? { ...t, dismissed: true } : t,
+        ),
+      };
     case 'HYDRATE':
       return action.state;
     default:
@@ -332,6 +357,10 @@ export interface CallContextValue {
   /** Surface (or clear) a live-analysis problem — e.g. the analyze stream
    *  failed, or this backend isn't hosting the call's media. */
   setAnalysisWarning: (warning: string | null) => void;
+  // Live intelligence — producers are useCallAnalysis; consumers CallPanel.
+  setProspectEmotion: (emotion: ProspectEmotion, confidence: number, ts: number) => void;
+  addCoachingTip: (tip: CoachingTip) => void;
+  dismissCoachingTip: (id: string) => void;
 }
 
 const CallContext = createContext<CallContextValue | null>(null);
@@ -595,6 +624,19 @@ export function CallProvider({ children }: { children: ReactNode }): React.JSX.E
     (warning: string | null) => dispatch({ kind: 'SET_ANALYSIS_WARNING', warning }),
     [],
   );
+  const setProspectEmotion = useCallback(
+    (emotion: ProspectEmotion, confidence: number, ts: number) =>
+      dispatch({ kind: 'SET_PROSPECT_EMOTION', emotion, confidence, ts }),
+    [],
+  );
+  const addCoachingTip = useCallback(
+    (tip: CoachingTip) => dispatch({ kind: 'ADD_COACHING_TIP', tip }),
+    [],
+  );
+  const dismissCoachingTip = useCallback(
+    (id: string) => dispatch({ kind: 'DISMISS_COACHING_TIP', id }),
+    [],
+  );
 
   const value = useMemo<CallContextValue>(
     () => ({
@@ -623,6 +665,9 @@ export function CallProvider({ children }: { children: ReactNode }): React.JSX.E
       unregisterPage,
       appendActivity,
       setAnalysisWarning,
+      setProspectEmotion,
+      addCoachingTip,
+      dismissCoachingTip,
     }),
     [
       state,
@@ -650,6 +695,9 @@ export function CallProvider({ children }: { children: ReactNode }): React.JSX.E
       unregisterPage,
       appendActivity,
       setAnalysisWarning,
+      setProspectEmotion,
+      addCoachingTip,
+      dismissCoachingTip,
     ],
   );
 

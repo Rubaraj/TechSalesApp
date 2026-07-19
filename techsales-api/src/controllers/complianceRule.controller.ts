@@ -6,7 +6,7 @@
  */
 import type { Request, Response } from 'express';
 import { repos } from '../repositories/registry.js';
-import { invalidateRulesCache } from '../ai/tools/complianceCheck.tool.js';
+import { invalidateRulesCache, loadActiveRules } from '../ai/tools/complianceCheck.tool.js';
 import type { ComplianceRule, ComplianceSeverity } from '../types/index.js';
 
 async function isAdmin(userId: string | undefined): Promise<boolean> {
@@ -87,6 +87,9 @@ export async function listComplianceRules(req: Request, res: Response): Promise<
     res.status(403).json({ success: false, error: 'Admin access required' });
     return;
   }
+  // Warm/seed: first-ever list on an empty collection seeds the legacy
+  // defaults (same path the scanner uses at call start).
+  await loadActiveRules();
   const rules = await repos.complianceRule.findAll(false);
   res.json({ success: true, data: { total: rules.length, rules } });
 }

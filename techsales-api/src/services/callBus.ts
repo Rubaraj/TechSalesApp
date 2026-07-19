@@ -50,12 +50,31 @@ export interface CallBusEntitiesEvent {
   entities: Partial<ExtractedEntities>;
 }
 
+/** Live intelligence — prospect emotion sample (emotionTracker). */
+export interface CallBusEmotionEvent {
+  type: 'emotion';
+  emotion: ProspectEmotion;
+  confidence: number;
+  ts: number;
+}
+
+/** Live intelligence — coaching tip for the agent (coachingAdvisor). */
+export interface CallBusCoachingEvent {
+  type: 'coaching';
+  source: 'rule' | 'ai';
+  tip: string;
+  focus: 'compliance' | 'empathy' | 'clarity' | 'pacing';
+  ts: number;
+}
+
 export type CallBusEvent =
   | CallBusTranscriptEvent
   | CallBusStatusEvent
   | CallBusErrorEvent
   | CallBusActionsEvent
-  | CallBusEntitiesEvent;
+  | CallBusEntitiesEvent
+  | CallBusEmotionEvent
+  | CallBusCoachingEvent;
 
 const emitters = new Map<string, EventEmitter>();
 

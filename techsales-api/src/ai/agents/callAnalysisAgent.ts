@@ -46,6 +46,20 @@ import { lookupMedicareTerm } from '../tools/medicareKnowledge.tool.js';
 import { extractFromProspectChunk } from '../rules/entityExtractor.js';
 import { summarizeTranscript } from '../rules/noteSummarizer.js';
 import { auditCallAnalysisEvent } from '../audit/auditCallAnalysisEvent.js';
+import {
+  startEmotionTracking,
+  stopEmotionTracking,
+  noteProspectChunk,
+  registerEmotionTagWriter,
+  __resetEmotionForTests,
+} from '../live/emotionTracker.js';
+import {
+  wireCoachingAdvisor,
+  startCoaching,
+  stopCoaching,
+  triggerCoaching,
+  __resetCoachingForTests,
+} from '../live/coachingAdvisor.js';
 
 // --- Per-call state (cleaned up on stop) ----------------------------------
 
@@ -74,6 +88,16 @@ function addTag(callSid: string, kind: CallTag['kind'], data: Record<string, unk
   const tags = callTags.get(callSid);
   if (tags) tags.push({ kind, ts: Date.now(), data });
 }
+
+// Live intelligence — one-time hook registration. The trackers live in their
+// own modules but tags/history/userIds are owned here, so they get accessors
+// instead of imports (avoids a require cycle through this agent).
+registerEmotionTagWriter((callSid, data) => addTag(callSid, 'emotion', data));
+wireCoachingAdvisor({
+  historyReader: (callSid) => transcriptHistory.get(callSid) ?? [],
+  tagWriter: (callSid, data) => addTag(callSid, 'coaching', data),
+  userIdReader: (callSid) => userIds.get(callSid),
+});
 
 // --- Public API -----------------------------------------------------------
 
@@ -127,6 +151,10 @@ export function startCallAnalysis(input: StartCallAnalysisInput): CallAnalysisHa
   // arrives (speech + Deepgram latency gives this plenty of head start).
   void loadActiveRules();
 
+  // Live intelligence — emotion sampling + coaching state for this call.
+  startEmotionTracking(callSid);
+  startCoaching(callSid);
+
   const unsubscribe = subscribe(callSid, (event: CallBusEvent) => {
     if (event.type !== 'transcript') return;
     if (!event.chunk.isFinal) return;
@@ -136,6 +164,10 @@ export function startCallAnalysis(input: StartCallAnalysisInput): CallAnalysisHa
       // conversation, not just the prospect side.
       transcriptHistory.get(callSid)?.push(event.chunk);
       runStub(callSid, event.chunk, userId);
+      // Live intelligence — sample prospect emotion (LLM, self-debounced).
+      if (event.chunk.speaker === 'prospect') {
+        noteProspectChunk(callSid, transcriptHistory.get(callSid) ?? [], userId);
+      }
     } catch (err) {
       logger.error({ err, callSid }, 'callAnalysisAgent: runStub threw');
     }
@@ -217,6 +249,8 @@ export function stopCallAnalysisByCallSid(callSid: string): void {
   userIds.delete(callSid);
   callMeta.delete(callSid);
   callTags.delete(callSid);
+  stopEmotionTracking(callSid);
+  stopCoaching(callSid);
   logger.info({ callSid }, 'callAnalysisAgent: stopped');
 }
 
@@ -274,6 +308,15 @@ function runAgentSideAnalysis(
       payload: { phrase: v.phrase, rule: v.rule, severity: v.severity },
     });
   }
+
+  // Live coaching — first violation of the batch triggers a tip (instant
+  // canned suggestion now, contextual LLM tip when the provider allows).
+  const first = violations[0];
+  triggerCoaching(callSid, {
+    kind: 'compliance',
+    detail: `Compliance violation "${first.ruleName}": agent said "${first.phrase}" — ${first.rule}`,
+    instantTip: first.suggestion,
+  });
 }
 
 async function runProspectSideAnalysis(
@@ -499,4 +542,6 @@ export function __resetAllForTests(): void {
   transcriptHistory.clear();
   callMeta.clear();
   callTags.clear();
+  __resetEmotionForTests();
+  __resetCoachingForTests();
 }

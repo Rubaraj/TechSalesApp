@@ -195,6 +195,28 @@ export async function getCallAnalyzeStream(req: Request, res: Response): Promise
       writeEvent(wireEvent);
       return;
     }
+    // Live intelligence — emotion samples + coaching tips pass through 1:1.
+    if (busEvent.type === 'emotion') {
+      const wireEvent: CallStreamEvent = {
+        type: 'emotion',
+        emotion: busEvent.emotion,
+        confidence: busEvent.confidence,
+        ts: busEvent.ts,
+      };
+      writeEvent(wireEvent);
+      return;
+    }
+    if (busEvent.type === 'coaching') {
+      const wireEvent: CallStreamEvent = {
+        type: 'coaching',
+        source: busEvent.source,
+        tip: busEvent.tip,
+        focus: busEvent.focus,
+        ts: busEvent.ts,
+      };
+      writeEvent(wireEvent);
+      return;
+    }
   });
 
   const cleanup = (): void => {

@@ -27,7 +27,11 @@ import {
   openSupervisorStream,
   SupervisorStreamAuthError,
 } from '../../services/supervisorService';
-import type { CallRecordSummary, SupervisorEvent } from '../../types/supervisor';
+import type {
+  CallRecordSummary,
+  ProspectEmotion,
+  SupervisorEvent,
+} from '../../types/supervisor';
 import { API_BASE } from '../../api/apiBase';
 import { TAG_CHIP_TONES, formatWhen, formatElapsed } from './supervisionUi';
 
@@ -47,7 +51,17 @@ interface LiveCall {
   agentName?: string;
   direction: string;
   startedAt: number;
+  /** Latest prospect emotion (emotion_shift events; unset until first). */
+  emotion?: ProspectEmotion;
 }
+
+const EMOTION_CHIP: Record<ProspectEmotion, string> = {
+  positive: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300',
+  neutral: 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300',
+  confused: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300',
+  frustrated: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300',
+  upset: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300',
+};
 
 interface LiveAlert {
   id: string;
@@ -204,6 +218,12 @@ export function Supervision() {
         );
         return;
       }
+      if (event.type === 'emotion_shift') {
+        setLiveCalls((prev) =>
+          prev.map((c) => (c.callSid === event.callSid ? { ...c, emotion: event.emotion } : c)),
+        );
+        return;
+      }
       if (event.type === 'qa_completed') {
         refreshRef.current();
       }
@@ -306,7 +326,7 @@ export function Supervision() {
                       title={`started ${new Date(c.startedAt).toLocaleTimeString()}`}
                     >
                       <PhoneCall className="w-4 h-4 text-green-600 dark:text-green-400" />
-                      <div className="min-w-0">
+                      <div className="min-w-0 flex-1">
                         <p className="text-sm font-semibold text-gray-900 dark:text-white">
                           {c.agentName ?? 'Unknown agent'}
                         </p>
@@ -315,6 +335,14 @@ export function Supervision() {
                           <span className="font-mono">{formatElapsed(c.startedAt, now)}</span>
                         </p>
                       </div>
+                      {c.emotion && (
+                        <span
+                          className={`text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full shrink-0 ${EMOTION_CHIP[c.emotion]}`}
+                          title={`Prospect sounds ${c.emotion}`}
+                        >
+                          {c.emotion}
+                        </span>
+                      )}
                     </div>
                   ))}
                 </div>
