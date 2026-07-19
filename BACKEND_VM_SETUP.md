@@ -209,7 +209,7 @@ Then connect the frontend:
 | AI (local, free) | Ollama (`ollama pull qwen2.5:7b nomic-embed-text`) + Qdrant (`docker run -p 6333:6333 qdrant/qdrant`), then `npm run index:build` | `AI_ENABLED=true`, `AI_LLM_PROVIDER=ollama` |
 | AI (Claude) | nothing — API only | `AI_ENABLED=true`, `AI_LLM_PROVIDER=anthropic`, `ANTHROPIC_API_KEY=...` (needs Console credit; a Max-plan login does not provide a backend key) |
 | AI (demo, no LLM) | nothing | `AI_ENABLED=true`, `AI_LLM_PROVIDER=stub` — deterministic Atlas/call-copilot behavior, zero cost |
-| Live calls | public HTTPS tunnel to :4000 (e.g. `cloudflared tunnel --url http://localhost:4000`) | `TWILIO_ENABLED=true` + `TWILIO_*` creds, `DEEPGRAM_API_KEY`, `PUBLIC_BASE_URL=<tunnel URL>`; update the TwiML App + phone-number webhooks in the Twilio console to the new tunnel URL |
+| Live calls | nothing new — production runs on the Pi behind the STABLE named tunnel `https://api.rubarajan.dev/techsales` (see `gateway/README.md`); Twilio webhooks already point there | `TWILIO_ENABLED=true` + `TWILIO_*` creds, `DEEPGRAM_API_KEY`, `PUBLIC_BASE_URL=https://api.rubarajan.dev/techsales`. For a temporary non-Pi instance use an ephemeral tunnel (`cloudflared tunnel --url http://localhost:4000`) and re-point the TwiML App + phone-number webhooks — remember to revert |
 
 Formulary data for drug-coverage features: `npm run formulary:build` (writes
 `data/formulary-synthetic.json`; a generated copy is already committed).

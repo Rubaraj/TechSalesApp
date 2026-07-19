@@ -83,8 +83,12 @@ cp .env.local.example .env.local        # Windows: copy .env.local.example .env.
 `.env.local` is gitignored. Defaults are fine for frontend-only work:
 
 - `VITE_AI_ENABLED=true` — master frontend AI flag (AI UI still hides in local mode).
-- `VITE_API_BASE_URL` — optional; only needed if a backend runs somewhere other than the
-  default Vite proxy target (`http://localhost:4000`).
+- `VITE_API_BASE_URL` — optional. Two supported modes:
+  - **Pure-local** (default, unset): same-origin `/api` + Vite dev proxy to a local
+    backend on `http://localhost:4000`.
+  - **Against the Pi-hosted production API** (no local backend needed):
+    `VITE_API_BASE_URL=https://api.rubarajan.dev/techsales/api`
+- `VITE_DEV_PROXY_TARGET` — optional; changes only the dev-proxy target (advanced).
 
 ---
 

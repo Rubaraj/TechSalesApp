@@ -18,7 +18,9 @@ Outbound + inbound PSTN calls → Deepgram diarized transcription → rule-based
                                                    │ POST /voice      │ POST /incoming
                                                    │                  │
                                                    ▼                  ▼
-                                       (Cloudflare TryCloudflare tunnel — laptop:4000 → public HTTPS)
+                            (Cloudflare NAMED tunnel "home-api" → api.rubarajan.dev
+                             → Pi: cloudflared-api → Caddy :8081 [/techsales prefix
+                             stripped, see gateway/] → Pi API :4000)
                                                             │
                                                             ▼
 ┌───────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -98,10 +100,10 @@ Outbound + inbound PSTN calls → Deepgram diarized transcription → rule-based
 │  │  medhub_lookup DB  │  │  │  │   <AuthProvider> <ThemeProvider> <Routes>                   │ │
 │  └────────────────────┘  │  │  │     <Layout>                                                │ │
 │                          │  │  │       <CallRuntime>  ← hosts the single useTwilioCall +     │ │
-│  cf-tunnel-techsales     │  │  │                       presence heartbeat, ALWAYS mounted    │ │
-│   (systemd, ephemeral    │  │  │         <Header>                                            │ │
-│    TryCloudflare URL)    │  │  │         <Outlet/> (pages swap here on nav)                  │ │
-│                          │  │  │         <CallPanel>  ← right-docked, never unmounts         │ │
+│  techsales-api (systemd) │  │  │                       presence heartbeat, ALWAYS mounted    │ │
+│  caddy :8081 (gateway)   │  │  │         <Header>                                            │ │
+│  cloudflared-api         │  │  │         <Outlet/> (pages swap here on nav)                  │ │
+│   (named tunnel)         │  │  │         <CallPanel>  ← right-docked, never unmounts         │ │
 └──────────────────────────┘  │  │       </CallRuntime>                                        │ │
                               │  │     </Routes>                                               │ │
                               │  │   </CallProvider>                                           │ │
