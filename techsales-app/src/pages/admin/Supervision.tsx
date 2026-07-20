@@ -263,6 +263,21 @@ export function Supervision() {
     return counts;
   };
 
+  /** QA overview computed from the fetched log (no extra endpoint). */
+  const qaStats = useMemo(() => {
+    const total = calls.length;
+    const flagged = calls.filter((c) => c.flagged).length;
+    const reviewed = calls.filter((c) => c.qaReview);
+    const avgScore =
+      reviewed.length > 0
+        ? Math.round(
+            reviewed.reduce((sum, c) => sum + (c.qaReview?.overallScore ?? 0), 0) /
+              reviewed.length,
+          )
+        : null;
+    return { total, flagged, reviewedCount: reviewed.length, avgScore };
+  }, [calls]);
+
   /** Distinct agents present in the current log for the filter dropdown. */
   const agentOptions = useMemo(() => {
     const map = new Map<string, string>();
@@ -377,6 +392,46 @@ export function Supervision() {
             </div>
           </div>
         )}
+      </div>
+
+      {/* QA overview stats (from the currently-filtered log) */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {[
+          { label: 'Recorded calls', value: String(qaStats.total) },
+          {
+            label: 'Flagged',
+            value:
+              qaStats.total > 0
+                ? `${qaStats.flagged} (${Math.round((qaStats.flagged / qaStats.total) * 100)}%)`
+                : '0',
+            tone: qaStats.flagged > 0 ? 'text-red-600 dark:text-red-400' : undefined,
+          },
+          { label: 'QA reviewed', value: `${qaStats.reviewedCount}/${qaStats.total}` },
+          {
+            label: 'Avg QA score',
+            value: qaStats.avgScore !== null ? String(qaStats.avgScore) : '—',
+            tone:
+              qaStats.avgScore === null
+                ? undefined
+                : qaStats.avgScore >= 80
+                  ? 'text-green-600 dark:text-green-400'
+                  : qaStats.avgScore >= 60
+                    ? 'text-amber-600 dark:text-amber-400'
+                    : 'text-red-600 dark:text-red-400',
+          },
+        ].map((s) => (
+          <div
+            key={s.label}
+            className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 px-4 py-3"
+          >
+            <p className="text-[11px] uppercase tracking-wider text-gray-500 dark:text-gray-400">
+              {s.label}
+            </p>
+            <p className={`text-xl font-bold ${s.tone ?? 'text-gray-900 dark:text-white'}`}>
+              {s.value}
+            </p>
+          </div>
+        ))}
       </div>
 
       {/* Call Log */}

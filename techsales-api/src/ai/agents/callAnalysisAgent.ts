@@ -535,6 +535,36 @@ function runPostCallNoteSummary(callSid: string, userId?: string): void {
 // --- Test / debug helpers --------------------------------------------------
 
 /** Test-only: reset all per-call state. Used by debug fixture-replay tests. */
+/**
+ * Live-call context for Atlas (same-process accessor). Returns null when the
+ * call isn't active here. `recentTranscript` is pre-formatted
+ * "AGENT:/PROSPECT:" lines, newest last.
+ */
+export function getLiveCallContext(
+  callSid: string,
+  lines = 10,
+): {
+  direction: 'inbound' | 'outbound';
+  from?: string;
+  durationSec: number;
+  recentTranscript?: string;
+} | null {
+  const meta = callMeta.get(callSid);
+  if (!meta) return null;
+  const history = transcriptHistory.get(callSid) ?? [];
+  const recent = history
+    .slice(-lines)
+    .map((c) => `${c.speaker === 'agent' ? 'AGENT' : 'PROSPECT'}: ${c.text}`)
+    .join('\n');
+  const from = callerNumbers.get(callSid);
+  return {
+    direction: meta.direction,
+    ...(from ? { from } : {}),
+    durationSec: Math.max(0, Math.round((Date.now() - meta.startedAt) / 1000)),
+    ...(recent ? { recentTranscript: recent } : {}),
+  };
+}
+
 export function __resetAllForTests(): void {
   accumulators.clear();
   shownTopics.clear();

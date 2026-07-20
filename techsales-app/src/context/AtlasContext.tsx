@@ -19,6 +19,7 @@ import {
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { atlasService, type AtlasStreamEvent } from '../services/atlasService';
 import { useAuth } from './AuthContext';
+import { useCallContext } from './CallContext';
 import type { LeadPhoneLookup } from '../services/leadService';
 
 export type AtlasMode = 'assist' | 'auto';
@@ -149,6 +150,10 @@ export function AtlasProvider({ children }: { children: ReactNode }): React.JSX.
   const navigate = useNavigate();
   const params = useParams<{ id?: string }>();
   const userId = user?.userId ?? null;
+  // Live-call context — AtlasProvider nests inside CallProvider, so the
+  // active callSid is available for the backend to attach recent transcript.
+  const { state: callState } = useCallContext();
+  const activeCallSid = callState.isCallActive ? callState.callSid : null;
 
   const [messages, setMessages] = useState<AtlasMessage[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
@@ -455,6 +460,7 @@ export function AtlasProvider({ children }: { children: ReactNode }): React.JSX.
             context: {
               route: location.pathname,
               ...(leadId ? { leadId } : {}),
+              ...(activeCallSid ? { callSid: activeCallSid } : {}),
               mode,
             },
           },
@@ -472,7 +478,7 @@ export function AtlasProvider({ children }: { children: ReactNode }): React.JSX.
         abortRef.current = null;
       }
     },
-    [userId, isStreaming, location.pathname, leadId, mode],
+    [userId, isStreaming, location.pathname, leadId, activeCallSid, mode],
   );
 
   const abort = useCallback((): void => {

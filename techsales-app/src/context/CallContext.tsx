@@ -150,6 +150,9 @@ function reducer(state: CallState, action: Action): CallState {
       return {
         ...initialCallState(),
         currentPage: state.currentPage,
+        // Keep the AI activity trail visible after hangup (post-call notes
+        // land here seconds after teardown). START_CALL clears it fresh.
+        aiActivityLog: state.aiActivityLog,
       };
     case 'TOGGLE_PANEL':
       return { ...state, isCallPanelOpen: !state.isCallPanelOpen };

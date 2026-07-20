@@ -36,6 +36,7 @@ import { AudioDeviceSelector } from './AudioDeviceSelector';
 import { ComplianceAlert } from './ComplianceAlert';
 import { EntitySummary } from './EntitySummary';
 import { IncomingCallView } from './IncomingCallView';
+import { InfoCard } from './InfoCard';
 
 // Phase 3a — how long a dismissed compliance flag stays in the DOM (with
 // reduced opacity + line-through) before it filters out. Avoids the jarring
@@ -294,6 +295,20 @@ export function CallPanel() {
         >
           {visibleComplianceFlags.map((flag) => (
             <ComplianceAlert key={flag.id} flag={flag} />
+          ))}
+        </div>
+      )}
+
+      {/* Medicare info cards — glossary-term explanations + plan deep-links
+       *  from the rule-based knowledge tool. Newest 2, below compliance. */}
+      {!showDialer && !showIncomingRing && state.infoCards.length > 0 && (
+        <div
+          className="border-b border-blue-200 dark:border-blue-800/50 px-3 py-2 space-y-1.5 max-h-40 overflow-y-auto bg-blue-50/40 dark:bg-blue-900/10"
+          role="region"
+          aria-label="Medicare info cards"
+        >
+          {state.infoCards.slice(-2).reverse().map((card) => (
+            <InfoCard key={card.id} card={card} />
           ))}
         </div>
       )}

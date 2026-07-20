@@ -59,14 +59,14 @@ export function ChatPane(): React.JSX.Element {
       ts: m.ts,
       data: m,
     }));
-    const activityRows: ChatRow[] = callState.isCallActive
-      ? callState.aiActivityLog.map((a) => ({
-          kind: 'activity',
-          id: a.id,
-          ts: a.timestamp,
-          data: a,
-        }))
-      : [];
+    // Shown during AND after a call — the trail (incl. the post-call note)
+    // survives hangup; a new call resets the log via START_CALL.
+    const activityRows: ChatRow[] = callState.aiActivityLog.map((a) => ({
+      kind: 'activity',
+      id: a.id,
+      ts: a.timestamp,
+      data: a,
+    }));
     // Phase 4 — interleave Atlas write-action proposals into the chat
     // stream chronologically. Old deck-below-composer is gone; approvals
     // now appear as inline messages from Atlas (with Approve / Reject

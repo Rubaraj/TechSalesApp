@@ -268,7 +268,10 @@ export function useCallAnalysis(): void {
       });
 
     return () => {
-      controller.abort();
+      // Grace-abort: the post-call note summary is published 1-2s AFTER the
+      // call ends (backend stop funnel). Keep the stream alive briefly so
+      // it lands; the server closes the stream itself on 'ended'.
+      setTimeout(() => controller.abort(), 5_000);
       abortRef.current = null;
     };
   }, [

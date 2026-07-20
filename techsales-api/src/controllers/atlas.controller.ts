@@ -20,6 +20,7 @@ import {
   streamAtlasAgent,
   type AtlasStreamEvent,
 } from '../ai/agents/atlasAgent.js';
+import { getLiveCallContext } from '../ai/agents/callAnalysisAgent.js';
 import {
   getSessionMessages,
   appendSessionMessage,
@@ -112,6 +113,11 @@ export async function postAtlasChat(req: Request, res: Response): Promise<void> 
     logger.debug({ err, userId }, 'atlas: pipeline summary precompute failed');
   }
 
+  // Live-call context — same-process read of the call pipeline's transcript
+  // history. Activates the "THEY ARE ON A CALL" prompt block so Atlas can
+  // answer "what did the prospect just say?" mid-call.
+  const liveCall = context.callSid ? getLiveCallContext(context.callSid) : null;
+
   let finalContent = '';
   const turnCards: Array<{ card: string; tool: string; data: unknown; ts: number }> = [];
 
@@ -132,6 +138,7 @@ export async function postAtlasChat(req: Request, res: Response): Promise<void> 
           mode: context.mode,
           today: new Date().toISOString().slice(0, 10),
           ...(pipelineSummary ? { pipelineSummary } : {}),
+          ...(liveCall ? { call: liveCall } : {}),
         },
       },
       ac.signal,
