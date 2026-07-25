@@ -155,6 +155,13 @@ function reducer(state: CallState, action: Action): CallState {
         // Keep the AI activity trail visible after hangup (post-call notes
         // land here seconds after teardown). START_CALL clears it fresh.
         aiActivityLog: state.aiActivityLog,
+        // Gap 2 — captured entities/actions SURVIVE the call so the agent
+        // can open the lead form afterwards and still apply them (the
+        // PendingCaptureNudge points there). Cleared on the next START_CALL.
+        pendingActions: state.pendingActions,
+        extractedEntities: state.extractedEntities,
+        leadId: state.leadId,
+        dialedNumber: state.dialedNumber,
       };
     case 'TOGGLE_PANEL':
       return { ...state, isCallPanelOpen: !state.isCallPanelOpen };

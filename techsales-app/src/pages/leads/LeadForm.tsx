@@ -489,8 +489,9 @@ export function LeadForm() {
   // change. fill_field actions populate empty fields and mark them AI-filled;
   // add_drug actions append the matching catalog entry. Idempotent — consumed
   // actions move to actionLog, so this effect won't re-apply old fills.
+  // Gap 2 — no longer gated on an active call: captures survive hangup, so
+  // opening the form AFTER the call still applies everything queued.
   useEffect(() => {
-    if (!callState.isCallActive) return;
     if (callState.pendingActions.length === 0) return;
 
     // 1) fill_field consumer.
