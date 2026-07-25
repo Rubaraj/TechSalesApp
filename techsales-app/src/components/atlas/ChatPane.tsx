@@ -13,6 +13,7 @@ import {
   useAtlas,
   type AtlasProposal,
   type AtlasNavigationSuggestion,
+  type AtlasDialSuggestion,
   type AtlasLeadSuggestion,
   type AtlasDisplayCard,
 } from '../../context/AtlasContext';
@@ -21,6 +22,7 @@ import { useCallContext } from '../../context/CallContext';
 import type { AiActivityEntry } from '../../types/call';
 import { ApprovalCard } from './ApprovalCard';
 import { NavigationCard } from './NavigationCard';
+import { DialCard } from './DialCard';
 import { IdentifiedLeadCard } from './IdentifiedLeadCard';
 import { CreateLeadCard } from './CreateLeadCard';
 import { AtlasMarkdown } from './AtlasMarkdown';
@@ -33,6 +35,7 @@ type ChatRow =
   | { kind: 'activity'; id: string; ts: number; data: AiActivityEntry }
   | { kind: 'proposal'; id: string; ts: number; data: AtlasProposal }
   | { kind: 'navigation'; id: string; ts: number; data: AtlasNavigationSuggestion }
+  | { kind: 'dial'; id: string; ts: number; data: AtlasDialSuggestion }
   | { kind: 'lead'; id: string; ts: number; data: AtlasLeadSuggestion }
   | { kind: 'card'; id: string; ts: number; data: AtlasDisplayCard };
 
@@ -41,6 +44,7 @@ export function ChatPane(): React.JSX.Element {
     messages,
     proposals,
     navigationSuggestions,
+    dialSuggestions,
     leadSuggestions,
     cards,
     mode,
@@ -89,6 +93,14 @@ export function ChatPane(): React.JSX.Element {
             data: s,
           }))
         : [];
+    // Gap 1 — click-to-call suggestions from start_call (Assist mode; Auto
+    // dials immediately unless a call was already live).
+    const dialRows: ChatRow[] = dialSuggestions.map((s) => ({
+      kind: 'dial',
+      id: s.id,
+      ts: s.ts,
+      data: s,
+    }));
     // Phase 4 outbound-dial — IdentifiedLeadCard / CreateLeadCard cards
     // surfaced when the agent dials a number. Always shown regardless of
     // Atlas mode (this is plain UX, not an agentic suggestion).
@@ -111,6 +123,7 @@ export function ChatPane(): React.JSX.Element {
       ...activityRows,
       ...proposalRows,
       ...navigationRows,
+      ...dialRows,
       ...leadRows,
       ...cardRows,
     ].sort((a, b) => a.ts - b.ts);
@@ -118,6 +131,7 @@ export function ChatPane(): React.JSX.Element {
     messages,
     proposals,
     navigationSuggestions,
+    dialSuggestions,
     leadSuggestions,
     cards,
     mode,
@@ -168,6 +182,9 @@ export function ChatPane(): React.JSX.Element {
           }
           if (row.kind === 'navigation') {
             return <NavigationCard key={row.id} suggestion={row.data} />;
+          }
+          if (row.kind === 'dial') {
+            return <DialCard key={row.id} suggestion={row.data} />;
           }
           if (row.kind === 'card') {
             return <AtlasDisplayCardView key={row.id} card={row.data} />;

@@ -25,6 +25,8 @@ import { getMyTargetsTool } from './getMyTargets.tool.js';
 import { getAppointmentsTool } from './getAppointments.tool.js';
 import { checkEligibilityTool } from './checkEligibility.tool.js';
 import { findPharmaciesNearTool } from './findPharmaciesNear.tool.js';
+import { startCallTool } from './startCall.tool.js';
+import { controlCallTool } from './controlCall.tool.js';
 
 export {
   searchPlansTool,
@@ -48,6 +50,8 @@ export {
   getAppointmentsTool,
   checkEligibilityTool,
   findPharmaciesNearTool,
+  startCallTool,
+  controlCallTool,
 };
 
 export const tools = [
@@ -92,4 +96,7 @@ export const atlasTools = [
   getQaReviewTool,
   runQaReviewTool,
   navigateToTool,
+  // Gap 1 — dialer control (dial via lead/phone; hangup/mute the live call).
+  startCallTool,
+  controlCallTool,
 ] as const;

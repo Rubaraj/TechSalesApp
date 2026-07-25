@@ -53,6 +53,10 @@ export type AtlasStreamEvent =
       preview: unknown;
     }
   | { type: 'navigate'; route: string; reason: string }
+  /** Gap 1 — dial request from start_call; FE dials (auto) or cards (assist). */
+  | { type: 'dial'; to: string; leadId?: string; leadName?: string }
+  /** Gap 1 — control_call on the live call; FE executes immediately. */
+  | { type: 'call_control'; action: 'hangup' | 'mute' | 'unmute' }
   /** Rich-chat upgrade — a tool result the FE renders as a purpose-built card. */
   | { type: 'display_card'; card: AtlasCardType; tool: string; data: unknown }
   | { type: 'final'; content: string; interactionId: string }
@@ -163,6 +167,27 @@ function extractSideChannelEvents(
     const nav = obj.navigate as { route?: unknown; reason?: unknown };
     if (typeof nav.route === 'string' && typeof nav.reason === 'string') {
       events.push({ type: 'navigate', route: nav.route, reason: nav.reason });
+    }
+  }
+
+  // Gap 1 — dial request (start_call)
+  if (obj.dial && typeof obj.dial === 'object') {
+    const d = obj.dial as { to?: unknown; leadId?: unknown; leadName?: unknown };
+    if (typeof d.to === 'string') {
+      events.push({
+        type: 'dial',
+        to: d.to,
+        ...(typeof d.leadId === 'string' ? { leadId: d.leadId } : {}),
+        ...(typeof d.leadName === 'string' ? { leadName: d.leadName } : {}),
+      });
+    }
+  }
+
+  // Gap 1 — live-call control (control_call)
+  if (obj.callControl && typeof obj.callControl === 'object') {
+    const c = obj.callControl as { action?: unknown };
+    if (c.action === 'hangup' || c.action === 'mute' || c.action === 'unmute') {
+      events.push({ type: 'call_control', action: c.action });
     }
   }
 

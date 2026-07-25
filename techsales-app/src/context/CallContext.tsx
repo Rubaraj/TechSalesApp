@@ -102,6 +102,8 @@ type Action =
   | { kind: 'SET_DIALED_NUMBER'; number: string | null }
   | { kind: 'SET_PENDING_DIAL'; to: string }
   | { kind: 'CLEAR_PENDING_DIAL' }
+  | { kind: 'SET_PENDING_CONTROL'; action: 'hangup' | 'mute' | 'unmute' }
+  | { kind: 'CLEAR_PENDING_CONTROL' }
   | { kind: 'INCOMING_RINGING'; caller: IncomingCaller; leadId: string | null }
   | { kind: 'INCOMING_ACCEPTED' }
   | { kind: 'APPEND_TRANSCRIPT'; chunk: TranscriptChunk }
@@ -170,6 +172,10 @@ function reducer(state: CallState, action: Action): CallState {
       return { ...state, pendingDial: action.to };
     case 'CLEAR_PENDING_DIAL':
       return { ...state, pendingDial: null };
+    case 'SET_PENDING_CONTROL':
+      return { ...state, pendingControl: action.action };
+    case 'CLEAR_PENDING_CONTROL':
+      return { ...state, pendingControl: null };
     case 'INCOMING_RINGING': {
       // Phase 2.6 — replace any idle state with an inbound ringing call.
       // The Twilio Device fires `incoming` before any other call could have
@@ -338,6 +344,9 @@ export interface CallContextValue {
   // via useEffect and hands to useTwilioCall.dial().
   dialNumber: (input: DialNumberInput) => void;
   clearPendingDial: () => void;
+  /** Gap 1 — queue a call-control action for CallRuntime to execute. */
+  requestCallControl: (action: 'hangup' | 'mute' | 'unmute') => void;
+  clearPendingControl: () => void;
   // Phase 2.6 — inbound call lifecycle. Producer (`useTwilioCall`'s
   // device.on('incoming')) calls `setIncomingRinging`; the IncomingCallView
   // calls the accept/reject helpers which are wired in CallRuntime.
@@ -557,6 +566,15 @@ export function CallProvider({ children }: { children: ReactNode }): React.JSX.E
     inFlightDialRef.current = false;
     dispatch({ kind: 'CLEAR_PENDING_DIAL' });
   }, []);
+  const requestCallControl = useCallback(
+    (action: 'hangup' | 'mute' | 'unmute') =>
+      dispatch({ kind: 'SET_PENDING_CONTROL', action }),
+    [],
+  );
+  const clearPendingControl = useCallback(
+    () => dispatch({ kind: 'CLEAR_PENDING_CONTROL' }),
+    [],
+  );
 
   const setIncomingRinging = useCallback(
     (caller: IncomingCaller, leadId: string | null) =>
@@ -656,6 +674,8 @@ export function CallProvider({ children }: { children: ReactNode }): React.JSX.E
       appendTranscript,
       dialNumber,
       clearPendingDial,
+      requestCallControl,
+      clearPendingControl,
       setIncomingRinging,
       setIncomingAccepted,
       mergeEntities,
@@ -686,6 +706,8 @@ export function CallProvider({ children }: { children: ReactNode }): React.JSX.E
       appendTranscript,
       dialNumber,
       clearPendingDial,
+      requestCallControl,
+      clearPendingControl,
       setIncomingRinging,
       setIncomingAccepted,
       mergeEntities,

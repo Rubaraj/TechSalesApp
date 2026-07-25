@@ -259,6 +259,10 @@ export interface CallState {
    *  Twilio SDK. Null when no dial is queued. Cleared by CallRuntime once
    *  `useTwilioCall.dial()` has been invoked. */
   pendingDial: string | null;
+  /** Gap 1 — a call-control action queued by Atlas (control_call tool);
+   *  the always-mounted <CallRuntime/> executes it via the Twilio handle
+   *  and clears it. Same relay pattern as pendingDial. */
+  pendingControl: 'hangup' | 'mute' | 'unmute' | null;
   /** Phase 2.6 — info for the inbound caller while the panel is showing the
    *  ring UI. Set on INCOMING_RINGING; cleared on accept (the call becomes
    *  a normal connected call) or reject (END_CALL). */
@@ -297,6 +301,7 @@ export const initialCallState = (): CallState => ({
   dialedNumber: null,
   direction: null,
   pendingDial: null,
+  pendingControl: null,
   incomingCaller: null,
   currentPage: null,
   transcript: [],

@@ -29,7 +29,7 @@ import { startHeartbeat } from '../../services/presenceService';
 const CallRuntimeContext = createContext<UseTwilioCallResult | null>(null);
 
 export function CallRuntime({ children }: { children?: ReactNode }) {
-  const { state, clearPendingDial } = useCallContext();
+  const { state, clearPendingDial, clearPendingControl } = useCallContext();
   const { user } = useAuth();
   const twilioCall = useTwilioCall();
 
@@ -64,6 +64,19 @@ export function CallRuntime({ children }: { children?: ReactNode }) {
   useEffect(() => {
     heartbeatRef.current?.beatNow();
   }, [inCallNow]);
+
+  // Gap 1 — execute Atlas call-control requests (control_call tool) via the
+  // Twilio handle this runtime owns. Same relay pattern as pendingDial.
+  useEffect(() => {
+    const action = state.pendingControl;
+    if (!action) return;
+    if (action === 'hangup') {
+      void twilioCall.hangup();
+    } else {
+      twilioCall.setMute(action === 'mute');
+    }
+    clearPendingControl();
+  }, [state.pendingControl, twilioCall, clearPendingControl]);
 
   // QA H4 — track the currently in-flight dial so a duplicate pendingDial
   // transition for the same `to` is a no-op, and a *different* `to`

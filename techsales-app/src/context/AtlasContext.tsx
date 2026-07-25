@@ -49,6 +49,15 @@ export interface AtlasProposal {
   autoApproved?: boolean;
 }
 
+/** Gap 1 — click-to-call card data (start_call tool, Assist mode). */
+export interface AtlasDialSuggestion {
+  id: string;
+  to: string;
+  leadId?: string;
+  leadName?: string;
+  ts: number;
+}
+
 export interface AtlasNavigationSuggestion {
   id: string;
   route: string;
@@ -86,6 +95,9 @@ export interface AtlasContextValue {
   isStreaming: boolean;
   proposals: AtlasProposal[];
   navigationSuggestions: AtlasNavigationSuggestion[];
+  /** Gap 1 — pending click-to-call suggestions (Assist mode). */
+  dialSuggestions: AtlasDialSuggestion[];
+  consumeDialSuggestion: (id: string) => AtlasDialSuggestion | null;
   /** Rich-chat — display cards interleaved into the chat stream by ts. */
   cards: AtlasDisplayCard[];
   mode: AtlasMode;
@@ -152,8 +164,11 @@ export function AtlasProvider({ children }: { children: ReactNode }): React.JSX.
   const userId = user?.userId ?? null;
   // Live-call context — AtlasProvider nests inside CallProvider, so the
   // active callSid is available for the backend to attach recent transcript.
-  const { state: callState } = useCallContext();
+  const { state: callState, dialNumber, requestCallControl } = useCallContext();
   const activeCallSid = callState.isCallActive ? callState.callSid : null;
+  // Fresh view for mid-stream event handlers (avoids stale closures).
+  const callActiveRef = useRef(false);
+  callActiveRef.current = callState.isCallActive;
 
   const [messages, setMessages] = useState<AtlasMessage[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
@@ -161,6 +176,7 @@ export function AtlasProvider({ children }: { children: ReactNode }): React.JSX.
   const [navigationSuggestions, setNavigationSuggestions] = useState<
     AtlasNavigationSuggestion[]
   >([]);
+  const [dialSuggestions, setDialSuggestions] = useState<AtlasDialSuggestion[]>([]);
   const [leadSuggestions, setLeadSuggestions] = useState<AtlasLeadSuggestion[]>([]);
   const [cards, setCards] = useState<AtlasDisplayCard[]>([]);
   const [resumedFromPriorSession, setResumedFromPriorSession] = useState(false);
@@ -422,6 +438,37 @@ export function AtlasProvider({ children }: { children: ReactNode }): React.JSX.
           ]);
           return;
         }
+        if (ev.type === 'dial') {
+          // Gap 1 — Auto Pilot dials immediately (unless a call is already
+          // live — never yank an in-progress call); Assist renders a
+          // click-to-call DialCard.
+          const m = modeRef.current;
+          if (m === 'auto' && !callActiveRef.current) {
+            dialNumber({
+              to: ev.to,
+              ...(ev.leadId ? { leadId: ev.leadId } : {}),
+              ...(ev.leadName ? { leadName: ev.leadName } : {}),
+            });
+            return;
+          }
+          setDialSuggestions((prev) => [
+            ...prev,
+            {
+              id: newId(),
+              to: ev.to,
+              ...(ev.leadId ? { leadId: ev.leadId } : {}),
+              ...(ev.leadName ? { leadName: ev.leadName } : {}),
+              ts: Date.now(),
+            },
+          ]);
+          return;
+        }
+        if (ev.type === 'call_control') {
+          // Gap 1 — the agent's explicit chat request is the consent;
+          // execute immediately in both modes. CallRuntime does the work.
+          requestCallControl(ev.action);
+          return;
+        }
         if (ev.type === 'display_card') {
           // Rich-chat — tool result rendered as a purpose-built card,
           // interleaved into the stream at receipt time.
@@ -478,7 +525,7 @@ export function AtlasProvider({ children }: { children: ReactNode }): React.JSX.
         abortRef.current = null;
       }
     },
-    [userId, isStreaming, location.pathname, leadId, activeCallSid, mode],
+    [userId, isStreaming, location.pathname, leadId, activeCallSid, mode, dialNumber, requestCallControl],
   );
 
   const abort = useCallback((): void => {
@@ -575,6 +622,16 @@ export function AtlasProvider({ children }: { children: ReactNode }): React.JSX.
     setLeadSuggestions([]);
   }, []);
 
+  const consumeDialSuggestion = useCallback(
+    (id: string): AtlasDialSuggestion | null => {
+      const found = dialSuggestions.find((s) => s.id === id);
+      if (!found) return null;
+      setDialSuggestions((prev) => prev.filter((s) => s.id !== id));
+      return found;
+    },
+    [dialSuggestions],
+  );
+
   const value = useMemo<AtlasContextValue>(
     () => ({
       messages,
@@ -590,6 +647,8 @@ export function AtlasProvider({ children }: { children: ReactNode }): React.JSX.
       approve,
       reject,
       consumeNavigationSuggestion,
+      dialSuggestions,
+      consumeDialSuggestion,
       leadSuggestions,
       addLeadSuggestion,
       consumeLeadSuggestion,
@@ -617,6 +676,8 @@ export function AtlasProvider({ children }: { children: ReactNode }): React.JSX.
       approve,
       reject,
       consumeNavigationSuggestion,
+      dialSuggestions,
+      consumeDialSuggestion,
       addLeadSuggestion,
       consumeLeadSuggestion,
       clearLeadSuggestions,

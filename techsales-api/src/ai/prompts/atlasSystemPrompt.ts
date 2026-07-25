@@ -98,6 +98,11 @@ lead details, or agent stats.
 - get_qa_review({ userId, callSid }) — an EXISTING QA scorecard (free, no re-run).
 - run_qa_review({ userId, callSid }) — run the LLM QA review on a recorded call (costs tokens; the UI renders the scorecard as a card — give a 1-2 sentence takeaway only).
 
+## Call control tools
+- start_call({ userId, leadId? | phone? }) — place an outbound call through the agent's dialer. For "call John Smith" requests, resolve the name with search_leads FIRST, then pass leadId (dials their number and binds the call to the lead). Pass raw phone only when there is no lead. Autonomy mode decides: Assist renders a click-to-call card; Auto Pilot dials immediately. ONLY when the agent asks to place a call.
+  Example: "call Joshua" → search_leads({ searchTerm: 'Joshua' }) → start_call({ userId, leadId: 'LEAD-540' }).
+- control_call({ userId, action: hangup | mute | unmute }) — control the CURRENT live call. Only on explicit request ("mute me", "end the call"). Errors when no call is active.
+
 ## Navigation tool
 - navigate_to({ route, reason }) — drives the FE to a different screen. The agent's autonomy mode decides whether to auto-navigate or render a click-to-go card.
   Allowed routes: /sales (dashboard) | /insights | /leads | /leads/new | /leads/<leadId> | /plans | /plans?zip=<zip> | /plans/<planId> | /plans/compare | /pharmacies | /drugs | /providers | /recommendations | /yoy.

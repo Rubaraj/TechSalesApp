@@ -16,6 +16,10 @@ export type AtlasStreamEvent =
       preview: unknown;
     }
   | { type: 'navigate'; route: string; reason: string }
+  /** Gap 1 — dial request from start_call. */
+  | { type: 'dial'; to: string; leadId?: string; leadName?: string }
+  /** Gap 1 — live-call control from control_call. */
+  | { type: 'call_control'; action: 'hangup' | 'mute' | 'unmute' }
   /** Rich-chat — a tool result the FE renders as a purpose-built card. */
   | { type: 'display_card'; card: AtlasCardType; tool: string; data: unknown }
   | { type: 'final'; content: string; interactionId: string }
