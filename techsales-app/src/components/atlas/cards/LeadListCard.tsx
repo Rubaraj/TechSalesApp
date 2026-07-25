@@ -44,7 +44,11 @@ function parseLeadList(data: unknown): LeadListData | null {
       state: isStr(l.state) ? l.state : undefined,
     });
   }
-  if (leads.length === 0) return null;
+  // Empty result sets are VALID (a search that matched nothing) — only
+  // reject payloads that don't even carry a leads/total shape.
+  if (leads.length === 0 && !Array.isArray(obj.leads) && !isNum(obj.total) && !isNum(obj.totalCount)) {
+    return null;
+  }
   const total = isNum(obj.total) ? obj.total : isNum(obj.totalCount) ? obj.totalCount : leads.length;
   const counts = asObj(obj.countsByStatus);
   return {
@@ -90,6 +94,14 @@ export function LeadListCard({ card }: { card: AtlasDisplayCard }): React.JSX.El
               {status} · {n}
             </span>
           ))}
+        </div>
+      )}
+      {visible.length === 0 && (
+        <div
+          className="px-3.5 py-3"
+          style={{ fontSize: 12.5, color: 'var(--color-atlas-fg-subtle)', fontStyle: 'italic' }}
+        >
+          No leads matched this search.
         </div>
       )}
       <div>

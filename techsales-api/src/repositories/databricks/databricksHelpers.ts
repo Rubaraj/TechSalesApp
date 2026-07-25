@@ -110,14 +110,18 @@ export function inMemorySearch<T>(input: InMemorySearchInput<T>): InMemorySearch
     }
   }
 
-  // Free-text search across the named fields, case-insensitive substring match.
-  const term = input.searchTerm?.trim().toLowerCase();
-  if (term && input.searchFields && input.searchFields.length > 0) {
+  // Free-text search across the named fields, case-insensitive substring
+  // match. Multi-word terms: every word must match at least one field (full
+  // names span firstName + lastName). Mirrors utils/search.searchByFields.
+  const words = (input.searchTerm?.trim().toLowerCase() ?? '').split(/\s+/).filter(Boolean);
+  if (words.length > 0 && input.searchFields && input.searchFields.length > 0) {
     rows = rows.filter((row) =>
-      (input.searchFields ?? []).some((f) => {
-        const v = asRec(row)[f as string];
-        return typeof v === 'string' && v.toLowerCase().includes(term);
-      }),
+      words.every((word) =>
+        (input.searchFields ?? []).some((f) => {
+          const v = asRec(row)[f as string];
+          return typeof v === 'string' && v.toLowerCase().includes(word);
+        }),
+      ),
     );
   }
 

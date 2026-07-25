@@ -16,21 +16,29 @@ export const filterByField = <T extends object>(
   value: unknown,
 ): T[] => items.filter((item) => item[field] === value);
 
-/** Case-insensitive search across the named string fields. */
+/**
+ * Case-insensitive search across the named string fields. Multi-word terms
+ * ("Joshua Johnson") require EVERY word to match at least one field — a
+ * full name spans firstName + lastName, which whole-term matching against
+ * individual fields can never satisfy. Single-word behavior is unchanged.
+ */
 export const searchByFields = <T extends object>(
   items: T[],
   searchTerm: string,
   fields: (keyof T)[],
 ): T[] => {
-  const lowerSearch = searchTerm.toLowerCase();
+  const words = searchTerm.toLowerCase().trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return items;
   return items.filter((item) =>
-    fields.some((field) => {
-      const value = item[field];
-      if (typeof value === 'string') {
-        return value.toLowerCase().includes(lowerSearch);
-      }
-      return false;
-    }),
+    words.every((word) =>
+      fields.some((field) => {
+        const value = item[field];
+        if (typeof value === 'string') {
+          return value.toLowerCase().includes(word);
+        }
+        return false;
+      }),
+    ),
   );
 };
 

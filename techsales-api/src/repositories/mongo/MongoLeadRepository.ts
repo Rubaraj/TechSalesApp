@@ -81,19 +81,26 @@ export class MongoLeadRepository implements IRepository<Lead> {
       }
     }
     if (params.searchTerm && params.searchTerm.trim()) {
-      const re = new RegExp(escapeRegex(params.searchTerm.trim()), 'i');
-      query.$or = [
-        { leadId: re },
-        { firstName: re },
-        { lastName: re },
-        { email: re },
-        { phone: re },
-        { city: re },
-        { county: re },
-        { zipCode: re },
-        { medicareNumber: re },
-        { medicaidId: re },
-      ];
+      // Multi-word terms ("Joshua Johnson"): every word must match at least
+      // one field (AND of per-word ORs) — a full name spans firstName +
+      // lastName, which a single whole-term regex can never match.
+      const words = params.searchTerm.trim().split(/\s+/);
+      const fields = [
+        'leadId',
+        'firstName',
+        'lastName',
+        'email',
+        'phone',
+        'city',
+        'county',
+        'zipCode',
+        'medicareNumber',
+        'medicaidId',
+      ] as const;
+      query.$and = words.map((w) => {
+        const re = new RegExp(escapeRegex(w), 'i');
+        return { $or: fields.map((f) => ({ [f]: re })) };
+      });
     }
 
     const sort: Record<string, 1 | -1> = {};
