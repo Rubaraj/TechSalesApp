@@ -161,6 +161,13 @@ function buildDynamic(input: AtlasPromptInput): string {
     if (input.call.recentTranscript) {
       lines.push(`Last few transcript lines:\n${input.call.recentTranscript}`);
     }
+  } else {
+    // Explicit grounding — without this the model may infer an active call
+    // from stale dial confirmations in the chat history.
+    lines.push(
+      'NO call is in progress right now. Any calls mentioned earlier in this ' +
+        'conversation have ended; a new dial request requires a fresh start_call.',
+    );
   }
   lines.push(
     `Autonomy mode: ${input.mode.toUpperCase()}. ` +
