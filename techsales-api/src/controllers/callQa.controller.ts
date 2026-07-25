@@ -10,7 +10,9 @@
  * session auth in this app yet); documented follow-up.
  */
 import type { Request, Response } from 'express';
+import { logger } from '../config/logger.js';
 import { repos } from '../repositories/registry.js';
+import { friendlyLlmError } from '../ai/llm/friendlyError.js';
 import { resolveAgentName, resolveAgentNames } from '../services/agentNameCache.js';
 import {
   runQaReview,
@@ -79,7 +81,9 @@ export async function postQaReview(req: Request, res: Response): Promise<void> {
     }
     const msg = err instanceof Error ? err.message : String(err);
     // Stub provider (no LLM) surfaces as a clean 503, other failures 500.
+    // Users get friendly copy; the raw error goes to the log.
+    logger.error({ err, callSid: req.params.callSid }, 'QA review failed');
     const status = msg.includes('AI_LLM_PROVIDER=stub') ? 503 : 500;
-    res.status(status).json({ success: false, error: msg });
+    res.status(status).json({ success: false, error: friendlyLlmError(err) });
   }
 }

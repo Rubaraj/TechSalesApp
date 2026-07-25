@@ -42,7 +42,8 @@ function reviewErrorCopy(error: string, status: number): string {
   if (error.includes('401')) {
     return 'LLM provider unreachable (auth failed) — check the OpenRouter key / start the VM.';
   }
-  return `Review failed: ${error}`;
+  // Backend already returns user-friendly copy — show it as-is.
+  return error;
 }
 
 type LoadState =

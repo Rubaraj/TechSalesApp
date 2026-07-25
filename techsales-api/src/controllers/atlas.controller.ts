@@ -21,6 +21,7 @@ import {
   type AtlasStreamEvent,
 } from '../ai/agents/atlasAgent.js';
 import { getLiveCallContext } from '../ai/agents/callAnalysisAgent.js';
+import { friendlyLlmError } from '../ai/llm/friendlyError.js';
 import {
   getSessionMessages,
   appendSessionMessage,
@@ -155,7 +156,8 @@ export async function postAtlasChat(req: Request, res: Response): Promise<void> 
       writeEvent(event);
     }
   } catch (err) {
-    writeEvent({ type: 'error', error: err instanceof Error ? err.message : String(err) });
+    logger.error({ err, userId }, 'atlas chat: stream errored');
+    writeEvent({ type: 'error', error: friendlyLlmError(err) });
   }
 
   // Persist the assistant turn. Card-only turns (no text) persist too —

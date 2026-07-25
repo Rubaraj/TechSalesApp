@@ -30,6 +30,7 @@ import { streamChatAgent } from '../ai/agents/chatAgent.js';
 import { AuditCallbackHandler } from '../ai/llm/callbacks.js';
 import { getProviderReadinessError } from '../ai/llm/chatModel.js';
 import { logger } from '../config/logger.js';
+import { friendlyLlmError } from '../ai/llm/friendlyError.js';
 
 interface EchoRequestBody {
   text?: unknown;
@@ -459,10 +460,9 @@ export async function chatHandler(req: Request, res: Response): Promise<void> {
       res.write(`data: ${JSON.stringify(event)}\n\n`);
     }
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
     logger.error({ err, memberId, planId }, 'chatHandler stream errored');
     try {
-      res.write(`data: ${JSON.stringify({ type: 'error', error: message })}\n\n`);
+      res.write(`data: ${JSON.stringify({ type: 'error', error: friendlyLlmError(err) })}\n\n`);
     } catch {
       // socket dead — nothing more to do.
     }

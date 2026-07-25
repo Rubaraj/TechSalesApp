@@ -19,6 +19,7 @@ import {
   SystemMessage,
 } from '@langchain/core/messages';
 import { getChatModel } from '../llm/chatModel.js';
+import { friendlyLlmError } from '../llm/friendlyError.js';
 import { AuditCallbackHandler } from '../llm/callbacks.js';
 import { env } from '../../config/env.js';
 import { logger } from '../../config/logger.js';
@@ -209,7 +210,8 @@ export async function* streamAtlasAgent(
   try {
     llm = getChatModel({ premium: false });
   } catch (err) {
-    yield { type: 'error', error: err instanceof Error ? err.message : String(err) };
+    logger.error({ err, userId: input.userId }, 'atlasAgent: chat model init failed');
+    yield { type: 'error', error: friendlyLlmError(err) };
     return;
   }
 
@@ -351,7 +353,8 @@ export async function* streamAtlasAgent(
     } else {
       agentError = err instanceof Error ? err.message : String(err);
       logger.error({ err, userId: input.userId }, 'atlasAgent stream failed');
-      yield { type: 'error', error: agentError };
+      // Raw error stays in the log above; users get friendly copy.
+      yield { type: 'error', error: friendlyLlmError(err) };
     }
   }
 

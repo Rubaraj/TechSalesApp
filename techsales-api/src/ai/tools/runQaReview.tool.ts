@@ -6,6 +6,7 @@
 import { tool } from '@langchain/core/tools';
 import { z } from 'zod';
 import { repos } from '../../repositories/registry.js';
+import { friendlyLlmError } from '../llm/friendlyError.js';
 import {
   runQaReview,
   QaReviewConflictError,
@@ -44,7 +45,7 @@ export const runQaReviewTool = tool(
       if (err instanceof QaReviewConflictError) {
         return JSON.stringify({ error: 'A QA review is already running for this call.' });
       }
-      return JSON.stringify({ error: String(err) });
+      return JSON.stringify({ error: friendlyLlmError(err) });
     }
   },
   {
