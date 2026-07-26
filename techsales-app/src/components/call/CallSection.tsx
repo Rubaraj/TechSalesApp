@@ -8,7 +8,8 @@
  * Returns null when no call is active.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Mic, MicOff, PhoneOff, AlertTriangle, Radio } from 'lucide-react';
+import { Mic, MicOff, PhoneOff, AlertTriangle, Radio, Lightbulb, X } from 'lucide-react';
+import type { ProspectEmotion } from '../../types/call';
 import { useCallContext } from '../../context/CallContext';
 import { useCallRuntime } from './CallRuntime';
 import { useCallAnalysis } from '../../hooks/useCallAnalysis';
@@ -22,6 +23,17 @@ import { IncomingCallView } from './IncomingCallView';
 
 const COMPLIANCE_FADE_MS = 5_000;
 
+/** Live intelligence — emotion badge tones on the dark atlas surface.
+ *  (Ported from the unmounted CallPanel; fixed hues because the atlas panel
+ *  is dark in both app themes.) */
+const EMOTION_TONES: Record<ProspectEmotion, { bg: string; fg: string }> = {
+  positive: { bg: 'rgba(34,197,94,0.16)', fg: '#4ade80' },
+  neutral: { bg: 'var(--color-atlas-surface-3)', fg: 'var(--color-atlas-fg-muted)' },
+  confused: { bg: 'rgba(245,158,11,0.16)', fg: '#fbbf24' },
+  frustrated: { bg: 'rgba(249,115,22,0.18)', fg: '#fb923c' },
+  upset: { bg: 'rgba(239,68,68,0.18)', fg: '#f87171' },
+};
+
 function formatDuration(ms: number): string {
   const totalSec = Math.max(0, Math.floor(ms / 1000));
   const mm = String(Math.floor(totalSec / 60)).padStart(2, '0');
@@ -30,7 +42,9 @@ function formatDuration(ms: number): string {
 }
 
 export function CallSection(): React.JSX.Element | null {
-  const { state } = useCallContext();
+  const { state, dismissCoachingTip } = useCallContext();
+  // Newest non-dismissed coaching tip (reducer caps + orders newest-first).
+  const visibleCoachTip = state.coachingTips.find((t) => !t.dismissed) ?? null;
 
   const [now, setNow] = useState<number>(() => Date.now());
   useEffect(() => {
@@ -160,6 +174,18 @@ export function CallSection(): React.JSX.Element | null {
           </div>
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
+          {callInProgress && state.prospectEmotion && (
+            <span
+              className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide"
+              style={{
+                background: EMOTION_TONES[state.prospectEmotion.emotion].bg,
+                color: EMOTION_TONES[state.prospectEmotion.emotion].fg,
+              }}
+              title={`Prospect sounds ${state.prospectEmotion.emotion} (${Math.round(state.prospectEmotion.confidence * 100)}% confidence)`}
+            >
+              {state.prospectEmotion.emotion}
+            </span>
+          )}
           {callInProgress && (
             <span
               className="px-2 py-0.5 rounded-md text-[11px]"
@@ -243,6 +269,47 @@ export function CallSection(): React.JSX.Element | null {
           {visibleComplianceFlags.map((flag) => (
             <ComplianceAlert key={flag.id} flag={flag} />
           ))}
+        </div>
+      )}
+
+      {/* Live intelligence — newest coaching tip, sticky below compliance.
+       *  'rule' tips are the instant canned suggestion; the richer 'ai' tip
+       *  replaces them when it lands (reducer handles the swap). */}
+      {!showDialer && !showIncomingRing && visibleCoachTip && (
+        <div
+          className="px-3 py-2"
+          style={{
+            borderBottom: '1px solid rgba(167,139,250,0.35)',
+            background: 'rgba(139,92,246,0.10)',
+          }}
+          role="region"
+          aria-label="Coaching tip"
+        >
+          <div className="flex items-start gap-2">
+            <Lightbulb className="w-4 h-4 shrink-0 mt-0.5" style={{ color: '#a78bfa' }} />
+            <div className="min-w-0 flex-1">
+              <p className="text-xs" style={{ color: '#ddd6fe' }}>
+                {visibleCoachTip.tip}
+              </p>
+              <p
+                className="text-[10px] uppercase tracking-wider mt-0.5"
+                style={{ color: '#a78bfa' }}
+              >
+                Coach · {visibleCoachTip.focus}
+                {visibleCoachTip.source === 'rule' ? ' · from rule' : ''}
+              </p>
+            </div>
+            <button
+              onClick={() => dismissCoachingTip(visibleCoachTip.id)}
+              className="p-0.5 rounded transition-colors"
+              style={{ color: '#a78bfa' }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(139,92,246,0.20)')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+              aria-label="Dismiss coaching tip"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
       )}
 
