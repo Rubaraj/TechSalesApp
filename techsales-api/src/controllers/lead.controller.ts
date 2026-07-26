@@ -40,26 +40,38 @@ export async function getLeadById(req: Request, res: Response<ServiceResponse<Le
  * `phone` query param can be E.164 or any digit-y string; matching is by
  * trailing-10 digits (handles stored format variance).
  */
+type LeadPhoneProjection = Pick<
+  Lead,
+  'leadId' | 'firstName' | 'lastName' | 'phone' | 'leadStatus' | 'state' | 'updatedAt'
+>;
+
+const projectLead = (lead: Lead): LeadPhoneProjection => ({
+  leadId: lead.leadId,
+  firstName: lead.firstName,
+  lastName: lead.lastName,
+  phone: lead.phone,
+  leadStatus: lead.leadStatus,
+  state: lead.state,
+  updatedAt: lead.updatedAt,
+});
+
 export async function lookupLeadByPhone(
   req: Request,
   res: Response<
-    ServiceResponse<
-      Pick<
-        Lead,
-        | 'leadId'
-        | 'firstName'
-        | 'lastName'
-        | 'phone'
-        | 'leadStatus'
-        | 'state'
-        | 'updatedAt'
-      >
-    >
+    ServiceResponse<LeadPhoneProjection | { matches: LeadPhoneProjection[] }>
   >,
 ): Promise<void> {
   const phone = stringOrUndef(req.query.phone) ?? '';
   if (!phone) {
     res.status(400).json({ success: false, error: '`phone` query parameter is required' });
+    return;
+  }
+  // Gap 3 — `?all=true` returns EVERY match (shared/family numbers) for the
+  // call-connect lead-routing popup. 200 with an empty array on no match
+  // (the caller decides UX). Default single-match shape is unchanged.
+  if (req.query.all === 'true') {
+    const matches = await repos.lead.findAllByPhone(phone);
+    res.json({ success: true, data: { matches: matches.map(projectLead) } });
     return;
   }
   const lead = await repos.lead.findByPhone(phone);
@@ -72,18 +84,7 @@ export async function lookupLeadByPhone(
   // (inbound IncomingCallView) only read leadId / name and are unaffected
   // by the extra fields. Dual/LIS flags live on ExtractedEntities, not the
   // persistent Lead — they're not surfaced here.
-  res.json({
-    success: true,
-    data: {
-      leadId: lead.leadId,
-      firstName: lead.firstName,
-      lastName: lead.lastName,
-      phone: lead.phone,
-      leadStatus: lead.leadStatus,
-      state: lead.state,
-      updatedAt: lead.updatedAt,
-    },
-  });
+  res.json({ success: true, data: projectLead(lead) });
 }
 
 export async function searchLeads(

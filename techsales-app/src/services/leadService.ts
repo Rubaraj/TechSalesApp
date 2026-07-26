@@ -103,6 +103,35 @@ export const lookupLeadByPhone = async (
   return apiGet<LeadPhoneLookup>(`/leads/lookup-by-phone?phone=${encodeURIComponent(phone)}`);
 };
 
+/**
+ * Gap 3 — ALL leads matching a phone (shared/family numbers) for the
+ * call-connect routing popup. Returns [] on no match or any error.
+ */
+export const lookupLeadsByPhone = async (phone: string): Promise<LeadPhoneLookup[]> => {
+  if (getMode() === 'local') {
+    const last10 = phone.replace(/\D/g, '').slice(-10);
+    return leads
+      .filter((l) => (l.phone ?? '').replace(/\D/g, '').slice(-10) === last10)
+      .map((l) => ({
+        leadId: l.leadId,
+        firstName: l.firstName,
+        lastName: l.lastName,
+        phone: l.phone,
+        leadStatus: l.leadStatus,
+        state: l.state,
+        updatedAt: l.updatedAt,
+      }));
+  }
+  try {
+    const res = await apiGet<{ matches: LeadPhoneLookup[] }>(
+      `/leads/lookup-by-phone?phone=${encodeURIComponent(phone)}&all=true`,
+    );
+    return res.success && res.data ? res.data.matches : [];
+  } catch {
+    return [];
+  }
+};
+
 export const searchLeads = async (
   params: LeadSearchParams,
 ): Promise<ServiceResponse<LeadSearchResult>> => {

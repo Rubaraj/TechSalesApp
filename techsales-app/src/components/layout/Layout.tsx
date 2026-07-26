@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom';
 import { Header } from './Header';
 import { CallRuntime } from '../call/CallRuntime';
 import { PendingCaptureNudge } from '../call/PendingCaptureNudge';
+import { CallLeadRoutingHost } from '../call/CallLeadRoutingHost';
 import { AtlasPanel } from '../atlas/AtlasPanel';
 import { useAtlas } from '../../context/AtlasContext';
 import { useCallContext } from '../../context/CallContext';
@@ -53,6 +54,8 @@ export function Layout() {
         <AtlasPanel />
         {/* Gap 2 — floating "AI captured N items" chip on any non-form page. */}
         <PendingCaptureNudge />
+        {/* Gap 3 — auto-open the matching lead when a call connects. */}
+        <CallLeadRoutingHost />
       </div>
     </CallRuntime>
   );
