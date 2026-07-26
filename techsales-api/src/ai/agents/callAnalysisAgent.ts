@@ -258,7 +258,7 @@ export function stopCallAnalysisByCallSid(callSid: string): void {
 
 function runStub(callSid: string, chunk: TranscriptChunk, userId?: string): void {
   if (chunk.speaker === 'agent') {
-    runAgentSideAnalysis(callSid, chunk.text, userId);
+    runAgentSideAnalysis(callSid, chunk, userId);
   } else if (chunk.speaker === 'prospect') {
     void runProspectSideAnalysis(callSid, chunk.text, userId);
   }
@@ -266,10 +266,10 @@ function runStub(callSid: string, chunk: TranscriptChunk, userId?: string): void
 
 function runAgentSideAnalysis(
   callSid: string,
-  text: string,
+  chunk: TranscriptChunk,
   userId?: string,
 ): void {
-  const violations = scanForViolations(text, getCompiledRulesSync());
+  const violations = scanForViolations(chunk.text, getCompiledRulesSync());
   if (violations.length === 0) return;
 
   const actions: AiAction[] = violations.map((v) => ({
@@ -279,6 +279,9 @@ function runAgentSideAnalysis(
     suggestion: v.suggestion,
     severity: v.severity,
     ruleName: v.ruleName,
+    // Gap 5 — lets the FE mark the exact transcript bubble that tripped
+    // the rule (chunk ids are stable across interim→final refinement).
+    chunkId: chunk.id,
   }));
   publish(callSid, { type: 'actions', actions });
 
@@ -290,6 +293,7 @@ function runAgentSideAnalysis(
       suggestion: v.suggestion,
       severity: v.severity,
       ruleName: v.ruleName,
+      chunkId: chunk.id,
     });
     publishGlobal({
       type: 'compliance_flag',

@@ -32,6 +32,7 @@ import { useCallAnalysis } from '../../hooks/useCallAnalysis';
 import { CallWaveform } from './CallWaveform';
 import { Dialer } from './Dialer';
 import { TranscriptBubble } from './TranscriptBubble';
+import { buildFlagByChunkId } from './transcriptFlags';
 import { AudioDeviceSelector } from './AudioDeviceSelector';
 import { ComplianceAlert } from './ComplianceAlert';
 import { EntitySummary } from './EntitySummary';
@@ -86,6 +87,12 @@ export function CallPanel() {
   const durationMs = useMemo(
     () => (state.callStartTime ? now - state.callStartTime : 0),
     [now, state.callStartTime],
+  );
+
+  // Gap 5 — inline flag marking on transcript bubbles.
+  const flagByChunkId = useMemo(
+    () => buildFlagByChunkId(state.complianceFlags),
+    [state.complianceFlags],
   );
 
   // Phase 3a — dismissed compliance flags fade then filter. The reducer
@@ -379,6 +386,7 @@ export function CallPanel() {
                 chunk={c}
                 diarized
                 offsetLabel={formatDuration(offsetMs)}
+                flag={flagByChunkId.get(c.id)}
               />
             );
           })}
