@@ -12,7 +12,7 @@ import { useEffect, useRef } from 'react';
 import { useCallContext } from '../context/CallContext';
 import { useAtlas } from '../context/AtlasContext';
 import { useAuth } from '../context/AuthContext';
-import { lookupLeadByPhone } from '../services/leadService';
+import { lookupLeadsByPhone } from '../services/leadService';
 
 function newId(): string {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
@@ -45,16 +45,21 @@ export function useOutboundLeadIdentification(): void {
     // can see it.
     setPanelOpen(true);
 
-    void lookupLeadByPhone(phone).then((res) => {
-      if (res.success) {
+    // Gap 3 refinement — all-matches lookup: exactly ONE match gets the
+    // identified card; MULTIPLE matches get NO card here (the routing
+    // popup handles selection and pushes the card for the CHOSEN lead —
+    // a first-match card would point "Open lead" at the wrong person);
+    // zero matches get the create card.
+    void lookupLeadsByPhone(phone).then((matches) => {
+      if (matches.length === 1) {
         addLeadSuggestion({
           id: newId(),
           kind: 'identified',
-          lead: res.data,
+          lead: matches[0],
           phone,
           ts: Date.now(),
         });
-      } else {
+      } else if (matches.length === 0) {
         addLeadSuggestion({
           id: newId(),
           kind: 'create',

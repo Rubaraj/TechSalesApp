@@ -18,7 +18,20 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { PhoneIncoming, UserPlus, X, ChevronRight } from 'lucide-react';
 import { Modal, Button, Badge } from '../common';
 import { useCallContext } from '../../context/CallContext';
+import { useAtlas } from '../../context/AtlasContext';
 import { lookupLeadsByPhone, type LeadPhoneLookup } from '../../services/leadService';
+
+/** Module-level so the react-hooks purity analyzer doesn't flag the
+ *  impure id/timestamp generation inside an event handler. */
+function makeIdentifiedSuggestion(lead: LeadPhoneLookup, phone: string) {
+  return {
+    id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    kind: 'identified' as const,
+    lead,
+    phone,
+    ts: Date.now(),
+  };
+}
 
 const STATUS_BADGE: Record<string, 'info' | 'primary' | 'warning' | 'success' | 'danger' | 'default'> = {
   'New Lead': 'info',
@@ -31,10 +44,17 @@ const STATUS_BADGE: Record<string, 'info' | 'primary' | 'warning' | 'success' | 
 
 export function CallLeadRoutingHost(): React.JSX.Element | null {
   const { state, bindCurrentCallToLead } = useCallContext();
+  const { addLeadSuggestion } = useAtlas();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [popup, setPopup] = useState<{ number: string; matches: LeadPhoneLookup[] } | null>(null);
+  const [popup, setPopup] = useState<{
+    number: string;
+    matches: LeadPhoneLookup[];
+    /** Outbound = selection binds only (the Atlas card opens the lead);
+     *  inbound = selection binds AND navigates (the original gap). */
+    direction: 'inbound' | 'outbound';
+  } | null>(null);
   // One routing decision per call.
   const routedCallIdRef = useRef<string | null>(null);
   const locationRef = useRef(location.pathname);
@@ -42,12 +62,13 @@ export function CallLeadRoutingHost(): React.JSX.Element | null {
     locationRef.current = location.pathname;
   }, [location.pathname]);
 
-  const { callId, callStatus, leadId, incomingCaller, dialedNumber } = {
+  const { callId, callStatus, leadId, incomingCaller, dialedNumber, direction } = {
     callId: state.callId,
     callStatus: state.callStatus,
     leadId: state.leadId,
     incomingCaller: state.incomingCaller,
     dialedNumber: state.dialedNumber,
+    direction: state.direction,
   };
 
   useEffect(() => {
@@ -55,11 +76,16 @@ export function CallLeadRoutingHost(): React.JSX.Element | null {
     if (routedCallIdRef.current === callId) return;
     routedCallIdRef.current = callId;
 
-    // Already bound (PhoneButton / Atlas dial with leadId): just make sure
-    // the agent is looking at the lead.
+    const isInbound = direction === 'inbound';
+
+    // Already bound (PhoneButton / Atlas dial with leadId, or single-match
+    // ring identification): inbound auto-opens the lead; outbound leaves
+    // navigation to the Atlas "Open lead" card (agent chose whom to call).
     if (leadId) {
-      const target = `/leads/${leadId}`;
-      if (locationRef.current !== target) navigate(target);
+      if (isInbound) {
+        const target = `/leads/${leadId}`;
+        if (locationRef.current !== target) navigate(target);
+      }
       return;
     }
 
@@ -67,24 +93,35 @@ export function CallLeadRoutingHost(): React.JSX.Element | null {
     if (!number) return;
 
     void lookupLeadsByPhone(number).then((matches) => {
-      // Call may have ended while we looked up — don't yank the UI then.
       if (matches.length === 1) {
         bindCurrentCallToLead(matches[0].leadId);
-        const target = `/leads/${matches[0].leadId}`;
-        if (locationRef.current !== target) navigate(target);
+        if (isInbound) {
+          const target = `/leads/${matches[0].leadId}`;
+          if (locationRef.current !== target) navigate(target);
+        }
         return;
       }
-      setPopup({ number, matches });
+      // Outbound zero-match: the Atlas CreateLeadCard already covers it —
+      // no popup noise. Inbound zero-match keeps the popup (create/skip).
+      if (matches.length === 0 && !isInbound) return;
+      setPopup({ number, matches, direction: isInbound ? 'inbound' : 'outbound' });
     });
-  }, [callStatus, callId, leadId, incomingCaller, dialedNumber, bindCurrentCallToLead, navigate]);
+  }, [callStatus, callId, leadId, incomingCaller, dialedNumber, direction, bindCurrentCallToLead, navigate]);
 
   if (!popup) return null;
 
   const closePopup = (): void => setPopup(null);
   const selectLead = (lead: LeadPhoneLookup): void => {
     bindCurrentCallToLead(lead.leadId);
+    const isInbound = popup.direction === 'inbound';
     closePopup();
-    navigate(`/leads/${lead.leadId}`);
+    if (isInbound) {
+      navigate(`/leads/${lead.leadId}`);
+    } else {
+      // Outbound: selection only BINDS. Push the identified card for the
+      // CHOSEN lead so "Open lead" in Atlas points at the right person.
+      addLeadSuggestion(makeIdentifiedSuggestion(lead, popup.number));
+    }
   };
   const newLead = (): void => {
     const phone = popup.number;
