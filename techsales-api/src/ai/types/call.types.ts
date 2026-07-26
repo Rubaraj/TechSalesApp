@@ -127,4 +127,7 @@ export type CallStreamEvent =
       focus: CoachingFocus;
       ts: number;
     }
-  | { type: 'error'; error: string };
+  | { type: 'error'; error: string }
+  /** Gap 7 — LLM degradation state push (on stream open when degraded +
+   *  on every transition while the stream is up). */
+  | { type: 'ai_health'; status: 'ok' | 'degraded'; reason?: string; ts: number };

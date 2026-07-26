@@ -2,6 +2,7 @@ import { Router, type Request, type Response } from 'express';
 import { getDbHealth, isMongoConnected } from '../config/mongo.js';
 import { getMode } from '../repositories/registry.js';
 import { env } from '../config/env.js';
+import { getLlmHealth, type LlmHealthSummary } from '../ai/llm/llmHealth.js';
 import type { ServiceResponse } from '../repositories/types.js';
 
 const PROCESS_START = Date.now();
@@ -21,6 +22,8 @@ interface HealthPayload {
   aiProvider: 'ollama' | 'anthropic' | 'stub';
   /** Phase 2 — whether Twilio+Deepgram call pipeline is configured + on. */
   twilioEnabled: boolean;
+  /** Gap 7 — passive LLM degradation state (real-call outcomes + probe). */
+  llm: LlmHealthSummary;
 }
 
 /**
@@ -40,6 +43,7 @@ healthRouter.get('/', (_req: Request, res: Response<ServiceResponse<HealthPayloa
     aiEnabled: env.AI_ENABLED,
     aiProvider: env.AI_LLM_PROVIDER,
     twilioEnabled: env.TWILIO_ENABLED,
+    llm: getLlmHealth(),
   };
   res.json({ success: true, data: payload });
 });

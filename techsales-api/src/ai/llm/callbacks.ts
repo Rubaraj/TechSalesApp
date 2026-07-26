@@ -14,6 +14,7 @@ import type { Serialized } from '@langchain/core/load/serializable';
 import { repos } from '../../repositories/registry.js';
 import { logger } from '../../config/logger.js';
 import { getActiveProvider, getActiveModel } from './chatModel.js';
+import { reportLlmSuccess, reportLlmFailure } from './llmHealth.js';
 
 export type AiInteractionKind =
   | 'echo'
@@ -200,10 +201,14 @@ export class AuditCallbackHandler extends BaseCallbackHandler {
     this.cachedInputTokens += usage.cachedInputTokens;
     this.cachedReadTokens += usage.cachedReadTokens;
     if (usage.model) this.model = usage.model;
+    // Gap 7 — every real LLM success/failure feeds the central health
+    // state (this handler rides along on all important call sites).
+    reportLlmSuccess();
   }
 
   override async handleLLMError(err: Error): Promise<void> {
     this.llmErrorMessage = err.message;
+    reportLlmFailure(err);
   }
 
   override async handleToolStart(

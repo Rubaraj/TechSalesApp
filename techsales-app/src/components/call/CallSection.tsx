@@ -19,6 +19,7 @@ import { TranscriptBubble } from './TranscriptBubble';
 import { buildFlagByChunkId } from './transcriptFlags';
 import { EntitySummary } from './EntitySummary';
 import { IncomingCallView } from './IncomingCallView';
+import { useAiHealth } from '../../services/aiHealthStore';
 
 /** Live intelligence — emotion badge tones on the dark atlas surface.
  *  (Ported from the unmounted CallPanel; fixed hues because the atlas panel
@@ -40,6 +41,8 @@ function formatDuration(ms: number): string {
 
 export function CallSection(): React.JSX.Element | null {
   const { state } = useCallContext();
+  // Gap 7 — in-call degradation banner above the transcript.
+  const aiHealth = useAiHealth();
 
   const [now, setNow] = useState<number>(() => Date.now());
   useEffect(() => {
@@ -239,6 +242,22 @@ export function CallSection(): React.JSX.Element | null {
           {state.analysisWarning && (
             <div className="rounded-lg border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20 px-2.5 py-2 text-xs text-amber-800 dark:text-amber-300">
               {state.analysisWarning}
+            </div>
+          )}
+          {/* Gap 7 — LLM degradation banner (separate concern from the
+           *  transcript-pipe analysisWarning above). */}
+          {aiHealth.degraded && (
+            <div
+              className="rounded-lg px-2.5 py-2 text-xs"
+              style={{
+                border: '1px solid rgba(245,158,11,0.35)',
+                background: 'rgba(245,158,11,0.10)',
+                color: '#fbbf24',
+              }}
+              role="status"
+              title={aiHealth.reason}
+            >
+              AI insights paused — compliance &amp; coaching rules still active.
             </div>
           )}
           {state.transcript.length === 0 && !state.analysisWarning && (

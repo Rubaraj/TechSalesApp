@@ -18,6 +18,7 @@
  */
 import { useEffect, useRef } from 'react';
 import { callService } from '../services/callService';
+import { setAiHealth } from '../services/aiHealthStore';
 import { useCallContext } from '../context/CallContext';
 import { useAuth } from '../context/AuthContext';
 import type {
@@ -246,6 +247,17 @@ export function useCallAnalysis(): void {
 
       if (event.type === 'entities') {
         mergeEntities(event.entities);
+        return;
+      }
+
+      if (event.type === 'ai_health') {
+        // Gap 7 — instant in-call degradation update (module store, not
+        // context state; the 30s Layout poll covers out-of-call).
+        setAiHealth({
+          degraded: event.status === 'degraded',
+          ...(event.reason ? { reason: event.reason } : {}),
+          since: event.ts,
+        });
         return;
       }
 

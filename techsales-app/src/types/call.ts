@@ -218,7 +218,10 @@ export type CallStreamEvent =
   | { type: 'tool_start'; tool: string; input: unknown }
   | { type: 'tool_end'; tool: string; output: unknown; latencyMs: number }
   | { type: 'thinking'; content: string }
-  | { type: 'error'; error: string };
+  | { type: 'error'; error: string }
+  /** Gap 7 — LLM degradation push (on stream open when degraded + on
+   *  every transition while the stream is up). */
+  | { type: 'ai_health'; status: 'ok' | 'degraded'; reason?: string; ts: number };
 
 /** Which transcription pipeline drives the current call. Single value today
  *  (Twilio + Deepgram); kept as a single-literal union for forward extension

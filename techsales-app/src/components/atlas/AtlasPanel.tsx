@@ -24,6 +24,7 @@ import { CallSection } from '../call/CallSection';
 import { AudioDevicePickerRows } from '../call/AudioDeviceSelector';
 import { AtlasMark } from './AtlasMark';
 import { NewChatConfirm } from './NewChatConfirm';
+import { useAiHealth } from '../../services/aiHealthStore';
 
 // Mirror the clamp values in AtlasContext so the live-drag preview can
 // also bound itself; the context's setter is the authoritative clamp.
@@ -43,6 +44,8 @@ export function AtlasPanel(): React.JSX.Element | null {
   } = useAtlas();
   const { state: callState, setMute } = useCallContext();
   const callPanelVisible = callState.isCallActive && callState.isCallPanelOpen;
+  // Gap 7 — amber "AI degraded" pill in the header when LLM calls fail.
+  const aiHealth = useAiHealth();
 
   const dragRef = useRef<{ startX: number; startWidth: number } | null>(null);
   // App-styled "Start a new chat?" confirm — replaces the native
@@ -153,6 +156,19 @@ export function AtlasPanel(): React.JSX.Element | null {
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
+            {aiHealth.degraded && (
+              <span
+                className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide"
+                style={{
+                  background: 'rgba(245,158,11,0.16)',
+                  color: '#fbbf24',
+                  border: '1px solid rgba(245,158,11,0.35)',
+                }}
+                title={`${aiHealth.reason ?? 'AI features are temporarily unavailable.'} Rule-based monitoring is still active.`}
+              >
+                AI degraded
+              </span>
+            )}
             <ModeToggle />
             <SettingsMenu
               isMuted={state(callState)}

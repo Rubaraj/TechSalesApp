@@ -15,6 +15,7 @@ import { mintVoiceAccessToken } from '../services/twilioService.js';
 import { subscribe, getActiveCalls, type CallBusEvent } from '../services/callBus.js';
 import { repos } from '../repositories/registry.js';
 import type { CallStreamEvent } from '../ai/types/call.types.js';
+import { getLlmHealth, onLlmHealthChange } from '../ai/llm/llmHealth.js';
 import { env } from '../config/env.js';
 import { logger } from '../config/logger.js';
 
@@ -143,6 +144,31 @@ export async function getCallAnalyzeStream(req: Request, res: Response): Promise
   writeEvent(openEvent);
   const heartbeat = setInterval(writeHeartbeat, 15_000);
 
+  // Gap 7 — LLM degradation push. Tell a freshly-attached client if the AI
+  // is already degraded, then forward every transition for the stream's
+  // lifetime. writableEnded guard: transitions can fire in the window
+  // between res.end() ('ended' path below) and the 'close' cleanup.
+  const currentHealth = getLlmHealth();
+  if (currentHealth.status === 'degraded') {
+    const healthEvent: CallStreamEvent = {
+      type: 'ai_health',
+      status: 'degraded',
+      ...(currentHealth.reason ? { reason: currentHealth.reason } : {}),
+      ts: Date.now(),
+    };
+    writeEvent(healthEvent);
+  }
+  const unsubHealth = onLlmHealthChange((health) => {
+    if (res.writableEnded) return;
+    const healthEvent: CallStreamEvent = {
+      type: 'ai_health',
+      status: health.status,
+      ...(health.reason ? { reason: health.reason } : {}),
+      ts: Date.now(),
+    };
+    writeEvent(healthEvent);
+  });
+
   // Split-brain detection: transcripts flow only through THIS process's
   // in-memory callBus. If the call isn't registered here after a grace
   // window, tell the FE it's watching the wrong backend instead of leaving
@@ -227,6 +253,7 @@ export async function getCallAnalyzeStream(req: Request, res: Response): Promise
     clearInterval(heartbeat);
     clearTimeout(notHostedCheck);
     unsubscribe();
+    unsubHealth();
     logger.debug({ callSid }, 'call analyze SSE closed');
   };
 

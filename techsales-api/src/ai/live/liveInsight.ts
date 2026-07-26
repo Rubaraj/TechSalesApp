@@ -36,6 +36,7 @@ import { SystemMessage, HumanMessage } from '@langchain/core/messages';
 import { logger } from '../../config/logger.js';
 import { env } from '../../config/env.js';
 import { getChatModel, getActiveProvider } from '../llm/chatModel.js';
+import { reportLlmFailure } from '../llm/llmHealth.js';
 import { AuditCallbackHandler } from '../llm/callbacks.js';
 import { publish, publishGlobal, type ProspectEmotion } from '../../services/callBus.js';
 import type { TranscriptChunk, AiAction } from '../types/call.types.js';
@@ -205,6 +206,11 @@ async function runTick(callSid: string): Promise<void> {
   try {
     await analyze(callSid, state, history, trigger);
   } catch (err) {
+    // Gap 7 — feed the degradation state. Covers getChatModel()
+    // construction throws that never reach the audit callbacks (invoke
+    // failures are also reported by handleLLMError; reportLlmFailure is
+    // idempotent).
+    reportLlmFailure(err);
     logger.debug({ err, callSid }, 'liveInsight: tick failed (skipped)');
   } finally {
     const s = states.get(callSid);
