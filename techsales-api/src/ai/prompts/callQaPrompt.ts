@@ -4,35 +4,45 @@
  */
 import type { CallLine, CallTag } from '../../models/callRecord.model.js';
 import type { CallMetrics } from '../qa/computeCallMetrics.js';
+import type { QaRubric } from '../qa/qaRubric.js';
 
 const MAX_TRANSCRIPT_CHARS = 24_000;
 
-export const QA_SYSTEM_PROMPT = `You are a Medicare sales call QA reviewer for a licensed insurance agency.
+/**
+ * Gap 9 — the system prompt is now assembled from the admin-editable
+ * rubric (Admin › QA Rubric): dimension bullets + disclosure checklist
+ * come from DB rows; only this scaffold text lives in code.
+ */
+export function buildQaSystemPrompt(rubric: QaRubric): string {
+  const dimensionBullets = rubric.dimensions
+    .map((d) => `- ${d.key}: ${d.label} (weight ${d.weight ?? 3}/5). ${d.description ?? ''}`.trim())
+    .join('\n');
+
+  const hasHeavyDimension = rubric.dimensions.some((d) => (d.weight ?? 3) >= 5);
+  const capSentence = hasHeavyDimension
+    ? ' A serious violation on a weight-5 dimension should cap the overall score below 60.'
+    : '';
+
+  const disclosureBullets =
+    rubric.disclosures.length > 0
+      ? rubric.disclosures.map((d) => `- "${d.label}"`).join('\n')
+      : '- (no required disclosures configured — return an empty checklist)';
+
+  return `You are a Medicare sales call QA reviewer for a licensed insurance agency.
 Score the AGENT's performance on the call transcript below. Be evidence-based:
 every score and checklist judgment must cite a short quote or observation from
 the transcript. Be fair but rigorous — this feedback is used for coaching.
 
-Scoring dimensions (0-100 each):
-- compliance: CMS marketing rules. No superlatives ("best plan"), no absolute
-  claims ("completely free", "guaranteed"), no pressure tactics, required
-  disclaimers when discussing benefits. Rule-based flags detected during the
-  call are listed under TAGS — verify them and look for anything they missed.
-- discovery: did the agent learn the prospect's situation — zip/county,
-  current coverage, medications, pharmacy, doctors, budget, eligibility?
-- communication: clarity, pacing, listening (see talk-ratio metric),
-  professionalism, plain-language explanations of Medicare concepts.
-- nextSteps: clear outcome — follow-up scheduled, enrollment step set,
-  expectations established.
+Scoring dimensions (0-100 each; higher weight = bigger influence on the
+overall score). Rule-based flags detected during the call are listed under
+TAGS — verify them and look for anything they missed.
+${dimensionBullets}
 
-overallScore: weighted judgment (compliance weighs heaviest — a serious
-violation should cap the overall score below 60).
+overallScore: weighted judgment across the dimensions above.${capSentence}
 
 disclosureChecklist items to evaluate:
-- "Agent identified themselves and the purpose of the call"
-- "No superlative or absolute claims about plans"
-- "Costs/benefits stated accurately with appropriate qualifiers"
-- "Prospect consent/willingness to continue was respected"
-- "Clear next step or close was established"`;
+${disclosureBullets}`;
+}
 
 function renderMmSs(ts: number, startTs: number): string {
   const sec = Math.max(0, Math.round((ts - startTs) / 1000));

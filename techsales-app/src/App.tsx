@@ -20,6 +20,7 @@ import {
   SupervisionCallDetail,
   ComplianceRulesManagement,
   CoachingRulesManagement,
+  QaRubricManagement,
 } from './pages/admin';
 import { LeadList, LeadDetail, LeadForm } from './pages/leads';
 import { PlanList, PlanDetail, PlanCompare } from './pages/plans';
@@ -263,6 +264,14 @@ function AppRoutes() {
             element={
               <AdminRoute>
                 <CoachingRulesManagement />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="qa-rubric"
+            element={
+              <AdminRoute>
+                <QaRubricManagement />
               </AdminRoute>
             }
           />

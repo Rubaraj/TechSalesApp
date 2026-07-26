@@ -44,6 +44,8 @@ export * from './complianceRule.js';
 
 export * from './coachingRule.js';
 
+export * from './qaRubricItem.js';
+
 // Common types
 export interface ApiResponse<T> {
   success: boolean;

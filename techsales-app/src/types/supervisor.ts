@@ -26,12 +26,11 @@ export interface QaDimension {
 
 export interface QaScorecard {
   overallScore: number;
-  dimensions: {
-    compliance: QaDimension;
-    discovery: QaDimension;
-    communication: QaDimension;
-    nextSteps: QaDimension;
-  };
+  /** Gap 9 — keys come from the admin-editable rubric at review time. */
+  dimensions: Record<string, QaDimension>;
+  /** Gap 9 — key → label snapshot the review was scored against (absent
+   *  on reviews older than the editable rubric). */
+  dimensionLabels?: Record<string, string>;
   strengths: string[];
   coachingPoints: string[];
   disclosureChecklist: Array<{ item: string; met: boolean; evidence: string }>;

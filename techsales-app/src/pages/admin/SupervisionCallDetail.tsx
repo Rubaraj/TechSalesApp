@@ -298,8 +298,10 @@ function Scorecard({ qa }: { qa: QaReview }): React.JSX.Element {
         {Object.entries(qa.dimensions).map(([name, dim]) => (
           <div key={name}>
             <div className="flex justify-between text-sm mb-1">
+              {/* Gap 9 — the review's own label snapshot wins; legacy
+                *  fallback covers reviews older than the editable rubric. */}
               <span className="font-medium text-gray-900 dark:text-white capitalize">
-                {name === 'nextSteps' ? 'Next steps' : name}
+                {qa.dimensionLabels?.[name] ?? (name === 'nextSteps' ? 'Next steps' : name)}
               </span>
               <span className="font-bold text-gray-900 dark:text-white">{dim.score}</span>
             </div>

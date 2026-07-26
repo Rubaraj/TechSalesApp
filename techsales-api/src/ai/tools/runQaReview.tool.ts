@@ -52,9 +52,9 @@ export const runQaReviewTool = tool(
     name: 'run_qa_review',
     description:
       'ADMIN ONLY — run the LLM QA review on a recorded call and get the scorecard ' +
-      '(overall + compliance/discovery/communication/nextSteps scores, strengths, ' +
-      'coaching points, disclosure checklist). Costs tokens; re-running overwrites. ' +
-      'Non-admin users receive an error. Use get_team_calls first to find callSids.',
+      '(overall + per-dimension scores against the supervisor-configured rubric, ' +
+      'strengths, coaching points, disclosure checklist). Costs tokens; re-running ' +
+      'overwrites. Non-admin users receive an error. Use get_team_calls first to find callSids.',
     schema: inputSchema,
   },
 );

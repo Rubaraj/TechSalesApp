@@ -25,6 +25,9 @@ import { DatabricksComplianceRuleRepository } from './databricks/DatabricksCompl
 import { MongoCoachingRuleRepository } from './mongo/MongoCoachingRuleRepository.js';
 import { JsonCoachingRuleRepository } from './json/JsonCoachingRuleRepository.js';
 import { DatabricksCoachingRuleRepository } from './databricks/DatabricksCoachingRuleRepository.js';
+import { MongoQaRubricItemRepository } from './mongo/MongoQaRubricItemRepository.js';
+import { JsonQaRubricItemRepository } from './json/JsonQaRubricItemRepository.js';
+import { DatabricksQaRubricItemRepository } from './databricks/DatabricksQaRubricItemRepository.js';
 import { DatabricksLeadRepository } from './databricks/DatabricksLeadRepository.js';
 import { DatabricksUserRepository } from './databricks/DatabricksUserRepository.js';
 import { DatabricksRoleRepository } from './databricks/DatabricksRoleRepository.js';
@@ -84,6 +87,10 @@ export type CoachingRuleRepo =
   | MongoCoachingRuleRepository
   | JsonCoachingRuleRepository
   | DatabricksCoachingRuleRepository;
+export type QaRubricItemRepo =
+  | MongoQaRubricItemRepository
+  | JsonQaRubricItemRepository
+  | DatabricksQaRubricItemRepository;
 
 export interface Repos {
   health: HealthRepo;
@@ -98,6 +105,7 @@ export interface Repos {
   callRecord: CallRecordRepo;
   complianceRule: ComplianceRuleRepo;
   coachingRule: CoachingRuleRepo;
+  qaRubricItem: QaRubricItemRepo;
 }
 
 interface RegistryState {
@@ -271,6 +279,21 @@ const buildCoachingRuleRepo = (mode: ConnectMode): CoachingRuleRepo => {
   }
 };
 
+const buildQaRubricItemRepo = (mode: ConnectMode): QaRubricItemRepo => {
+  switch (mode) {
+    case 'mongo':
+      return new MongoQaRubricItemRepository();
+    case 'json':
+      return new JsonQaRubricItemRepository();
+    case 'databricks':
+      return new DatabricksQaRubricItemRepository();
+    default: {
+      const _exhaustive: never = mode;
+      throw new Error(`Unknown backend: ${String(_exhaustive)}`);
+    }
+  }
+};
+
 export function initRegistry(connectResult: ConnectResult): void {
   if (state) {
     throw new Error('initRegistry called twice — registry is a singleton.');
@@ -291,6 +314,7 @@ export function initRegistry(connectResult: ConnectResult): void {
       callRecord: buildCallRecordRepo(mode),
       complianceRule: buildComplianceRuleRepo(mode),
       coachingRule: buildCoachingRuleRepo(mode),
+      qaRubricItem: buildQaRubricItemRepo(mode),
     },
   };
   logger.info({ mode }, 'Repository registry initialized');

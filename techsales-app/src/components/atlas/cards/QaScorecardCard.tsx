@@ -1,7 +1,8 @@
 /**
  * Rich-chat — QA scorecard card for `run_qa_review` / `get_qa_review`
- * (admin-only tools). Overall score, four dimension bars, top coaching
- * points, and an "Open in Supervision" link to the full transcript view.
+ * (admin-only tools). Overall score, per-dimension bars (rubric-driven),
+ * top coaching points, and an "Open in Supervision" link to the full
+ * transcript view.
  */
 import { ClipboardCheck, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -34,12 +35,17 @@ function parseQa(data: unknown): QaCardData | null {
   if (!obj || !isStr(obj.callSid) || !isNum(obj.overallScore)) return null;
   const dims: QaDim[] = [];
   const dimsObj = asObj(obj.dimensions);
+  // Gap 9 — dimensions are rubric-driven now: iterate whatever keys the
+  // review carries (schema key order is preserved), labeling from the
+  // review's own snapshot with the legacy map as fallback.
+  const labelsObj = asObj(obj.dimensionLabels);
   if (dimsObj) {
-    for (const key of ['compliance', 'discovery', 'communication', 'nextSteps']) {
-      const d = asObj(dimsObj[key]);
+    for (const [key, raw] of Object.entries(dimsObj)) {
+      const d = asObj(raw);
       if (d && isNum(d.score)) {
+        const snapLabel = labelsObj && isStr(labelsObj[key]) ? labelsObj[key] : undefined;
         dims.push({
-          name: DIM_LABELS[key] ?? key,
+          name: snapLabel ?? DIM_LABELS[key] ?? key,
           score: d.score,
           evidence: isStr(d.evidence) ? d.evidence : undefined,
         });

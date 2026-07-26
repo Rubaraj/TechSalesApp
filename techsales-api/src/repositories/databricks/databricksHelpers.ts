@@ -24,6 +24,7 @@ export const APP_TABLES = {
   callRecords: 'call_records',
   complianceRules: 'compliance_rules',
   coachingRules: 'coaching_rules',
+  qaRubricItems: 'qa_rubric_items',
 } as const;
 
 export const LOOKUP_TABLES = {

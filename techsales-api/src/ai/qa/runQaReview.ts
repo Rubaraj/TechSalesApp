@@ -15,8 +15,9 @@ import { repos } from '../../repositories/registry.js';
 import { getChatModel, getActiveModel } from '../llm/chatModel.js';
 import { AuditCallbackHandler } from '../llm/callbacks.js';
 import { publishGlobal } from '../../services/callBus.js';
-import { QA_SYSTEM_PROMPT, buildQaUserPrompt } from '../prompts/callQaPrompt.js';
+import { buildQaSystemPrompt, buildQaUserPrompt } from '../prompts/callQaPrompt.js';
 import { computeCallMetrics } from './computeCallMetrics.js';
+import { loadQaRubric, type QaRubric } from './qaRubric.js';
 import type { CallRecord, QaScorecard } from '../../models/callRecord.model.js';
 
 const dimensionSchema = z.object({
@@ -24,20 +25,24 @@ const dimensionSchema = z.object({
   evidence: z.string(),
 });
 
-const ScorecardSchema = z.object({
-  overallScore: z.number().min(0).max(100),
-  dimensions: z.object({
-    compliance: dimensionSchema,
-    discovery: dimensionSchema,
-    communication: dimensionSchema,
-    nextSteps: dimensionSchema,
-  }),
-  strengths: z.array(z.string()),
-  coachingPoints: z.array(z.string()),
-  disclosureChecklist: z.array(
-    z.object({ item: z.string(), met: z.boolean(), evidence: z.string() }),
-  ),
-});
+/**
+ * Gap 9 — the scorecard schema is built per review from the admin-editable
+ * rubric: one required property per active dimension, in sortOrder order
+ * (the LLM echoes schema key order, so renderers need no extra sorting).
+ */
+function buildScorecardSchema(rubric: QaRubric) {
+  return z.object({
+    overallScore: z.number().min(0).max(100),
+    dimensions: z.object(
+      Object.fromEntries(rubric.dimensions.map((d) => [d.key as string, dimensionSchema])),
+    ),
+    strengths: z.array(z.string()),
+    coachingPoints: z.array(z.string()),
+    disclosureChecklist: z.array(
+      z.object({ item: z.string(), met: z.boolean(), evidence: z.string() }),
+    ),
+  });
+}
 
 const inFlight = new Set<string>();
 
@@ -70,7 +75,10 @@ export async function runQaReview(
       temperature: 0.2,
     });
 
-    const structured = llm.withStructuredOutput(ScorecardSchema, { name: 'qa_scorecard' });
+    const rubric = await loadQaRubric();
+    const structured = llm.withStructuredOutput(buildScorecardSchema(rubric), {
+      name: 'qa_scorecard',
+    });
     const metrics = computeCallMetrics(record.lines);
     const userPrompt = buildQaUserPrompt({
       lines: record.lines,
@@ -81,9 +89,15 @@ export async function runQaReview(
     });
 
     const scorecard = (await structured.invoke(
-      [new SystemMessage(QA_SYSTEM_PROMPT), new HumanMessage(userPrompt)],
+      [new SystemMessage(buildQaSystemPrompt(rubric)), new HumanMessage(userPrompt)],
       { callbacks: [auditCb] },
     )) as QaScorecard;
+    // Gap 9 — snapshot the dimension labels the review was scored against,
+    // attached HERE so it flows into persistence, REST responses, and both
+    // Atlas tools (which spread the scorecard) automatically.
+    scorecard.dimensionLabels = Object.fromEntries(
+      rubric.dimensions.map((d) => [d.key as string, d.label]),
+    );
 
     const interactionId = await auditCb.flush({
       kind: 'call_qa',
