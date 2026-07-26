@@ -16,6 +16,7 @@ import { subscribe, getActiveCalls, type CallBusEvent } from '../services/callBu
 import { repos } from '../repositories/registry.js';
 import type { CallStreamEvent } from '../ai/types/call.types.js';
 import { getLlmHealth, onLlmHealthChange } from '../ai/llm/llmHealth.js';
+import { getLiveTranscript } from '../ai/agents/callAnalysisAgent.js';
 import { env } from '../config/env.js';
 import { logger } from '../config/logger.js';
 
@@ -185,6 +186,22 @@ export async function getCallAnalyzeStream(req: Request, res: Response): Promise
       logger.warn({ callSid }, 'analyze SSE: call not hosted by this process');
     }
   }, 15_000);
+
+  // Gap 10 — backfill for mid-call attachers (supervisor live view): replay
+  // the transcript-so-far as ONE batch event. No snapshot/subscribe race:
+  // everything from writeHead through subscribe() below is synchronous (no
+  // await) and publish() is a sync EventEmitter dispatch, so no chunk can
+  // land between this snapshot and the subscription attaching. The agent's
+  // own stream connects at call start (empty history → no event).
+  const backfill = getLiveTranscript(callSid);
+  if (backfill.length > 0) {
+    const backfillEvent: CallStreamEvent = {
+      type: 'transcript_backfill',
+      chunks: backfill,
+      ts: Date.now(),
+    };
+    writeEvent(backfillEvent);
+  }
 
   // Forward every callBus event for this call to the SSE wire. Translates
   // bus shape → wire shape (the bus has internal 'status' events; the wire

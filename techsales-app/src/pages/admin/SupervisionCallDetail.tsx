@@ -3,9 +3,16 @@
  * on-demand QA review scorecard panel. Distinguishes not-found (call may
  * still be persisting) from server errors, both with Retry; re-running a
  * QA review requires an arm-then-confirm second click.
+ *
+ * Gap 10 — LIVE MODE: navigating here from a live call row (nav state
+ * {live: true}) attaches to the call's analyze SSE stream instead of
+ * fetching the record: the server backfills the transcript-so-far, new
+ * lines stream in (interims refine in place), compliance flags mark
+ * their line live, and on call end the page flips to the persisted
+ * record (poll with retry — the stream's 'ended' can beat persistence).
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft,
   Sparkles,
@@ -15,11 +22,29 @@ import {
   XCircle,
   Info,
   RefreshCw,
+  Radio,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { getCall, runQaReview } from '../../services/supervisorService';
+import { callService } from '../../services/callService';
 import type { CallRecordDetail, CallTag, QaReview } from '../../types/supervisor';
-import { TAG_INLINE_TONES, TAG_ICONS, formatWhen, scoreTone } from './supervisionUi';
+import type { TranscriptChunk, ProspectEmotion } from '../../types/call';
+import {
+  TAG_INLINE_TONES,
+  TAG_ICONS,
+  EMOTION_CHIP,
+  formatWhen,
+  formatElapsed,
+  scoreTone,
+} from './supervisionUi';
+
+/** Gap 10 — metadata passed by Supervision's live-call rows. */
+interface LiveNavState {
+  live?: boolean;
+  startedAt?: number;
+  agentName?: string;
+  direction?: string;
+}
 
 function tagLabel(tag: CallTag): string {
   if (tag.kind === 'compliance') {
@@ -49,6 +74,7 @@ function reviewErrorCopy(error: string, status: number): string {
 type LoadState =
   | { phase: 'loading' }
   | { phase: 'ready'; record: CallRecordDetail }
+  | { phase: 'live' }
   | { phase: 'missing' }
   | { phase: 'error' };
 
@@ -56,7 +82,10 @@ export function SupervisionCallDetail() {
   const { callSid } = useParams<{ callSid: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const userId = user?.userId ?? '';
+  const navState = (location.state ?? {}) as LiveNavState;
+  const isLiveNav = navState.live === true;
 
   const [load, setLoad] = useState<LoadState>({ phase: 'loading' });
   const [isReviewing, setIsReviewing] = useState(false);
@@ -64,20 +93,140 @@ export function SupervisionCallDetail() {
   const [rerunArmed, setRerunArmed] = useState(false);
   const armTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Gap 10 — live-mode state. liveOverRef flips once the call ends so
+  // record-poll 404s never re-enter live mode.
+  const [liveChunks, setLiveChunks] = useState<TranscriptChunk[]>([]);
+  const [flaggedChunkIds, setFlaggedChunkIds] = useState<Set<string>>(new Set());
+  const [liveEmotion, setLiveEmotion] = useState<ProspectEmotion | null>(null);
+  const [liveWarning, setLiveWarning] = useState<string | null>(null);
+  const liveOverRef = useRef(false);
+
+  /** After the call ends: the analyze stream's 'ended' can beat the record
+   *  write, so poll with retry-on-404 before giving up. */
+  const pollRecord = useCallback(async (): Promise<void> => {
+    if (!userId || !callSid) return;
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const result = await getCall(userId, callSid);
+      if (result.record) {
+        setLoad({ phase: 'ready', record: result.record });
+        return;
+      }
+      if (result.status !== 404) {
+        setLoad({ phase: 'error' });
+        return;
+      }
+      await new Promise((r) => setTimeout(r, 1500));
+    }
+    setLoad({ phase: 'missing' });
+  }, [userId, callSid]);
+
   const fetchRecord = useCallback(() => {
     if (!userId || !callSid) return;
     getCall(userId, callSid).then((result) => {
       if (result.record) {
         setLoad({ phase: 'ready', record: result.record });
+      } else if (result.status === 404 && isLiveNav && !liveOverRef.current) {
+        // Call is still in progress (no record yet) — enter live mode.
+        setLoad({ phase: 'live' });
       } else {
         setLoad(result.status === 404 ? { phase: 'missing' } : { phase: 'error' });
       }
     });
-  }, [userId, callSid]);
+  }, [userId, callSid, isLiveNav]);
 
   useEffect(() => {
     fetchRecord();
   }, [fetchRecord]);
+
+  // Gap 10 — the live analyze-SSE subscription. Opens when live mode is
+  // entered; both the 'ended' event and the stream promise settling funnel
+  // into the same record poll.
+  const isLive = load.phase === 'live';
+  useEffect(() => {
+    if (!isLive || !callSid || !userId) return undefined;
+    const controller = new AbortController();
+
+    const finishToRecord = (): void => {
+      if (liveOverRef.current) return;
+      liveOverRef.current = true;
+      controller.abort();
+      setLoad({ phase: 'loading' });
+      void pollRecord();
+    };
+
+    const upsert = (chunk: TranscriptChunk): void => {
+      setLiveChunks((prev) => {
+        const i = prev.findIndex((c) => c.id === chunk.id);
+        if (i === -1) return [...prev, chunk];
+        const copy = [...prev];
+        copy[i] = chunk;
+        return copy;
+      });
+    };
+
+    void callService
+      .openAnalyzeStream({
+        callSid,
+        userId,
+        signal: controller.signal,
+        onEvent: (event) => {
+          if (event.type === 'transcript') {
+            upsert(event.chunk);
+            return;
+          }
+          if (event.type === 'transcript_backfill') {
+            // Merge as prefix; dedupe by id against anything already live.
+            setLiveChunks((prev) => {
+              const seen = new Set(prev.map((c) => c.id));
+              return [...event.chunks.filter((c) => !seen.has(c.id)), ...prev];
+            });
+            return;
+          }
+          if (event.type === 'actions') {
+            const ids: string[] = [];
+            for (const a of event.actions) {
+              if (a.type === 'compliance_flag' && a.chunkId) ids.push(a.chunkId);
+            }
+            if (ids.length > 0) {
+              setFlaggedChunkIds((prev) => new Set([...prev, ...ids]));
+            }
+            return;
+          }
+          if (event.type === 'emotion') {
+            setLiveEmotion(event.emotion);
+            return;
+          }
+          if (event.type === 'call_status') {
+            if (event.status === 'ended') finishToRecord();
+            else if (event.status === 'not_hosted') {
+              setLiveWarning(
+                'Live transcript unavailable — this backend is not receiving the call audio.',
+              );
+            }
+          }
+        },
+      })
+      .then(finishToRecord)
+      .catch((err: unknown) => {
+        if ((err as { name?: string })?.name === 'AbortError') return;
+        finishToRecord();
+      });
+
+    return () => controller.abort();
+  }, [isLive, callSid, userId, pollRecord]);
+
+  // Live elapsed ticker + transcript auto-scroll.
+  const [now, setNow] = useState<number>(() => Date.now());
+  useEffect(() => {
+    if (!isLive) return undefined;
+    const id = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(id);
+  }, [isLive]);
+  const liveScrollRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = liveScrollRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [liveChunks.length]);
 
   useEffect(
     () => () => {
@@ -141,6 +290,116 @@ export function SupervisionCallDetail() {
       </div>
     );
   }
+  // Gap 10 — live mode: streaming transcript view while the call is up.
+  if (load.phase === 'live') {
+    const liveStart = liveChunks[0]?.timestamp ?? navState.startedAt ?? now;
+    const liveOffset = (ts: number): string => {
+      const sec = Math.max(0, Math.round((ts - liveStart) / 1000));
+      return `${String(Math.floor(sec / 60)).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`;
+    };
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <button
+              onClick={() => navigate('/admin/supervision')}
+              className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-1"
+            >
+              <ArrowLeft className="w-4 h-4" /> Back to Supervision
+            </button>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+              {callSid}
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wide bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300">
+                <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                Live
+              </span>
+            </h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {navState.agentName ?? 'Unknown agent'} · {navState.direction ?? 'call'} ·{' '}
+              <span className="font-mono">
+                {formatElapsed(navState.startedAt ?? liveStart, now)}
+              </span>
+              {liveEmotion && (
+                <span
+                  className={`ml-2 text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full ${EMOTION_CHIP[liveEmotion]}`}
+                  title={`Prospect sounds ${liveEmotion}`}
+                >
+                  {liveEmotion}
+                </span>
+              )}
+            </p>
+          </div>
+        </div>
+
+        {liveWarning && (
+          <div className="rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 p-4 text-sm text-amber-800 dark:text-amber-300">
+            {liveWarning}
+          </div>
+        )}
+
+        <div className="grid lg:grid-cols-2 gap-6 items-start">
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3 flex items-center gap-2">
+              <Radio className="w-4 h-4 text-red-500" /> Live transcript
+            </h3>
+            <div ref={liveScrollRef} className="space-y-2 max-h-[560px] overflow-y-auto pr-1">
+              {liveChunks.length === 0 && (
+                <p className="text-sm text-gray-400 dark:text-gray-500 italic">
+                  Listening… lines appear as the conversation happens.
+                </p>
+              )}
+              {liveChunks.map((chunk) => {
+                const flagged = flaggedChunkIds.has(chunk.id);
+                return (
+                  <div
+                    key={chunk.id}
+                    className={`flex gap-2 text-sm ${chunk.isFinal ? '' : 'opacity-60'} ${
+                      flagged ? 'rounded-lg bg-amber-50 dark:bg-amber-900/20 px-1.5 py-0.5 -mx-1.5' : ''
+                    }`}
+                  >
+                    <span className="text-[11px] font-mono text-gray-400 dark:text-gray-500 pt-0.5 shrink-0">
+                      {liveOffset(chunk.timestamp)}
+                    </span>
+                    <span
+                      className={`font-bold shrink-0 ${
+                        chunk.speaker === 'agent'
+                          ? 'text-orange-600 dark:text-orange-400'
+                          : 'text-blue-600 dark:text-blue-400'
+                      }`}
+                    >
+                      {chunk.speaker === 'agent'
+                        ? 'Agent'
+                        : chunk.speaker === 'prospect'
+                          ? 'Prospect'
+                          : '—'}
+                      :
+                    </span>
+                    <span className="text-gray-800 dark:text-gray-200">
+                      {chunk.text}
+                      {flagged && (
+                        <AlertTriangle className="inline w-3.5 h-3.5 ml-1.5 -mt-0.5 text-amber-600 dark:text-amber-400" />
+                      )}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">
+              QA scorecard
+            </h3>
+            <p className="text-sm text-gray-400 dark:text-gray-500 italic py-8 text-center">
+              Available after the call ends — this page switches to the full record
+              automatically.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (load.phase === 'missing' || load.phase === 'error') {
     return (
       <div className="py-16 text-center text-gray-500 dark:text-gray-400 space-y-3">

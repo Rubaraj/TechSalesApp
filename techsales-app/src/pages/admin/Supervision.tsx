@@ -32,7 +32,7 @@ import type {
   ProspectEmotion,
   SupervisorEvent,
 } from '../../types/supervisor';
-import { TAG_CHIP_TONES, formatWhen, formatElapsed } from './supervisionUi';
+import { TAG_CHIP_TONES, EMOTION_CHIP, formatWhen, formatElapsed } from './supervisionUi';
 
 interface LiveCall {
   callSid: string;
@@ -42,14 +42,6 @@ interface LiveCall {
   /** Latest prospect emotion (emotion_shift events; unset until first). */
   emotion?: ProspectEmotion;
 }
-
-const EMOTION_CHIP: Record<ProspectEmotion, string> = {
-  positive: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300',
-  neutral: 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300',
-  confused: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300',
-  frustrated: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300',
-  upset: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300',
-};
 
 interface LiveAlert {
   id: string;
@@ -320,10 +312,22 @@ export function Supervision() {
               ) : (
                 <div className="space-y-2">
                   {liveCalls.map((c) => (
-                    <div
+                    // Gap 10 — click a live call to watch its transcript
+                    // stream in real time (SupervisionCallDetail live mode).
+                    <button
                       key={c.callSid}
-                      className="flex items-center gap-3 p-3 rounded-lg border border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-900/10"
-                      title={`started ${new Date(c.startedAt).toLocaleTimeString()}`}
+                      onClick={() =>
+                        navigate(`/admin/supervision/${encodeURIComponent(c.callSid)}`, {
+                          state: {
+                            live: true,
+                            startedAt: c.startedAt,
+                            agentName: c.agentName,
+                            direction: c.direction,
+                          },
+                        })
+                      }
+                      className="w-full flex items-center gap-3 p-3 rounded-lg border border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-900/10 hover:bg-green-100/60 dark:hover:bg-green-900/25 text-left transition-colors"
+                      title={`started ${new Date(c.startedAt).toLocaleTimeString()} — click to watch live`}
                     >
                       <PhoneCall className="w-4 h-4 text-green-600 dark:text-green-400" />
                       <div className="min-w-0 flex-1">
@@ -343,7 +347,8 @@ export function Supervision() {
                           {c.emotion}
                         </span>
                       )}
-                    </div>
+                      <ChevronRight className="w-4 h-4 text-gray-400 shrink-0" />
+                    </button>
                   ))}
                 </div>
               )}

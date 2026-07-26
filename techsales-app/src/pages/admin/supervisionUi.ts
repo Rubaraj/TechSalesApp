@@ -48,6 +48,15 @@ export const TAG_ICONS: Record<string, LucideIcon> = {
 };
 
 /** Time for today's timestamps, date + time otherwise. */
+/** Prospect-emotion chip tones (Supervision live rows + live call detail). */
+export const EMOTION_CHIP: Record<string, string> = {
+  positive: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300',
+  neutral: 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300',
+  confused: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300',
+  frustrated: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300',
+  upset: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300',
+};
+
 export function formatWhen(ts: number | string): string {
   const d = new Date(ts);
   const today = new Date();

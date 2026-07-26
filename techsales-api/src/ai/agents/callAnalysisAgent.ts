@@ -583,6 +583,15 @@ export function getLiveCallContext(
   };
 }
 
+/**
+ * Gap 10 — full final-chunk transcript of a LIVE call (both speakers,
+ * chronological). Used by the analyze SSE to backfill supervisors who
+ * attach mid-call. Returns a copy; empty when the call isn't hosted here.
+ */
+export function getLiveTranscript(callSid: string): TranscriptChunk[] {
+  return [...(transcriptHistory.get(callSid) ?? [])];
+}
+
 export function __resetAllForTests(): void {
   accumulators.clear();
   shownTopics.clear();

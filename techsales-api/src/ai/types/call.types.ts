@@ -130,4 +130,7 @@ export type CallStreamEvent =
   | { type: 'error'; error: string }
   /** Gap 7 — LLM degradation state push (on stream open when degraded +
    *  on every transition while the stream is up). */
-  | { type: 'ai_health'; status: 'ok' | 'degraded'; reason?: string; ts: number };
+  | { type: 'ai_health'; status: 'ok' | 'degraded'; reason?: string; ts: number }
+  /** Gap 10 — transcript-so-far replay for clients attaching mid-call
+   *  (supervisor live view). Finals only, chronological. */
+  | { type: 'transcript_backfill'; chunks: TranscriptChunk[]; ts: number };
