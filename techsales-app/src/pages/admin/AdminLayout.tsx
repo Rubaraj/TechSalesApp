@@ -9,7 +9,7 @@ const adminNavItems = [
   { to: '/admin/supervision', icon: Radio, label: 'Supervision' },
   { to: '/admin/compliance', icon: ShieldAlert, label: 'Compliance Rules' },
   { to: '/admin/coaching', icon: Lightbulb, label: 'Coaching Rules' },
-  { to: '/admin/qa-rubric', icon: ClipboardCheck, label: 'QA Rubric' },
+  { to: '/admin/qa-rubric', icon: ClipboardCheck, label: 'QA Analytics' },
   { to: '/admin/settings', icon: Settings, label: 'System Settings' },
 ];
 
