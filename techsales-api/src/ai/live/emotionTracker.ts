@@ -2,10 +2,11 @@
  * Live-call emotion tracking (LLM-only, prospect speech).
  *
  * Sampled from the callAnalysisAgent's subscribe path on prospect FINAL
- * chunks: every 3rd prospect chunk OR 20s since the last sample, whichever
- * comes first. One cheap structured LLM call (same template as runQaReview)
- * classifies the prospect's current emotional state from the last few lines
- * of both speakers.
+ * chunks: the FIRST prospect utterance samples immediately, then every 3rd
+ * prospect chunk OR 20s since the last sample, whichever comes first. One
+ * cheap structured LLM call (same template as runQaReview) classifies the
+ * prospect's current emotional state from the last few lines of both
+ * speakers.
  *
  * Results:
  *   - every sample  → per-call `emotion` SSE event (agent's header badge)
@@ -98,12 +99,17 @@ export function noteProspectChunk(
   if (getActiveProvider() === 'stub') return;
 
   state.chunksSinceSample += 1;
+  // Option A (user decision) — the FIRST prospect utterance samples
+  // immediately (the window carries the agent's lines for context), so
+  // short or agent-dominated calls get an emotion read too. Observed miss:
+  // 11 agent lines + 2 prospect lines incl. "I'm confused" → the old
+  // 3-chunk first-sample quota never fired. After the first sample the
+  // cadence is every 3rd chunk or 20s, whichever comes first.
   const due =
+    state.lastSampleAt === 0 ||
     state.chunksSinceSample >= SAMPLE_EVERY_CHUNKS ||
-    (state.lastSampleAt > 0 && Date.now() - state.lastSampleAt >= SAMPLE_MIN_INTERVAL_MS);
-  if (!due && state.lastSampleAt > 0) return;
-  // First-ever sample waits for the chunk quota so the window has substance.
-  if (state.lastSampleAt === 0 && state.chunksSinceSample < SAMPLE_EVERY_CHUNKS) return;
+    Date.now() - state.lastSampleAt >= SAMPLE_MIN_INTERVAL_MS;
+  if (!due) return;
 
   state.inFlight = true;
   state.chunksSinceSample = 0;
