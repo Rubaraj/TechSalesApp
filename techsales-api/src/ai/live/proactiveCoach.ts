@@ -2,8 +2,10 @@
  * Gap 6 — proactive coaching engine (rule-based, LLM-free).
  *
  * Unlike coachingAdvisor (which REACTS to violations / emotion shifts), this
- * module evaluates admin-editable coaching rules on EVERY final transcript
- * chunk and fires unprompted tips:
+ * module evaluates admin-editable coaching rules on every final transcript
+ * chunk AND on a 5s per-call timer (so time-based rules fire on schedule
+ * even mid-silence — speech-only evaluation missed thresholds crossed while
+ * nobody was talking), firing unprompted tips:
  *
  *   talk_ratio        — agent talk share (by chars) ≥ thresholdPct after
  *                       minCallSec into the call
@@ -71,25 +73,52 @@ export async function loadCoachingRules(): Promise<CoachingRule[]> {
 
 // --- Per-call state ---------------------------------------------------------
 
+/** Timer cadence for time-based rules (talk_ratio / missed_discovery) so
+ *  they fire on schedule even when nobody is speaking (no chunks arriving). */
+const TICK_MS = 5_000;
+
+interface ProactiveReaders {
+  history: () => TranscriptChunk[];
+  entities: () => ExtractedEntities;
+}
+
 interface ProactiveState {
   startedAt: number;
   /** Agent finals since the prospect last spoke. */
   consecutiveAgent: number;
   /** ruleId → last fire ts (once-per-call; talk/monologue re-arm). */
   firedAt: Map<string, number>;
+  /** Periodic evaluator for the time-based rules during silence. */
+  timer: NodeJS.Timeout;
+  readers: ProactiveReaders;
 }
 
 const states = new Map<string, ProactiveState>();
 
-export function startProactiveCoach(callSid: string): void {
-  states.set(callSid, { startedAt: Date.now(), consecutiveAgent: 0, firedAt: new Map() });
+/**
+ * `readers` give the timer path live access to the transcript history and
+ * entity accumulator owned by callAnalysisAgent (same accessor pattern as
+ * coachingAdvisor's hooks — avoids an import cycle through the agent).
+ */
+export function startProactiveCoach(callSid: string, readers: ProactiveReaders): void {
+  const timer = setInterval(() => evaluateRules(callSid, null), TICK_MS);
+  states.set(callSid, {
+    startedAt: Date.now(),
+    consecutiveAgent: 0,
+    firedAt: new Map(),
+    timer,
+    readers,
+  });
 }
 
 export function stopProactiveCoach(callSid: string): void {
+  const state = states.get(callSid);
+  if (state) clearInterval(state.timer);
   states.delete(callSid);
 }
 
 export function __resetProactiveCoachForTests(): void {
+  for (const state of states.values()) clearInterval(state.timer);
   states.clear();
   cache = null;
 }
@@ -101,23 +130,31 @@ export function registerProactiveCoachTagWriter(writer: TagWriter): void {
   tagWriter = writer;
 }
 
-// --- Per-chunk evaluation ---------------------------------------------------
+// --- Evaluation -------------------------------------------------------------
 
 /**
  * Called for every FINAL chunk (both speakers) from callAnalysisAgent's
- * subscribe callback. Evaluates the cached active rules and fires tips.
+ * subscribe callback. Updates the monologue counter, then evaluates all
+ * rules. The per-call timer covers the silent gaps between chunks.
  */
-export function noteChunkForProactiveCoach(
-  callSid: string,
-  chunk: TranscriptChunk,
-  history: TranscriptChunk[],
-  entities: ExtractedEntities,
-): void {
+export function noteChunkForProactiveCoach(callSid: string, chunk: TranscriptChunk): void {
   const state = states.get(callSid);
   if (!state) return;
 
   if (chunk.speaker === 'agent') state.consecutiveAgent += 1;
   else if (chunk.speaker === 'prospect') state.consecutiveAgent = 0;
+
+  evaluateRules(callSid, chunk);
+}
+
+/**
+ * Evaluate the cached active rules and fire tips. `chunk` is null on timer
+ * ticks — monologue is chunk-count-driven, so it only fires on the chunk
+ * path; the time-based rules fire on either.
+ */
+function evaluateRules(callSid: string, chunk: TranscriptChunk | null): void {
+  const state = states.get(callSid);
+  if (!state) return;
 
   const rules = getActiveCoachingRulesSync();
   if (rules.length === 0) return;
@@ -142,7 +179,7 @@ export function noteChunkForProactiveCoach(
         if (elapsedSec < minSec) break;
         let agentChars = 0;
         let totalChars = 0;
-        for (const c of history) {
+        for (const c of state.readers.history()) {
           totalChars += c.text.length;
           if (c.speaker === 'agent') agentChars += c.text.length;
         }
@@ -150,6 +187,7 @@ export function noteChunkForProactiveCoach(
         break;
       }
       case 'monologue': {
+        if (!chunk) break; // counter only advances on chunks
         const max = rule.params.maxConsecutiveAgentUtterances ?? 6;
         if (state.consecutiveAgent >= max) {
           fires = true;
@@ -160,6 +198,7 @@ export function noteChunkForProactiveCoach(
       case 'missed_discovery': {
         const after = rule.params.checkAfterSec ?? 120;
         if (elapsedSec < after) break;
+        const entities = state.readers.entities();
         const item = rule.params.item ?? 'zip';
         fires =
           item === 'zip'

@@ -164,7 +164,10 @@ export function startCallAnalysis(input: StartCallAnalysisInput): CallAnalysisHa
   // Live intelligence — emotion sampling + coaching state for this call.
   startEmotionTracking(callSid);
   startCoaching(callSid);
-  startProactiveCoach(callSid);
+  startProactiveCoach(callSid, {
+    history: () => transcriptHistory.get(callSid) ?? [],
+    entities: () => accumulators.get(callSid) ?? emptyExtractedEntities(),
+  });
 
   const unsubscribe = subscribe(callSid, (event: CallBusEvent) => {
     if (event.type !== 'transcript') return;
@@ -180,14 +183,9 @@ export function startCallAnalysis(input: StartCallAnalysisInput): CallAnalysisHa
         noteProspectChunk(callSid, transcriptHistory.get(callSid) ?? [], userId);
       }
       // Gap 6 — proactive coaching rules (talk-ratio / monologue / missed
-      // discovery). Sync + LLM-free; entity accumulator may lag one chunk
-      // behind for in-flight prospect extraction, which is fine here.
-      noteChunkForProactiveCoach(
-        callSid,
-        event.chunk,
-        transcriptHistory.get(callSid) ?? [],
-        accumulators.get(callSid) ?? emptyExtractedEntities(),
-      );
+      // discovery). Sync + LLM-free; the engine also self-evaluates on a 5s
+      // timer so time-based rules fire during silence.
+      noteChunkForProactiveCoach(callSid, event.chunk);
     } catch (err) {
       logger.error({ err, callSid }, 'callAnalysisAgent: runStub threw');
     }
