@@ -110,11 +110,35 @@ export function CallLeadRoutingHost(): React.JSX.Element | null {
 
   if (!popup) return null;
 
-  const closePopup = (): void => setPopup(null);
+  // Gaps 3+4 handoff (Option A) — Atlas may have STAGED new-lead values
+  // (fill_lead_form) before this popup appeared. Declining the listed
+  // matches then clearly means "continue with the staged new lead", so
+  // Skip routes to the form too (the amber hint below announces it), and
+  // the ?phone= prefill is dropped whenever a staged phone exists so the
+  // dialed number never overwrites the dictated one.
+  const stagedFills = state.pendingActions.filter((a) => a.type === 'fill_field');
+  const hasStagedPhone = stagedFills.some(
+    (a) => a.type === 'fill_field' && a.field === 'phone' && typeof a.value === 'string' && a.value,
+  );
+  const hasStagedData = stagedFills.length > 0;
+
+  const openNewLeadForm = (): void => {
+    setPopup(null);
+    navigate(
+      hasStagedPhone ? '/leads/new' : `/leads/new?phone=${encodeURIComponent(popup.number)}`,
+    );
+  };
+  const closePopup = (): void => {
+    if (hasStagedData) {
+      openNewLeadForm();
+      return;
+    }
+    setPopup(null);
+  };
   const selectLead = (lead: LeadPhoneLookup): void => {
     bindCurrentCallToLead(lead.leadId);
     const isInbound = popup.direction === 'inbound';
-    closePopup();
+    setPopup(null);
     if (isInbound) {
       navigate(`/leads/${lead.leadId}`);
     } else {
@@ -123,11 +147,7 @@ export function CallLeadRoutingHost(): React.JSX.Element | null {
       addLeadSuggestion(makeIdentifiedSuggestion(lead, popup.number));
     }
   };
-  const newLead = (): void => {
-    const phone = popup.number;
-    closePopup();
-    navigate(`/leads/new?phone=${encodeURIComponent(phone)}`);
-  };
+  const newLead = (): void => openNewLeadForm();
 
   return (
     <Modal
@@ -154,6 +174,14 @@ export function CallLeadRoutingHost(): React.JSX.Element | null {
           ? `${popup.matches.length} leads share the number ${popup.number} — pick the one on the line, or start fresh.`
           : `No lead found for ${popup.number}. Create one now, or skip and keep the call unlinked.`}
       </div>
+      {hasStagedData && (
+        <div className="flex items-center gap-2 mb-3 px-3 py-2 rounded-lg border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20 text-xs text-amber-800 dark:text-amber-300">
+          <UserPlus className="w-3.5 h-3.5 shrink-0" />
+          Atlas staged new-lead details ({stagedFills.length} field
+          {stagedFills.length > 1 ? 's' : ''}) — “New lead” or “Skip” both continue to the form
+          with them applied.
+        </div>
+      )}
       {popup.matches.length > 0 && (
         <div className="divide-y divide-gray-100 dark:divide-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
           {popup.matches.map((lead) => (
