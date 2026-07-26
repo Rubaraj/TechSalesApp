@@ -24,7 +24,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { callService } from '../services/callService';
 import { useCallContext } from '../context/CallContext';
 import { useAuth } from '../context/AuthContext';
-import { lookupLeadByPhone } from '../services/leadService';
+import { lookupLeadsByPhone } from '../services/leadService';
 import * as ringtone from '../services/ringtone';
 
 type HandleType = Awaited<
@@ -136,15 +136,20 @@ export function useTwilioCall(): UseTwilioCallResult {
         incomingCallRef.current = callLike;
         const from = callLike.parameters?.From ?? '';
         // Best-effort lead lookup. Don't block the ring UI on it.
+        // Gap 3 — ALL matches: exactly one binds (auto-open on accept);
+        // several leave leadId null so the routing popup lets the agent
+        // pick (auto-binding the first match hid the multi-match popup).
         void (async () => {
           let leadName: string | null = null;
           let leadId: string | null = null;
           if (from) {
             try {
-              const res = await lookupLeadByPhone(from);
-              if (res.success && res.data) {
-                leadName = `${res.data.firstName} ${res.data.lastName}`.trim();
-                leadId = res.data.leadId;
+              const matches = await lookupLeadsByPhone(from);
+              if (matches.length === 1) {
+                leadName = `${matches[0].firstName} ${matches[0].lastName}`.trim();
+                leadId = matches[0].leadId;
+              } else if (matches.length > 1) {
+                leadName = `${matches.length} matching leads`;
               }
             } catch {
               // ignore
