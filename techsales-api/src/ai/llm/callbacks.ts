@@ -35,11 +35,17 @@ export type AiInteractionKind =
    *  supervisor who requested it; input carries the callSid). */
   | 'call_qa'
   /** Live-call intelligence — one row per emotion sample of a call's
-   *  prospect speech (userId = the call's agent). */
+   *  prospect speech (userId = the call's agent). Superseded by
+   *  call_live_insight; kept for historical audit rows. */
   | 'call_emotion'
   /** Live-call intelligence — one row per AI coaching tip generated for
-   *  the agent mid-call (userId = the call's agent). */
-  | 'call_coaching';
+   *  the agent mid-call (userId = the call's agent). Superseded by
+   *  call_live_insight; kept for historical audit rows. */
+  | 'call_coaching'
+  /** Live-call intelligence — one row per merged 20s insight tick (emotion
+   *  + coaching tip + AI compliance concern in a single structured call;
+   *  userId = the call's agent). */
+  | 'call_live_insight';
 
 export interface ToolCallTrace {
   name: string;

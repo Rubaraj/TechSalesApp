@@ -47,19 +47,13 @@ import { extractFromProspectChunk } from '../rules/entityExtractor.js';
 import { summarizeTranscript } from '../rules/noteSummarizer.js';
 import { auditCallAnalysisEvent } from '../audit/auditCallAnalysisEvent.js';
 import {
-  startEmotionTracking,
-  stopEmotionTracking,
-  noteProspectChunk,
-  registerEmotionTagWriter,
-  __resetEmotionForTests,
-} from '../live/emotionTracker.js';
-import {
-  wireCoachingAdvisor,
-  startCoaching,
-  stopCoaching,
-  triggerCoaching,
-  __resetCoachingForTests,
-} from '../live/coachingAdvisor.js';
+  wireLiveInsight,
+  startLiveInsight,
+  stopLiveInsight,
+  noteProspectChunkForInsight,
+  noteViolationForInsight,
+  __resetLiveInsightForTests,
+} from '../live/liveInsight.js';
 import {
   loadCoachingRules,
   startProactiveCoach,
@@ -100,12 +94,13 @@ function addTag(callSid: string, kind: CallTag['kind'], data: Record<string, unk
 // Live intelligence — one-time hook registration. The trackers live in their
 // own modules but tags/history/userIds are owned here, so they get accessors
 // instead of imports (avoids a require cycle through this agent).
-registerEmotionTagWriter((callSid, data) => addTag(callSid, 'emotion', data));
 registerProactiveCoachTagWriter((callSid, data) => addTag(callSid, 'coaching', data));
-wireCoachingAdvisor({
+wireLiveInsight({
   historyReader: (callSid) => transcriptHistory.get(callSid) ?? [],
-  tagWriter: (callSid, data) => addTag(callSid, 'coaching', data),
   userIdReader: (callSid) => userIds.get(callSid),
+  emotionTagWriter: (callSid, data) => addTag(callSid, 'emotion', data),
+  coachingTagWriter: (callSid, data) => addTag(callSid, 'coaching', data),
+  complianceTagWriter: (callSid, data) => addTag(callSid, 'compliance', data),
 });
 
 // --- Public API -----------------------------------------------------------
@@ -161,9 +156,9 @@ export function startCallAnalysis(input: StartCallAnalysisInput): CallAnalysisHa
   void loadActiveRules();
   void loadCoachingRules();
 
-  // Live intelligence — emotion sampling + coaching state for this call.
-  startEmotionTracking(callSid);
-  startCoaching(callSid);
+  // Live intelligence — merged 20s LLM insight loop (emotion + coaching +
+  // AI compliance double-check) + the rule-based proactive coach.
+  startLiveInsight(callSid);
   startProactiveCoach(callSid, {
     history: () => transcriptHistory.get(callSid) ?? [],
     entities: () => accumulators.get(callSid) ?? emptyExtractedEntities(),
@@ -178,9 +173,10 @@ export function startCallAnalysis(input: StartCallAnalysisInput): CallAnalysisHa
       // conversation, not just the prospect side.
       transcriptHistory.get(callSid)?.push(event.chunk);
       runStub(callSid, event.chunk, userId);
-      // Live intelligence — sample prospect emotion (LLM, self-debounced).
+      // Live intelligence — the first prospect utterance fast-paths the
+      // merged insight tick (after that the 20s clock owns the cadence).
       if (event.chunk.speaker === 'prospect') {
-        noteProspectChunk(callSid, transcriptHistory.get(callSid) ?? [], userId);
+        noteProspectChunkForInsight(callSid);
       }
       // Gap 6 — proactive coaching rules (talk-ratio / monologue / missed
       // discovery). Sync + LLM-free; the engine also self-evaluates on a 5s
@@ -267,8 +263,7 @@ export function stopCallAnalysisByCallSid(callSid: string): void {
   userIds.delete(callSid);
   callMeta.delete(callSid);
   callTags.delete(callSid);
-  stopEmotionTracking(callSid);
-  stopCoaching(callSid);
+  stopLiveInsight(callSid);
   stopProactiveCoach(callSid);
   logger.info({ callSid }, 'callAnalysisAgent: stopped');
 }
@@ -332,13 +327,13 @@ function runAgentSideAnalysis(
     });
   }
 
-  // Live coaching — first violation of the batch triggers a tip (instant
-  // canned suggestion now, contextual LLM tip when the provider allows).
+  // Live coaching — first violation of the batch publishes its instant
+  // canned tip now; the detail feeds the next insight tick's richer tip.
   const first = violations[0];
-  triggerCoaching(callSid, {
-    kind: 'compliance',
+  noteViolationForInsight(callSid, {
     detail: `Compliance violation "${first.ruleName}": agent said "${first.phrase}" — ${first.rule}`,
     instantTip: first.suggestion,
+    phrase: first.phrase,
   });
 }
 
@@ -595,7 +590,6 @@ export function __resetAllForTests(): void {
   transcriptHistory.clear();
   callMeta.clear();
   callTags.clear();
-  __resetEmotionForTests();
-  __resetCoachingForTests();
+  __resetLiveInsightForTests();
   __resetProactiveCoachForTests();
 }
