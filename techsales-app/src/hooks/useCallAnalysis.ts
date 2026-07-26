@@ -114,6 +114,15 @@ function formatFillValue(value: string | boolean): string {
   return value.length > 40 ? value.slice(0, 40) + '…' : value;
 }
 
+/** Chat feed — leading emoji for emotion-shift rows. */
+const EMOTION_ICONS: Record<string, string> = {
+  positive: '😊',
+  neutral: '😐',
+  confused: '😕',
+  frustrated: '😠',
+  upset: '😡',
+};
+
 export function useCallAnalysis(): void {
   const {
     state,
@@ -132,6 +141,9 @@ export function useCallAnalysis(): void {
   const callSid = state.callSid;
   const abortRef = useRef<AbortController | null>(null);
   const warnedRef = useRef(false);
+  // Chat feed — last emotion seen, so only SHIFTS post an activity row
+  // (samples repeat every ~20s; a row per sample would spam the chat).
+  const prevEmotionRef = useRef<string | null>(null);
 
   useEffect(() => {
     // Only subscribe when we have a Twilio call SID and are in Twilio mode.
@@ -140,6 +152,7 @@ export function useCallAnalysis(): void {
 
     const controller = new AbortController();
     abortRef.current = controller;
+    prevEmotionRef.current = null; // fresh call → first sample posts a row
 
     const onEvent = (event: CallStreamEvent): void => {
       if (event.type === 'transcript') {
@@ -238,6 +251,20 @@ export function useCallAnalysis(): void {
 
       if (event.type === 'emotion') {
         setProspectEmotion(event.emotion, event.confidence, event.ts);
+        // Chat feed — post a row on shifts only (incl. the first sample).
+        const prev = prevEmotionRef.current;
+        if (event.emotion !== prev) {
+          prevEmotionRef.current = event.emotion;
+          appendActivity({
+            id: makeId(),
+            timestamp: Date.now(),
+            kind: 'emotion',
+            icon: EMOTION_ICONS[event.emotion] ?? '🙂',
+            text: prev
+              ? `Prospect sounds ${event.emotion} (was ${prev})`
+              : `Prospect sounds ${event.emotion}`,
+          });
+        }
         return;
       }
 
@@ -248,6 +275,15 @@ export function useCallAnalysis(): void {
           tip: event.tip,
           focus: event.focus,
           ts: event.ts,
+        });
+        // Chat feed — coaching tips render as feed rows in the Atlas chat
+        // (the call section's dedicated Coach card was retired for this).
+        appendActivity({
+          id: makeId(),
+          timestamp: Date.now(),
+          kind: 'coaching',
+          icon: '💡',
+          text: event.tip,
         });
         return;
       }

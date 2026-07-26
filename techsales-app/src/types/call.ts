@@ -151,7 +151,16 @@ export type StampedAiAction = AiAction & { _id: string };
 export interface AiActivityEntry {
   id: string;
   timestamp: number;
-  kind: 'fill' | 'drug' | 'pharmacy' | 'provider' | 'note' | 'compliance' | 'info';
+  kind:
+    | 'fill'
+    | 'drug'
+    | 'pharmacy'
+    | 'provider'
+    | 'note'
+    | 'compliance'
+    | 'info'
+    | 'coaching'
+    | 'emotion';
   text: string;
   /** Emoji rendered as the leading icon in the feed row. */
   icon: string;

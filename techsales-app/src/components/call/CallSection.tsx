@@ -8,7 +8,7 @@
  * Returns null when no call is active.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Mic, MicOff, PhoneOff, AlertTriangle, Radio, Lightbulb, X } from 'lucide-react';
+import { Mic, MicOff, PhoneOff, AlertTriangle, Radio } from 'lucide-react';
 import type { ProspectEmotion } from '../../types/call';
 import { useCallContext } from '../../context/CallContext';
 import { useCallRuntime } from './CallRuntime';
@@ -17,11 +17,8 @@ import { CallWaveform } from './CallWaveform';
 import { Dialer } from './Dialer';
 import { TranscriptBubble } from './TranscriptBubble';
 import { buildFlagByChunkId } from './transcriptFlags';
-import { ComplianceAlert } from './ComplianceAlert';
 import { EntitySummary } from './EntitySummary';
 import { IncomingCallView } from './IncomingCallView';
-
-const COMPLIANCE_FADE_MS = 5_000;
 
 /** Live intelligence — emotion badge tones on the dark atlas surface.
  *  (Ported from the unmounted CallPanel; fixed hues because the atlas panel
@@ -42,9 +39,7 @@ function formatDuration(ms: number): string {
 }
 
 export function CallSection(): React.JSX.Element | null {
-  const { state, dismissCoachingTip } = useCallContext();
-  // Newest non-dismissed coaching tip (reducer caps + orders newest-first).
-  const visibleCoachTip = state.coachingTips.find((t) => !t.dismissed) ?? null;
+  const { state } = useCallContext();
 
   const [now, setNow] = useState<number>(() => Date.now());
   useEffect(() => {
@@ -71,40 +66,6 @@ export function CallSection(): React.JSX.Element | null {
   const flagByChunkId = useMemo(
     () => buildFlagByChunkId(state.complianceFlags),
     [state.complianceFlags],
-  );
-
-  const [hiddenFlags, setHiddenFlags] = useState<{
-    callId: string | null;
-    ids: Set<string>;
-  }>(() => ({ callId: null, ids: new Set() }));
-  const activeHiddenIds = useMemo(
-    () => (hiddenFlags.callId === state.callId ? hiddenFlags.ids : new Set<string>()),
-    [hiddenFlags, state.callId],
-  );
-  useEffect(() => {
-    const timers: number[] = [];
-    for (const flag of state.complianceFlags) {
-      if (!flag.dismissed || activeHiddenIds.has(flag.id)) continue;
-      const t = window.setTimeout(() => {
-        setHiddenFlags((prev) => {
-          const sameCall = prev.callId === state.callId;
-          const ids = sameCall ? prev.ids : new Set<string>();
-          if (ids.has(flag.id)) return prev;
-          const next = new Set(ids);
-          next.add(flag.id);
-          return { callId: state.callId, ids: next };
-        });
-      }, COMPLIANCE_FADE_MS);
-      timers.push(t);
-    }
-    return () => {
-      for (const t of timers) window.clearTimeout(t);
-    };
-  }, [state.complianceFlags, state.callId, activeHiddenIds]);
-
-  const visibleComplianceFlags = useMemo(
-    () => state.complianceFlags.filter((f) => !activeHiddenIds.has(f.id)),
-    [state.complianceFlags, activeHiddenIds],
   );
 
   if (!state.isCallActive) return null;
@@ -256,62 +217,9 @@ export function CallSection(): React.JSX.Element | null {
         <Dialer dial={twilioCall.dial} isDialing={twilioCall.isDialing} error={twilioCall.error} />
       )}
 
-      {!showDialer && !showIncomingRing && visibleComplianceFlags.length > 0 && (
-        <div
-          className="px-3 py-2 space-y-1.5 max-h-32 overflow-y-auto"
-          style={{
-            borderBottom: '1px solid rgba(255,107,107,0.35)',
-            background: 'rgba(255,107,107,0.06)',
-          }}
-          role="region"
-          aria-label="Compliance alerts"
-        >
-          {visibleComplianceFlags.map((flag) => (
-            <ComplianceAlert key={flag.id} flag={flag} />
-          ))}
-        </div>
-      )}
-
-      {/* Live intelligence — newest coaching tip, sticky below compliance.
-       *  'rule' tips are the instant canned suggestion; the richer 'ai' tip
-       *  replaces them when it lands (reducer handles the swap). */}
-      {!showDialer && !showIncomingRing && visibleCoachTip && (
-        <div
-          className="px-3 py-2"
-          style={{
-            borderBottom: '1px solid rgba(167,139,250,0.35)',
-            background: 'rgba(139,92,246,0.10)',
-          }}
-          role="region"
-          aria-label="Coaching tip"
-        >
-          <div className="flex items-start gap-2">
-            <Lightbulb className="w-4 h-4 shrink-0 mt-0.5" style={{ color: '#a78bfa' }} />
-            <div className="min-w-0 flex-1">
-              <p className="text-xs" style={{ color: '#ddd6fe' }}>
-                {visibleCoachTip.tip}
-              </p>
-              <p
-                className="text-[10px] uppercase tracking-wider mt-0.5"
-                style={{ color: '#a78bfa' }}
-              >
-                Coach · {visibleCoachTip.focus}
-                {visibleCoachTip.source === 'rule' ? ' · from rule' : ''}
-              </p>
-            </div>
-            <button
-              onClick={() => dismissCoachingTip(visibleCoachTip.id)}
-              className="p-0.5 rounded transition-colors"
-              style={{ color: '#a78bfa' }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(139,92,246,0.20)')}
-              onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-              aria-label="Dismiss coaching tip"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Compliance alerts + coaching tips now render as tinted rows in the
+       *  Atlas chat feed (ChatPane activity rows) — the transcript keeps the
+       *  inline per-bubble flag marks, and the header keeps the emotion pill. */}
 
       {!showDialer && !showIncomingRing && (
         <div

@@ -394,6 +394,8 @@ const ACTIVITY_TONE: Record<
   provider: { bg: 'rgba(79,147,247,0.10)', border: 'rgba(79,147,247,0.30)', dot: '#4f93f7', label: 'Provider' },
   note: { bg: 'rgba(255,255,255,0.04)', border: 'var(--color-atlas-border)', dot: 'var(--color-atlas-fg-muted)', label: 'Note' },
   info: { bg: 'rgba(149,128,255,0.10)', border: 'rgba(149,128,255,0.30)', dot: '#9580ff', label: 'Info' },
+  coaching: { bg: 'rgba(167,139,250,0.12)', border: 'rgba(167,139,250,0.35)', dot: '#a78bfa', label: 'Coach' },
+  emotion: { bg: 'rgba(251,191,36,0.10)', border: 'rgba(251,191,36,0.30)', dot: '#fbbf24', label: 'Emotion' },
 };
 
 function ActivityRow({ entry }: { entry: AiActivityEntry }): React.JSX.Element {
