@@ -6,7 +6,7 @@
  * call on ONE clock, and adds an LLM compliance double-check for phrasing
  * the regex rules miss:
  *
- *   every TICK_MS (20s), if new final lines arrived since the last run:
+ *   every TICK_MS (15s), if new final lines arrived since the last run:
  *     one Haiku call over the last WINDOW_LINES returns
  *       { emotion, confidence, rationale, tip|null, focus|null,
  *         complianceConcern|null }
@@ -40,7 +40,7 @@ import { AuditCallbackHandler } from '../llm/callbacks.js';
 import { publish, publishGlobal, type ProspectEmotion } from '../../services/callBus.js';
 import type { TranscriptChunk, AiAction } from '../types/call.types.js';
 
-const TICK_MS = 20_000;
+const TICK_MS = 15_000;
 const WINDOW_LINES = 10;
 const TIPS_PER_CALL = 5;
 
