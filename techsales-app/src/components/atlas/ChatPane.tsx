@@ -118,6 +118,8 @@ export function ChatPane(): React.JSX.Element {
       ts: c.ts,
       data: c,
     }));
+    // Newest-first (user decision): the whole feed sorts descending so the
+    // latest tip/flag/reply is always at the top — no scrolling mid-call.
     return [
       ...msgRows,
       ...activityRows,
@@ -126,7 +128,7 @@ export function ChatPane(): React.JSX.Element {
       ...dialRows,
       ...leadRows,
       ...cardRows,
-    ].sort((a, b) => a.ts - b.ts);
+    ].sort((a, b) => b.ts - a.ts);
   }, [
     messages,
     proposals,
@@ -140,8 +142,9 @@ export function ChatPane(): React.JSX.Element {
   ]);
 
   useEffect(() => {
+    // Newest-first feed → keep the viewport anchored at the top.
     const el = listRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
+    if (el) el.scrollTop = 0;
   }, [rows.length, isStreaming]);
 
   const onSubmit = (e: React.FormEvent): void => {
