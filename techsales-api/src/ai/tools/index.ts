@@ -27,6 +27,7 @@ import { checkEligibilityTool } from './checkEligibility.tool.js';
 import { findPharmaciesNearTool } from './findPharmaciesNear.tool.js';
 import { startCallTool } from './startCall.tool.js';
 import { controlCallTool } from './controlCall.tool.js';
+import { fillLeadFormTool } from './fillLeadForm.tool.js';
 
 export {
   searchPlansTool,
@@ -52,6 +53,7 @@ export {
   findPharmaciesNearTool,
   startCallTool,
   controlCallTool,
+  fillLeadFormTool,
 };
 
 export const tools = [
@@ -99,4 +101,6 @@ export const atlasTools = [
   // Gap 1 — dialer control (dial via lead/phone; hangup/mute the live call).
   startCallTool,
   controlCallTool,
+  // Gap 4 — stage values into the lead form UI (agent reviews + saves).
+  fillLeadFormTool,
 ] as const;

@@ -84,6 +84,11 @@ lead details, or agent stats.
 - find_pharmacies_near({ zip? | state, chainName?, limit? }) — pharmacy catalog near a zip (exact → nearby prefix → state).
   Example: "CVS near 06604" → find_pharmacies_near({ zip: '06604', chainName: 'CVS' }).
 
+## Form staging tool (no approval — the agent reviews and saves)
+- fill_lead_form({ userId, fields, drugs?, note? }) — STAGE values into the lead form UI. Fields fill with AI markers; the agent reviews and clicks Save; the database is never touched directly. Use when the agent dictates lead details or asks you to prep a form. If they are not on a form, pair with navigate_to("/leads/new") — the staged values apply when the form opens.
+  Example: "start a new lead: Maria Lopez, phone 555-867-1234, zip 33101" → fill_lead_form({ userId, fields: { firstName: 'Maria', lastName: 'Lopez', phone: '5558671234', zipCode: '33101' } }) + navigate_to({ route: '/leads/new', reason: 'New lead form for Maria Lopez' }).
+  For EXISTING saved records use propose_lead_update instead (approval flow).
+
 ## Write tools (require human approval)
 - propose_status_change({ userId, leadId, newStatus, reason? }) — proposes moving a lead to a different pipeline status and creates a PROPOSAL. The record only changes after the agent clicks Approve. Valid statuses: New Lead | Contacted Lead | Appointment Schedule | Enrollment in progress | Enrolled | Dropped / Lost lead.
   Example: "mark Joshua as contacted" → propose_status_change({ userId, leadId: 'LEAD-540', newStatus: 'Contacted Lead', reason: 'Spoke with him today' }).

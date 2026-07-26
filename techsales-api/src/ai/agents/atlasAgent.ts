@@ -57,6 +57,13 @@ export type AtlasStreamEvent =
   | { type: 'dial'; to: string; leadId?: string; leadName?: string }
   /** Gap 1 — control_call on the live call; FE executes immediately. */
   | { type: 'call_control'; action: 'hangup' | 'mute' | 'unmute' }
+  /** Gap 4 — fill_lead_form staging; FE enqueues fill_field/add_drug actions. */
+  | {
+      type: 'form_fill';
+      fields: Record<string, string>;
+      drugs?: Array<{ drugName: string; dosage?: string; frequency?: string }>;
+      note?: string;
+    }
   /** Rich-chat upgrade — a tool result the FE renders as a purpose-built card. */
   | { type: 'display_card'; card: AtlasCardType; tool: string; data: unknown }
   | { type: 'final'; content: string; interactionId: string }
@@ -188,6 +195,25 @@ function extractSideChannelEvents(
     const c = obj.callControl as { action?: unknown };
     if (c.action === 'hangup' || c.action === 'mute' || c.action === 'unmute') {
       events.push({ type: 'call_control', action: c.action });
+    }
+  }
+
+  // Gap 4 — form staging (fill_lead_form)
+  if (obj.formFill && typeof obj.formFill === 'object') {
+    const f = obj.formFill as {
+      fields?: unknown;
+      drugs?: unknown;
+      note?: unknown;
+    };
+    if (f.fields && typeof f.fields === 'object' && !Array.isArray(f.fields)) {
+      events.push({
+        type: 'form_fill',
+        fields: f.fields as Record<string, string>,
+        ...(Array.isArray(f.drugs)
+          ? { drugs: f.drugs as Array<{ drugName: string; dosage?: string; frequency?: string }> }
+          : {}),
+        ...(typeof f.note === 'string' ? { note: f.note } : {}),
+      });
     }
   }
 

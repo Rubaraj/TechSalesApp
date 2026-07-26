@@ -20,6 +20,13 @@ export type AtlasStreamEvent =
   | { type: 'dial'; to: string; leadId?: string; leadName?: string }
   /** Gap 1 — live-call control from control_call. */
   | { type: 'call_control'; action: 'hangup' | 'mute' | 'unmute' }
+  /** Gap 4 — fill_lead_form staging into the lead form UI. */
+  | {
+      type: 'form_fill';
+      fields: Record<string, string>;
+      drugs?: Array<{ drugName: string; dosage?: string; frequency?: string }>;
+      note?: string;
+    }
   /** Rich-chat — a tool result the FE renders as a purpose-built card. */
   | { type: 'display_card'; card: AtlasCardType; tool: string; data: unknown }
   | { type: 'final'; content: string; interactionId: string }

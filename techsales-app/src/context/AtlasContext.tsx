@@ -20,6 +20,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { atlasService, type AtlasStreamEvent } from '../services/atlasService';
 import { useAuth } from './AuthContext';
 import { useCallContext } from './CallContext';
+import type { AiAction } from '../types/call';
 import type { LeadPhoneLookup } from '../services/leadService';
 
 export type AtlasMode = 'assist' | 'auto';
@@ -164,7 +165,7 @@ export function AtlasProvider({ children }: { children: ReactNode }): React.JSX.
   const userId = user?.userId ?? null;
   // Live-call context — AtlasProvider nests inside CallProvider, so the
   // active callSid is available for the backend to attach recent transcript.
-  const { state: callState, dialNumber, requestCallControl } = useCallContext();
+  const { state: callState, dialNumber, requestCallControl, enqueueActions } = useCallContext();
   const activeCallSid = callState.isCallActive ? callState.callSid : null;
   // Fresh view for mid-stream event handlers (avoids stale closures).
   const callActiveRef = useRef(false);
@@ -469,6 +470,30 @@ export function AtlasProvider({ children }: { children: ReactNode }): React.JSX.
           requestCallControl(ev.action);
           return;
         }
+        if (ev.type === 'form_fill') {
+          // Gap 4 — stage values as the SAME actions the call pipeline
+          // emits: the lead form applies them with AI chips; off-form the
+          // capture nudge points there. DB untouched until the agent saves.
+          const staged: AiAction[] = Object.entries(ev.fields).map(([field, value]) => ({
+            type: 'fill_field',
+            field,
+            value,
+            confidence: 1,
+          }));
+          for (const d of ev.drugs ?? []) {
+            staged.push({
+              type: 'add_drug',
+              drugName: d.drugName,
+              ...(d.dosage ? { dosage: d.dosage } : {}),
+              ...(d.frequency ? { frequency: d.frequency } : {}),
+            });
+          }
+          if (ev.note) {
+            staged.push({ type: 'add_note', category: 'other', text: ev.note });
+          }
+          if (staged.length > 0) enqueueActions(staged);
+          return;
+        }
         if (ev.type === 'display_card') {
           // Rich-chat — tool result rendered as a purpose-built card,
           // interleaved into the stream at receipt time.
@@ -525,7 +550,7 @@ export function AtlasProvider({ children }: { children: ReactNode }): React.JSX.
         abortRef.current = null;
       }
     },
-    [userId, isStreaming, location.pathname, leadId, activeCallSid, mode, dialNumber, requestCallControl],
+    [userId, isStreaming, location.pathname, leadId, activeCallSid, mode, dialNumber, requestCallControl, enqueueActions],
   );
 
   const abort = useCallback((): void => {
