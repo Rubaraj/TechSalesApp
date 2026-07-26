@@ -100,6 +100,10 @@ export function SupervisionCallDetail() {
   const [liveEmotion, setLiveEmotion] = useState<ProspectEmotion | null>(null);
   const [liveWarning, setLiveWarning] = useState<string | null>(null);
   const liveOverRef = useRef(false);
+  // Parity — live tags rendered as the same inline chips the persisted
+  // record shows: backfilled on attach, then grown from stream events.
+  const [liveTags, setLiveTags] = useState<CallTag[]>([]);
+  const prevLiveEmotionRef = useRef<ProspectEmotion | null>(null);
 
   /** After the call ends: the analyze stream's 'ended' can beat the record
    *  write, so poll with retry-on-404 before giving up. */
@@ -180,20 +184,75 @@ export function SupervisionCallDetail() {
               const seen = new Set(prev.map((c) => c.id));
               return [...event.chunks.filter((c) => !seen.has(c.id)), ...prev];
             });
+            // Tags-so-far (chips for events that fired before we joined).
+            setLiveTags((prev) => {
+              const seen = new Set(prev.map((t) => `${t.kind}:${t.ts}`));
+              const fresh = (event.tags as CallTag[]).filter(
+                (t) => !seen.has(`${t.kind}:${t.ts}`),
+              );
+              return [...fresh, ...prev];
+            });
+            // Seed the shift tracker from the last backfilled emotion tag so
+            // the first live sample doesn't duplicate an already-shown shift.
+            const emotionTags = (event.tags as CallTag[]).filter((t) => t.kind === 'emotion');
+            const lastShift = emotionTags[emotionTags.length - 1];
+            if (lastShift && typeof lastShift.data.to === 'string') {
+              prevLiveEmotionRef.current = lastShift.data.to as ProspectEmotion;
+              setLiveEmotion(lastShift.data.to as ProspectEmotion);
+            }
             return;
           }
           if (event.type === 'actions') {
             const ids: string[] = [];
+            const tags: CallTag[] = [];
             for (const a of event.actions) {
-              if (a.type === 'compliance_flag' && a.chunkId) ids.push(a.chunkId);
+              if (a.type !== 'compliance_flag') continue;
+              if (a.chunkId) ids.push(a.chunkId);
+              tags.push({
+                kind: 'compliance',
+                ts: Date.now(),
+                data: {
+                  phrase: a.phrase,
+                  rule: a.rule,
+                  suggestion: a.suggestion,
+                  ...(a.severity ? { severity: a.severity } : {}),
+                  ...(a.ruleName ? { ruleName: a.ruleName } : {}),
+                  ...(a.chunkId ? { chunkId: a.chunkId } : {}),
+                },
+              });
             }
             if (ids.length > 0) {
               setFlaggedChunkIds((prev) => new Set([...prev, ...ids]));
             }
+            if (tags.length > 0) setLiveTags((prev) => [...prev, ...tags]);
+            return;
+          }
+          if (event.type === 'coaching') {
+            setLiveTags((prev) => [
+              ...prev,
+              {
+                kind: 'coaching',
+                ts: event.ts,
+                data: { tip: event.tip, focus: event.focus, source: event.source },
+              },
+            ]);
             return;
           }
           if (event.type === 'emotion') {
             setLiveEmotion(event.emotion);
+            // Chip on SHIFT only (matches what gets persisted as tags).
+            const prev = prevLiveEmotionRef.current;
+            if (event.emotion !== prev) {
+              prevLiveEmotionRef.current = event.emotion;
+              setLiveTags((tags) => [
+                ...tags,
+                {
+                  kind: 'emotion',
+                  ts: event.ts,
+                  data: { from: prev, to: event.emotion, confidence: event.confidence },
+                },
+              ]);
+            }
             return;
           }
           if (event.type === 'call_status') {
@@ -226,7 +285,25 @@ export function SupervisionCallDetail() {
   useEffect(() => {
     const el = liveScrollRef.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [liveChunks.length]);
+  }, [liveChunks.length, liveTags.length]);
+
+  /** Parity — live tags anchored to the nearest preceding chunk by ts
+   *  (same rule the persisted view applies to record.tags). */
+  const liveTagsByChunkIndex = useMemo(() => {
+    const map = new Map<number, CallTag[]>();
+    if (liveChunks.length === 0) return map;
+    for (const tag of liveTags) {
+      let idx = 0;
+      for (let i = 0; i < liveChunks.length; i++) {
+        if (liveChunks[i].timestamp <= tag.ts) idx = i;
+        else break;
+      }
+      const list = map.get(idx) ?? [];
+      list.push(tag);
+      map.set(idx, list);
+    }
+    return map;
+  }, [liveChunks, liveTags]);
 
   useEffect(
     () => () => {
@@ -348,38 +425,52 @@ export function SupervisionCallDetail() {
                   Listening… lines appear as the conversation happens.
                 </p>
               )}
-              {liveChunks.map((chunk) => {
+              {liveChunks.map((chunk, i) => {
                 const flagged = flaggedChunkIds.has(chunk.id);
                 return (
-                  <div
-                    key={chunk.id}
-                    className={`flex gap-2 text-sm ${chunk.isFinal ? '' : 'opacity-60'} ${
-                      flagged ? 'rounded-lg bg-amber-50 dark:bg-amber-900/20 px-1.5 py-0.5 -mx-1.5' : ''
-                    }`}
-                  >
-                    <span className="text-[11px] font-mono text-gray-400 dark:text-gray-500 pt-0.5 shrink-0">
-                      {liveOffset(chunk.timestamp)}
-                    </span>
-                    <span
-                      className={`font-bold shrink-0 ${
-                        chunk.speaker === 'agent'
-                          ? 'text-orange-600 dark:text-orange-400'
-                          : 'text-blue-600 dark:text-blue-400'
+                  <div key={chunk.id}>
+                    <div
+                      className={`flex gap-2 text-sm ${chunk.isFinal ? '' : 'opacity-60'} ${
+                        flagged ? 'rounded-lg bg-amber-50 dark:bg-amber-900/20 px-1.5 py-0.5 -mx-1.5' : ''
                       }`}
                     >
-                      {chunk.speaker === 'agent'
-                        ? 'Agent'
-                        : chunk.speaker === 'prospect'
-                          ? 'Prospect'
-                          : '—'}
-                      :
-                    </span>
-                    <span className="text-gray-800 dark:text-gray-200">
-                      {chunk.text}
-                      {flagged && (
-                        <AlertTriangle className="inline w-3.5 h-3.5 ml-1.5 -mt-0.5 text-amber-600 dark:text-amber-400" />
-                      )}
-                    </span>
+                      <span className="text-[11px] font-mono text-gray-400 dark:text-gray-500 pt-0.5 shrink-0">
+                        {liveOffset(chunk.timestamp)}
+                      </span>
+                      <span
+                        className={`font-bold shrink-0 ${
+                          chunk.speaker === 'agent'
+                            ? 'text-orange-600 dark:text-orange-400'
+                            : 'text-blue-600 dark:text-blue-400'
+                        }`}
+                      >
+                        {chunk.speaker === 'agent'
+                          ? 'Agent'
+                          : chunk.speaker === 'prospect'
+                            ? 'Prospect'
+                            : '—'}
+                        :
+                      </span>
+                      <span className="text-gray-800 dark:text-gray-200">
+                        {chunk.text}
+                        {flagged && (
+                          <AlertTriangle className="inline w-3.5 h-3.5 ml-1.5 -mt-0.5 text-amber-600 dark:text-amber-400" />
+                        )}
+                      </span>
+                    </div>
+                    {/* Parity — same inline tag chips as the persisted view. */}
+                    {(liveTagsByChunkIndex.get(i) ?? []).map((tag, ti) => {
+                      const Icon = TAG_ICONS[tag.kind] ?? Info;
+                      return (
+                        <div
+                          key={ti}
+                          className={`flex items-start gap-1.5 ml-12 mt-1 px-2.5 py-1.5 rounded-lg border text-xs ${TAG_INLINE_TONES[tag.kind] ?? TAG_INLINE_TONES.note}`}
+                        >
+                          <Icon className="w-3.5 h-3.5 shrink-0 mt-[1px]" />
+                          <span>{tagLabel(tag)}</span>
+                        </div>
+                      );
+                    })}
                   </div>
                 );
               })}

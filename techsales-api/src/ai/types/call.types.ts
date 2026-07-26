@@ -132,5 +132,12 @@ export type CallStreamEvent =
    *  on every transition while the stream is up). */
   | { type: 'ai_health'; status: 'ok' | 'degraded'; reason?: string; ts: number }
   /** Gap 10 — transcript-so-far replay for clients attaching mid-call
-   *  (supervisor live view). Finals only, chronological. */
-  | { type: 'transcript_backfill'; chunks: TranscriptChunk[]; ts: number };
+   *  (supervisor live view). Finals only, chronological. `tags` carries
+   *  the call's accumulated tags (compliance/coaching/emotion/...) so the
+   *  live view renders the same inline chips as the persisted record. */
+  | {
+      type: 'transcript_backfill';
+      chunks: TranscriptChunk[];
+      tags: Array<{ kind: string; ts: number; data: Record<string, unknown> }>;
+      ts: number;
+    };

@@ -592,6 +592,15 @@ export function getLiveTranscript(callSid: string): TranscriptChunk[] {
   return [...(transcriptHistory.get(callSid) ?? [])];
 }
 
+/**
+ * Gap 10 parity — tags accumulated so far on a LIVE call (compliance /
+ * coaching / emotion / info / note), for the supervisor backfill. Returns
+ * a copy; empty when the call isn't hosted here.
+ */
+export function getLiveTags(callSid: string): CallTag[] {
+  return [...(callTags.get(callSid) ?? [])];
+}
+
 export function __resetAllForTests(): void {
   accumulators.clear();
   shownTopics.clear();

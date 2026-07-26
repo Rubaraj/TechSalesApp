@@ -16,7 +16,7 @@ import { subscribe, getActiveCalls, type CallBusEvent } from '../services/callBu
 import { repos } from '../repositories/registry.js';
 import type { CallStreamEvent } from '../ai/types/call.types.js';
 import { getLlmHealth, onLlmHealthChange } from '../ai/llm/llmHealth.js';
-import { getLiveTranscript } from '../ai/agents/callAnalysisAgent.js';
+import { getLiveTranscript, getLiveTags } from '../ai/agents/callAnalysisAgent.js';
 import { env } from '../config/env.js';
 import { logger } from '../config/logger.js';
 
@@ -194,10 +194,12 @@ export async function getCallAnalyzeStream(req: Request, res: Response): Promise
   // land between this snapshot and the subscription attaching. The agent's
   // own stream connects at call start (empty history → no event).
   const backfill = getLiveTranscript(callSid);
-  if (backfill.length > 0) {
+  const backfillTags = getLiveTags(callSid);
+  if (backfill.length > 0 || backfillTags.length > 0) {
     const backfillEvent: CallStreamEvent = {
       type: 'transcript_backfill',
       chunks: backfill,
+      tags: backfillTags,
       ts: Date.now(),
     };
     writeEvent(backfillEvent);
