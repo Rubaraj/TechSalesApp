@@ -22,6 +22,9 @@ import { DatabricksCallRecordRepository } from './databricks/DatabricksCallRecor
 import { MongoComplianceRuleRepository } from './mongo/MongoComplianceRuleRepository.js';
 import { JsonComplianceRuleRepository } from './json/JsonComplianceRuleRepository.js';
 import { DatabricksComplianceRuleRepository } from './databricks/DatabricksComplianceRuleRepository.js';
+import { MongoCoachingRuleRepository } from './mongo/MongoCoachingRuleRepository.js';
+import { JsonCoachingRuleRepository } from './json/JsonCoachingRuleRepository.js';
+import { DatabricksCoachingRuleRepository } from './databricks/DatabricksCoachingRuleRepository.js';
 import { DatabricksLeadRepository } from './databricks/DatabricksLeadRepository.js';
 import { DatabricksUserRepository } from './databricks/DatabricksUserRepository.js';
 import { DatabricksRoleRepository } from './databricks/DatabricksRoleRepository.js';
@@ -77,6 +80,10 @@ export type ComplianceRuleRepo =
   | MongoComplianceRuleRepository
   | JsonComplianceRuleRepository
   | DatabricksComplianceRuleRepository;
+export type CoachingRuleRepo =
+  | MongoCoachingRuleRepository
+  | JsonCoachingRuleRepository
+  | DatabricksCoachingRuleRepository;
 
 export interface Repos {
   health: HealthRepo;
@@ -90,6 +97,7 @@ export interface Repos {
   aiInteraction: AiInteractionRepo;
   callRecord: CallRecordRepo;
   complianceRule: ComplianceRuleRepo;
+  coachingRule: CoachingRuleRepo;
 }
 
 interface RegistryState {
@@ -248,6 +256,21 @@ const buildComplianceRuleRepo = (mode: ConnectMode): ComplianceRuleRepo => {
   }
 };
 
+const buildCoachingRuleRepo = (mode: ConnectMode): CoachingRuleRepo => {
+  switch (mode) {
+    case 'mongo':
+      return new MongoCoachingRuleRepository();
+    case 'json':
+      return new JsonCoachingRuleRepository();
+    case 'databricks':
+      return new DatabricksCoachingRuleRepository();
+    default: {
+      const _exhaustive: never = mode;
+      throw new Error(`Unknown backend: ${String(_exhaustive)}`);
+    }
+  }
+};
+
 export function initRegistry(connectResult: ConnectResult): void {
   if (state) {
     throw new Error('initRegistry called twice — registry is a singleton.');
@@ -267,6 +290,7 @@ export function initRegistry(connectResult: ConnectResult): void {
       aiInteraction: buildAiInteractionRepo(mode),
       callRecord: buildCallRecordRepo(mode),
       complianceRule: buildComplianceRuleRepo(mode),
+      coachingRule: buildCoachingRuleRepo(mode),
     },
   };
   logger.info({ mode }, 'Repository registry initialized');

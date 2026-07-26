@@ -19,6 +19,7 @@ import {
   Supervision,
   SupervisionCallDetail,
   ComplianceRulesManagement,
+  CoachingRulesManagement,
 } from './pages/admin';
 import { LeadList, LeadDetail, LeadForm } from './pages/leads';
 import { PlanList, PlanDetail, PlanCompare } from './pages/plans';
@@ -254,6 +255,14 @@ function AppRoutes() {
             element={
               <AdminRoute>
                 <ComplianceRulesManagement />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="coaching"
+            element={
+              <AdminRoute>
+                <CoachingRulesManagement />
               </AdminRoute>
             }
           />

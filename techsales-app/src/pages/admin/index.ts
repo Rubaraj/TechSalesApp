@@ -11,4 +11,5 @@ export { AllEnrollments } from './AllEnrollments';
 export { Supervision } from './Supervision';
 export { SupervisionCallDetail } from './SupervisionCallDetail';
 export { ComplianceRulesManagement } from './ComplianceRulesManagement';
+export { CoachingRulesManagement } from './CoachingRulesManagement';
 

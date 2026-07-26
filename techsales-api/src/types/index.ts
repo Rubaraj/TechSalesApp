@@ -42,6 +42,8 @@ export * from './enrollmentForm.js';
 
 export * from './complianceRule.js';
 
+export * from './coachingRule.js';
+
 // Common types
 export interface ApiResponse<T> {
   success: boolean;

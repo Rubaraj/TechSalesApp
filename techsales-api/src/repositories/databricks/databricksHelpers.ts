@@ -23,6 +23,7 @@ export const APP_TABLES = {
   aiInteractions: 'ai_interactions',
   callRecords: 'call_records',
   complianceRules: 'compliance_rules',
+  coachingRules: 'coaching_rules',
 } as const;
 
 export const LOOKUP_TABLES = {

@@ -187,7 +187,7 @@ export interface ComplianceFlag {
  *  `actions`, `entities`, `tool_start`, `tool_end`, `thinking`. */
 export type ProspectEmotion = 'positive' | 'neutral' | 'confused' | 'frustrated' | 'upset';
 
-export type CoachingFocus = 'compliance' | 'empathy' | 'clarity' | 'pacing';
+export type CoachingFocus = 'compliance' | 'empathy' | 'clarity' | 'pacing' | 'discovery';
 
 export interface CoachingTip {
   id: string;

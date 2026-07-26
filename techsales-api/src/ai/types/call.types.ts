@@ -110,7 +110,7 @@ export const emptyExtractedEntities = (): ExtractedEntities => ({
 
 export type ProspectEmotion = 'positive' | 'neutral' | 'confused' | 'frustrated' | 'upset';
 
-export type CoachingFocus = 'compliance' | 'empathy' | 'clarity' | 'pacing';
+export type CoachingFocus = 'compliance' | 'empathy' | 'clarity' | 'pacing' | 'discovery';
 
 /** SSE event union sent over `GET /api/ai/call/analyze`. */
 export type CallStreamEvent =

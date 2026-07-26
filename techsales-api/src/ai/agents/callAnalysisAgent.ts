@@ -60,6 +60,14 @@ import {
   triggerCoaching,
   __resetCoachingForTests,
 } from '../live/coachingAdvisor.js';
+import {
+  loadCoachingRules,
+  startProactiveCoach,
+  stopProactiveCoach,
+  noteChunkForProactiveCoach,
+  registerProactiveCoachTagWriter,
+  __resetProactiveCoachForTests,
+} from '../live/proactiveCoach.js';
 
 // --- Per-call state (cleaned up on stop) ----------------------------------
 
@@ -93,6 +101,7 @@ function addTag(callSid: string, kind: CallTag['kind'], data: Record<string, unk
 // own modules but tags/history/userIds are owned here, so they get accessors
 // instead of imports (avoids a require cycle through this agent).
 registerEmotionTagWriter((callSid, data) => addTag(callSid, 'emotion', data));
+registerProactiveCoachTagWriter((callSid, data) => addTag(callSid, 'coaching', data));
 wireCoachingAdvisor({
   historyReader: (callSid) => transcriptHistory.get(callSid) ?? [],
   tagWriter: (callSid, data) => addTag(callSid, 'coaching', data),
@@ -150,10 +159,12 @@ export function startCallAnalysis(input: StartCallAnalysisInput): CallAnalysisHa
   // Warm/refresh the compiled compliance-rule cache before the first chunk
   // arrives (speech + Deepgram latency gives this plenty of head start).
   void loadActiveRules();
+  void loadCoachingRules();
 
   // Live intelligence — emotion sampling + coaching state for this call.
   startEmotionTracking(callSid);
   startCoaching(callSid);
+  startProactiveCoach(callSid);
 
   const unsubscribe = subscribe(callSid, (event: CallBusEvent) => {
     if (event.type !== 'transcript') return;
@@ -168,6 +179,15 @@ export function startCallAnalysis(input: StartCallAnalysisInput): CallAnalysisHa
       if (event.chunk.speaker === 'prospect') {
         noteProspectChunk(callSid, transcriptHistory.get(callSid) ?? [], userId);
       }
+      // Gap 6 — proactive coaching rules (talk-ratio / monologue / missed
+      // discovery). Sync + LLM-free; entity accumulator may lag one chunk
+      // behind for in-flight prospect extraction, which is fine here.
+      noteChunkForProactiveCoach(
+        callSid,
+        event.chunk,
+        transcriptHistory.get(callSid) ?? [],
+        accumulators.get(callSid) ?? emptyExtractedEntities(),
+      );
     } catch (err) {
       logger.error({ err, callSid }, 'callAnalysisAgent: runStub threw');
     }
@@ -251,6 +271,7 @@ export function stopCallAnalysisByCallSid(callSid: string): void {
   callTags.delete(callSid);
   stopEmotionTracking(callSid);
   stopCoaching(callSid);
+  stopProactiveCoach(callSid);
   logger.info({ callSid }, 'callAnalysisAgent: stopped');
 }
 
@@ -578,4 +599,5 @@ export function __resetAllForTests(): void {
   callTags.clear();
   __resetEmotionForTests();
   __resetCoachingForTests();
+  __resetProactiveCoachForTests();
 }

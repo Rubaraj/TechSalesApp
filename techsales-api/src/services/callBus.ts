@@ -63,7 +63,7 @@ export interface CallBusCoachingEvent {
   type: 'coaching';
   source: 'rule' | 'ai';
   tip: string;
-  focus: 'compliance' | 'empathy' | 'clarity' | 'pacing';
+  focus: 'compliance' | 'empathy' | 'clarity' | 'pacing' | 'discovery';
   ts: number;
 }
 
