@@ -170,6 +170,7 @@ export function TrainingSimulator() {
           signal: controller.signal,
           onEvent: (event) => {
             if (event.type === 'transcript') {
+              console.log('[sim] transcript:', event.chunk.speaker, '—', event.chunk.text);
               setChunks((prev) => {
                 const i = prev.findIndex((c) => c.id === event.chunk.id);
                 if (i === -1) return [...prev, event.chunk];
@@ -264,6 +265,7 @@ export function TrainingSimulator() {
               speaking?: boolean;
               message?: string;
             };
+            console.log('[sim] ws message:', msg.type, msg.message ?? '');
             if (msg.type === 'session' && msg.callSid) {
               sessionSid = msg.callSid;
               setSimSid(msg.callSid);

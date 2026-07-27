@@ -112,6 +112,16 @@ function handleDgJson(ctx: SessionCtx, raw: string): void {
   } catch {
     return;
   }
+  // Diagnostics — every DG event type (+ role/text for transcripts).
+  logger.info(
+    {
+      simSid: ctx.simSid,
+      dgType: msg.type,
+      ...(msg.role ? { role: msg.role } : {}),
+      ...(msg.content ? { text: msg.content.slice(0, 80) } : {}),
+    },
+    'simulator: DG event',
+  );
   switch (msg.type) {
     case 'SettingsApplied': {
       ctx.dgReady = true;
@@ -235,15 +245,25 @@ async function handleConnection(ws: WebSocket, req: IncomingMessage): Promise<vo
   );
 
   // Browser messages: binary = mic audio; JSON = control.
+  let micFramesIn = 0;
+  let micFramesForwarded = 0;
   ws.on('message', (data: RawData, isBinary: boolean) => {
     if (ctx.closed) return;
     if (isBinary) {
       const frame = Buffer.isBuffer(data) ? data : Buffer.from(data as ArrayBuffer);
+      micFramesIn += 1;
       if (ctx.dgReady && dgWs.readyState === WebSocket.OPEN) {
         dgWs.send(frame);
+        micFramesForwarded += 1;
       } else {
         if (ctx.pendingMic.length >= MAX_PENDING_FRAMES) ctx.pendingMic.shift();
         ctx.pendingMic.push(frame);
+      }
+      if (micFramesIn === 1 || micFramesIn % 100 === 0) {
+        logger.info(
+          { simSid: ctx.simSid, micFramesIn, micFramesForwarded, bytes: frame.length },
+          'simulator: mic frames',
+        );
       }
       return;
     }

@@ -106,7 +106,13 @@ export async function startSimulatorAudio(
 
   // Batch worklet chunks into ~100ms frames before shipping.
   let pending = new Int16Array(0);
+  let framesSent = 0;
+  let workletMessages = 0;
   worklet.port.onmessage = (e: MessageEvent<ArrayBuffer>) => {
+    workletMessages += 1;
+    if (workletMessages === 1) {
+      console.log('[sim-audio] worklet producing audio (ctx rate', ctx.sampleRate, ')');
+    }
     const incoming = new Int16Array(e.data);
     const merged = new Int16Array(pending.length + incoming.length);
     merged.set(pending, 0);
@@ -115,9 +121,24 @@ export async function startSimulatorAudio(
     while (pending.length >= FRAME_SAMPLES) {
       const frame = pending.slice(0, FRAME_SAMPLES);
       pending = pending.slice(FRAME_SAMPLES);
+      framesSent += 1;
+      if (framesSent === 1 || framesSent % 50 === 0) {
+        // Peak level of this frame — 0 means the mic path is silent.
+        let peak = 0;
+        for (let i = 0; i < frame.length; i++) {
+          const v = Math.abs(frame[i]);
+          if (v > peak) peak = v;
+        }
+        console.log(`[sim-audio] mic frame #${framesSent} sent (peak ${peak}/32767)`);
+      }
       onMicFrame(frame.buffer);
     }
   };
+  window.setTimeout(() => {
+    if (workletMessages === 0) {
+      console.warn('[sim-audio] worklet produced NO audio in 3s — capture graph not running');
+    }
+  }, 3000);
 
   // --- Playback queue -------------------------------------------------------
   let nextStartTime = 0;
