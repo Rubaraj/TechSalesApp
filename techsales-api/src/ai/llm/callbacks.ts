@@ -43,7 +43,7 @@ export type AiInteractionKind =
    *  the agent mid-call (userId = the call's agent). Superseded by
    *  call_live_insight; kept for historical audit rows. */
   | 'call_coaching'
-  /** Live-call intelligence — one row per merged 20s insight tick (emotion
+  /** Live-call intelligence — one row per merged 15s insight tick (emotion
    *  + coaching tip + AI compliance concern in a single structured call;
    *  userId = the call's agent). */
   | 'call_live_insight';

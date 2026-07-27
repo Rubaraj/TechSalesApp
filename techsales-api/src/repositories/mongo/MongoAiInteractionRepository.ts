@@ -6,7 +6,7 @@
  */
 import { getAiInteractionModel, type AiInteraction } from '../../models/aiInteraction.model.js';
 import type { AiInteractionRecord } from '../../ai/llm/callbacks.js';
-import type { AiStatsAggregate, AiStatsByKind } from '../types.js';
+import type { AiStatsAggregate, AiStatsByKind, CostRow } from '../types.js';
 import { generateId } from '../../utils/paginate.js';
 
 const stripInternals = (
@@ -78,6 +78,49 @@ export class MongoAiInteractionRepository {
    * because Mongo's `$percentile` requires an Atlas-only operator on older
    * server versions and we want this to work against the local Pi cluster.
    */
+  /**
+   * AI cost analysis — payload-free rows since `sinceIso` (ISO-string
+   * $gte is valid: createdAt is always fixed-width toISOString UTC).
+   * `input.callSid` / `input.agentUserId` are projected server-side (works
+   * on Mixed paths) and lifted to flat fields; the heavy input/output
+   * payloads are never fetched.
+   */
+  async findForCostAnalysis(sinceIso: string): Promise<CostRow[]> {
+    const docs = await this.model()
+      .find({ createdAt: { $gte: sinceIso } })
+      .select(
+        'kind userId model provider tokensIn tokensOut cachedInputTokens cachedReadTokens createdAt input.callSid input.agentUserId',
+      )
+      .lean<
+        Array<{
+          kind: string;
+          userId?: string;
+          model?: string;
+          provider?: string;
+          tokensIn?: number;
+          tokensOut?: number;
+          cachedInputTokens?: number;
+          cachedReadTokens?: number;
+          createdAt: string;
+          input?: { callSid?: string; agentUserId?: string };
+        }>
+      >()
+      .exec();
+    return docs.map((d) => ({
+      kind: d.kind,
+      ...(d.userId ? { userId: d.userId } : {}),
+      model: d.model ?? '',
+      provider: d.provider ?? '',
+      tokensIn: d.tokensIn ?? 0,
+      tokensOut: d.tokensOut ?? 0,
+      cachedInputTokens: d.cachedInputTokens ?? 0,
+      cachedReadTokens: d.cachedReadTokens ?? 0,
+      createdAt: d.createdAt,
+      ...(d.input?.callSid ? { callSid: String(d.input.callSid) } : {}),
+      ...(d.input?.agentUserId ? { agentUserId: String(d.input.agentUserId) } : {}),
+    }));
+  }
+
   async aggregateLast24h(): Promise<AiStatsAggregate> {
     const sinceIso = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
     const docs = await this.model()

@@ -10,7 +10,7 @@ import { JsonStore } from './JsonStore.js';
 import { BOOTSTRAP_PATHS } from '../../utils/bootstrap.js';
 import { env } from '../../config/env.js';
 import { generateId } from '../../utils/paginate.js';
-import type { AiStatsAggregate } from '../types.js';
+import type { AiStatsAggregate, CostRow } from '../types.js';
 import { summarize } from '../mongo/MongoAiInteractionRepository.js';
 
 export class JsonAiInteractionRepository {
@@ -57,6 +57,30 @@ export class JsonAiInteractionRepository {
       total += (row.tokensIn ?? 0) + (row.tokensOut ?? 0) - (row.cachedInputTokens ?? 0);
     }
     return total > 0 ? total : 0;
+  }
+
+  /** AI cost analysis — payload-free rows since `sinceIso`. */
+  async findForCostAnalysis(sinceIso: string): Promise<CostRow[]> {
+    const store = await this.getStore();
+    return store
+      .get()
+      .filter((r) => (r.createdAt || '') >= sinceIso)
+      .map((r) => {
+        const input = (r.input ?? {}) as { callSid?: string; agentUserId?: string };
+        return {
+          kind: r.kind,
+          ...(r.userId ? { userId: r.userId } : {}),
+          model: r.model ?? '',
+          provider: r.provider ?? '',
+          tokensIn: r.tokensIn ?? 0,
+          tokensOut: r.tokensOut ?? 0,
+          cachedInputTokens: r.cachedInputTokens ?? 0,
+          cachedReadTokens: r.cachedReadTokens ?? 0,
+          createdAt: r.createdAt,
+          ...(input.callSid ? { callSid: String(input.callSid) } : {}),
+          ...(input.agentUserId ? { agentUserId: String(input.agentUserId) } : {}),
+        };
+      });
   }
 
   /** 24h aggregate. Filters in-memory then delegates to the shared summarizer. */

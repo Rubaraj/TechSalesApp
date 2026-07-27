@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { Users, Shield, Building2, Settings, Target, Radio, ShieldAlert, Lightbulb, ClipboardCheck } from 'lucide-react';
+import { Users, Shield, Building2, Settings, Target, Radio, ShieldAlert, Lightbulb, ClipboardCheck, DollarSign } from 'lucide-react';
 
 const adminNavItems = [
   { to: '/admin/users', icon: Users, label: 'User Management' },
@@ -10,6 +10,7 @@ const adminNavItems = [
   { to: '/admin/compliance', icon: ShieldAlert, label: 'Compliance Rules' },
   { to: '/admin/coaching', icon: Lightbulb, label: 'Coaching Rules' },
   { to: '/admin/qa-rubric', icon: ClipboardCheck, label: 'QA Analytics' },
+  { to: '/admin/ai-costs', icon: DollarSign, label: 'AI Cost Analysis' },
   { to: '/admin/settings', icon: Settings, label: 'System Settings' },
 ];
 

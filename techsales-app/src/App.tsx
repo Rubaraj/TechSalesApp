@@ -21,6 +21,7 @@ import {
   ComplianceRulesManagement,
   CoachingRulesManagement,
   QaRubricManagement,
+  AiCostAnalysis,
 } from './pages/admin';
 import { LeadList, LeadDetail, LeadForm } from './pages/leads';
 import { PlanList, PlanDetail, PlanCompare } from './pages/plans';
@@ -272,6 +273,14 @@ function AppRoutes() {
             element={
               <AdminRoute>
                 <QaRubricManagement />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="ai-costs"
+            element={
+              <AdminRoute>
+                <AiCostAnalysis />
               </AdminRoute>
             }
           />

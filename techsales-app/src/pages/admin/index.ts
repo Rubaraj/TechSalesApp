@@ -13,4 +13,5 @@ export { SupervisionCallDetail } from './SupervisionCallDetail';
 export { ComplianceRulesManagement } from './ComplianceRulesManagement';
 export { CoachingRulesManagement } from './CoachingRulesManagement';
 export { QaRubricManagement } from './QaRubricManagement';
+export { AiCostAnalysis } from './AiCostAnalysis';
 

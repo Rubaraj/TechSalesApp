@@ -35,6 +35,7 @@ import {
 import { callRouter } from './call.routes.js';
 import { listQaCalls, getQaCall, postQaReview } from '../controllers/callQa.controller.js';
 import { getSupervisorStream } from '../controllers/supervisor.controller.js';
+import { getCostAnalysis } from '../controllers/aiCost.controller.js';
 import { env } from '../config/env.js';
 
 export const aiRouter: Router = Router();
@@ -58,6 +59,8 @@ aiRouter.post('/atlas/approvals/:proposalId', asyncHandler(postAtlasApproval));
 aiRouter.get('/qa/calls', asyncHandler(listQaCalls));
 aiRouter.get('/qa/calls/:callSid', asyncHandler(getQaCall));
 aiRouter.get('/supervisor/stream', asyncHandler(getSupervisorStream));
+// AI cost analysis — admin-gated aggregation over the audit log (LLM-free).
+aiRouter.get('/cost-analysis', asyncHandler(getCostAnalysis));
 
 aiRouter.use((_req: Request, res: Response, next: NextFunction) => {
   if (!env.AI_ENABLED) {

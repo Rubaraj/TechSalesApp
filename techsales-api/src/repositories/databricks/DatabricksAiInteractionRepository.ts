@@ -5,7 +5,7 @@
  */
 import type { AiInteraction } from '../../models/aiInteraction.model.js';
 import type { AiInteractionRecord } from '../../ai/llm/callbacks.js';
-import type { AiStatsAggregate } from '../types.js';
+import type { AiStatsAggregate, CostRow } from '../types.js';
 import { generateId } from '../../utils/paginate.js';
 import { summarize } from '../mongo/MongoAiInteractionRepository.js';
 import {
@@ -69,6 +69,32 @@ export class DatabricksAiInteractionRepository {
     if (!row) return 0;
     const total = Number(row.tokens_in) + Number(row.tokens_out) - Number(row.cached_input);
     return total > 0 ? total : 0;
+  }
+
+  /** AI cost analysis — payload-free rows since `sinceIso`. */
+  async findForCostAnalysis(sinceIso: string): Promise<CostRow[]> {
+    const rows = await db().query<{ data: string }>(
+      `SELECT data FROM ${this.table()}
+       WHERE get_json_object(data, '$.createdAt') >= ?`,
+      [sinceIso],
+    );
+    return rows.map((r) => {
+      const p = JSON.parse(r.data) as AiInteraction;
+      const input = (p.input ?? {}) as { callSid?: string; agentUserId?: string };
+      return {
+        kind: p.kind,
+        ...(p.userId ? { userId: p.userId } : {}),
+        model: p.model ?? '',
+        provider: p.provider ?? '',
+        tokensIn: p.tokensIn ?? 0,
+        tokensOut: p.tokensOut ?? 0,
+        cachedInputTokens: p.cachedInputTokens ?? 0,
+        cachedReadTokens: p.cachedReadTokens ?? 0,
+        createdAt: p.createdAt,
+        ...(input.callSid ? { callSid: String(input.callSid) } : {}),
+        ...(input.agentUserId ? { agentUserId: String(input.agentUserId) } : {}),
+      };
+    });
   }
 
   /**

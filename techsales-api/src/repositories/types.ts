@@ -82,3 +82,23 @@ export interface AiStatsAggregate {
   latencyP95Ms: number;
   byKind: AiStatsByKind[];
 }
+
+/**
+ * AI cost analysis — the flat, payload-free row shape all three
+ * aiInteraction repos return from `findForCostAnalysis(sinceIso)`.
+ * `callSid`/`agentUserId` are lifted out of the Mixed `input` payload
+ * (present on call_qa / call_live_insight rows only).
+ */
+export interface CostRow {
+  kind: string;
+  userId?: string;
+  model: string;
+  provider: string;
+  tokensIn: number;
+  tokensOut: number;
+  cachedInputTokens: number;
+  cachedReadTokens: number;
+  createdAt: string;
+  callSid?: string;
+  agentUserId?: string;
+}
