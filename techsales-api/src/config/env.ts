@@ -134,12 +134,12 @@ const envSchema = z.object({
   // `simulatorEnabled()` below — zod defaults can't reference other vars.
   SIMULATOR_ENABLED: truthy.default(true),
   // Deepgram-hosted "think" LLM for the prospect persona. Runs inside
-  // Deepgram's cloud (NOT the app's OpenRouter stack). Must be on Deepgram's
-  // CURRENT voice-agent model list (developers.deepgram.com/docs/
-  // voice-agent-llm-models) — ids off that list are rejected at Settings
-  // time ("model not available"). claude-4-5-haiku = their Standard tier:
-  // fastest replies, right fit for a live voice persona.
-  SIMULATOR_THINK_MODEL: z.string().default('claude-4-5-haiku'),
+  // Deepgram's cloud (NOT the app's OpenRouter stack). Off-list ids are
+  // rejected at Settings time ("model not available"). Probed live against
+  // agent.deepgram.com (2026-07): accepted = claude-haiku-4-5,
+  // claude-sonnet-4-5, claude-sonnet-4-6, claude-sonnet-5. Haiku = fastest
+  // replies, right fit for a live voice persona.
+  SIMULATOR_THINK_MODEL: z.string().default('claude-haiku-4-5'),
   // Hard per-session cap — cost control on agent minutes.
   SIMULATOR_MAX_SESSION_SECONDS: z.coerce.number().int().positive().default(600),
 
