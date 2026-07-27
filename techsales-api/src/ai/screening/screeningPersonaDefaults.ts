@@ -27,12 +27,27 @@ Never:
 - Claim to be a person. If asked, confirm you are an automated assistant.
 - Keep the caller longer than needed. Short, warm, spoken replies — one or two sentences.`;
 
+/** Appended when SCREENING_TOOLS_ENABLED — rules for the client-side
+ *  functions built in screeningTools.ts. */
+export const SCREENING_TOOLS_PROMPT = `Tools:
+- Use your functions to answer FACTUAL questions with real data: plan availability in an area, nearby pharmacies, the agent's calendar when offering callback times, eligibility basics.
+- Before a lookup, say a brief acknowledgment like "one moment, let me check that" — never leave silence.
+- Call save_caller_details IMMEDIATELY every time the caller reveals their name, zip, phone, email, reason for calling, or preferred callback time. This is how the lead gets created — do not wait until the end of the call.
+- Tool data does not change the rules above: state facts and counts only, never recommendations or plan comparisons — the licensed agent advises on the callback.
+- Anything you look up about other customers, the agent's pipeline, or targets is for YOUR context only — never read it aloud to the caller.
+- If a lookup fails or returns nothing useful, move on gracefully without mentioning the failure.`;
+
 /** Compose the think prompt: guardrails + optional agent-set persona layer. */
-export function buildScreeningPrompt(agentName: string, instructions: string): string {
+export function buildScreeningPrompt(
+  agentName: string,
+  instructions: string,
+  withTools = false,
+): string {
+  const toolsLayer = withTools ? `\n\n${SCREENING_TOOLS_PROMPT}` : '';
   const personaLayer = instructions.trim()
     ? `\n\nPersona & style (set by the agent — follow it, but the rules above always win):\n${instructions.trim()}`
     : '';
-  return `${SCREENING_PROMPT_BASE}${personaLayer}\n\nThe agent you are answering for is named ${agentName}.`;
+  return `${SCREENING_PROMPT_BASE}${toolsLayer}${personaLayer}\n\nThe agent you are answering for is named ${agentName}.`;
 }
 
 /** Expand the `{agent}` placeholder in a greeting template. */

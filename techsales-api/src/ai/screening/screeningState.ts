@@ -16,6 +16,10 @@ export interface ScreeningEntry {
   token: string;
   takenOver: boolean;
   startedAt: number;
+  /** Lines captured by the assistant's save_caller_details function
+   *  (reason for calling, callback preference) — flow into the
+   *  auto-created lead's note via createLeadFromScreening.noteLines. */
+  notes: string[];
 }
 
 const entries = new Map<string, ScreeningEntry>();
@@ -26,9 +30,20 @@ export function registerScreening(callSid: string, agentUserId: string): Screeni
     token: randomUUID(),
     takenOver: false,
     startedAt: Date.now(),
+    notes: [],
   };
   entries.set(callSid, entry);
   return entry;
+}
+
+/** Record a note line from the screening assistant (no-op when the call
+ *  isn't screened). Dedupes exact repeats — the voice model may call
+ *  save_caller_details several times with the same reason. */
+export function appendScreeningNote(callSid: string, line: string): void {
+  const entry = entries.get(callSid);
+  const trimmed = line.trim();
+  if (!entry || !trimmed) return;
+  if (!entry.notes.includes(trimmed)) entry.notes.push(trimmed);
 }
 
 export function getScreening(callSid: string): ScreeningEntry | undefined {

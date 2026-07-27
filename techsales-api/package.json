@@ -45,7 +45,8 @@
     "twilio": "^6.0.2",
     "wink-bm25-text-search": "^3.1.2",
     "ws": "^8.21.0",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "zod-to-json-schema": "^3.25.2"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

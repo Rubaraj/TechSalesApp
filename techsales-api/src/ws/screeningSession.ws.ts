@@ -28,6 +28,10 @@ import {
   buildScreeningPrompt,
   renderGreeting,
 } from '../ai/screening/screeningPersonaDefaults.js';
+import {
+  buildScreeningFunctionDefs,
+  executeScreeningFunction,
+} from '../ai/screening/screeningTools.js';
 import { resolveAgentName } from '../services/agentNameCache.js';
 import { repos } from '../repositories/registry.js';
 import type { ScreeningPersonaRecord } from '../types/index.js';
@@ -40,6 +44,9 @@ const MAX_PENDING_FRAMES = 500;
 interface BridgeCtx {
   callSid: string | null;
   streamSid: string | null;
+  /** Screening agent's userId — injected into every tool invocation
+   *  server-side (the voice model never chooses whose data it reads). */
+  agentUserId: string | null;
   twilioWs: WebSocket;
   dgWs: WebSocket | null;
   dgReady: boolean;
@@ -87,7 +94,10 @@ function buildSettings(
       listen: { provider: { type: 'deepgram', model: 'nova-3' } },
       think: {
         provider: { type: 'anthropic', model: env.SIMULATOR_THINK_MODEL },
-        prompt: buildScreeningPrompt(who, persona?.instructions ?? ''),
+        prompt: buildScreeningPrompt(who, persona?.instructions ?? '', env.SCREENING_TOOLS_ENABLED),
+        // Client-side function calling (no endpoint ⇒ DG sends
+        // FunctionCallRequest over this socket) — the Atlas tool set.
+        ...(env.SCREENING_TOOLS_ENABLED ? { functions: buildScreeningFunctionDefs() } : {}),
       },
       speak: { provider: { type: 'deepgram', model: voice } },
     },
@@ -125,7 +135,14 @@ function openDeepgram(
       }
       return;
     }
-    let msg: { type?: string; role?: string; content?: string; description?: string };
+    let msg: {
+      type?: string;
+      role?: string;
+      content?: string;
+      description?: string;
+      /** FunctionCallRequest payload (client_side functions only). */
+      functions?: { id?: string; name?: string; arguments?: string; client_side?: boolean }[];
+    };
     try {
       msg = JSON.parse(data.toString()) as typeof msg;
     } catch {
@@ -163,6 +180,35 @@ function openDeepgram(
             speaker: 'agent',
           };
           publish(ctx.callSid, { type: 'transcript', chunk });
+        }
+        return;
+      }
+      case 'FunctionCallRequest': {
+        // Atlas-tool function calling — execute server-side, reply with the
+        // matching request id. DG pauses generation until the response.
+        for (const fn of msg.functions ?? []) {
+          if (fn.client_side === false) continue;
+          const fnId = fn.id ?? '';
+          const fnName = fn.name ?? '';
+          logger.info(
+            { callSid: ctx.callSid, fn: fnName, args: (fn.arguments ?? '').slice(0, 200) },
+            'screening: function call requested',
+          );
+          const respond = (content: string): void => {
+            if (dgWs.readyState === WebSocket.OPEN) {
+              dgWs.send(
+                JSON.stringify({ type: 'FunctionCallResponse', id: fnId, name: fnName, content }),
+              );
+            }
+          };
+          if (!ctx.callSid || !ctx.agentUserId) {
+            respond(JSON.stringify({ error: 'Session not ready' }));
+            continue;
+          }
+          void executeScreeningFunction(fnName, fn.arguments ?? '{}', {
+            callSid: ctx.callSid,
+            agentUserId: ctx.agentUserId,
+          }).then(respond);
         }
         return;
       }
@@ -204,6 +250,7 @@ function handleConnection(ws: WebSocket): void {
   const ctx: BridgeCtx = {
     callSid: null,
     streamSid: null,
+    agentUserId: null,
     twilioWs: ws,
     dgWs: null,
     dgReady: false,
@@ -234,6 +281,7 @@ function handleConnection(ws: WebSocket): void {
         }
         ctx.callSid = callSid;
         ctx.streamSid = msg.start?.streamSid ?? null;
+        ctx.agentUserId = entry.agentUserId;
         logger.info(
           { callSid, streamSid: ctx.streamSid, agentUserId: entry.agentUserId },
           'screening: bridge started',

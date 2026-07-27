@@ -151,6 +151,10 @@ const envSchema = z.object({
   // 'agent' chunks. Default off — the existing media-stream fork should
   // capture the AI's voice on the outbound track like any agent audio.
   SCREENING_PUBLISH_BOT_TRANSCRIPTS: truthy.default(false),
+  // Kill switch for the screening assistant's function calling (Atlas tools
+  // + save_caller_details). Off → the assistant still screens, just without
+  // lookups or structured capture.
+  SCREENING_TOOLS_ENABLED: truthy.default(true),
 
   // Public base URL the Pi tunnel exposes. Used for the TwiML <Stream url>
   // and any callbacks that need a full URL. e.g. https://techsales-dev.example.com

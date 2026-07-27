@@ -236,6 +236,7 @@ export function stopCallAnalysisByCallSid(callSid: string): void {
     void createLeadFromScreening({
       callSid,
       entities: entitiesSnapshot,
+      ...(screening.notes.length > 0 ? { noteLines: screening.notes } : {}),
       ...(callerNumber ? { callerNumber } : {}),
       agentUserId: screening.agentUserId,
     });
@@ -628,6 +629,25 @@ export function getLiveTranscript(callSid: string): TranscriptChunk[] {
  */
 export function getLiveTags(callSid: string): CallTag[] {
   return [...(callTags.get(callSid) ?? [])];
+}
+
+/**
+ * AI screening — structured entities captured by the assistant's
+ * save_caller_details function call. Merges into the same accumulator the
+ * regex extractor feeds (function-call data arrives clean, so it wins the
+ * spread), publishes the diff to the live panel, and tags it for the QA
+ * record. No-op when the callSid has no active analysis session.
+ * (Bridge→agent import direction matches the simulator bridge — no cycle.)
+ */
+export function ingestScreeningEntities(
+  callSid: string,
+  diff: Partial<ExtractedEntities>,
+): void {
+  const current = accumulators.get(callSid);
+  if (!current || Object.keys(diff).length === 0) return;
+  accumulators.set(callSid, { ...current, ...diff });
+  publish(callSid, { type: 'entities', entities: diff });
+  addTag(callSid, 'entity', diff as Record<string, unknown>);
 }
 
 export function __resetAllForTests(): void {
