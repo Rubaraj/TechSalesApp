@@ -81,7 +81,10 @@ const unsubscribers = new Map<string, () => void>();
 const userIds = new Map<string, string>();
 /** QA pipeline — per-call metadata the WS handler doesn't thread anywhere
  *  else; owned here because the persist hook lives in stop(). */
-const callMeta = new Map<string, { direction: 'inbound' | 'outbound'; startedAt: number }>();
+const callMeta = new Map<
+  string,
+  { direction: 'inbound' | 'outbound'; startedAt: number; simulated?: boolean }
+>();
 /** QA pipeline — tags the rule-based analysis produced during the call
  *  (compliance / info / entity / note), persisted with the transcript. */
 const callTags = new Map<string, CallTag[]>();
@@ -115,6 +118,9 @@ export interface StartCallAnalysisInput {
   /** QA pipeline — call direction for the persisted record + supervisor
    *  feed. Defaults to 'outbound' when the caller doesn't know. */
   direction?: 'inbound' | 'outbound';
+  /** Training simulator session — persisted on the record (trainee QA
+   *  access + Training cost bucket). */
+  simulated?: boolean;
 }
 
 export interface CallAnalysisHandle {
@@ -140,7 +146,11 @@ export function startCallAnalysis(input: StartCallAnalysisInput): CallAnalysisHa
   shownTopics.set(callSid, new Set());
   transcriptHistory.set(callSid, []);
   callTags.set(callSid, []);
-  callMeta.set(callSid, { direction, startedAt: Date.now() });
+  callMeta.set(callSid, {
+    direction,
+    startedAt: Date.now(),
+    ...(input.simulated ? { simulated: true } : {}),
+  });
   if (callerNumber) callerNumbers.set(callSid, callerNumber);
   if (userId) userIds.set(callSid, userId);
   logger.info(
@@ -236,6 +246,7 @@ export function stopCallAnalysisByCallSid(callSid: string): void {
       ...(userId ? { userId } : {}),
       direction: meta.direction,
       startedAt: meta.startedAt,
+      ...(meta.simulated ? { simulated: true } : {}),
       lines,
       tags,
     }).then(() => {

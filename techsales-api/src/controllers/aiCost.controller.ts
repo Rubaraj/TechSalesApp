@@ -20,8 +20,10 @@ import {
   CACHE_READ_MULT,
   DEEPGRAM_PER_MIN,
   STREAMS_PER_CALL,
+  SIMULATOR_AGENT_PER_MIN,
   costOfRow,
   transcriptCost,
+  simulatorSessionCost,
   resolveModelPrice,
 } from '../ai/cost/pricing.js';
 import type { AiInteractionKind } from '../ai/llm/callbacks.js';
@@ -41,6 +43,7 @@ interface UserCosts {
   copilotUsd: number;
   qaUsd: number;
   transcriptUsd: number;
+  trainingUsd: number;
   totalUsd: number;
   llmCalls: number;
   calls: number;
@@ -63,7 +66,14 @@ export async function getCostAnalysis(req: Request, res: Response): Promise<void
   const calls = allCalls.filter((c) => c.createdAt >= sinceIso);
 
   // --- Per-row costing + bucket/user accumulation ---------------------------
-  const totals = { copilotUsd: 0, qaUsd: 0, transcriptUsd: 0, llmCalls: 0, tokens: 0 };
+  const totals = {
+    copilotUsd: 0,
+    qaUsd: 0,
+    transcriptUsd: 0,
+    trainingUsd: 0,
+    llmCalls: 0,
+    tokens: 0,
+  };
   const byUser = new Map<string, UserCosts>();
   const userRow = (userId: string): UserCosts => {
     const existing = byUser.get(userId);
@@ -74,6 +84,7 @@ export async function getCostAnalysis(req: Request, res: Response): Promise<void
       copilotUsd: 0,
       qaUsd: 0,
       transcriptUsd: 0,
+      trainingUsd: 0,
       totalUsd: 0,
       llmCalls: 0,
       calls: 0,
@@ -113,6 +124,25 @@ export async function getCostAnalysis(req: Request, res: Response): Promise<void
       userRow(effectiveUser).llmCalls += 1;
     }
 
+    // Training bucket — ALL LLM rows tied to a simulator session (insight
+    // ticks + practice QA reviews) regardless of kind. They still feed the
+    // per-call join maps for the per-call table, but stay OUT of the
+    // real-call projection averages below.
+    if (row.callSid?.startsWith('SIM-')) {
+      totals.trainingUsd += usd;
+      userRow(effectiveUser).trainingUsd += usd;
+      if (row.kind === 'call_live_insight') {
+        const entry = liveUsdByCall.get(row.callSid) ?? { usd: 0, ticks: 0 };
+        entry.usd += usd;
+        entry.ticks += 1;
+        liveUsdByCall.set(row.callSid, entry);
+      }
+      if (row.kind === 'call_qa') {
+        qaUsdByCall.set(row.callSid, (qaUsdByCall.get(row.callSid) ?? 0) + usd);
+      }
+      continue;
+    }
+
     if (bucket === 'copilot') {
       totals.copilotUsd += usd;
       userRow(effectiveUser).copilotUsd += usd;
@@ -140,40 +170,62 @@ export async function getCostAnalysis(req: Request, res: Response): Promise<void
     }
   }
 
-  // --- Transcript costs from call durations ---------------------------------
+  // --- Transcript / voice-agent costs from call durations -------------------
   let totalCallSec = 0;
-  let liveInsightCallSec = 0; // minutes of calls that actually ran insight (E4)
+  let liveInsightCallSec = 0; // minutes of REAL calls that ran insight (E4)
+  let simSessionSec = 0;
+  let simSessionCount = 0;
   const perCall = calls.map((c) => {
-    const tUsd = transcriptCost(c.durationSec);
-    totals.transcriptUsd += tUsd;
-    totalCallSec += c.durationSec;
+    const isSim = c.simulated === true;
     const owner = c.userId ?? UNATTRIBUTED;
     const u = userRow(owner);
-    u.transcriptUsd += tUsd;
     u.calls += 1;
     const live = liveUsdByCall.get(c.callSid);
-    if (live) liveInsightCallSec += c.durationSec;
+    const qaUsd = qaUsdByCall.get(c.callSid) ?? 0;
+
+    // Simulated sessions: Voice Agent minutes (STT+LLM+TTS bundled) —
+    // NOT the per-stream Deepgram transcript rate (that would double-bill).
+    let tUsd = 0;
+    let agentUsd = 0;
+    if (isSim) {
+      agentUsd = simulatorSessionCost(c.durationSec);
+      totals.trainingUsd += agentUsd;
+      u.trainingUsd += agentUsd;
+      simSessionSec += c.durationSec;
+      simSessionCount += 1;
+    } else {
+      tUsd = transcriptCost(c.durationSec);
+      totals.transcriptUsd += tUsd;
+      totalCallSec += c.durationSec;
+      u.transcriptUsd += tUsd;
+      if (live) liveInsightCallSec += c.durationSec;
+    }
+
     return {
       callSid: c.callSid,
       userId: c.userId ?? null,
       startedAt: c.startedAt,
       durationSec: c.durationSec,
+      simulated: isSim,
       liveInsightUsd: live?.usd ?? 0,
       liveTicks: live?.ticks ?? 0,
-      qaReviewUsd: qaUsdByCall.get(c.callSid) ?? 0,
+      qaReviewUsd: qaUsd,
       transcriptUsd: tUsd,
-      totalUsd: (live?.usd ?? 0) + (qaUsdByCall.get(c.callSid) ?? 0) + tUsd,
+      voiceAgentUsd: agentUsd,
+      totalUsd: (live?.usd ?? 0) + qaUsd + tUsd + agentUsd,
     };
   });
 
   for (const u of byUser.values()) {
-    u.totalUsd = u.copilotUsd + u.qaUsd + u.transcriptUsd;
+    u.totalUsd = u.copilotUsd + u.qaUsd + u.transcriptUsd + u.trainingUsd;
   }
   const names = await resolveAgentNames([...byUser.keys()].filter((u) => u !== UNATTRIBUTED));
   for (const u of byUser.values()) u.name = names.get(u.userId) ?? null;
 
-  const totalUsd = totals.copilotUsd + totals.qaUsd + totals.transcriptUsd;
-  const avgCallMinutes = calls.length > 0 ? totalCallSec / 60 / calls.length : 0;
+  const totalUsd =
+    totals.copilotUsd + totals.qaUsd + totals.transcriptUsd + totals.trainingUsd;
+  const realCallCount = calls.filter((c) => c.simulated !== true).length;
+  const avgCallMinutes = realCallCount > 0 ? totalCallSec / 60 / realCallCount : 0;
 
   res.json({
     success: true,
@@ -186,8 +238,16 @@ export async function getCostAnalysis(req: Request, res: Response): Promise<void
         cacheReadMult: CACHE_READ_MULT,
         deepgramPerMin: DEEPGRAM_PER_MIN,
         streamsPerCall: STREAMS_PER_CALL,
+        simulatorAgentPerMin: SIMULATOR_AGENT_PER_MIN,
       },
-      totals: { ...totals, totalUsd, callCount: calls.length, callMinutes: totalCallSec / 60 },
+      totals: {
+        ...totals,
+        totalUsd,
+        callCount: realCallCount,
+        callMinutes: totalCallSec / 60,
+        simSessionCount,
+        simMinutes: simSessionSec / 60,
+      },
       byUser: [...byUser.values()].sort((a, b) => b.totalUsd - a.totalUsd),
       perCall: perCall.slice(0, 50),
       averages: {
@@ -199,8 +259,14 @@ export async function getCostAnalysis(req: Request, res: Response): Promise<void
           liveInsightCallSec > 0 ? liveUsdTotal / (liveInsightCallSec / 60) : 0,
         perCallQaUsd: qaReviewCount > 0 ? qaReviewUsdTotal / qaReviewCount : 0,
         perCallTranscriptUsd:
-          calls.length > 0 ? totals.transcriptUsd / calls.length : 0,
+          realCallCount > 0 ? totals.transcriptUsd / realCallCount : 0,
         avgCallMinutes,
+        // Training: all-in cost (agent minutes + insight + reviews) per
+        // practice minute, and the observed session length.
+        perSimMinuteUsd:
+          simSessionSec > 0 ? totals.trainingUsd / (simSessionSec / 60) : 0,
+        avgSimSessionMinutes:
+          simSessionCount > 0 ? simSessionSec / 60 / simSessionCount : 0,
       },
       dataQuality: {
         zeroTokenRows,

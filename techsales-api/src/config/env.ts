@@ -130,6 +130,17 @@ const envSchema = z.object({
   DEEPGRAM_MODEL: z.string().default('nova-3'),
   DEEPGRAM_LANGUAGE: z.string().default('en-US'),
 
+  // Training simulator (Deepgram Voice Agent). The effective on-switch is
+  // `simulatorEnabled()` below — zod defaults can't reference other vars.
+  SIMULATOR_ENABLED: truthy.default(true),
+  // Deepgram-hosted "think" LLM for the prospect persona. Runs inside
+  // Deepgram's cloud (NOT the app's OpenRouter stack). claude-sonnet-4 is
+  // in the SDK's typed enum and still active upstream; check Deepgram's
+  // current agent model list when changing.
+  SIMULATOR_THINK_MODEL: z.string().default('claude-sonnet-4-20250514'),
+  // Hard per-session cap — cost control on agent minutes.
+  SIMULATOR_MAX_SESSION_SECONDS: z.coerce.number().int().positive().default(600),
+
   // Public base URL the Pi tunnel exposes. Used for the TwiML <Stream url>
   // and any callbacks that need a full URL. e.g. https://techsales-dev.example.com
   PUBLIC_BASE_URL: z.string().optional(),
@@ -209,4 +220,10 @@ export type DataBackend = 'mongo' | 'json' | 'databricks';
 export function getDataBackend(): DataBackend {
   if (env.DATA_BACKEND) return env.DATA_BACKEND;
   return env.FORCE_JSON ? 'json' : 'mongo';
+}
+
+/** Training simulator on-switch: flag AND a Deepgram key (the Voice Agent
+ *  session is a Deepgram cloud service). */
+export function simulatorEnabled(): boolean {
+  return env.SIMULATOR_ENABLED && !!env.DEEPGRAM_API_KEY;
 }

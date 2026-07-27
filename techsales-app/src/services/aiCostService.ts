@@ -7,11 +7,14 @@ export interface CostTotals {
   copilotUsd: number;
   qaUsd: number;
   transcriptUsd: number;
+  trainingUsd: number;
   totalUsd: number;
   llmCalls: number;
   tokens: number;
   callCount: number;
   callMinutes: number;
+  simSessionCount: number;
+  simMinutes: number;
 }
 
 export interface CostByUser {
@@ -20,6 +23,7 @@ export interface CostByUser {
   copilotUsd: number;
   qaUsd: number;
   transcriptUsd: number;
+  trainingUsd: number;
   totalUsd: number;
   llmCalls: number;
   calls: number;
@@ -30,10 +34,12 @@ export interface CostPerCall {
   userId: string | null;
   startedAt: string;
   durationSec: number;
+  simulated: boolean;
   liveInsightUsd: number;
   liveTicks: number;
   qaReviewUsd: number;
   transcriptUsd: number;
+  voiceAgentUsd: number;
   totalUsd: number;
 }
 
@@ -43,6 +49,8 @@ export interface CostAverages {
   perCallQaUsd: number;
   perCallTranscriptUsd: number;
   avgCallMinutes: number;
+  perSimMinuteUsd: number;
+  avgSimSessionMinutes: number;
 }
 
 export interface CostAnalysis {
@@ -54,6 +62,7 @@ export interface CostAnalysis {
     cacheReadMult: number;
     deepgramPerMin: number;
     streamsPerCall: number;
+    simulatorAgentPerMin: number;
   };
   totals: CostTotals;
   byUser: CostByUser[];

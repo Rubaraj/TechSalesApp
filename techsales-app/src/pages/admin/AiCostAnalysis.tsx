@@ -21,6 +21,7 @@ import {
   Users,
   ChevronUp,
   ChevronDown,
+  GraduationCap,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import {
@@ -80,6 +81,13 @@ const BUCKETS = [
     chip: 'bg-sky-500 dark:bg-sky-600',
     hint: 'Deepgram streaming speech-to-text (2 audio streams per call)',
   },
+  {
+    key: 'trainingUsd' as const,
+    label: 'Training',
+    icon: GraduationCap,
+    chip: 'bg-emerald-500 dark:bg-emerald-600',
+    hint: 'Practice sessions: Voice Agent minutes (STT+LLM+TTS) + their insight ticks and practice scorecards',
+  },
 ];
 
 function SortHeader({
@@ -121,6 +129,8 @@ interface ProjectionInputs {
   avgCallMinutes: number;
   reviewedPct: number;
   workdaysPerMonth: number;
+  practiceSessionsPerAgentPerMonth: number;
+  avgPracticeMinutes: number;
 }
 
 export function AiCostAnalysis() {
@@ -150,6 +160,8 @@ export function AiCostAnalysis() {
     avgCallMinutes: 3,
     reviewedPct: 100,
     workdaysPerMonth: 22,
+    practiceSessionsPerAgentPerMonth: 4,
+    avgPracticeMinutes: 5,
   });
   const [projSeeded, setProjSeeded] = useState(false);
 
@@ -160,11 +172,19 @@ export function AiCostAnalysis() {
     try {
       const result = await getCostAnalysis(userId, days);
       setData(result);
-      // Seed avg call minutes from observed data once (keep admin edits after).
+      // Seed observed averages once (keep admin edits after).
       if (!projSeeded && result.averages.avgCallMinutes > 0) {
         setProj((p) => ({
           ...p,
           avgCallMinutes: Math.max(0.5, Number(result.averages.avgCallMinutes.toFixed(1))),
+          ...(result.averages.avgSimSessionMinutes > 0
+            ? {
+                avgPracticeMinutes: Math.max(
+                  0.5,
+                  Number(result.averages.avgSimSessionMinutes.toFixed(1)),
+                ),
+              }
+            : {}),
         }));
         setProjSeeded(true);
       }
@@ -202,7 +222,16 @@ export function AiCostAnalysis() {
     const live = callMinutesPerMonth * a.perCallMinuteLiveUsd;
     const qaReviews = callsPerMonth * (proj.reviewedPct / 100) * a.perCallQaUsd;
     const copilot = proj.agents * proj.workdaysPerMonth * a.perAgentPerDayCopilotUsd;
-    const total = transcript + live + qaReviews + copilot;
+    // Training: observed all-in per-minute rate when sim data exists;
+    // otherwise list agent rate + live-tick rate + one review per session.
+    const practiceMinutes =
+      proj.agents * proj.practiceSessionsPerAgentPerMonth * proj.avgPracticeMinutes;
+    const training =
+      a.perSimMinuteUsd > 0
+        ? practiceMinutes * a.perSimMinuteUsd
+        : practiceMinutes * (data.pricing.simulatorAgentPerMin + a.perCallMinuteLiveUsd) +
+          proj.agents * proj.practiceSessionsPerAgentPerMonth * a.perCallQaUsd;
+    const total = transcript + live + qaReviews + copilot + training;
     return {
       callsPerMonth,
       callMinutesPerMonth,
@@ -211,6 +240,7 @@ export function AiCostAnalysis() {
       live,
       qaReviews,
       transcript,
+      training,
       total,
       perAgent: proj.agents > 0 ? total / proj.agents : 0,
     };
@@ -261,7 +291,7 @@ export function AiCostAnalysis() {
       </div>
 
       {/* Bucket tiles + total */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {BUCKETS.map((b) => {
           const Icon = b.icon;
           const usd = totals[b.key];
@@ -301,6 +331,7 @@ export function AiCostAnalysis() {
           <div className="text-xs text-gray-400 mt-1">
             {fmtNum(totals.llmCalls)} LLM calls · {fmtNum(totals.tokens)} tokens ·{' '}
             {fmtNum(totals.callMinutes)} call min
+            {totals.simSessionCount > 0 ? ` · ${totals.simSessionCount} practice` : ''}
           </div>
         </div>
       </div>
@@ -351,6 +382,7 @@ export function AiCostAnalysis() {
                   <th className="py-2 pr-3 font-semibold text-right">Copilot</th>
                   <th className="py-2 pr-3 font-semibold text-right">QA</th>
                   <th className="py-2 pr-3 font-semibold text-right">Transcript</th>
+                  <th className="py-2 pr-3 font-semibold text-right">Training</th>
                   <th className="py-2 font-semibold text-right">Total</th>
                 </tr>
               </thead>
@@ -368,6 +400,7 @@ export function AiCostAnalysis() {
                     <td className="py-2 pr-3 text-right tabular-nums text-gray-700 dark:text-gray-300">{fmtUsd(u.copilotUsd)}</td>
                     <td className="py-2 pr-3 text-right tabular-nums text-gray-700 dark:text-gray-300">{fmtUsd(u.qaUsd)}</td>
                     <td className="py-2 pr-3 text-right tabular-nums text-gray-700 dark:text-gray-300">{fmtUsd(u.transcriptUsd)}</td>
+                    <td className="py-2 pr-3 text-right tabular-nums text-gray-700 dark:text-gray-300">{fmtUsd(u.trainingUsd)}</td>
                     <td className="py-2 text-right tabular-nums font-semibold text-gray-900 dark:text-white">{fmtUsd(u.totalUsd)}</td>
                   </tr>
                 ))}
@@ -407,6 +440,11 @@ export function AiCostAnalysis() {
                       >
                         …{c.callSid.slice(-8)}
                       </button>
+                      {c.simulated && (
+                        <span className="ml-1.5 text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300">
+                          SIM
+                        </span>
+                      )}
                       <span className="block text-[11px] text-gray-400">
                         {formatWhen(c.startedAt)}
                         {c.liveTicks > 0 ? ` · ${c.liveTicks} ticks` : ''}
@@ -415,7 +453,12 @@ export function AiCostAnalysis() {
                     <td className="py-2 pr-3 text-right tabular-nums text-gray-700 dark:text-gray-300">{fmtDuration(c.durationSec)}</td>
                     <td className="py-2 pr-3 text-right tabular-nums text-gray-700 dark:text-gray-300">{fmtUsd(c.liveInsightUsd)}</td>
                     <td className="py-2 pr-3 text-right tabular-nums text-gray-700 dark:text-gray-300">{fmtUsd(c.qaReviewUsd)}</td>
-                    <td className="py-2 pr-3 text-right tabular-nums text-gray-700 dark:text-gray-300">{fmtUsd(c.transcriptUsd)}</td>
+                    <td
+                      className="py-2 pr-3 text-right tabular-nums text-gray-700 dark:text-gray-300"
+                      title={c.simulated ? 'Voice agent minutes (STT+LLM+TTS bundled)' : undefined}
+                    >
+                      {c.simulated ? fmtUsd(c.voiceAgentUsd) : fmtUsd(c.transcriptUsd)}
+                    </td>
                     <td className="py-2 text-right tabular-nums font-semibold text-gray-900 dark:text-white">{fmtUsd(c.totalUsd)}</td>
                   </tr>
                 ))}
@@ -433,7 +476,7 @@ export function AiCostAnalysis() {
         <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
           Monthly cost scaled from the observed averages above — edit the assumptions live.
         </p>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-5">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
           {(
             [
               ['agents', 'Agents', 1, 10000],
@@ -441,6 +484,8 @@ export function AiCostAnalysis() {
               ['avgCallMinutes', 'Avg call minutes', 0.5, 120],
               ['reviewedPct', '% calls QA-reviewed', 0, 100],
               ['workdaysPerMonth', 'Workdays / month', 1, 31],
+              ['practiceSessionsPerAgentPerMonth', 'Practice sessions / agent / month', 0, 100],
+              ['avgPracticeMinutes', 'Avg practice minutes', 0.5, 60],
             ] as Array<[keyof ProjectionInputs, string, number, number]>
           ).map(([key, label, min, max]) => (
             <div key={key}>
@@ -451,7 +496,7 @@ export function AiCostAnalysis() {
                 type="number"
                 min={min}
                 max={max}
-                step={key === 'avgCallMinutes' ? 0.5 : 1}
+                step={key === 'avgCallMinutes' || key === 'avgPracticeMinutes' ? 0.5 : 1}
                 value={proj[key]}
                 onChange={(e) =>
                   setProj((p) => ({ ...p, [key]: Number(e.target.value) || 0 }))
@@ -462,14 +507,16 @@ export function AiCostAnalysis() {
           ))}
         </div>
         {projection && (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
             {BUCKETS.map((b) => {
               const value =
                 b.key === 'copilotUsd'
                   ? projection.copilot
                   : b.key === 'qaUsd'
                     ? projection.qa
-                    : projection.transcript;
+                    : b.key === 'transcriptUsd'
+                      ? projection.transcript
+                      : projection.training;
               return (
                 <div key={b.key} className="rounded-lg bg-gray-50 dark:bg-gray-900/40 border border-gray-200 dark:border-gray-700 p-4">
                   <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">
@@ -510,7 +557,8 @@ export function AiCostAnalysis() {
             .map(([m, p]) => `${m} $${p.inPerMTok}/$${p.outPerMTok} per MTok`)
             .join(' · ')}{' '}
           · cache write ×{data.pricing.cacheWriteMult}, read ×{data.pricing.cacheReadMult} ·
-          Deepgram ${data.pricing.deepgramPerMin}/min × {data.pricing.streamsPerCall} streams.
+          Deepgram ${data.pricing.deepgramPerMin}/min × {data.pricing.streamsPerCall} streams ·
+          Voice Agent ${data.pricing.simulatorAgentPerMin}/min (training).
         </p>
         {(data.dataQuality.fallbackModels.length > 0 ||
           data.dataQuality.unknownModels.length > 0 ||

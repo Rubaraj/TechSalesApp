@@ -53,6 +53,8 @@ export interface CallRecord {
   tags: CallTag[];
   /** True when any compliance tag exists — the review-queue criterion. */
   flagged: boolean;
+  /** Training simulator session (no real prospect). */
+  simulated?: boolean;
   qaReview:
     | (QaScorecard & { reviewedAt: string; reviewedBy?: string; model: string; interactionId?: string })
     | null;
@@ -92,6 +94,7 @@ const callRecordSchema = new Schema<CallRecord>(
     lines: { type: [lineSchema], default: [] },
     tags: { type: [tagSchema], default: [] },
     flagged: { type: Boolean, default: false, index: true },
+    simulated: { type: Boolean, default: false, index: true },
     qaReview: { type: Schema.Types.Mixed, default: null },
     createdAt: { type: String, required: true, index: true },
   },

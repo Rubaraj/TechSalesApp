@@ -16,6 +16,13 @@ export default defineConfig(({ mode }) => {
           target: env.VITE_DEV_PROXY_TARGET ?? 'http://localhost:4000',
           changeOrigin: true,
         },
+        // Training simulator WebSocket (browser mic ↔ Deepgram Voice Agent
+        // bridge). ws:true is required — plain proxies drop the upgrade.
+        '/ws': {
+          target: env.VITE_DEV_PROXY_TARGET ?? 'http://localhost:4000',
+          changeOrigin: true,
+          ws: true,
+        },
       },
     },
   }

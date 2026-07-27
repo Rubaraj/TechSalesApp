@@ -103,14 +103,6 @@ export async function postCallToken(
  * idle-close the connection.
  */
 export async function getCallAnalyzeStream(req: Request, res: Response): Promise<void> {
-  if (!env.TWILIO_ENABLED) {
-    res.status(501).json({
-      success: false,
-      error: 'Twilio integration is disabled (TWILIO_ENABLED=false)',
-    });
-    return;
-  }
-
   const callSid =
     (req.query.callSid as string | undefined) ??
     (typeof req.body === 'object' && req.body
@@ -121,6 +113,15 @@ export async function getCallAnalyzeStream(req: Request, res: Response): Promise
     res.status(400).json({
       success: false,
       error: '`callSid` query parameter is required',
+    });
+    return;
+  }
+
+  // Training-simulator sessions (SIM- sids) stream without Twilio.
+  if (!env.TWILIO_ENABLED && !callSid.startsWith('SIM-')) {
+    res.status(501).json({
+      success: false,
+      error: 'Twilio integration is disabled (TWILIO_ENABLED=false)',
     });
     return;
   }

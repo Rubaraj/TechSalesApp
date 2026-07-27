@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Sun, Moon, LogOut, User, Bell, LayoutDashboard, ShoppingBag, Settings, Database, FileJson, Cpu, Sparkles, Cloud, Phone, PhoneOff } from 'lucide-react';
+import { Sun, Moon, LogOut, User, Bell, LayoutDashboard, ShoppingBag, Settings, Database, FileJson, Cpu, Sparkles, Cloud, Phone, PhoneOff, GraduationCap } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { useCallContext } from '../../context/CallContext';
@@ -97,6 +97,7 @@ export function Header() {
 
   const isInsightsActive = location.pathname === '/insights' || location.pathname === '/';
   const isSalesActive = isSalesRoute;
+  const isTrainingActive = location.pathname.startsWith('/training');
   const isAdminActive = location.pathname.startsWith('/admin');
   const isAdmin = user?.accessLevel === 'admin' || user?.isSuperAdmin;
 
@@ -108,8 +109,9 @@ export function Header() {
         { path: '/admin', label: 'Admin', icon: Settings, active: isAdminActive },
       ]
     : [
-        { path: '/insights', label: 'Insights', icon: LayoutDashboard, active: isInsightsActive && !isSalesActive },
+        { path: '/insights', label: 'Insights', icon: LayoutDashboard, active: isInsightsActive && !isSalesActive && !isTrainingActive },
         { path: '/sales', label: 'Sales', icon: ShoppingBag, active: isSalesActive },
+        { path: '/training', label: 'Training', icon: GraduationCap, active: isTrainingActive },
       ];
 
   return (

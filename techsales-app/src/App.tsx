@@ -24,6 +24,7 @@ import {
   AiCostAnalysis,
 } from './pages/admin';
 import { LeadList, LeadDetail, LeadForm } from './pages/leads';
+import { TrainingSimulator } from './pages/training';
 import { PlanList, PlanDetail, PlanCompare } from './pages/plans';
 import { PharmacySearchPage } from './pages/pharmacies';
 import { DrugSearchPage } from './pages/drugs';
@@ -193,6 +194,7 @@ function AppRoutes() {
         <Route index element={<Navigate to="/insights" replace />} />
         <Route path="insights" element={<Dashboard tab="insights" />} />
         <Route path="sales" element={<Dashboard tab="sales" />} />
+        <Route path="training" element={<TrainingSimulator />} />
         
         {/* Lead Management Routes */}
         <Route path="leads" element={<LeadList />} />

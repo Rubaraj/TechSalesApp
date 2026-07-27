@@ -9,7 +9,7 @@ import { bootstrapJsonStore } from './utils/bootstrap.js';
 import { requestLogger } from './middleware/requestLogger.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { apiRouter } from './routes/index.js';
-import { attachTwilioMediaStreamWs } from './ws/twilioMediaStream.ws.js';
+import { attachWs } from './ws/attachWs.js';
 
 async function main(): Promise<void> {
   // 1. Decide the mode — ONE connection attempt; locked for process lifetime.
@@ -62,11 +62,9 @@ async function main(): Promise<void> {
     );
   });
 
-  // 5a. Phase 2 — attach the Twilio Media Streams WebSocket on the same HTTP
-  //     server. Only routes `/ws/twilio-media`. No-op for other upgrades.
-  if (env.TWILIO_ENABLED) {
-    attachTwilioMediaStreamWs(server);
-  }
+  // 5a. WebSocket endpoints (Twilio media stream + training simulator) share
+  //     one upgrade router — each is wired only when its feature is enabled.
+  attachWs(server);
 
   // 6. Graceful shutdown.
   const shutdown = (signal: string): void => {

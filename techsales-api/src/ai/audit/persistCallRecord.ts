@@ -18,6 +18,9 @@ export interface PersistCallRecordInput {
   startedAt: number;
   lines: CallLine[];
   tags: CallTag[];
+  /** Training simulator session (SIM- callSid) — enables the trainee's
+   *  own-record QA access and the Training cost bucket. */
+  simulated?: boolean;
 }
 
 export async function persistCallRecord(input: PersistCallRecordInput): Promise<void> {
@@ -35,6 +38,7 @@ export async function persistCallRecord(input: PersistCallRecordInput): Promise<
       lines: input.lines.slice(0, MAX_LINES),
       tags: input.tags,
       flagged: input.tags.some((t) => t.kind === 'compliance'),
+      ...(input.simulated ? { simulated: true } : {}),
       qaReview: null,
       createdAt: new Date(now).toISOString(),
     };

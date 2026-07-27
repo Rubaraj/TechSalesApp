@@ -46,15 +46,26 @@ export async function listQaCalls(req: Request, res: Response): Promise<void> {
   res.json({ success: true, data: { total: enriched.length, calls: enriched } });
 }
 
+/** Training simulator — trainees may read/score their OWN practice
+ *  sessions; everything else stays admin-only. */
+function ownsSimRecord(
+  record: { simulated?: boolean; userId?: string } | null,
+  userId: string,
+): boolean {
+  return !!record && record.simulated === true && !!userId && record.userId === userId;
+}
+
 export async function getQaCall(req: Request, res: Response): Promise<void> {
   const userId = String(req.query.userId ?? '');
-  if (!(await isAdmin(userId))) {
-    res.status(403).json({ success: false, error: 'Admin access required' });
-    return;
-  }
   const record = await repos.callRecord.findByCallSid(String(req.params.callSid));
+  // Missing record → 404 for everyone: the trainee's post-session poll
+  // relies on 404-means-retry while persistence catches up.
   if (!record) {
     res.status(404).json({ success: false, error: 'Call record not found' });
+    return;
+  }
+  if (!(await isAdmin(userId)) && !ownsSimRecord(record, userId)) {
+    res.status(403).json({ success: false, error: 'Admin access required' });
     return;
   }
   const agentName = await resolveAgentName(record.userId);
@@ -64,8 +75,11 @@ export async function getQaCall(req: Request, res: Response): Promise<void> {
 export async function postQaReview(req: Request, res: Response): Promise<void> {
   const userId = String((req.body as { userId?: string } | undefined)?.userId ?? '');
   if (!(await isAdmin(userId))) {
-    res.status(403).json({ success: false, error: 'Admin access required' });
-    return;
+    const record = await repos.callRecord.findByCallSid(String(req.params.callSid));
+    if (!ownsSimRecord(record, userId)) {
+      res.status(403).json({ success: false, error: 'Admin access required' });
+      return;
+    }
   }
   try {
     const result = await runQaReview(String(req.params.callSid), userId);

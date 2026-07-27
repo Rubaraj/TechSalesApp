@@ -44,6 +44,10 @@ export const DEEPGRAM_PER_MIN = 0.0077;
  *  1-minute call transcribes 2 minutes of audio. */
 export const STREAMS_PER_CALL = 2;
 
+/** Deepgram Voice Agent bundled STT+LLM+TTS rate, USD per session minute
+ *  (training simulator). Verify against deepgram.com/pricing when demoing. */
+export const SIMULATOR_AGENT_PER_MIN = 0.065;
+
 export type CostBucket = 'copilot' | 'qa';
 
 /** Kind → bucket. 'transcript' is derived from callRecords, not rows. */
@@ -126,4 +130,10 @@ export function costOfRow(
 /** USD transcription cost of one call (both Deepgram streams). */
 export function transcriptCost(durationSec: number): number {
   return (Math.max(0, durationSec) / 60) * STREAMS_PER_CALL * DEEPGRAM_PER_MIN;
+}
+
+/** USD Voice Agent cost of one training session (STT+LLM+TTS bundled —
+ *  one agent session, no per-stream multiplier). */
+export function simulatorSessionCost(durationSec: number): number {
+  return (Math.max(0, durationSec) / 60) * SIMULATOR_AGENT_PER_MIN;
 }

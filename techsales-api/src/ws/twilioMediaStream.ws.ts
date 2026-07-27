@@ -19,7 +19,6 @@
  * stuck-call from burning Twilio + Deepgram credit.
  */
 import type { IncomingMessage } from 'node:http';
-import type { Duplex } from 'node:stream';
 import { WebSocketServer, WebSocket, type RawData } from 'ws';
 import { env } from '../config/env.js';
 import { logger } from '../config/logger.js';
@@ -342,28 +341,13 @@ function handleConnection(ws: WebSocket, req: IncomingMessage): void {
 }
 
 /**
- * Attach the Twilio Media Stream WS server to the running HTTP server.
- * Routes only `/ws/twilio-media` to this handler; any other upgrade attempt
- * gets the socket destroyed.
+ * Build the Twilio Media Stream WS server. Upgrade routing now lives in
+ * ws/attachWs.ts (single shared router — a second registered 'upgrade'
+ * listener would race this module's old catch-all destroy).
  */
-export function attachTwilioMediaStreamWs(httpServer: import('node:http').Server): void {
+export function createTwilioMediaStreamWss(): WebSocketServer {
   const wss = new WebSocketServer({ noServer: true });
-
   wss.on('connection', handleConnection);
-
-  httpServer.on('upgrade', (req: IncomingMessage, socket: Duplex, head: Buffer) => {
-    if (req.url === '/ws/twilio-media') {
-      wss.handleUpgrade(req, socket, head, (ws) => {
-        wss.emit('connection', ws, req);
-      });
-      return;
-    }
-    // Not our path. Close gracefully so other upgrade handlers can claim.
-    // If no one claims it within a tick, destroy the socket.
-    setImmediate(() => {
-      if (!socket.destroyed) socket.destroy();
-    });
-  });
-
-  logger.info('Twilio Media Streams WS listening on /ws/twilio-media');
+  logger.info('Twilio Media Streams WS handler ready (/ws/twilio-media)');
+  return wss;
 }
