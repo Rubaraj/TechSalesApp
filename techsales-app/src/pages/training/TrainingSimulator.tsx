@@ -148,8 +148,6 @@ export function TrainingSimulator() {
   useEffect(() => {
     if (phase.name !== 'pick' || !selectedMic) return undefined;
     let cancelled = false;
-    setMicLevel(0);
-    setMicMuted(false);
     void startMicMeter(selectedMic, (level, muted) => {
       setMicLevel(level);
       setMicMuted(muted);
@@ -434,6 +432,8 @@ export function TrainingSimulator() {
               value={selectedMic}
               onChange={(e) => {
                 setSelectedMic(e.target.value);
+                setMicLevel(0);
+                setMicMuted(false);
                 const m = mics.find((x) => x.id === e.target.value);
                 if (m) persistMicSelection(m.id, m.label);
               }}
