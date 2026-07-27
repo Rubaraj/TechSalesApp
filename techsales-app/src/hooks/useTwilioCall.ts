@@ -26,6 +26,15 @@ import { useCallContext } from '../context/CallContext';
 import { useAuth } from '../context/AuthContext';
 import { lookupLeadsByPhone } from '../services/leadService';
 import * as ringtone from '../services/ringtone';
+import {
+  isScreeningActive,
+  setScreeningActive,
+  isTakeoverPending,
+  setTakeoverPending,
+  setScreeningEnabled,
+  isScreeningEnabled,
+  startScreening,
+} from '../services/screeningService';
 
 type HandleType = Awaited<
   ReturnType<typeof import('../services/twilioClientService')['initTwilioDevice']>
@@ -45,6 +54,10 @@ export interface UseTwilioCallResult {
   setMute: (muted: boolean) => void;
   acceptIncoming: () => Promise<void>;
   rejectIncoming: () => void;
+  /** AI screening — the assistant answers the ringing call on the agent's
+   *  behalf. Available when the backend reports screeningEnabled. */
+  screenIncoming: () => Promise<void>;
+  screeningAvailable: boolean;
   /** Accessor for the underlying Twilio Device — used by AudioDeviceSelector
    *  to read device.audio.availableInputDevices etc. Returns null until the
    *  Device has been initialized. */
@@ -74,6 +87,7 @@ export function useTwilioCall(): UseTwilioCallResult {
     setDialedNumber,
     setIncomingRinging,
     setIncomingAccepted,
+    screeningStarted,
   } = useCallContext();
   const handleRef = useRef<HandleType | null>(null);
   const initPromiseRef = useRef<Promise<HandleType> | null>(null);
@@ -81,6 +95,7 @@ export function useTwilioCall(): UseTwilioCallResult {
   const [isReady, setIsReady] = useState(false);
   const [isDialing, setIsDialing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [screeningAvailable, setScreeningAvailable] = useState(false);
 
   // Shared lifecycle binding for inbound + outbound calls. Wires status
   // transitions into CallContext.
@@ -123,6 +138,9 @@ export function useTwilioCall(): UseTwilioCallResult {
     if (!user?.userId) throw new Error('Not signed in');
     const p = (async (): Promise<HandleType> => {
       const minted = await callService.fetchToken({ userId: user.userId });
+      // AI screening availability rides the token response (no extra call).
+      setScreeningEnabled(minted.screeningEnabled === true);
+      setScreeningAvailable(minted.screeningEnabled === true);
       const { initTwilioDevice } = await import('../services/twilioClientService');
       const handle = await initTwilioDevice({
         token: minted.token,
@@ -133,6 +151,26 @@ export function useTwilioCall(): UseTwilioCallResult {
       // Phase 2.6 — wire the inbound handler ONCE per Device.
       handle.on('incoming', (call) => {
         const callLike = call as unknown as CallLike;
+
+        // AI screening takeover — this invite is the agent leg replacing the
+        // assistant. Auto-accept: no ringtone, no INCOMING_RINGING (that
+        // reducer hard-replaces state and would wipe the screening
+        // transcript). The 'accept' lifecycle handler re-sets the same
+        // parent callSid and flips status to connected.
+        if (isTakeoverPending()) {
+          setTakeoverPending(false);
+          setScreeningActive(false);
+          bindCallLifecycle(callLike);
+          try {
+            callLike.accept();
+          } catch (err) {
+            setError(err instanceof Error ? err.message : String(err));
+            return;
+          }
+          handle.attachCall(callLike as unknown as Parameters<HandleType['attachCall']>[0]);
+          return;
+        }
+
         incomingCallRef.current = callLike;
         const from = callLike.parameters?.From ?? '';
         // Best-effort lead lookup. Don't block the ring UI on it.
@@ -167,6 +205,9 @@ export function useTwilioCall(): UseTwilioCallResult {
         callLike.on('cancel', () => {
           ringtone.stop();
           incomingCallRef.current = null;
+          // AI screening: the Screen redirect CANCELS this ringing leg on
+          // purpose — the panel must stay up (the assistant has the call).
+          if (isScreeningActive()) return;
           endCall();
         });
       });
@@ -180,7 +221,7 @@ export function useTwilioCall(): UseTwilioCallResult {
     } finally {
       initPromiseRef.current = null;
     }
-  }, [user?.userId, setIncomingRinging, endCall]);
+  }, [user?.userId, setIncomingRinging, endCall, bindCallLifecycle]);
 
   // Phase 2.6 — eager init on login. Twilio needs `device.register()` to
   // have run BEFORE an inbound call arrives. The init is idempotent via
@@ -259,6 +300,29 @@ export function useTwilioCall(): UseTwilioCallResult {
     endCall();
   }, [endCall]);
 
+  /** AI screening — hand the ringing call to the assistant. The backend
+   *  redirects the PARENT call to the screening bridge; the redirect
+   *  cancels this ringing client leg (handled by the guarded 'cancel'). */
+  const screenIncoming = useCallback(async (): Promise<void> => {
+    const call = incomingCallRef.current;
+    if (!call || !user?.userId || !isScreeningEnabled()) return;
+    const parentSid = call.customParameters?.get('parentCallSid');
+    if (!parentSid) {
+      setError('Screening unavailable for this call (no parent call id).');
+      return;
+    }
+    setError(null);
+    try {
+      setScreeningActive(true);
+      await startScreening(parentSid, user.userId);
+      ringtone.stop();
+      screeningStarted(parentSid);
+    } catch (err) {
+      setScreeningActive(false);
+      setError(err instanceof Error ? err.message : String(err));
+    }
+  }, [user?.userId, screeningStarted]);
+
   const hangup = useCallback(async (): Promise<void> => {
     setCallStatus('ending');
     // Hang up the CALL, not the Device. Destroying the Device here (the old
@@ -331,6 +395,8 @@ export function useTwilioCall(): UseTwilioCallResult {
     setMute,
     acceptIncoming,
     rejectIncoming,
+    screenIncoming,
+    screeningAvailable,
     getDevice,
   };
 }

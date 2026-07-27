@@ -55,6 +55,8 @@ export interface CallRecord {
   flagged: boolean;
   /** Training simulator session (no real prospect). */
   simulated?: boolean;
+  /** AI call screening handled (part of) this call. */
+  screenedByAi?: boolean;
   qaReview:
     | (QaScorecard & { reviewedAt: string; reviewedBy?: string; model: string; interactionId?: string })
     | null;
@@ -95,6 +97,7 @@ const callRecordSchema = new Schema<CallRecord>(
     tags: { type: [tagSchema], default: [] },
     flagged: { type: Boolean, default: false, index: true },
     simulated: { type: Boolean, default: false, index: true },
+    screenedByAi: { type: Boolean, default: false },
     qaReview: { type: Schema.Types.Mixed, default: null },
     createdAt: { type: String, required: true, index: true },
   },

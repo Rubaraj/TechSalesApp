@@ -106,6 +106,7 @@ type Action =
   | { kind: 'CLEAR_PENDING_CONTROL' }
   | { kind: 'INCOMING_RINGING'; caller: IncomingCaller; leadId: string | null }
   | { kind: 'INCOMING_ACCEPTED' }
+  | { kind: 'SCREENING_STARTED'; callSid: string }
   | { kind: 'APPEND_TRANSCRIPT'; chunk: TranscriptChunk }
   | { kind: 'MERGE_ENTITIES'; entities: Partial<ExtractedEntities> }
   | { kind: 'ENQUEUE_ACTIONS'; actions: AiAction[] }
@@ -209,6 +210,17 @@ function reducer(state: CallState, action: Action): CallState {
       return {
         ...state,
         callStatus: 'connected',
+        incomingCaller: null,
+      };
+    case 'SCREENING_STARTED':
+      // AI screening — the assistant answers on the agent's behalf. Keep
+      // the call slice alive (transcript streams via the parent callSid);
+      // clear the ring UI. Takeover later transitions to 'connected' via
+      // the normal accept flow with the SAME callSid.
+      return {
+        ...state,
+        callSid: action.callSid,
+        callStatus: 'screening',
         incomingCaller: null,
       };
     case 'APPEND_TRANSCRIPT': {
@@ -359,6 +371,8 @@ export interface CallContextValue {
   // calls the accept/reject helpers which are wired in CallRuntime.
   setIncomingRinging: (caller: IncomingCaller, leadId: string | null) => void;
   setIncomingAccepted: () => void;
+  /** AI screening — the assistant answers on the agent's behalf. */
+  screeningStarted: (callSid: string) => void;
   // Phase 2/3 surface — wired now so consumers can import the types but the
   // implementations are pass-throughs to the reducer; they become meaningful
   // once the SSE client and page-registration code lands.
@@ -592,6 +606,10 @@ export function CallProvider({ children }: { children: ReactNode }): React.JSX.E
     () => dispatch({ kind: 'INCOMING_ACCEPTED' }),
     [],
   );
+  const screeningStarted = useCallback(
+    (callSid: string) => dispatch({ kind: 'SCREENING_STARTED', callSid }),
+    [],
+  );
 
 
   // Phase 2/3 stubs — wire to the reducer so types stay honest. No
@@ -685,6 +703,7 @@ export function CallProvider({ children }: { children: ReactNode }): React.JSX.E
       clearPendingControl,
       setIncomingRinging,
       setIncomingAccepted,
+      screeningStarted,
       mergeEntities,
       enqueueActions,
       consumeActionsByType,
@@ -717,6 +736,7 @@ export function CallProvider({ children }: { children: ReactNode }): React.JSX.E
       clearPendingControl,
       setIncomingRinging,
       setIncomingAccepted,
+      screeningStarted,
       mergeEntities,
       enqueueActions,
       consumeActionsByType,

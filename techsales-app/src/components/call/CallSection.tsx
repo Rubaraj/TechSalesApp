@@ -8,8 +8,14 @@
  * Returns null when no call is active.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Mic, MicOff, PhoneOff, AlertTriangle, Radio } from 'lucide-react';
+import { Mic, MicOff, PhoneOff, AlertTriangle, Radio, Bot, Headset } from 'lucide-react';
 import type { ProspectEmotion } from '../../types/call';
+import { useAuth } from '../../context/AuthContext';
+import {
+  takeoverScreening,
+  hangupScreening,
+  setTakeoverPending,
+} from '../../services/screeningService';
 import { useCallContext } from '../../context/CallContext';
 import { useCallRuntime } from './CallRuntime';
 import { useCallAnalysis } from '../../hooks/useCallAnalysis';
@@ -41,6 +47,7 @@ function formatDuration(ms: number): string {
 
 export function CallSection(): React.JSX.Element | null {
   const { state } = useCallContext();
+  const { user } = useAuth();
   // Gap 7 — in-call degradation banner above the transcript.
   const aiHealth = useAiHealth();
 
@@ -73,12 +80,14 @@ export function CallSection(): React.JSX.Element | null {
 
   if (!state.isCallActive) return null;
 
+  const isScreening = state.callStatus === 'screening';
   const callInProgress =
     state.callStatus === 'connecting' ||
     state.callStatus === 'ringing' ||
     state.callStatus === 'connected' ||
+    isScreening ||
     state.callStatus === 'ending';
-  const isListening = state.callStatus === 'connected';
+  const isListening = state.callStatus === 'connected' || isScreening;
 
   const showIncomingRing = state.direction === 'inbound' && state.callStatus === 'ringing';
   const showDialer = state.callStatus === 'idle' && !showIncomingRing;
@@ -111,20 +120,30 @@ export function CallSection(): React.JSX.Element | null {
         style={{ borderBottom: '1px solid var(--color-atlas-border)' }}
       >
         <div className="flex items-center gap-2.5 min-w-0">
-          <Radio
-            className="w-4 h-4 shrink-0"
-            style={{
-              color: isListening
-                ? 'var(--color-exl-orange-bright)'
-                : 'var(--color-atlas-fg-subtle)',
-            }}
-          />
+          {isScreening ? (
+            <Bot className="w-4 h-4 shrink-0 animate-pulse" style={{ color: '#a78bfa' }} />
+          ) : (
+            <Radio
+              className="w-4 h-4 shrink-0"
+              style={{
+                color: isListening
+                  ? 'var(--color-exl-orange-bright)'
+                  : 'var(--color-atlas-fg-subtle)',
+              }}
+            />
+          )}
           <div className="min-w-0 leading-tight">
             <p
               className="text-[10px] font-bold uppercase tracking-[0.08em]"
-              style={{ color: 'var(--color-atlas-fg-muted)' }}
+              style={{ color: isScreening ? '#a78bfa' : 'var(--color-atlas-fg-muted)' }}
             >
-              {showDialer ? 'Dialer' : showIncomingRing ? 'Incoming' : 'On call'}
+              {showDialer
+                ? 'Dialer'
+                : showIncomingRing
+                  ? 'Incoming'
+                  : isScreening
+                    ? 'AI screening'
+                    : 'On call'}
             </p>
             <p
               className="text-[13.5px] font-semibold truncate"
@@ -162,6 +181,37 @@ export function CallSection(): React.JSX.Element | null {
               {formatDuration(durationMs)}
             </span>
           )}
+          {isScreening && state.callSid && user?.userId && (
+            <>
+              <button
+                onClick={() => {
+                  setTakeoverPending(true);
+                  void takeoverScreening(state.callSid!, user.userId).catch(() =>
+                    setTakeoverPending(false),
+                  );
+                }}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold text-white transition-colors"
+                style={{ background: '#7c3aed' }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = '#6d28d9')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = '#7c3aed')}
+                title="Take over from the AI assistant"
+              >
+                <Headset className="w-3.5 h-3.5" />
+                Take over
+              </button>
+              <button
+                onClick={() => void hangupScreening(state.callSid!, user.userId)}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold text-white transition-colors"
+                style={{ background: '#dc2626' }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = '#b91c1c')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = '#dc2626')}
+                title="End the screened call"
+              >
+                <PhoneOff className="w-3.5 h-3.5" />
+                End
+              </button>
+            </>
+          )}
           {state.callStatus === 'connected' && (
             <button
               onClick={() => twilioCall.setMute(!state.isMuted)}
@@ -183,7 +233,7 @@ export function CallSection(): React.JSX.Element | null {
               {state.isMuted ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
             </button>
           )}
-          {callInProgress && !showIncomingRing && (
+          {callInProgress && !showIncomingRing && !isScreening && (
             <button
               onClick={handleEnd}
               className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold text-white transition-colors"

@@ -9,14 +9,15 @@
  * always-mounted host of `useTwilioCall`). The Twilio Call object the
  * buttons operate on is held in `useTwilioCall`'s internal ref.
  */
-import { Phone, PhoneOff } from 'lucide-react';
+import { Phone, PhoneOff, Bot } from 'lucide-react';
 import { useCallContext } from '../../context/CallContext';
 import { useCallRuntime } from './CallRuntime';
 import { formatPhoneUS } from '../../utils/phoneUtils';
 
 export function IncomingCallView(): React.JSX.Element {
   const { state } = useCallContext();
-  const { acceptIncoming, rejectIncoming } = useCallRuntime();
+  const { acceptIncoming, rejectIncoming, screenIncoming, screeningAvailable } =
+    useCallRuntime();
   const caller = state.incomingCaller;
 
   const displayName = caller?.leadName ?? null;
@@ -66,6 +67,19 @@ export function IncomingCallView(): React.JSX.Element {
           <Phone className="w-4 h-4" />
           Accept
         </button>
+        {screeningAvailable && (
+          <button
+            onClick={() => {
+              void screenIncoming();
+            }}
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-violet-600 hover:bg-violet-700 text-white text-sm font-medium transition-colors shadow"
+            aria-label="Let the AI assistant screen this call"
+            title="The AI assistant answers on your behalf — you watch live and can take over any time"
+          >
+            <Bot className="w-4 h-4" />
+            Screen
+          </button>
+        )}
       </div>
     </div>
   );

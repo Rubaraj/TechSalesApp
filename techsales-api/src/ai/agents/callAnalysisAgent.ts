@@ -62,6 +62,8 @@ import {
   registerProactiveCoachTagWriter,
   __resetProactiveCoachForTests,
 } from '../live/proactiveCoach.js';
+import { consumeScreening } from '../screening/screeningState.js';
+import { createLeadFromScreening } from '../screening/autoLead.js';
 
 // --- Per-call state (cleaned up on stop) ----------------------------------
 
@@ -224,6 +226,21 @@ export function stopCallAnalysisByCallSid(callSid: string): void {
     logger.error({ err, callSid }, 'callAnalysisAgent: post-call summary threw');
   }
 
+  // AI screening — consume the screening entry (if any) BEFORE the state
+  // deletes. Call ended still-screened (no takeover) → auto-create a lead
+  // from the accumulated entities; fire-and-forget, never blocks teardown.
+  const screening = consumeScreening(callSid);
+  if (screening && !screening.takenOver) {
+    const entitiesSnapshot = accumulators.get(callSid) ?? emptyExtractedEntities();
+    const callerNumber = callerNumbers.get(callSid);
+    void createLeadFromScreening({
+      callSid,
+      entities: entitiesSnapshot,
+      ...(callerNumber ? { callerNumber } : {}),
+      agentUserId: screening.agentUserId,
+    });
+  }
+
   // QA pipeline — snapshot per-call state BEFORE the deletes below, then
   // persist + notify the supervisor feed fire-and-forget.
   const history = transcriptHistory.get(callSid) ?? [];
@@ -247,6 +264,7 @@ export function stopCallAnalysisByCallSid(callSid: string): void {
       direction: meta.direction,
       startedAt: meta.startedAt,
       ...(meta.simulated ? { simulated: true } : {}),
+      ...(screening ? { screenedByAi: true } : {}),
       lines,
       tags,
     }).then(() => {

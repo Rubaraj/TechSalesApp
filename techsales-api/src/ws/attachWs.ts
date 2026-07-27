@@ -10,18 +10,21 @@
 import type { IncomingMessage } from 'node:http';
 import type { Duplex } from 'node:stream';
 import type { WebSocketServer } from 'ws';
-import { env, simulatorEnabled } from '../config/env.js';
+import { env, simulatorEnabled, screeningEnabled } from '../config/env.js';
 import { logger } from '../config/logger.js';
 import { createTwilioMediaStreamWss } from './twilioMediaStream.ws.js';
 import { createSimulatorWss } from './simulatorSession.ws.js';
+import { createScreeningWss } from './screeningSession.ws.js';
 
 export function attachWs(httpServer: import('node:http').Server): void {
   const twilioWss = env.TWILIO_ENABLED ? createTwilioMediaStreamWss() : null;
   const simulatorWss = simulatorEnabled() ? createSimulatorWss() : null;
+  const screeningWss = screeningEnabled() ? createScreeningWss() : null;
 
   const route = (pathname: string): WebSocketServer | null => {
     if (pathname === '/ws/twilio-media') return twilioWss;
     if (pathname === '/ws/simulator') return simulatorWss;
+    if (pathname === '/ws/screening') return screeningWss;
     return null;
   };
 
@@ -38,7 +41,7 @@ export function attachWs(httpServer: import('node:http').Server): void {
   });
 
   logger.info(
-    { twilio: !!twilioWss, simulator: !!simulatorWss },
+    { twilio: !!twilioWss, simulator: !!simulatorWss, screening: !!screeningWss },
     'WS upgrade router attached',
   );
 }

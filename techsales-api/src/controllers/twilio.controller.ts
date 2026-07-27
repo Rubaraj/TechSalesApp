@@ -16,6 +16,7 @@ import { env } from '../config/env.js';
 import { logger } from '../config/logger.js';
 import { incrementMinutesForUser } from '../middleware/callMinuteCap.js';
 import { pickRoundRobin } from '../services/agentPresence.js';
+import { getScreening } from '../ai/screening/screeningState.js';
 
 // E.164 — `+` followed by 1-15 digits. Reject anything else before we hand it
 // back as a <Number> child to <Dial>; otherwise an attacker forging a webhook
@@ -205,6 +206,18 @@ export function twilioIncomingResultWebhook(req: Request, res: Response): void {
   const status = body.DialCallStatus ?? '';
   const callSid = body.CallSid ?? '';
   logger.info({ callSid, status }, 'Twilio incoming result webhook');
+
+  // AI screening hedge: a redirect that interrupts the <Dial> should skip
+  // this callback entirely — if it fires anyway, do NOT run the fallback
+  // TwiML (it would hang up a call the assistant is handling).
+  if (callSid && getScreening(callSid)) {
+    logger.warn(
+      { callSid, status },
+      'Twilio incoming result fired for a SCREENED call — returning empty response',
+    );
+    res.type('text/xml').send('<?xml version="1.0" encoding="UTF-8"?><Response/>');
+    return;
+  }
 
   if (status === 'completed') {
     res

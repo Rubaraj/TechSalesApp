@@ -20,6 +20,8 @@ interface FetchTokenResult {
   identity: string;
   expiresAt: number;
   outboundCallerId: string;
+  /** AI call screening availability (gates the incoming Screen button). */
+  screeningEnabled?: boolean;
 }
 
 async function fetchToken(input: FetchTokenInput): Promise<FetchTokenResult> {

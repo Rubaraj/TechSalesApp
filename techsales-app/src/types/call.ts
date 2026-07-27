@@ -244,6 +244,7 @@ export type CallStatus =
   | 'connecting' // token fetched, Device initializing
   | 'ringing' // PSTN ringing
   | 'connected' // both legs up, audio flowing
+  | 'screening' // AI assistant is handling the call on the agent's behalf
   | 'ending' // hangup in progress
   | 'ended' // peer or local hung up
   | 'error';

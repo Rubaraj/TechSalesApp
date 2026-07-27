@@ -50,6 +50,9 @@ interface DrugRow {
 }
 
 let validZips: Set<string> = new Set();
+/** zip → geo details, retained for the screening auto-lead's required
+ *  state/county/city fields. */
+let zipGeo: Map<string, { state: string; county: string; city: string }> = new Map();
 let drugNameToCanonical: Map<string, string> = new Map();
 let loaded = false;
 
@@ -63,6 +66,12 @@ async function ensureLoaded(): Promise<void> {
     const zips = JSON.parse(zipRaw) as ZipRow[];
     const drugs = JSON.parse(drugRaw) as DrugRow[];
     validZips = new Set(zips.map((z) => z.zipCode));
+    zipGeo = new Map(
+      zips.map((z) => [
+        z.zipCode,
+        { state: z.state ?? '', county: z.county ?? '', city: z.city ?? '' },
+      ]),
+    );
     drugNameToCanonical = new Map();
     for (const d of drugs) {
       if (d.brandName) drugNameToCanonical.set(d.brandName.toLowerCase(), d.brandName);
@@ -164,6 +173,15 @@ export interface ExtractOptions {
  *
  * Returns a partial — only fields that changed or are newly known.
  */
+/** Screening auto-lead — geo details for an extracted zip (state/county/
+ *  city are Mongoose-required on Lead). Loads the lookup on first use. */
+export async function resolveZipGeo(
+  zipCode: string,
+): Promise<{ state: string; county: string; city: string } | null> {
+  await ensureLoaded();
+  return zipGeo.get(zipCode) ?? null;
+}
+
 export async function extractFromProspectChunk(
   text: string,
   current: ExtractedEntities,

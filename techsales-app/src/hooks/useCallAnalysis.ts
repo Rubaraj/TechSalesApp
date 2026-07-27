@@ -19,6 +19,7 @@
 import { useEffect, useRef } from 'react';
 import { callService } from '../services/callService';
 import { setAiHealth } from '../services/aiHealthStore';
+import { isScreeningActive, setScreeningActive } from '../services/screeningService';
 import { useCallContext } from '../context/CallContext';
 import { useAuth } from '../context/AuthContext';
 import type {
@@ -136,6 +137,7 @@ export function useCallAnalysis(): void {
     setAnalysisWarning,
     setProspectEmotion,
     addCoachingTip,
+    endCall,
   } = useCallContext();
   const { user } = useAuth();
   const userId = user?.userId ?? '';
@@ -182,6 +184,11 @@ export function useCallAnalysis(): void {
           // (arrives before the first transcript chunk).
           warnedRef.current = false;
           setAnalysisWarning(null);
+        } else if (event.status === 'ended' && isScreeningActive()) {
+          // AI screening: no device call exists to fire 'disconnect', so the
+          // SSE end signal is the only teardown trigger for the panel.
+          setScreeningActive(false);
+          endCall();
         }
         return;
       }
@@ -336,5 +343,6 @@ export function useCallAnalysis(): void {
     setAnalysisWarning,
     setProspectEmotion,
     addCoachingTip,
+    endCall,
   ]);
 }

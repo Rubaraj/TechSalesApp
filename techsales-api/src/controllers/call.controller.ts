@@ -17,7 +17,7 @@ import { repos } from '../repositories/registry.js';
 import type { CallStreamEvent } from '../ai/types/call.types.js';
 import { getLlmHealth, onLlmHealthChange } from '../ai/llm/llmHealth.js';
 import { getLiveTranscript, getLiveTags } from '../ai/agents/callAnalysisAgent.js';
-import { env } from '../config/env.js';
+import { env, screeningEnabled } from '../config/env.js';
 import { logger } from '../config/logger.js';
 
 interface CallTokenRequestBody {
@@ -30,6 +30,8 @@ interface CallTokenResponseData {
   expiresAt: number;
   /** Echoed back so the FE can pre-populate the Twilio Device caller ID UI. */
   outboundCallerId: string;
+  /** AI call screening availability (gates the incoming-call Screen button). */
+  screeningEnabled: boolean;
 }
 
 export async function postCallToken(
@@ -83,6 +85,9 @@ export async function postCallToken(
         identity: minted.identity,
         expiresAt: minted.expiresAt,
         outboundCallerId: env.TWILIO_OUTBOUND_CALLER_ID ?? '',
+        // AI call screening availability — piggybacked here so the FE
+        // needs no extra round-trip (fetched at Device init).
+        screeningEnabled: screeningEnabled(),
       },
     });
   } catch (err) {

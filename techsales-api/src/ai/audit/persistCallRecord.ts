@@ -21,6 +21,8 @@ export interface PersistCallRecordInput {
   /** Training simulator session (SIM- callSid) — enables the trainee's
    *  own-record QA access and the Training cost bucket. */
   simulated?: boolean;
+  /** AI call screening handled (part of) this call. */
+  screenedByAi?: boolean;
 }
 
 export async function persistCallRecord(input: PersistCallRecordInput): Promise<void> {
@@ -39,6 +41,7 @@ export async function persistCallRecord(input: PersistCallRecordInput): Promise<
       tags: input.tags,
       flagged: input.tags.some((t) => t.kind === 'compliance'),
       ...(input.simulated ? { simulated: true } : {}),
+      ...(input.screenedByAi ? { screenedByAi: true } : {}),
       qaReview: null,
       createdAt: new Date(now).toISOString(),
     };

@@ -143,6 +143,15 @@ const envSchema = z.object({
   // Hard per-session cap — cost control on agent minutes.
   SIMULATOR_MAX_SESSION_SECONDS: z.coerce.number().int().positive().default(600),
 
+  // AI call screening ("Screen" on inbound calls — the Voice Agent answers
+  // on the agent's behalf until takeover). Effective switch is
+  // `screeningEnabled()` below.
+  SCREENING_ENABLED: truthy.default(true),
+  // Contingency: publish the Voice Agent's own transcript of its speech as
+  // 'agent' chunks. Default off — the existing media-stream fork should
+  // capture the AI's voice on the outbound track like any agent audio.
+  SCREENING_PUBLISH_BOT_TRANSCRIPTS: truthy.default(false),
+
   // Public base URL the Pi tunnel exposes. Used for the TwiML <Stream url>
   // and any callbacks that need a full URL. e.g. https://techsales-dev.example.com
   PUBLIC_BASE_URL: z.string().optional(),
@@ -228,4 +237,9 @@ export function getDataBackend(): DataBackend {
  *  session is a Deepgram cloud service). */
 export function simulatorEnabled(): boolean {
   return env.SIMULATOR_ENABLED && !!env.DEEPGRAM_API_KEY;
+}
+
+/** AI call screening on-switch: needs Twilio (real calls) + Deepgram. */
+export function screeningEnabled(): boolean {
+  return env.SCREENING_ENABLED && env.TWILIO_ENABLED && !!env.DEEPGRAM_API_KEY;
 }
