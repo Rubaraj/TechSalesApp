@@ -240,19 +240,21 @@ export function TrainingSimulator() {
 
       let sessionSid: string | null = null;
       try {
-        // Mic + audio first (user gesture context for the AudioContext).
         const ws = new WebSocket(simulatorWsUrl(userId, personaId));
         ws.binaryType = 'arraybuffer';
         wsRef.current = ws;
 
-        const audio = await startSimulatorAudio((frame) => {
-          if (ws.readyState === WebSocket.OPEN) ws.send(frame);
-        });
-        audioRef.current = audio;
+        // Handlers attach BEFORE the (slow) mic setup — the server sends
+        // {type:'session'} the moment the socket opens, and a message with
+        // no listener is silently lost. Early persona audio buffers until
+        // the playback pipeline exists.
+        let audio: SimulatorAudioHandle | null = null;
+        const earlyAudio: ArrayBuffer[] = [];
 
         ws.onmessage = (e: MessageEvent) => {
           if (e.data instanceof ArrayBuffer) {
-            audio.playFrame(e.data);
+            if (audio) audio.playFrame(e.data);
+            else earlyAudio.push(e.data);
             return;
           }
           try {
@@ -271,7 +273,7 @@ export function TrainingSimulator() {
               return;
             }
             if (msg.type === 'barge_in') {
-              audio.flushPlayback();
+              audio?.flushPlayback();
               return;
             }
             if (msg.type === 'agent_state') {
@@ -294,6 +296,16 @@ export function TrainingSimulator() {
         };
         ws.onclose = () => finishSession(sessionSid);
         ws.onerror = () => finishSession(sessionSid);
+
+        // Mic + playback pipeline (user-gesture context for the
+        // AudioContext; may take seconds if the permission prompt shows).
+        const started = await startSimulatorAudio((frame) => {
+          if (ws.readyState === WebSocket.OPEN) ws.send(frame);
+        });
+        audio = started;
+        audioRef.current = started;
+        for (const frame of earlyAudio) started.playFrame(frame);
+        earlyAudio.length = 0;
       } catch (err) {
         cleanupSession();
         endedRef.current = true;
