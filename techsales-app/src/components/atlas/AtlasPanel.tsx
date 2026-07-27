@@ -12,10 +12,12 @@
  * fills the full height.
  */
 import { useEffect, useRef, useState } from 'react';
-import { Settings, Mic, MicOff, Compass, History, Plus, X } from 'lucide-react';
+import { Settings, Mic, MicOff, Compass, History, Plus, X, Bot } from 'lucide-react';
 import { useAtlas } from '../../context/AtlasContext';
 import { useAuth } from '../../context/AuthContext';
 import { useCallContext } from '../../context/CallContext';
+import { useTwilioEnabled } from '../../hooks/useTwilioEnabled';
+import { ScreeningAssistantModal } from '../settings/ScreeningAssistantModal';
 import { ChatPane } from './ChatPane';
 import { GreetingCard } from './GreetingCard';
 import { ModeToggle } from './ModeToggle';
@@ -51,6 +53,12 @@ export function AtlasPanel(): React.JSX.Element | null {
   // App-styled "Start a new chat?" confirm — replaces the native
   // window.confirm so the prompt matches the rest of the UI chrome.
   const [confirmNewChat, setConfirmNewChat] = useState(false);
+  // AI screening assistant persona popup — reached via the gear menu.
+  // Agents only: admins never receive inbound calls to screen.
+  const twilioOn = useTwilioEnabled();
+  const isAdminUser = user?.accessLevel === 'admin' || user?.isSuperAdmin;
+  const canTuneAssistant = twilioOn && !isAdminUser;
+  const [showAssistantSettings, setShowAssistantSettings] = useState(false);
 
   useEffect(() => {
     function onMove(e: MouseEvent): void {
@@ -179,6 +187,9 @@ export function AtlasPanel(): React.JSX.Element | null {
               }}
               onClose={() => setPanelOpen(false)}
               startNewDisabled={messages.length === 0}
+              onAssistantSettings={
+                canTuneAssistant ? () => setShowAssistantSettings(true) : undefined
+              }
             />
           </div>
         </div>
@@ -213,6 +224,10 @@ export function AtlasPanel(): React.JSX.Element | null {
         void startNewSession();
       }}
     />
+    {/* Mount fresh each open — the modal's initial state is its reset. */}
+    {showAssistantSettings && (
+      <ScreeningAssistantModal isOpen onClose={() => setShowAssistantSettings(false)} />
+    )}
     </>
   );
 }
@@ -228,6 +243,9 @@ interface SettingsMenuProps {
   onStartNew: () => void;
   onClose: () => void;
   startNewDisabled: boolean;
+  /** Opens the AI screening-assistant persona popup; omitted for admins
+   *  (they never receive inbound calls to screen). */
+  onAssistantSettings?: () => void;
 }
 
 function SettingsMenu({
@@ -236,6 +254,7 @@ function SettingsMenu({
   onStartNew,
   onClose,
   startNewDisabled,
+  onAssistantSettings,
 }: SettingsMenuProps): React.JSX.Element {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
@@ -303,6 +322,16 @@ function SettingsMenu({
             }}
             disabled={startNewDisabled}
           />
+          {onAssistantSettings && (
+            <MenuItem
+              icon={<Bot className="w-4 h-4" />}
+              label="AI assistant"
+              onClick={() => {
+                onAssistantSettings();
+                setOpen(false);
+              }}
+            />
+          )}
           {/* Mic + speaker pickers — renders only when a Twilio device is
            *  initialized (i.e. during/after an active call). Replaces the
            *  old in-panel footer dropdowns. */}

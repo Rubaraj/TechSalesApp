@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Sun, Moon, LogOut, User, Bell, LayoutDashboard, ShoppingBag, Settings, Database, FileJson, Cpu, Sparkles, Cloud, Phone, PhoneOff, GraduationCap } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
@@ -8,7 +7,6 @@ import { useAtlas } from '../../context/AtlasContext';
 import { useTwilioEnabled } from '../../hooks/useTwilioEnabled';
 import { ActiveCallBadge } from '../call/ActiveCallBadge';
 import { AtlasMark } from '../atlas/AtlasMark';
-import { ScreeningAssistantModal } from '../settings/ScreeningAssistantModal';
 import { getLogoByTheme } from '../../utils/logoUtils';
 
 // Routes that should highlight the Sales tab
@@ -41,8 +39,6 @@ export function Header() {
   } = useAtlas();
   const twilioOn = useTwilioEnabled();
   const isAdminUser = user?.accessLevel === 'admin' || user?.isSuperAdmin;
-  // AI screening assistant settings popup (agents only — gear icon).
-  const [showAssistantSettings, setShowAssistantSettings] = useState(false);
   // Show call UI only when the full Twilio + Deepgram pipeline is configured
   // and the user is a sales agent. Web Speech fallback was removed —
   // there's no half-functional mode left.
@@ -240,20 +236,6 @@ export function Header() {
             </button>
           )}
 
-          {/* AI assistant settings — agents customize the persona the
-              screening assistant uses when answering on their behalf. */}
-          {showCallButton && (
-            <button
-              type="button"
-              onClick={() => setShowAssistantSettings(true)}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              aria-label="AI assistant settings"
-              title="AI screening assistant settings"
-            >
-              <Settings className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-            </button>
-          )}
-
           {/* Theme toggle */}
           <button
             onClick={toggleTheme}
@@ -341,10 +323,6 @@ export function Header() {
         </div>
       </div>
 
-      {/* Mount fresh each open — the modal's initial state is its reset. */}
-      {showAssistantSettings && (
-        <ScreeningAssistantModal isOpen onClose={() => setShowAssistantSettings(false)} />
-      )}
     </header>
   );
 }
