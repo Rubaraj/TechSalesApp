@@ -84,6 +84,39 @@ function persistedInputDevice(): { id?: string; label?: string } {
   }
 }
 
+export interface MicOption {
+  id: string;
+  label: string;
+}
+
+/** Enumerate audio inputs for the Training page's mic picker. */
+export async function listMics(): Promise<MicOption[]> {
+  const devices = await navigator.mediaDevices.enumerateDevices();
+  return devices
+    .filter((d) => d.kind === 'audioinput' && d.deviceId !== 'default' && d.deviceId !== 'communications')
+    .map((d, i) => ({ id: d.deviceId, label: d.label || `Microphone ${i + 1}` }));
+}
+
+/** Persist the chosen mic to the SAME key the Twilio call UI uses, so one
+ *  selection fixes both surfaces. */
+export function persistMicSelection(id: string, label: string): void {
+  try {
+    const raw = window.localStorage.getItem('techsales:call-audio-devices');
+    const existing = raw ? (JSON.parse(raw) as Record<string, unknown>) : {};
+    window.localStorage.setItem(
+      'techsales:call-audio-devices',
+      JSON.stringify({ ...existing, inputDeviceId: id, inputLabel: label }),
+    );
+  } catch {
+    // ignore quota / privacy mode
+  }
+}
+
+/** Heuristic: virtual devices that capture silence unless their app runs. */
+export function looksVirtual(label: string): boolean {
+  return /steam streaming|virtual|vb-audio|cable output|wave link/i.test(label);
+}
+
 async function resolveMicDeviceId(): Promise<string | undefined> {
   const pref = persistedInputDevice();
   if (!pref.id && !pref.label) return undefined;

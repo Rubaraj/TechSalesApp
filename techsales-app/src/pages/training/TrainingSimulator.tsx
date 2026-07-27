@@ -26,7 +26,14 @@ import {
   simulatorWsUrl,
   type SimulatorPersonaCard,
 } from '../../services/simulatorService';
-import { startSimulatorAudio, type SimulatorAudioHandle } from '../../services/simulatorAudio';
+import {
+  startSimulatorAudio,
+  listMics,
+  persistMicSelection,
+  looksVirtual,
+  type SimulatorAudioHandle,
+  type MicOption,
+} from '../../services/simulatorAudio';
 import type { CallRecordDetail, CallTag, QaReview } from '../../types/supervisor';
 import type { TranscriptChunk, ProspectEmotion } from '../../types/call';
 import {
@@ -68,6 +75,8 @@ export function TrainingSimulator() {
   const [simEnabled, setSimEnabled] = useState(true);
   const [phase, setPhase] = useState<Phase>({ name: 'pick' });
   const [selectedPersona, setSelectedPersona] = useState<string | null>(null);
+  const [mics, setMics] = useState<MicOption[]>([]);
+  const [selectedMic, setSelectedMic] = useState<string>('');
 
   // Live-session state (clone of the supervisor live-view shape).
   const [simSid, setSimSid] = useState<string | null>(null);
@@ -98,6 +107,29 @@ export function TrainingSimulator() {
         setSimEnabled(d.enabled);
       })
       .catch(() => setPersonas([]));
+    // Mic picker — Chrome's default input can be a virtual (silent) device
+    // like "Steam Streaming Microphone"; let the trainee pick the real one.
+    void listMics()
+      .then((list) => {
+        setMics(list);
+        try {
+          const raw = window.localStorage.getItem('techsales:call-audio-devices');
+          const pref = raw ? (JSON.parse(raw) as { inputDeviceId?: string; inputLabel?: string }) : {};
+          const match =
+            list.find((m) => m.id === pref.inputDeviceId) ??
+            list.find((m) => m.label === pref.inputLabel) ??
+            // No saved pref: prefer the first NON-virtual device.
+            list.find((m) => !looksVirtual(m.label)) ??
+            list[0];
+          if (match) {
+            setSelectedMic(match.id);
+            persistMicSelection(match.id, match.label);
+          }
+        } catch {
+          if (list[0]) setSelectedMic(list[0].id);
+        }
+      })
+      .catch(() => setMics([]));
   }, []);
 
   useEffect(() => {
@@ -360,6 +392,35 @@ export function TrainingSimulator() {
             <Headphones className="w-3.5 h-3.5" /> Use headphones for the best experience.
           </p>
         </div>
+        {mics.length > 0 && (
+          <div className="max-w-md">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1.5">
+              <Mic className="w-4 h-4" /> Microphone
+            </label>
+            <select
+              value={selectedMic}
+              onChange={(e) => {
+                setSelectedMic(e.target.value);
+                const m = mics.find((x) => x.id === e.target.value);
+                if (m) persistMicSelection(m.id, m.label);
+              }}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm"
+            >
+              {mics.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.label}
+                  {looksVirtual(m.label) ? ' (virtual — likely silent)' : ''}
+                </option>
+              ))}
+            </select>
+            {looksVirtual(mics.find((m) => m.id === selectedMic)?.label ?? '') && (
+              <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                This looks like a virtual device — it usually captures silence. Pick your real
+                microphone.
+              </p>
+            )}
+          </div>
+        )}
         {!simEnabled && (
           <div className="rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 p-4 text-sm text-amber-800 dark:text-amber-300">
             The training simulator is not enabled on this server.
