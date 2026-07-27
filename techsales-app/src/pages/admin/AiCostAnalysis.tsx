@@ -11,9 +11,23 @@
  * direct labels + tables carry the numbers.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Bot, ClipboardCheck, AudioLines, DollarSign, Loader2, Users } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import {
+  Bot,
+  ClipboardCheck,
+  AudioLines,
+  DollarSign,
+  Loader2,
+  Users,
+  ChevronUp,
+  ChevronDown,
+} from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { getCostAnalysis, type CostAnalysis } from '../../services/aiCostService';
+import {
+  getCostAnalysis,
+  type CostAnalysis,
+  type CostPerCall,
+} from '../../services/aiCostService';
 import { formatWhen } from './supervisionUi';
 
 const RANGES = [7, 30, 90] as const;
@@ -35,6 +49,14 @@ function fmtUsd(v: number): string {
 function fmtNum(v: number): string {
   return new Intl.NumberFormat('en-US').format(Math.round(v));
 }
+
+function fmtDuration(sec: number): string {
+  const s = Math.max(0, Math.round(sec));
+  return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+}
+
+/** Sortable columns of the per-call table. */
+type CallSortKey = 'startedAt' | 'durationSec' | 'liveInsightUsd' | 'qaReviewUsd' | 'transcriptUsd' | 'totalUsd';
 
 const BUCKETS = [
   {
@@ -60,6 +82,39 @@ const BUCKETS = [
   },
 ];
 
+function SortHeader({
+  label,
+  sortKey,
+  sort,
+  onToggle,
+  align = 'right',
+  last = false,
+}: {
+  label: string;
+  sortKey: CallSortKey;
+  sort: { key: CallSortKey; dir: 'asc' | 'desc' };
+  onToggle: (key: CallSortKey) => void;
+  align?: 'left' | 'right';
+  last?: boolean;
+}) {
+  const active = sort.key === sortKey;
+  const Arrow = sort.dir === 'desc' ? ChevronDown : ChevronUp;
+  return (
+    <th className={`py-2 font-semibold ${last ? '' : 'pr-3'} ${align === 'right' ? 'text-right' : 'text-left'}`}>
+      <button
+        onClick={() => onToggle(sortKey)}
+        className={`inline-flex items-center gap-0.5 hover:text-gray-900 dark:hover:text-white transition-colors ${
+          active ? 'text-gray-900 dark:text-white' : ''
+        }`}
+        title={`Sort by ${label.toLowerCase()}`}
+      >
+        {label}
+        {active && <Arrow className="w-3 h-3" />}
+      </button>
+    </th>
+  );
+}
+
 interface ProjectionInputs {
   agents: number;
   callsPerAgentPerDay: number;
@@ -70,7 +125,19 @@ interface ProjectionInputs {
 
 export function AiCostAnalysis() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const userId = user?.userId ?? '';
+
+  // Per-call table sorting — cost-heavy calls first by default.
+  const [callSort, setCallSort] = useState<{ key: CallSortKey; dir: 'asc' | 'desc' }>({
+    key: 'totalUsd',
+    dir: 'desc',
+  });
+  const toggleCallSort = (key: CallSortKey): void => {
+    setCallSort((prev) =>
+      prev.key === key ? { key, dir: prev.dir === 'desc' ? 'asc' : 'desc' } : { key, dir: 'desc' },
+    );
+  };
 
   const [days, setDays] = useState<number>(30);
   const [data, setData] = useState<CostAnalysis | null>(null);
@@ -112,6 +179,18 @@ export function AiCostAnalysis() {
   useEffect(() => {
     load();
   }, [load]);
+
+  const sortedCalls = useMemo<CostPerCall[]>(() => {
+    if (!data) return [];
+    const rows = [...data.perCall];
+    const { key, dir } = callSort;
+    rows.sort((a, b) => {
+      const av = key === 'startedAt' ? Date.parse(a.startedAt) : a[key];
+      const bv = key === 'startedAt' ? Date.parse(b.startedAt) : b[key];
+      return dir === 'desc' ? bv - av : av - bv;
+    });
+    return rows;
+  }, [data, callSort]);
 
   const projection = useMemo(() => {
     if (!data) return null;
@@ -297,7 +376,8 @@ export function AiCostAnalysis() {
           </div>
         </div>
 
-        {/* Per-call table */}
+        {/* Per-call table — sortable, cost-desc by default; call links open
+         *  the Supervision transcript view. */}
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
           <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">
             Cost per call
@@ -306,25 +386,33 @@ export function AiCostAnalysis() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left text-xs text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
-                  <th className="py-2 pr-3 font-semibold">Call</th>
-                  <th className="py-2 pr-3 font-semibold text-right">Live AI</th>
-                  <th className="py-2 pr-3 font-semibold text-right">QA review</th>
-                  <th className="py-2 pr-3 font-semibold text-right">Transcript</th>
-                  <th className="py-2 font-semibold text-right">Total</th>
+                  <SortHeader label="Call" sortKey="startedAt" sort={callSort} onToggle={toggleCallSort} align="left" />
+                  <SortHeader label="Duration" sortKey="durationSec" sort={callSort} onToggle={toggleCallSort} />
+                  <SortHeader label="Live AI" sortKey="liveInsightUsd" sort={callSort} onToggle={toggleCallSort} />
+                  <SortHeader label="QA review" sortKey="qaReviewUsd" sort={callSort} onToggle={toggleCallSort} />
+                  <SortHeader label="Transcript" sortKey="transcriptUsd" sort={callSort} onToggle={toggleCallSort} />
+                  <SortHeader label="Total" sortKey="totalUsd" sort={callSort} onToggle={toggleCallSort} last />
                 </tr>
               </thead>
               <tbody>
-                {data.perCall.map((c) => (
+                {sortedCalls.map((c) => (
                   <tr key={c.callSid} className="border-b border-gray-100 dark:border-gray-700/60 last:border-0">
                     <td className="py-2 pr-3">
-                      <span className="font-mono text-xs text-gray-700 dark:text-gray-300">
+                      <button
+                        onClick={() =>
+                          navigate(`/admin/supervision/${encodeURIComponent(c.callSid)}`)
+                        }
+                        className="font-mono text-xs text-orange-600 dark:text-orange-400 hover:underline"
+                        title="Open call transcript"
+                      >
                         …{c.callSid.slice(-8)}
-                      </span>
+                      </button>
                       <span className="block text-[11px] text-gray-400">
-                        {formatWhen(c.startedAt)} · {Math.round(c.durationSec)}s
+                        {formatWhen(c.startedAt)}
                         {c.liveTicks > 0 ? ` · ${c.liveTicks} ticks` : ''}
                       </span>
                     </td>
+                    <td className="py-2 pr-3 text-right tabular-nums text-gray-700 dark:text-gray-300">{fmtDuration(c.durationSec)}</td>
                     <td className="py-2 pr-3 text-right tabular-nums text-gray-700 dark:text-gray-300">{fmtUsd(c.liveInsightUsd)}</td>
                     <td className="py-2 pr-3 text-right tabular-nums text-gray-700 dark:text-gray-300">{fmtUsd(c.qaReviewUsd)}</td>
                     <td className="py-2 pr-3 text-right tabular-nums text-gray-700 dark:text-gray-300">{fmtUsd(c.transcriptUsd)}</td>
