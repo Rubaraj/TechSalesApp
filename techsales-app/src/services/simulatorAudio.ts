@@ -154,6 +154,16 @@ export async function startSimulatorAudio(
     '| persisted pref:',
     persistedInputDevice().label ?? '(none)',
   );
+  if (track) {
+    if (track.muted) {
+      console.warn(
+        '[sim-audio] TRACK IS MUTED AT THE OS LEVEL — check the keyboard mic-mute key ' +
+          '(often F4 / mic icon) or Windows Sound settings. Audio will be silent until unmuted.',
+      );
+    }
+    track.onmute = () => console.warn('[sim-audio] mic muted by the OS');
+    track.onunmute = () => console.log('[sim-audio] mic UNMUTED — audio should flow now');
+  }
 
   const ctx = new AudioContext();
   await ctx.resume();
