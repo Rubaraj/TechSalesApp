@@ -22,26 +22,20 @@ import { env } from '../config/env.js';
 import { logger } from '../config/logger.js';
 import { publish } from '../services/callBus.js';
 import { getScreening } from '../ai/screening/screeningState.js';
+import {
+  DEFAULT_SCREENING_VOICE,
+  DEFAULT_SCREENING_GREETING,
+  buildScreeningPrompt,
+  renderGreeting,
+} from '../ai/screening/screeningPersonaDefaults.js';
 import { resolveAgentName } from '../services/agentNameCache.js';
+import { repos } from '../repositories/registry.js';
+import type { ScreeningPersonaRecord } from '../types/index.js';
 import type { TranscriptChunk } from '../ai/types/call.types.js';
 
 const DG_AGENT_URL = 'wss://agent.deepgram.com/v1/agent/converse';
 const KEEPALIVE_MS = 8_000;
 const MAX_PENDING_FRAMES = 500;
-const SCREENING_VOICE = 'aura-2-thalia-en';
-
-const SCREENING_PROMPT_BASE = `You are an automated phone assistant answering a Medicare sales line on behalf of a licensed agent who is momentarily unavailable. Your ONLY job is polite triage — you are NOT a salesperson.
-
-Do:
-- Gather, conversationally and one at a time: the caller's name, the reason they're calling, their zip code, and when is a good time for the agent to call them back.
-- If they volunteer details (current plan, medications, pharmacy), acknowledge briefly — don't probe deeper.
-- Answer only basic logistical questions (office hours, "who will call me back").
-- When you have name + reason (+ zip if offered), wrap up: confirm the agent will follow up, thank them, say goodbye.
-
-Never:
-- Recommend, compare, or discuss the merits of any plan. If asked, say the licensed agent will cover that on the callback.
-- Claim to be a person. If asked, confirm you are an automated assistant.
-- Keep the caller longer than needed. Short, warm, spoken replies — one or two sentences.`;
 
 interface BridgeCtx {
   callSid: string | null;
@@ -74,8 +68,13 @@ function teardown(ctx: BridgeCtx, reason: string): void {
   logger.info({ callSid: ctx.callSid, reason }, 'screening: bridge closed');
 }
 
-function buildSettings(agentName: string | null): Record<string, unknown> {
+function buildSettings(
+  agentName: string | null,
+  persona: ScreeningPersonaRecord | null,
+): Record<string, unknown> {
   const who = agentName ?? 'our agent';
+  const greeting = renderGreeting(persona?.greeting || DEFAULT_SCREENING_GREETING, who);
+  const voice = persona?.voice || DEFAULT_SCREENING_VOICE;
   return {
     type: 'Settings',
     audio: {
@@ -84,13 +83,13 @@ function buildSettings(agentName: string | null): Record<string, unknown> {
     },
     agent: {
       language: 'en',
-      greeting: `Hi, thanks for calling! I'm ${who}'s automated assistant — they'll be with you shortly, but I can get things started. May I ask who's calling?`,
+      greeting,
       listen: { provider: { type: 'deepgram', model: 'nova-3' } },
       think: {
         provider: { type: 'anthropic', model: env.SIMULATOR_THINK_MODEL },
-        prompt: `${SCREENING_PROMPT_BASE}\n\nThe agent you are answering for is named ${who}.`,
+        prompt: buildScreeningPrompt(who, persona?.instructions ?? ''),
       },
-      speak: { provider: { type: 'deepgram', model: SCREENING_VOICE } },
+      speak: { provider: { type: 'deepgram', model: voice } },
     },
   };
 }
@@ -101,14 +100,18 @@ function sendTwilio(ctx: BridgeCtx, payload: Record<string, unknown>): void {
   }
 }
 
-function openDeepgram(ctx: BridgeCtx, agentName: string | null): void {
+function openDeepgram(
+  ctx: BridgeCtx,
+  agentName: string | null,
+  persona: ScreeningPersonaRecord | null,
+): void {
   const dgWs = new WebSocket(DG_AGENT_URL, {
     headers: { Authorization: `Token ${env.DEEPGRAM_API_KEY}` },
   });
   ctx.dgWs = dgWs;
 
   dgWs.on('open', () => {
-    dgWs.send(JSON.stringify(buildSettings(agentName)));
+    dgWs.send(JSON.stringify(buildSettings(agentName, persona)));
   });
   dgWs.on('message', (data: RawData, isBinary: boolean) => {
     if (ctx.closed) return;
@@ -235,9 +238,10 @@ function handleConnection(ws: WebSocket): void {
           { callSid, streamSid: ctx.streamSid, agentUserId: entry.agentUserId },
           'screening: bridge started',
         );
-        void resolveAgentName(entry.agentUserId)
-          .then((name) => openDeepgram(ctx, name))
-          .catch(() => openDeepgram(ctx, null));
+        void Promise.all([
+          resolveAgentName(entry.agentUserId).catch(() => null),
+          repos.screeningPersona.findByUserId(entry.agentUserId).catch(() => null),
+        ]).then(([name, persona]) => openDeepgram(ctx, name, persona));
         return;
       }
       case 'media': {

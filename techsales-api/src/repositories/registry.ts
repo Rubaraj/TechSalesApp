@@ -31,6 +31,9 @@ import { DatabricksQaRubricItemRepository } from './databricks/DatabricksQaRubri
 import { MongoSimulatorPersonaRepository } from './mongo/MongoSimulatorPersonaRepository.js';
 import { JsonSimulatorPersonaRepository } from './json/JsonSimulatorPersonaRepository.js';
 import { DatabricksSimulatorPersonaRepository } from './databricks/DatabricksSimulatorPersonaRepository.js';
+import { MongoScreeningPersonaRepository } from './mongo/MongoScreeningPersonaRepository.js';
+import { JsonScreeningPersonaRepository } from './json/JsonScreeningPersonaRepository.js';
+import { DatabricksScreeningPersonaRepository } from './databricks/DatabricksScreeningPersonaRepository.js';
 import { DatabricksLeadRepository } from './databricks/DatabricksLeadRepository.js';
 import { DatabricksUserRepository } from './databricks/DatabricksUserRepository.js';
 import { DatabricksRoleRepository } from './databricks/DatabricksRoleRepository.js';
@@ -98,6 +101,10 @@ export type SimulatorPersonaRepo =
   | MongoSimulatorPersonaRepository
   | JsonSimulatorPersonaRepository
   | DatabricksSimulatorPersonaRepository;
+export type ScreeningPersonaRepo =
+  | MongoScreeningPersonaRepository
+  | JsonScreeningPersonaRepository
+  | DatabricksScreeningPersonaRepository;
 
 export interface Repos {
   health: HealthRepo;
@@ -114,6 +121,7 @@ export interface Repos {
   coachingRule: CoachingRuleRepo;
   qaRubricItem: QaRubricItemRepo;
   simulatorPersona: SimulatorPersonaRepo;
+  screeningPersona: ScreeningPersonaRepo;
 }
 
 interface RegistryState {
@@ -317,6 +325,21 @@ const buildSimulatorPersonaRepo = (mode: ConnectMode): SimulatorPersonaRepo => {
   }
 };
 
+const buildScreeningPersonaRepo = (mode: ConnectMode): ScreeningPersonaRepo => {
+  switch (mode) {
+    case 'mongo':
+      return new MongoScreeningPersonaRepository();
+    case 'json':
+      return new JsonScreeningPersonaRepository();
+    case 'databricks':
+      return new DatabricksScreeningPersonaRepository();
+    default: {
+      const _exhaustive: never = mode;
+      throw new Error(`Unknown backend: ${String(_exhaustive)}`);
+    }
+  }
+};
+
 export function initRegistry(connectResult: ConnectResult): void {
   if (state) {
     throw new Error('initRegistry called twice — registry is a singleton.');
@@ -339,6 +362,7 @@ export function initRegistry(connectResult: ConnectResult): void {
       coachingRule: buildCoachingRuleRepo(mode),
       qaRubricItem: buildQaRubricItemRepo(mode),
       simulatorPersona: buildSimulatorPersonaRepo(mode),
+      screeningPersona: buildScreeningPersonaRepo(mode),
     },
   };
   logger.info({ mode }, 'Repository registry initialized');

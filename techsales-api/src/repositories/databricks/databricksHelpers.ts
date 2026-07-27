@@ -26,6 +26,7 @@ export const APP_TABLES = {
   coachingRules: 'coaching_rules',
   qaRubricItems: 'qa_rubric_items',
   simulatorPersonas: 'simulator_personas',
+  screeningPersonas: 'screening_personas',
 } as const;
 
 export const LOOKUP_TABLES = {

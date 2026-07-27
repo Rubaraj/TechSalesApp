@@ -6,6 +6,11 @@
  *   POST /api/screening/takeover {callSid, userId} — agent takes over
  *   POST /api/screening/hangup   {callSid, userId} — end the call
  *
+ * Persona (per-agent assistant tuning — Header gear icon popup):
+ *   GET    /api/screening/persona/:userId — saved persona + defaults + voices
+ *   PUT    /api/screening/persona/:userId {greeting, instructions, voice}
+ *   DELETE /api/screening/persona/:userId — reset to defaults
+ *
  * start/takeover redirect the PARENT call via Twilio REST. The original
  * <Start><Stream> transcription fork survives both redirects, so one
  * analysis session spans ring → screening → takeover → hangup.
@@ -21,6 +26,11 @@ import {
   getScreening,
   markTakenOver,
 } from '../ai/screening/screeningState.js';
+import {
+  DEFAULT_SCREENING_GREETING,
+  DEFAULT_SCREENING_VOICE,
+} from '../ai/screening/screeningPersonaDefaults.js';
+import { CURATED_VOICES } from '../ai/simulator/personas.js';
 
 export const screeningRouter = Router();
 
@@ -143,5 +153,100 @@ screeningRouter.post(
       return;
     }
     res.json({ success: true, data: { ended: true } });
+  }),
+);
+
+// ---------------------------------------------------------------------------
+// Per-agent persona (self-service; POC userId posture like everything else).
+// Not gated on screeningEnabled() — the popup should work even while the
+// pipeline is temporarily off (e.g. Deepgram key rotation).
+// ---------------------------------------------------------------------------
+
+const PERSONA_DEFAULTS = {
+  greeting: DEFAULT_SCREENING_GREETING,
+  instructions: '',
+  voice: DEFAULT_SCREENING_VOICE,
+};
+
+const MAX_GREETING_CHARS = 400;
+const MAX_INSTRUCTIONS_CHARS = 4000;
+
+async function requireUser(req: Request, res: Response): Promise<string | null> {
+  const userId = String(req.params.userId ?? '');
+  if (!userId) {
+    res.status(400).json({ success: false, error: '`userId` is required' });
+    return null;
+  }
+  const user = await repos.user.findById(userId);
+  if (!user) {
+    res.status(403).json({ success: false, error: 'Unknown user' });
+    return null;
+  }
+  return userId;
+}
+
+screeningRouter.get(
+  '/persona/:userId',
+  asyncHandler(async (req: Request, res: Response) => {
+    const userId = await requireUser(req, res);
+    if (!userId) return;
+    const persona = await repos.screeningPersona.findByUserId(userId);
+    res.json({
+      success: true,
+      data: { persona, defaults: PERSONA_DEFAULTS, voices: CURATED_VOICES },
+    });
+  }),
+);
+
+screeningRouter.put(
+  '/persona/:userId',
+  asyncHandler(async (req: Request, res: Response) => {
+    const userId = await requireUser(req, res);
+    if (!userId) return;
+    const body = (req.body ?? {}) as { greeting?: unknown; instructions?: unknown; voice?: unknown };
+    const greeting = String(body.greeting ?? '').trim();
+    const instructions = String(body.instructions ?? '').trim();
+    const voice = String(body.voice ?? '').trim();
+    if (!greeting) {
+      res.status(400).json({ success: false, error: '`greeting` is required' });
+      return;
+    }
+    if (greeting.length > MAX_GREETING_CHARS) {
+      res
+        .status(400)
+        .json({ success: false, error: `\`greeting\` must be ≤ ${MAX_GREETING_CHARS} characters` });
+      return;
+    }
+    if (instructions.length > MAX_INSTRUCTIONS_CHARS) {
+      res.status(400).json({
+        success: false,
+        error: `\`instructions\` must be ≤ ${MAX_INSTRUCTIONS_CHARS} characters`,
+      });
+      return;
+    }
+    if (!voice.startsWith('aura-')) {
+      res
+        .status(400)
+        .json({ success: false, error: '`voice` must be a Deepgram Aura model (aura-…)' });
+      return;
+    }
+    const persona = await repos.screeningPersona.upsert(userId, {
+      greeting,
+      instructions,
+      voice,
+    });
+    logger.info({ userId, voice }, 'screening: persona saved');
+    res.json({ success: true, data: { persona } });
+  }),
+);
+
+screeningRouter.delete(
+  '/persona/:userId',
+  asyncHandler(async (req: Request, res: Response) => {
+    const userId = await requireUser(req, res);
+    if (!userId) return;
+    const deleted = await repos.screeningPersona.delete(userId);
+    logger.info({ userId, deleted }, 'screening: persona reset to defaults');
+    res.json({ success: true, data: { reset: true } });
   }),
 );

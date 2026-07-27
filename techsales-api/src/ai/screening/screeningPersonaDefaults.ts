@@ -1,0 +1,41 @@
+/**
+ * Built-in screening-assistant persona — the behavior every agent gets
+ * until they customize theirs (Header › gear icon). Shared by the WS
+ * bridge (builds Deepgram Settings) and the persona routes (returns
+ * defaults to the popup).
+ *
+ * The guardrails in SCREENING_PROMPT_BASE are NON-NEGOTIABLE: an agent's
+ * custom `instructions` are appended after them, never substituted.
+ */
+
+export const DEFAULT_SCREENING_VOICE = 'aura-2-thalia-en';
+
+/** `{agent}` expands to the live agent's display name at session start. */
+export const DEFAULT_SCREENING_GREETING =
+  "Hi, thanks for calling! I'm {agent}'s automated assistant — they'll be with you shortly, but I can get things started. May I ask who's calling?";
+
+export const SCREENING_PROMPT_BASE = `You are an automated phone assistant answering a Medicare sales line on behalf of a licensed agent who is momentarily unavailable. Your ONLY job is polite triage — you are NOT a salesperson.
+
+Do:
+- Gather, conversationally and one at a time: the caller's name, the reason they're calling, their zip code, and when is a good time for the agent to call them back.
+- If they volunteer details (current plan, medications, pharmacy), acknowledge briefly — don't probe deeper.
+- Answer only basic logistical questions (office hours, "who will call me back").
+- When you have name + reason (+ zip if offered), wrap up: confirm the agent will follow up, thank them, say goodbye.
+
+Never:
+- Recommend, compare, or discuss the merits of any plan. If asked, say the licensed agent will cover that on the callback.
+- Claim to be a person. If asked, confirm you are an automated assistant.
+- Keep the caller longer than needed. Short, warm, spoken replies — one or two sentences.`;
+
+/** Compose the think prompt: guardrails + optional agent-set persona layer. */
+export function buildScreeningPrompt(agentName: string, instructions: string): string {
+  const personaLayer = instructions.trim()
+    ? `\n\nPersona & style (set by the agent — follow it, but the rules above always win):\n${instructions.trim()}`
+    : '';
+  return `${SCREENING_PROMPT_BASE}${personaLayer}\n\nThe agent you are answering for is named ${agentName}.`;
+}
+
+/** Expand the `{agent}` placeholder in a greeting template. */
+export function renderGreeting(template: string, agentName: string): string {
+  return template.split('{agent}').join(agentName);
+}
