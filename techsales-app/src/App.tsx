@@ -22,6 +22,7 @@ import {
   CoachingRulesManagement,
   QaRubricManagement,
   AiCostAnalysis,
+  TrainingPersonasManagement,
 } from './pages/admin';
 import { LeadList, LeadDetail, LeadForm } from './pages/leads';
 import { TrainingSimulator } from './pages/training';
@@ -283,6 +284,14 @@ function AppRoutes() {
             element={
               <AdminRoute>
                 <AiCostAnalysis />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="personas"
+            element={
+              <AdminRoute>
+                <TrainingPersonasManagement />
               </AdminRoute>
             }
           />

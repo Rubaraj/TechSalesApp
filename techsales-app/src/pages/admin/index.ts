@@ -14,4 +14,5 @@ export { ComplianceRulesManagement } from './ComplianceRulesManagement';
 export { CoachingRulesManagement } from './CoachingRulesManagement';
 export { QaRubricManagement } from './QaRubricManagement';
 export { AiCostAnalysis } from './AiCostAnalysis';
+export { TrainingPersonasManagement } from './TrainingPersonasManagement';
 

@@ -25,7 +25,8 @@ import { logger } from '../config/logger.js';
 import { repos } from '../repositories/registry.js';
 import { publish, endCall as endCallBus } from '../services/callBus.js';
 import { startCallAnalysis } from '../ai/agents/callAnalysisAgent.js';
-import { getPersona } from '../ai/simulator/personas.js';
+import { getPersonaById } from '../ai/simulator/personas.js';
+import type { SimulatorPersonaRecord } from '../types/index.js';
 import type { TranscriptChunk } from '../ai/types/call.types.js';
 
 const DG_AGENT_URL = 'wss://agent.deepgram.com/v1/agent/converse';
@@ -84,8 +85,7 @@ function teardown(ctx: SessionCtx, reason: string): void {
   logger.info({ simSid: ctx.simSid, reason }, 'simulator: session ended');
 }
 
-function buildSettings(personaId: string | undefined): Record<string, unknown> {
-  const persona = getPersona(personaId);
+function buildSettings(persona: SimulatorPersonaRecord): Record<string, unknown> {
   return {
     type: 'Settings',
     audio: {
@@ -178,6 +178,9 @@ async function handleConnection(ws: WebSocket, req: IncomingMessage): Promise<vo
     ws.close(4401, 'unknown user');
     return;
   }
+  // Admin-editable personas (DB-backed, cached); falls back to the first
+  // active persona when the requested id is unknown/deactivated.
+  const persona = await getPersonaById(personaId);
 
   const ctx: SessionCtx = {
     simSid: `SIM-${randomUUID()}`,
@@ -214,7 +217,7 @@ async function handleConnection(ws: WebSocket, req: IncomingMessage): Promise<vo
   ctx.dgWs = dgWs;
 
   dgWs.on('open', () => {
-    dgWs.send(JSON.stringify(buildSettings(personaId)));
+    dgWs.send(JSON.stringify(buildSettings(persona)));
   });
   dgWs.on('message', (data: RawData, isBinary: boolean) => {
     if (ctx.closed) return;
@@ -281,7 +284,7 @@ async function handleConnection(ws: WebSocket, req: IncomingMessage): Promise<vo
   });
 
   logger.info(
-    { simSid: ctx.simSid, userId, personaId: getPersona(personaId).id },
+    { simSid: ctx.simSid, userId, personaId: persona.personaId },
     'simulator: session started',
   );
 }

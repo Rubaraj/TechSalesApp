@@ -46,6 +46,8 @@ export * from './coachingRule.js';
 
 export * from './qaRubricItem.js';
 
+export * from './simulatorPersona.js';
+
 // Common types
 export interface ApiResponse<T> {
   success: boolean;
