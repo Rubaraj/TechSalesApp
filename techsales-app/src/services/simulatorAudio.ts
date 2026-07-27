@@ -117,6 +117,52 @@ export function looksVirtual(label: string): boolean {
   return /steam streaming|virtual|vb-audio|cable output|wave link/i.test(label);
 }
 
+export interface MicMeterHandle {
+  stop: () => void;
+}
+
+/**
+ * Mic test meter — opens the given device and reports its live level
+ * (0..1) ~10×/s so the picker can show which device actually hears you.
+ */
+export async function startMicMeter(
+  deviceId: string,
+  onLevel: (level: number, muted: boolean) => void,
+): Promise<MicMeterHandle> {
+  const stream = await navigator.mediaDevices.getUserMedia({
+    audio: { deviceId: { exact: deviceId } },
+  });
+  const track = stream.getAudioTracks()[0];
+  const ctx = new AudioContext();
+  await ctx.resume();
+  const source = ctx.createMediaStreamSource(stream);
+  const analyser = ctx.createAnalyser();
+  analyser.fftSize = 1024;
+  source.connect(analyser);
+  const buf = new Uint8Array(analyser.fftSize);
+  const timer = window.setInterval(() => {
+    analyser.getByteTimeDomainData(buf);
+    let peak = 0;
+    for (let i = 0; i < buf.length; i++) {
+      const v = Math.abs(buf[i] - 128) / 128;
+      if (v > peak) peak = v;
+    }
+    onLevel(peak, track?.muted ?? false);
+  }, 100);
+  return {
+    stop: () => {
+      window.clearInterval(timer);
+      try {
+        source.disconnect();
+      } catch {
+        // already disconnected
+      }
+      for (const t of stream.getTracks()) t.stop();
+      void ctx.close();
+    },
+  };
+}
+
 async function resolveMicDeviceId(): Promise<string | undefined> {
   const pref = persistedInputDevice();
   if (!pref.id && !pref.label) return undefined;

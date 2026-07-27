@@ -28,10 +28,12 @@ import {
 } from '../../services/simulatorService';
 import {
   startSimulatorAudio,
+  startMicMeter,
   listMics,
   persistMicSelection,
   looksVirtual,
   type SimulatorAudioHandle,
+  type MicMeterHandle,
   type MicOption,
 } from '../../services/simulatorAudio';
 import type { CallRecordDetail, CallTag, QaReview } from '../../types/supervisor';
@@ -77,6 +79,9 @@ export function TrainingSimulator() {
   const [selectedPersona, setSelectedPersona] = useState<string | null>(null);
   const [mics, setMics] = useState<MicOption[]>([]);
   const [selectedMic, setSelectedMic] = useState<string>('');
+  const [micLevel, setMicLevel] = useState<number>(0);
+  const [micMuted, setMicMuted] = useState<boolean>(false);
+  const meterRef = useRef<MicMeterHandle | null>(null);
 
   // Live-session state (clone of the supervisor live-view shape).
   const [simSid, setSimSid] = useState<string | null>(null);
@@ -137,6 +142,34 @@ export function TrainingSimulator() {
     const id = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(id);
   }, [phase.name]);
+
+  // Live mic-test meter on the pick screen — shows which device actually
+  // hears you before a session starts.
+  useEffect(() => {
+    if (phase.name !== 'pick' || !selectedMic) return undefined;
+    let cancelled = false;
+    setMicLevel(0);
+    setMicMuted(false);
+    void startMicMeter(selectedMic, (level, muted) => {
+      setMicLevel(level);
+      setMicMuted(muted);
+    })
+      .then((handle) => {
+        if (cancelled) {
+          handle.stop();
+          return;
+        }
+        meterRef.current = handle;
+      })
+      .catch(() => {
+        // Meter is best-effort; the session itself will surface real errors.
+      });
+    return () => {
+      cancelled = true;
+      meterRef.current?.stop();
+      meterRef.current = null;
+    };
+  }, [phase.name, selectedMic]);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -417,6 +450,33 @@ export function TrainingSimulator() {
               <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
                 This looks like a virtual device — it usually captures silence. Pick your real
                 microphone.
+              </p>
+            )}
+            {/* Live level meter — speak and watch the bar. */}
+            <div className="mt-2 flex items-center gap-2">
+              <span className="text-[11px] text-gray-500 dark:text-gray-400 shrink-0">
+                Mic test:
+              </span>
+              <div className="flex-1 h-2.5 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                <div
+                  className={`h-2.5 transition-all duration-100 ${
+                    micLevel > 0.03 ? 'bg-green-500' : 'bg-gray-400'
+                  }`}
+                  style={{ width: `${Math.min(100, Math.round(micLevel * 140))}%` }}
+                />
+              </div>
+              <span className="text-[11px] tabular-nums text-gray-500 dark:text-gray-400 w-10 text-right">
+                {Math.round(micLevel * 100)}%
+              </span>
+            </div>
+            {micMuted ? (
+              <p className="text-xs text-red-600 dark:text-red-400 mt-1">
+                This device reports MUTED — Windows/hardware is not delivering audio from it.
+                Pick a different microphone above.
+              </p>
+            ) : (
+              <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-1">
+                Speak — the bar should jump. If it stays flat, pick a different device.
               </p>
             )}
           </div>
