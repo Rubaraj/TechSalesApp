@@ -70,12 +70,57 @@ export interface SimulatorAudioHandle {
   flushPlayback: () => void;
 }
 
+/** Same persisted mic preference the Twilio call UI uses
+ *  (AudioDeviceSelector) — Chrome's default input can be a dead device
+ *  while the user's real mic is a non-default one. */
+function persistedInputDevice(): { id?: string; label?: string } {
+  try {
+    const raw = window.localStorage.getItem('techsales:call-audio-devices');
+    if (!raw) return {};
+    const p = JSON.parse(raw) as { inputDeviceId?: string; inputLabel?: string };
+    return { id: p.inputDeviceId, label: p.inputLabel };
+  } catch {
+    return {};
+  }
+}
+
+async function resolveMicDeviceId(): Promise<string | undefined> {
+  const pref = persistedInputDevice();
+  if (!pref.id && !pref.label) return undefined;
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const inputs = devices.filter((d) => d.kind === 'audioinput');
+    const byId = pref.id && inputs.find((d) => d.deviceId === pref.id);
+    if (byId) return byId.deviceId;
+    const byLabel = pref.label && inputs.find((d) => d.label === pref.label);
+    if (byLabel) return byLabel.deviceId;
+  } catch {
+    // fall through to default
+  }
+  return undefined;
+}
+
 export async function startSimulatorAudio(
   onMicFrame: (frame: ArrayBuffer) => void,
 ): Promise<SimulatorAudioHandle> {
+  const deviceId = await resolveMicDeviceId();
   const stream = await navigator.mediaDevices.getUserMedia({
-    audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+    audio: {
+      ...(deviceId ? { deviceId: { exact: deviceId } } : {}),
+      echoCancellation: true,
+      noiseSuppression: true,
+      autoGainControl: true,
+    },
   });
+  const track = stream.getAudioTracks()[0];
+  console.log(
+    '[sim-audio] mic device:',
+    track?.label || '(unnamed)',
+    '| muted:',
+    track?.muted,
+    '| persisted pref:',
+    persistedInputDevice().label ?? '(none)',
+  );
 
   const ctx = new AudioContext();
   await ctx.resume();
