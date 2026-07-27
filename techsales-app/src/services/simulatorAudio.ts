@@ -92,10 +92,17 @@ export async function startSimulatorAudio(
   const source = ctx.createMediaStreamSource(stream);
   const worklet = new AudioWorkletNode(ctx, 'mic-downsampler', {
     numberOfInputs: 1,
-    numberOfOutputs: 0,
+    numberOfOutputs: 1,
     processorOptions: { targetRate: TARGET_INPUT_RATE },
   });
   source.connect(worklet);
+  // CRITICAL: browsers only render graph branches that reach the
+  // destination — without this (muted) tap the worklet's process() never
+  // runs and no mic frames are ever captured.
+  const mute = ctx.createGain();
+  mute.gain.value = 0;
+  worklet.connect(mute);
+  mute.connect(ctx.destination);
 
   // Batch worklet chunks into ~100ms frames before shipping.
   let pending = new Int16Array(0);
@@ -159,6 +166,7 @@ export async function startSimulatorAudio(
     try {
       source.disconnect();
       worklet.disconnect();
+      mute.disconnect();
     } catch {
       // already disconnected
     }
