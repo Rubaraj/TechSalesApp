@@ -242,15 +242,15 @@ export function ScreeningAssistantModal({ isOpen, onClose }: ScreeningAssistantM
             <div className="space-y-2.5">
               <ToggleRow
                 id="screening-create-lead"
-                label="Take details and save the lead during the call"
-                hint="Asks for the details a lead record needs, opens the lead screen so you can watch it fill in, and saves it before the call ends."
+                label="Can save the lead during the call"
+                hint="Lets the assistant open the lead screen and write the record while you watch. Off means it can't — it still takes the details, but the lead is only created when the call ends."
                 checked={createLeadLive}
                 onChange={setCreateLeadLive}
               />
               <ToggleRow
                 id="screening-offer-plans"
-                label="Mention what plans are available"
-                hint="After saving, asks whether the caller wants to hear what's in their area and looks it up. It states facts only — never recommends a plan."
+                label="Can look up available plans"
+                hint="Lets the assistant search plans for the caller's area and state what it finds — facts only, never a recommendation. Off means it can't look them up at all, even if your playbook asks it to."
                 checked={offerPlans}
                 onChange={setOfferPlans}
               />
@@ -269,8 +269,10 @@ export function ScreeningAssistantModal({ isOpen, onClose }: ScreeningAssistantM
                 onChange={(e) => setInstructions(e.target.value)}
               />
               <p className={hintClass}>
-                What the assistant asks and in what order. Edit freely — this is the script it
-                follows on every screened call.
+                The whole flow of the call — what the assistant asks, and in what order. Edit any
+                step or add your own; whatever is here is exactly what it follows. Use{' '}
+                <span className="font-medium">Reset to default</span> to start from the shipped
+                flow again.
               </p>
             </div>
           </>

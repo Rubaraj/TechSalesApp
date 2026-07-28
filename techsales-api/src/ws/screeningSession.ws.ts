@@ -52,6 +52,8 @@ interface BridgeCtx {
   agentUserId: string | null;
   /** Persona toggle — drive the browser + save the lead during the call. */
   createLeadLive: boolean;
+  /** Persona toggle — plan lookups are available. */
+  offerPlans: boolean;
   twilioWs: WebSocket;
   dgWs: WebSocket | null;
   dgReady: boolean;
@@ -114,8 +116,16 @@ function buildSettings(
           knownLead,
         }),
         // Client-side function calling (no endpoint ⇒ DG sends
-        // FunctionCallRequest over this socket) — the Atlas tool set.
-        ...(env.SCREENING_TOOLS_ENABLED ? { functions: buildScreeningFunctionDefs() } : {}),
+        // FunctionCallRequest over this socket). Gated by the persona, so a
+        // switched-off capability is never offered to the model at all.
+        ...(env.SCREENING_TOOLS_ENABLED
+          ? {
+              functions: buildScreeningFunctionDefs({
+                canSaveLead: persona?.createLeadLive ?? true,
+                canSearchPlans: persona?.offerPlans ?? true,
+              }),
+            }
+          : {}),
       },
       speak: { provider: { type: 'deepgram', model: voice } },
     },
@@ -231,6 +241,7 @@ function openDeepgram(
             callSid: ctx.callSid,
             agentUserId: ctx.agentUserId,
             createLeadLive: ctx.createLeadLive,
+            offerPlans: ctx.offerPlans,
           })
             .then(respond)
             .catch((err: unknown) => {
@@ -283,6 +294,7 @@ function handleConnection(ws: WebSocket): void {
     streamSid: null,
     agentUserId: null,
     createLeadLive: true,
+    offerPlans: true,
     twilioWs: ws,
     dgWs: null,
     dgReady: false,
@@ -330,6 +342,7 @@ function handleConnection(ws: WebSocket): void {
             : Promise.resolve(null),
         ]).then(([name, persona, lead]) => {
           ctx.createLeadLive = persona?.createLeadLive ?? true;
+          ctx.offerPlans = persona?.offerPlans ?? true;
           const knownLead: KnownLeadContext | null = lead
             ? {
                 leadId: lead.leadId,

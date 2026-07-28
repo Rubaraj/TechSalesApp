@@ -232,11 +232,20 @@ export function stopCallAnalysisByCallSid(callSid: string): void {
   // from the accumulated entities; fire-and-forget, never blocks teardown.
   const screening = consumeScreening(callSid);
   if (screening?.leadId) {
-    // The assistant already saved this caller's lead mid-call — finalize it
-    // with only the notes captured AFTER that save, instead of writing a
-    // second lead (or repeating lines the save already persisted). Applies
-    // even after a takeover: the lead is real by then.
-    void finalizeScreeningLead(screening.leadId, unwrittenNotes(screening));
+    // The assistant already saved this caller's lead mid-call. Sweep the
+    // final entity snapshot onto it so anything captured AFTER that save —
+    // a medication, a pharmacy — still lands, and append only the notes
+    // that save didn't already persist. Applies even after a takeover: the
+    // lead is real by then.
+    const callerNumber = callerNumbers.get(callSid);
+    void finalizeScreeningLead({
+      leadId: screening.leadId,
+      agentUserId: screening.agentUserId,
+      callSid,
+      entities: accumulators.get(callSid) ?? emptyExtractedEntities(),
+      ...(callerNumber ? { callerNumber } : {}),
+      noteLines: unwrittenNotes(screening),
+    });
   } else if (screening && !screening.takenOver) {
     const entitiesSnapshot = accumulators.get(callSid) ?? emptyExtractedEntities();
     const callerNumber = callerNumbers.get(callSid);

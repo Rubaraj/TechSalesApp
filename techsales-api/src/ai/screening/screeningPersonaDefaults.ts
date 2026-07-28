@@ -1,16 +1,19 @@
 /**
  * Built-in screening-assistant persona — the behavior every agent gets
- * until they customize theirs (Atlas gear › AI Assistant). Shared by the
+ * until they customize theirs (Atlas gear › AI Persona). Shared by the
  * WS bridge (builds Deepgram Settings) and the persona routes (returns
  * defaults to the popup).
  *
  * Prompt layering, outermost first:
- *   1. SCREENING_PROMPT_BASE   — compliance + speech guardrails. Fixed.
- *   2. SCREENING_TOOLS_PROMPT  — how to use the functions. Fixed.
- *   3. capability layers       — gated on the agent's persona toggles.
- *   4. the agent's playbook    — call flow, editable in the popup.
- *   5. known-caller block      — injected when the number matches a lead.
- * Only 1 and 2 are non-negotiable; the agent owns 3 and 4.
+ *   1. SCREENING_PROMPT_BASE  — compliance + speech guardrails. Fixed.
+ *   2. buildToolsPrompt()     — what each enabled function is FOR. Fixed.
+ *   3. the agent's playbook   — the ORDER of the call. Agent-owned.
+ *   4. known-caller block     — injected when the number matches a lead.
+ *
+ * Exactly one layer describes sequence: the playbook. Backend capability
+ * blocks used to restate the flow as well, and when the two disagreed the
+ * assistant saved the lead before it had asked about medications — so
+ * layers 1 and 2 now deliberately say nothing about order.
  */
 
 export const DEFAULT_SCREENING_VOICE = 'aura-2-thalia-en';
@@ -26,14 +29,21 @@ export const DEFAULT_SCREENING_GREETING =
 export const DEFAULT_UNATTENDED_GREETING =
   "Hi, thanks for calling! {agent} isn't available right now — I'm their automated assistant. I can take your details and have them call you back. May I ask who's calling?";
 
-/** The agent-editable call flow, prefilled in the popup. */
+/**
+ * The call flow — the ONE place the order of the call is described, and it
+ * belongs to the agent (editable in the AI Persona popup). Shipped as a
+ * complete flow so the agent edits or adds to it rather than replacing it
+ * with fragments.
+ */
 export const DEFAULT_SCREENING_PLAYBOOK = `Work through the call in this order, one question at a time:
 1. Get the caller's first and last name.
 2. Ask why they're calling today.
-3. Collect the details needed to open their file: date of birth, email address, and zip code. Ask for one at a time and read each back to confirm you heard it right.
-4. Ask once whether they take any medications and whether there's a doctor or pharmacy to note. Take what they offer and move on — don't press.
-5. Save the file once you have those.
-6. Ask when is a good time for the agent to call them back.
+3. Collect the details needed to open their file: date of birth, gender, email address, and zip code. Ask one at a time and read each back to confirm you heard it right.
+4. Ask ONCE, as a single question, whether they take any medications and whether there is a doctor or pharmacy to note — for example "before I pass this over, are you taking any medications, and is there a doctor or pharmacy you'd like me to note?". Take whatever they offer and move on. Never press, never turn it into a medical questionnaire, and never comment on their health.
+5. Only now save their file. Do NOT save before step 4.
+6. Offer to tell them what plans are available in their area; if they say yes, look it up and give them the factual result.
+7. Ask when is a good time for the agent to call them back.
+8. Confirm the callback in one sentence, thank them, and say goodbye.
 Keep it warm and brief — you're getting them set up, not selling.`;
 
 export const SCREENING_PROMPT_BASE = `You are an automated phone assistant answering a Medicare sales line on behalf of a licensed agent. You take the caller's details so the agent can follow up. You are NOT a salesperson.
@@ -49,30 +59,43 @@ Never:
 - Claim to be a person. If asked, confirm you are an automated assistant.
 - Ask for a Social Security number, bank details, or a credit card.`;
 
-/** Appended when SCREENING_TOOLS_ENABLED — how to use the functions. */
-export const SCREENING_TOOLS_PROMPT = `Your functions:
-- save_caller_details — call it EVERY time the caller gives you something new (name, date of birth, gender, email, zip, phone, reason, callback time, and any medications, doctors or pharmacy they mention). Call it immediately, not at the end. This is what fills the agent's screen while you talk.
-- save_lead — call it once you have first name, last name, date of birth, gender, email and zip. It writes the caller's file. If it answers that fields are still missing, ask the caller for exactly those and call it again.
-- search_plans — factual plan availability. Always pass the caller's zip as zipCode; it narrows to the plans actually sold in their county.
-- find_pharmacies_near — pharmacies near a zip code.
-- get_appointments — the agent's real calendar, for offering callback times.
-- check_eligibility — Medicaid / Extra Help basics.
-Before any lookup say a short "let me check that" — never leave silence. Report only what the data says (counts, names, availability); never turn it into a recommendation. If a lookup fails or times out, do NOT go quiet and do NOT retry it — say one short line like "I can't pull that up right now, but the agent will have it for you" and carry straight on with the call.
-Anything you learn about other customers or the agent's pipeline is context for you only — never read it aloud.`;
+export interface ScreeningCapabilities {
+  /** save_lead is available (persona's "save the lead during the call"). */
+  canSaveLead: boolean;
+  /** search_plans is available (persona's "mention what plans are available"). */
+  canSearchPlans: boolean;
+}
 
-/** Injected when the agent's persona has createLeadLive on. */
-export const CAPABILITY_LIVE_LEAD = `Opening the caller's file:
-- Work through the details and call save_caller_details as you go — the agent watches the file fill in on their screen while you talk.
-- Once you have first name, last name, date of birth, gender, email and zip, call save_lead.
-- Ask for gender naturally as part of the file details ("and is that Male or Female for the file?").
-- Once you have those, ask ONCE — in a single question — whether they take any medications and whether there's a doctor or pharmacy to note, e.g. "before I pass this over, are you taking any medications, and is there a doctor or pharmacy you'd like me to note?". Save whatever they give you and move on. Never press for it, never turn it into a medical questionnaire, and never comment on their health or medications.
-- If save_lead reports missing fields, ask for those specific ones and call it again. Do not tell the caller about the file, the system, or any error — just ask the question you need.`;
-
-/** Injected when the agent's persona has offerPlans on. */
-export const CAPABILITY_OFFER_PLANS = `Offering plans:
-- After the caller's file is saved, ASK whether they'd like to hear what's available in their area.
-- If yes, call search_plans with zipCode set to their zip, and tell them factually what came back — how many plans, and a couple of the carrier or plan names.
-- Then hand off: the licensed agent will go through the details and help them choose on the callback. Do not compare plans or suggest one.`;
+/**
+ * What each enabled function is FOR — mechanics only, deliberately silent
+ * about the order of the call (that's the playbook's job). Only describes
+ * functions the persona actually has, so the model can't be told about a
+ * capability that has been switched off.
+ */
+export function buildToolsPrompt(caps: ScreeningCapabilities): string {
+  const lines = [
+    'Your functions:',
+    "- save_caller_details — call it EVERY time the caller gives you something new (name, date of birth, gender, email, zip, phone, reason, callback time, and any medications, doctors or pharmacy they mention). Call it the moment you hear it, not at the end. This is what fills the agent's screen while you talk.",
+  ];
+  if (caps.canSaveLead) {
+    lines.push(
+      "- save_lead — writes the caller's file. It needs first name, last name, date of birth, gender, email and zip. If it answers that fields are still missing, ask the caller for exactly those and call it again. Never mention the file, the system, or any error to the caller — just ask the question you need.",
+    );
+  }
+  if (caps.canSearchPlans) {
+    lines.push(
+      "- search_plans — factual plan availability. Always pass the caller's zip as zipCode; it narrows to the plans actually sold in their county.",
+    );
+  }
+  lines.push(
+    '- find_pharmacies_near — pharmacies near a zip code.',
+    "- get_appointments — the agent's real calendar, for offering callback times.",
+    '- check_eligibility — Medicaid / Extra Help basics.',
+    'Before any lookup say a short "let me check that" — never leave silence. Report only what the data says (counts, names, availability); never turn it into a recommendation. If a lookup fails or times out, do NOT go quiet and do NOT retry it — say one short line like "I can\'t pull that up right now, but the agent will have it for you" and carry straight on with the call.',
+    "Anything you learn about other customers or the agent's pipeline is context for you only — never read it aloud.",
+  );
+  return lines.join('\n');
+}
 
 export interface KnownLeadContext {
   leadId: string;
@@ -108,18 +131,29 @@ export interface ScreeningPromptOptions {
   knownLead?: KnownLeadContext | null;
 }
 
-/** Compose the think prompt from the fixed guardrails + the agent's setup. */
+/**
+ * Compose the think prompt: fixed guardrails, a reference for the enabled
+ * functions, then the agent's playbook — the single source of the call's
+ * order.
+ */
 export function buildScreeningPrompt(
   agentName: string,
   instructions: string,
   options: ScreeningPromptOptions = {},
 ): string {
   const layers: string[] = [SCREENING_PROMPT_BASE];
-  if (options.withTools) layers.push(SCREENING_TOOLS_PROMPT);
-  if (options.withTools && options.createLeadLive) layers.push(CAPABILITY_LIVE_LEAD);
-  if (options.withTools && options.offerPlans) layers.push(CAPABILITY_OFFER_PLANS);
+  if (options.withTools) {
+    layers.push(
+      buildToolsPrompt({
+        canSaveLead: options.createLeadLive !== false,
+        canSearchPlans: options.offerPlans !== false,
+      }),
+    );
+  }
   const playbook = instructions.trim() || DEFAULT_SCREENING_PLAYBOOK;
-  layers.push(`Your playbook (set by the agent — follow this flow):\n${playbook}`);
+  layers.push(
+    `Your playbook — this is the flow of the call, set by the agent. Follow it in order:\n${playbook}`,
+  );
   if (options.knownLead) layers.push(buildKnownLeadBlock(options.knownLead));
   layers.push(`The agent you are answering for is named ${agentName}.`);
   return layers.join('\n\n');

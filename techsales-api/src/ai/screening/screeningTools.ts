@@ -33,6 +33,7 @@ import {
 } from '../agents/callAnalysisAgent.js';
 import { appendScreeningNote, getScreening, claimScreeningNavigation } from './screeningState.js';
 import { saveScreeningLead } from './liveLead.js';
+import type { ScreeningCapabilities } from './screeningPersonaDefaults.js';
 import type { ExtractedEntities } from '../types/call.types.js';
 
 export interface ScreeningToolContext {
@@ -40,6 +41,8 @@ export interface ScreeningToolContext {
   agentUserId: string;
   /** Persona toggle — drive the agent's browser + save the lead mid-call. */
   createLeadLive?: boolean;
+  /** Persona toggle — plan lookups are available. */
+  offerPlans?: boolean;
 }
 
 /** Shape Deepgram expects in `agent.think.functions[]` (no `endpoint` ⇒
@@ -194,15 +197,36 @@ const SAVE_LEAD_DEF: ScreeningFunctionDef = {
   parameters: { type: 'object', properties: {} },
 };
 
-let cachedDefs: ScreeningFunctionDef[] | null = null;
+/** Converted Atlas defs — the zod→JSON Schema work is the expensive part,
+ *  and it doesn't vary by persona, so it's cached once and filtered below. */
+let cachedAtlasDefs: ScreeningFunctionDef[] | null = null;
 
-/** All function defs sent to Deepgram in Settings. Built once — the
- *  schemas are static module singletons. */
-export function buildScreeningFunctionDefs(): ScreeningFunctionDef[] {
-  if (cachedDefs) return cachedDefs;
-  cachedDefs = [...TOOL_MAP.values()].map(toFunctionDef);
-  cachedDefs.push(SAVE_CALLER_DETAILS_DEF, SAVE_LEAD_DEF);
-  return cachedDefs;
+/**
+ * The function defs sent to Deepgram in Settings, gated by the persona's
+ * capabilities. A switched-off capability is WITHHELD, not merely
+ * discouraged in the prompt — the model can't call what it isn't given.
+ */
+export function buildScreeningFunctionDefs(
+  caps: ScreeningCapabilities = { canSaveLead: true, canSearchPlans: true },
+): ScreeningFunctionDef[] {
+  if (!cachedAtlasDefs) cachedAtlasDefs = [...TOOL_MAP.values()].map(toFunctionDef);
+  const defs = cachedAtlasDefs.filter(
+    (d) => caps.canSearchPlans || !PLAN_FUNCTIONS.has(d.name),
+  );
+  defs.push(SAVE_CALLER_DETAILS_DEF);
+  if (caps.canSaveLead) defs.push(SAVE_LEAD_DEF);
+  return defs;
+}
+
+/** Withheld when the persona's "mention what plans are available" is off. */
+const PLAN_FUNCTIONS = new Set(['search_plans', 'compare_plans']);
+
+/** Is this function available to the given persona? Mirrors the gating above
+ *  so a stale or hallucinated call can't slip past it. */
+function isFunctionAllowed(name: string, caps: ScreeningCapabilities): boolean {
+  if (name === SAVE_LEAD) return caps.canSaveLead;
+  if (PLAN_FUNCTIONS.has(name)) return caps.canSearchPlans;
+  return true;
 }
 
 /** One-line args summary for the live info card (never the full payload). */
@@ -385,6 +409,15 @@ export async function executeScreeningFunction(
     args = parsed !== null && typeof parsed === 'object' ? (parsed as Record<string, unknown>) : {};
   } catch {
     return JSON.stringify({ error: 'Malformed function arguments' });
+  }
+
+  const caps: ScreeningCapabilities = {
+    canSaveLead: ctx.createLeadLive !== false,
+    canSearchPlans: ctx.offerPlans !== false,
+  };
+  if (!isFunctionAllowed(name, caps)) {
+    logger.warn({ callSid: ctx.callSid, name }, 'screening: function disabled for this persona');
+    return JSON.stringify({ error: 'That is not available on this call.' });
   }
 
   try {

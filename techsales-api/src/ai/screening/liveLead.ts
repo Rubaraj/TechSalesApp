@@ -210,8 +210,13 @@ export async function saveScreeningLead(
       return { saved: false, missing: ['a phone number we can reach you on'] };
     }
 
-    const missing = REQUIRED_FIELDS.filter((f) => !entities[f]).map((f) => FIELD_LABELS[f]);
-    if (missing.length > 0) return { saved: false, missing };
+    // The required set gates CREATING a record. When we already have one
+    // (a later save in the same call, or the teardown sweep) we're only
+    // enriching, so a field the caller never gave must not abort the write.
+    if (!input.existingLeadId) {
+      const missing = REQUIRED_FIELDS.filter((f) => !entities[f]).map((f) => FIELD_LABELS[f]);
+      if (missing.length > 0) return { saved: false, missing };
+    }
 
     const zip = entities.zipCode ?? '';
     const geo = zip ? await resolveZipGeo(zip) : null;
@@ -340,23 +345,35 @@ function publishLeadSaved(callSid: string, leadId: string, created: boolean): vo
 }
 
 /**
- * Teardown — finalize a lead written during the call. Appends the
- * post-call note lines; never creates (that's `createLeadFromScreening`'s
- * job when no live lead exists).
+ * Teardown sweep for a lead written during the call.
+ *
+ * Anything the caller mentioned AFTER `save_lead` — a medication, their
+ * pharmacy, a doctor — is only in the entity accumulator, and the tagging
+ * that would put it on the record runs inside `saveScreeningLead`. So this
+ * simply runs that enrich path once more against the final snapshot rather
+ * than re-implementing it: catalog tagging, blank-filling and note append
+ * all come along, and existing tags are deduped.
+ *
+ * Never creates — `existingLeadId` guarantees the enrich branch.
  */
-export async function finalizeScreeningLead(
-  leadId: string,
-  noteLines: string[],
-): Promise<void> {
-  if (noteLines.length === 0) return;
+export async function finalizeScreeningLead(input: {
+  leadId: string;
+  agentUserId: string;
+  callSid: string;
+  entities: ExtractedEntities;
+  callerNumber?: string;
+  noteLines: string[];
+}): Promise<void> {
   try {
-    const existing = await repos.lead.findById(leadId);
-    if (!existing) return;
-    await repos.lead.update(leadId, {
-      notes: [existing.notes, noteLines.join('\n')].filter(Boolean).join('\n'),
-      updatedBy: 'AI-SCREENING',
+    await saveScreeningLead({
+      callSid: input.callSid,
+      agentUserId: input.agentUserId,
+      entities: input.entities,
+      existingLeadId: input.leadId,
+      ...(input.callerNumber ? { callerNumber: input.callerNumber } : {}),
+      ...(input.noteLines.length > 0 ? { noteLines: input.noteLines } : {}),
     });
   } catch (err) {
-    logger.error({ err, leadId }, 'screening lead: finalize failed');
+    logger.error({ err, leadId: input.leadId }, 'screening lead: finalize failed');
   }
 }
