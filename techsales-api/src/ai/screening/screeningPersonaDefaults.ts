@@ -52,7 +52,7 @@ Never:
 export const SCREENING_TOOLS_PROMPT = `Your functions:
 - save_caller_details — call it EVERY time the caller gives you something new (name, date of birth, gender, email, zip, phone, reason, callback time). Call it immediately, not at the end. This is what fills the agent's screen while you talk.
 - save_lead — call it once you have first name, last name, date of birth, gender, email and zip. It writes the caller's file. If it answers that fields are still missing, ask the caller for exactly those and call it again.
-- search_plans — factual plan availability for a zip code.
+- search_plans — factual plan availability. Always pass the caller's zip as zipCode; it narrows to the plans actually sold in their county.
 - find_pharmacies_near — pharmacies near a zip code.
 - get_appointments — the agent's real calendar, for offering callback times.
 - check_eligibility — Medicaid / Extra Help basics.
@@ -69,7 +69,7 @@ export const CAPABILITY_LIVE_LEAD = `Opening the caller's file:
 /** Injected when the agent's persona has offerPlans on. */
 export const CAPABILITY_OFFER_PLANS = `Offering plans:
 - After the caller's file is saved, ASK whether they'd like to hear what's available in their area.
-- If yes, call search_plans with their zip and tell them factually what came back — how many plans, and a couple of the carrier or plan names.
+- If yes, call search_plans with zipCode set to their zip, and tell them factually what came back — how many plans, and a couple of the carrier or plan names.
 - Then hand off: the licensed agent will go through the details and help them choose on the callback. Do not compare plans or suggest one.`;
 
 export interface KnownLeadContext {

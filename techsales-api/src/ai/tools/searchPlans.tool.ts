@@ -8,10 +8,45 @@
  * LangChain ReAct agents pass tool outputs back as text, and a stable
  * machine-readable JSON envelope makes it easy for Claude to summarize.
  */
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
 import { tool } from '@langchain/core/tools';
 import { z } from 'zod';
 import { hybridSearch, type HybridFilter } from '../vectorstore/hybridRetriever.js';
 import type { PlanPayload } from '../vectorstore/collections.js';
+import { BOOTSTRAP_PATHS } from '../../utils/bootstrap.js';
+
+interface ZipArea {
+  stateAbbr: string;
+  county: string;
+  state: string;
+  city: string;
+}
+
+/** zip → area, loaded once (same module-cache pattern as findPharmaciesNear). */
+let zipIndex: Map<string, ZipArea> | null = null;
+async function resolveZipArea(zipCode: string): Promise<ZipArea | null> {
+  if (!zipIndex) {
+    try {
+      const raw = await readFile(
+        path.join(BOOTSTRAP_PATHS.lookupDir, 'zipStateCounty.json'),
+        'utf8',
+      );
+      const rows = JSON.parse(raw) as Array<
+        { zipCode: string; stateAbbr: string; county: string; state: string; city: string }
+      >;
+      zipIndex = new Map(
+        rows.map((r) => [
+          r.zipCode,
+          { stateAbbr: r.stateAbbr, county: r.county, state: r.state, city: r.city },
+        ]),
+      );
+    } catch {
+      zipIndex = new Map();
+    }
+  }
+  return zipIndex.get(zipCode) ?? null;
+}
 
 const inputSchema = z.object({
   query: z
@@ -19,11 +54,18 @@ const inputSchema = z.object({
     .min(1)
     .describe('Natural-language description of what the user wants in a plan.'),
   topK: z.number().int().min(1).max(20).default(5),
+  zipCode: z
+    .string()
+    .regex(/^\d{5}$/)
+    .optional()
+    .describe(
+      "The caller's 5-digit zip code. Preferred over `state` — it narrows to the plans actually sold in their county.",
+    ),
   state: z
     .string()
     .length(2)
     .optional()
-    .describe('Two-letter US state filter (e.g. "FL", "CA").'),
+    .describe('Two-letter US state filter (e.g. "FL", "CA"). Ignored when zipCode is given.'),
   carrier: z
     .string()
     .optional()
@@ -70,7 +112,15 @@ function buildRationale(payload: PlanPayload, sources: { vector?: number; bm25?:
 export const searchPlansTool = tool(
   async (input: ToolInput): Promise<string> => {
     const filter: HybridFilter = {};
-    if (input.state) filter.states = input.state.toUpperCase();
+    // A zip is what callers actually give us; it resolves to the county the
+    // plan has to serve. Falls back to the state filter when the zip isn't in
+    // the lookup, so an unknown zip degrades instead of returning nothing.
+    const area = input.zipCode ? await resolveZipArea(input.zipCode) : null;
+    if (area) {
+      filter.counties = `${area.stateAbbr}/${area.county}`;
+    } else if (input.state) {
+      filter.states = input.state.toUpperCase();
+    }
     if (input.carrier) filter.carrier = input.carrier;
     if (input.planType) filter.planType = input.planType;
 

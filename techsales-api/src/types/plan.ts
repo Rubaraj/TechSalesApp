@@ -6,6 +6,14 @@ export interface PlanDocument {
   documentDate?: string;
 }
 
+/** Where a plan is actually sold. Counties are drawn from the zip lookup, so
+ *  every county named here resolves from at least one caller zip code. */
+export interface PlanServiceArea {
+  state: string;
+  stateAbbr: string;
+  counties: string[];
+}
+
 export interface Plan {
   planId: string;
   contractYear: number;
@@ -20,6 +28,9 @@ export interface Plan {
   planStatus: 'Active' | 'Inactive' | 'Renewal' | 'New Plan';
   market: string;
   region: string;
+  /** County-level availability. A caller's zip resolves to state + county via
+   *  `zipStateCounty`, which is then matched against these. */
+  serviceAreas?: PlanServiceArea[];
   legalEntity: string;
   marketingName: string;
   minAge?: number;

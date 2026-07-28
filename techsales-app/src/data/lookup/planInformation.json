@@ -13,6 +13,15 @@
     "planStatus": "Active",
     "market": "Northeast",
     "region": "New England",
+    "serviceAreas": [
+      {
+        "state": "Connecticut",
+        "stateAbbr": "CT",
+        "counties": [
+          "Fairfield"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Life Insurance Company",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -64,6 +73,15 @@
     "planStatus": "Active",
     "market": "Northeast",
     "region": "New England",
+    "serviceAreas": [
+      {
+        "state": "Connecticut",
+        "stateAbbr": "CT",
+        "counties": [
+          "Fairfield"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Life Insurance Company",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -115,6 +133,15 @@
     "planStatus": "Active",
     "market": "Northeast",
     "region": "New York",
+    "serviceAreas": [
+      {
+        "state": "New York",
+        "stateAbbr": "NY",
+        "counties": [
+          "New York"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Life Insurance Company",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -166,6 +193,15 @@
     "planStatus": "Active",
     "market": "Southeast",
     "region": "Florida",
+    "serviceAreas": [
+      {
+        "state": "Florida",
+        "stateAbbr": "FL",
+        "counties": [
+          "Miami-Dade"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Health Inc. (FL)",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -203,6 +239,15 @@
     "planStatus": "Active",
     "market": "Southeast",
     "region": "Florida",
+    "serviceAreas": [
+      {
+        "state": "Florida",
+        "stateAbbr": "FL",
+        "counties": [
+          "Miami-Dade"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Health Inc. (FL)",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -247,6 +292,15 @@
     "planStatus": "Active",
     "market": "Northeast",
     "region": "Keystone",
+    "serviceAreas": [
+      {
+        "state": "Pennsylvania",
+        "stateAbbr": "PA",
+        "counties": [
+          "Philadelphia"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Health Inc. (PA)",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -284,6 +338,15 @@
     "planStatus": "Active",
     "market": "Northeast",
     "region": "Keystone",
+    "serviceAreas": [
+      {
+        "state": "Pennsylvania",
+        "stateAbbr": "PA",
+        "counties": [
+          "Philadelphia"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Health Inc. (PA)",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -321,6 +384,15 @@
     "planStatus": "Active",
     "market": "Midwest",
     "region": "Heartland",
+    "serviceAreas": [
+      {
+        "state": "Illinois",
+        "stateAbbr": "IL",
+        "counties": [
+          "Cook"
+        ]
+      }
+    ],
     "legalEntity": "Coventry Health Care of Missouri",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -358,6 +430,15 @@
     "planStatus": "Active",
     "market": "Midwest",
     "region": "Heartland",
+    "serviceAreas": [
+      {
+        "state": "Illinois",
+        "stateAbbr": "IL",
+        "counties": [
+          "Cook"
+        ]
+      }
+    ],
     "legalEntity": "Coventry Health Care of Missouri",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -402,6 +483,17 @@
     "planStatus": "Active",
     "market": "Southwest",
     "region": "South Central",
+    "serviceAreas": [
+      {
+        "state": "Texas",
+        "stateAbbr": "TX",
+        "counties": [
+          "Collin",
+          "Dallas",
+          "Harris"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Health and Life Insurance Company",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -453,6 +545,17 @@
     "planStatus": "Active",
     "market": "Southwest",
     "region": "South Central",
+    "serviceAreas": [
+      {
+        "state": "Texas",
+        "stateAbbr": "TX",
+        "counties": [
+          "Collin",
+          "Dallas",
+          "Harris"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Health Inc. (TX)",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -490,6 +593,17 @@
     "planStatus": "Active",
     "market": "Southwest",
     "region": "South Central",
+    "serviceAreas": [
+      {
+        "state": "Texas",
+        "stateAbbr": "TX",
+        "counties": [
+          "Collin",
+          "Dallas",
+          "Harris"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Health Inc. (TX)",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -534,6 +648,15 @@
     "planStatus": "Active",
     "market": "Southeast",
     "region": "Florida",
+    "serviceAreas": [
+      {
+        "state": "Florida",
+        "stateAbbr": "FL",
+        "counties": [
+          "Miami-Dade"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Health Inc. (FL)",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -578,6 +701,15 @@
     "planStatus": "Active",
     "market": "Northeast",
     "region": "New York",
+    "serviceAreas": [
+      {
+        "state": "New York",
+        "stateAbbr": "NY",
+        "counties": [
+          "New York"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Health Inc. (NY)",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -629,6 +761,15 @@
     "planStatus": "Active",
     "market": "Northeast",
     "region": "New York",
+    "serviceAreas": [
+      {
+        "state": "New York",
+        "stateAbbr": "NY",
+        "counties": [
+          "New York"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Health Inc. (NY)",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -680,6 +821,15 @@
     "planStatus": "Active",
     "market": "Northeast",
     "region": "Keystone",
+    "serviceAreas": [
+      {
+        "state": "Pennsylvania",
+        "stateAbbr": "PA",
+        "counties": [
+          "Philadelphia"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Life Insurance Company",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -717,6 +867,15 @@
     "planStatus": "Active",
     "market": "West",
     "region": "California",
+    "serviceAreas": [
+      {
+        "state": "California",
+        "stateAbbr": "CA",
+        "counties": [
+          "Los Angeles"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Better Health of California",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -761,6 +920,15 @@
     "planStatus": "Active",
     "market": "West",
     "region": "Arizona",
+    "serviceAreas": [
+      {
+        "state": "Arizona",
+        "stateAbbr": "AZ",
+        "counties": [
+          "Maricopa"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Health of Arizona",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -805,6 +973,15 @@
     "planStatus": "Active",
     "market": "West",
     "region": "Arizona",
+    "serviceAreas": [
+      {
+        "state": "Arizona",
+        "stateAbbr": "AZ",
+        "counties": [
+          "Maricopa"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Health of Arizona",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -849,6 +1026,15 @@
     "planStatus": "Active",
     "market": "Midwest",
     "region": "Great Lakes",
+    "serviceAreas": [
+      {
+        "state": "Illinois",
+        "stateAbbr": "IL",
+        "counties": [
+          "Cook"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Health Inc.",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -900,6 +1086,15 @@
     "planStatus": "Active",
     "market": "Midwest",
     "region": "Great Lakes",
+    "serviceAreas": [
+      {
+        "state": "Illinois",
+        "stateAbbr": "IL",
+        "counties": [
+          "Cook"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Health Inc.",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -951,6 +1146,15 @@
     "planStatus": "Active",
     "market": "Northeast",
     "region": "Keystone",
+    "serviceAreas": [
+      {
+        "state": "Pennsylvania",
+        "stateAbbr": "PA",
+        "counties": [
+          "Philadelphia"
+        ]
+      }
+    ],
     "legalEntity": "Coventry Health Care of West Virginia",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -988,6 +1192,15 @@
     "planStatus": "Active",
     "market": "Southeast",
     "region": "Georgia/Gulf States",
+    "serviceAreas": [
+      {
+        "state": "Georgia",
+        "stateAbbr": "GA",
+        "counties": [
+          "Fulton"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Life Insurance Company",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -1039,6 +1252,15 @@
     "planStatus": "Active",
     "market": "Midwest",
     "region": "Ohio/Kentucky",
+    "serviceAreas": [
+      {
+        "state": "Kentucky",
+        "stateAbbr": "KY",
+        "counties": [
+          "Jefferson"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Life Insurance Company",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -1090,6 +1312,22 @@
     "planStatus": "Active",
     "market": "Southeast",
     "region": "Mid South",
+    "serviceAreas": [
+      {
+        "state": "Florida",
+        "stateAbbr": "FL",
+        "counties": [
+          "Miami-Dade"
+        ]
+      },
+      {
+        "state": "Georgia",
+        "stateAbbr": "GA",
+        "counties": [
+          "Fulton"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Life Insurance Company",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -1127,6 +1365,80 @@
     "planStatus": "Active",
     "market": "National",
     "region": "PDP",
+    "serviceAreas": [
+      {
+        "state": "Arizona",
+        "stateAbbr": "AZ",
+        "counties": [
+          "Maricopa"
+        ]
+      },
+      {
+        "state": "California",
+        "stateAbbr": "CA",
+        "counties": [
+          "Los Angeles"
+        ]
+      },
+      {
+        "state": "Connecticut",
+        "stateAbbr": "CT",
+        "counties": [
+          "Fairfield"
+        ]
+      },
+      {
+        "state": "Florida",
+        "stateAbbr": "FL",
+        "counties": [
+          "Miami-Dade"
+        ]
+      },
+      {
+        "state": "Georgia",
+        "stateAbbr": "GA",
+        "counties": [
+          "Fulton"
+        ]
+      },
+      {
+        "state": "Illinois",
+        "stateAbbr": "IL",
+        "counties": [
+          "Cook"
+        ]
+      },
+      {
+        "state": "Kentucky",
+        "stateAbbr": "KY",
+        "counties": [
+          "Jefferson"
+        ]
+      },
+      {
+        "state": "New York",
+        "stateAbbr": "NY",
+        "counties": [
+          "New York"
+        ]
+      },
+      {
+        "state": "Pennsylvania",
+        "stateAbbr": "PA",
+        "counties": [
+          "Philadelphia"
+        ]
+      },
+      {
+        "state": "Texas",
+        "stateAbbr": "TX",
+        "counties": [
+          "Collin",
+          "Dallas",
+          "Harris"
+        ]
+      }
+    ],
     "legalEntity": "SilverScript Insurance Company",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -1178,6 +1490,80 @@
     "planStatus": "Active",
     "market": "National",
     "region": "PDP",
+    "serviceAreas": [
+      {
+        "state": "Arizona",
+        "stateAbbr": "AZ",
+        "counties": [
+          "Maricopa"
+        ]
+      },
+      {
+        "state": "California",
+        "stateAbbr": "CA",
+        "counties": [
+          "Los Angeles"
+        ]
+      },
+      {
+        "state": "Connecticut",
+        "stateAbbr": "CT",
+        "counties": [
+          "Fairfield"
+        ]
+      },
+      {
+        "state": "Florida",
+        "stateAbbr": "FL",
+        "counties": [
+          "Miami-Dade"
+        ]
+      },
+      {
+        "state": "Georgia",
+        "stateAbbr": "GA",
+        "counties": [
+          "Fulton"
+        ]
+      },
+      {
+        "state": "Illinois",
+        "stateAbbr": "IL",
+        "counties": [
+          "Cook"
+        ]
+      },
+      {
+        "state": "Kentucky",
+        "stateAbbr": "KY",
+        "counties": [
+          "Jefferson"
+        ]
+      },
+      {
+        "state": "New York",
+        "stateAbbr": "NY",
+        "counties": [
+          "New York"
+        ]
+      },
+      {
+        "state": "Pennsylvania",
+        "stateAbbr": "PA",
+        "counties": [
+          "Philadelphia"
+        ]
+      },
+      {
+        "state": "Texas",
+        "stateAbbr": "TX",
+        "counties": [
+          "Collin",
+          "Dallas",
+          "Harris"
+        ]
+      }
+    ],
     "legalEntity": "SilverScript Insurance Company",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -1229,6 +1615,80 @@
     "planStatus": "Active",
     "market": "National",
     "region": "PDP",
+    "serviceAreas": [
+      {
+        "state": "Arizona",
+        "stateAbbr": "AZ",
+        "counties": [
+          "Maricopa"
+        ]
+      },
+      {
+        "state": "California",
+        "stateAbbr": "CA",
+        "counties": [
+          "Los Angeles"
+        ]
+      },
+      {
+        "state": "Connecticut",
+        "stateAbbr": "CT",
+        "counties": [
+          "Fairfield"
+        ]
+      },
+      {
+        "state": "Florida",
+        "stateAbbr": "FL",
+        "counties": [
+          "Miami-Dade"
+        ]
+      },
+      {
+        "state": "Georgia",
+        "stateAbbr": "GA",
+        "counties": [
+          "Fulton"
+        ]
+      },
+      {
+        "state": "Illinois",
+        "stateAbbr": "IL",
+        "counties": [
+          "Cook"
+        ]
+      },
+      {
+        "state": "Kentucky",
+        "stateAbbr": "KY",
+        "counties": [
+          "Jefferson"
+        ]
+      },
+      {
+        "state": "New York",
+        "stateAbbr": "NY",
+        "counties": [
+          "New York"
+        ]
+      },
+      {
+        "state": "Pennsylvania",
+        "stateAbbr": "PA",
+        "counties": [
+          "Philadelphia"
+        ]
+      },
+      {
+        "state": "Texas",
+        "stateAbbr": "TX",
+        "counties": [
+          "Collin",
+          "Dallas",
+          "Harris"
+        ]
+      }
+    ],
     "legalEntity": "SilverScript Insurance Company",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -1266,6 +1726,80 @@
     "planStatus": "Active",
     "market": "National",
     "region": "PDP",
+    "serviceAreas": [
+      {
+        "state": "Arizona",
+        "stateAbbr": "AZ",
+        "counties": [
+          "Maricopa"
+        ]
+      },
+      {
+        "state": "California",
+        "stateAbbr": "CA",
+        "counties": [
+          "Los Angeles"
+        ]
+      },
+      {
+        "state": "Connecticut",
+        "stateAbbr": "CT",
+        "counties": [
+          "Fairfield"
+        ]
+      },
+      {
+        "state": "Florida",
+        "stateAbbr": "FL",
+        "counties": [
+          "Miami-Dade"
+        ]
+      },
+      {
+        "state": "Georgia",
+        "stateAbbr": "GA",
+        "counties": [
+          "Fulton"
+        ]
+      },
+      {
+        "state": "Illinois",
+        "stateAbbr": "IL",
+        "counties": [
+          "Cook"
+        ]
+      },
+      {
+        "state": "Kentucky",
+        "stateAbbr": "KY",
+        "counties": [
+          "Jefferson"
+        ]
+      },
+      {
+        "state": "New York",
+        "stateAbbr": "NY",
+        "counties": [
+          "New York"
+        ]
+      },
+      {
+        "state": "Pennsylvania",
+        "stateAbbr": "PA",
+        "counties": [
+          "Philadelphia"
+        ]
+      },
+      {
+        "state": "Texas",
+        "stateAbbr": "TX",
+        "counties": [
+          "Collin",
+          "Dallas",
+          "Harris"
+        ]
+      }
+    ],
     "legalEntity": "SilverScript Insurance Company",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -1317,6 +1851,80 @@
     "planStatus": "Active",
     "market": "National",
     "region": "PDP",
+    "serviceAreas": [
+      {
+        "state": "Arizona",
+        "stateAbbr": "AZ",
+        "counties": [
+          "Maricopa"
+        ]
+      },
+      {
+        "state": "California",
+        "stateAbbr": "CA",
+        "counties": [
+          "Los Angeles"
+        ]
+      },
+      {
+        "state": "Connecticut",
+        "stateAbbr": "CT",
+        "counties": [
+          "Fairfield"
+        ]
+      },
+      {
+        "state": "Florida",
+        "stateAbbr": "FL",
+        "counties": [
+          "Miami-Dade"
+        ]
+      },
+      {
+        "state": "Georgia",
+        "stateAbbr": "GA",
+        "counties": [
+          "Fulton"
+        ]
+      },
+      {
+        "state": "Illinois",
+        "stateAbbr": "IL",
+        "counties": [
+          "Cook"
+        ]
+      },
+      {
+        "state": "Kentucky",
+        "stateAbbr": "KY",
+        "counties": [
+          "Jefferson"
+        ]
+      },
+      {
+        "state": "New York",
+        "stateAbbr": "NY",
+        "counties": [
+          "New York"
+        ]
+      },
+      {
+        "state": "Pennsylvania",
+        "stateAbbr": "PA",
+        "counties": [
+          "Philadelphia"
+        ]
+      },
+      {
+        "state": "Texas",
+        "stateAbbr": "TX",
+        "counties": [
+          "Collin",
+          "Dallas",
+          "Harris"
+        ]
+      }
+    ],
     "legalEntity": "SilverScript Insurance Company",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -1354,6 +1962,80 @@
     "planStatus": "Active",
     "market": "National",
     "region": "National",
+    "serviceAreas": [
+      {
+        "state": "Arizona",
+        "stateAbbr": "AZ",
+        "counties": [
+          "Maricopa"
+        ]
+      },
+      {
+        "state": "California",
+        "stateAbbr": "CA",
+        "counties": [
+          "Los Angeles"
+        ]
+      },
+      {
+        "state": "Connecticut",
+        "stateAbbr": "CT",
+        "counties": [
+          "Fairfield"
+        ]
+      },
+      {
+        "state": "Florida",
+        "stateAbbr": "FL",
+        "counties": [
+          "Miami-Dade"
+        ]
+      },
+      {
+        "state": "Georgia",
+        "stateAbbr": "GA",
+        "counties": [
+          "Fulton"
+        ]
+      },
+      {
+        "state": "Illinois",
+        "stateAbbr": "IL",
+        "counties": [
+          "Cook"
+        ]
+      },
+      {
+        "state": "Kentucky",
+        "stateAbbr": "KY",
+        "counties": [
+          "Jefferson"
+        ]
+      },
+      {
+        "state": "New York",
+        "stateAbbr": "NY",
+        "counties": [
+          "New York"
+        ]
+      },
+      {
+        "state": "Pennsylvania",
+        "stateAbbr": "PA",
+        "counties": [
+          "Philadelphia"
+        ]
+      },
+      {
+        "state": "Texas",
+        "stateAbbr": "TX",
+        "counties": [
+          "Collin",
+          "Dallas",
+          "Harris"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Life Insurance Company",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -1405,6 +2087,80 @@
     "planStatus": "Active",
     "market": "National",
     "region": "National",
+    "serviceAreas": [
+      {
+        "state": "Arizona",
+        "stateAbbr": "AZ",
+        "counties": [
+          "Maricopa"
+        ]
+      },
+      {
+        "state": "California",
+        "stateAbbr": "CA",
+        "counties": [
+          "Los Angeles"
+        ]
+      },
+      {
+        "state": "Connecticut",
+        "stateAbbr": "CT",
+        "counties": [
+          "Fairfield"
+        ]
+      },
+      {
+        "state": "Florida",
+        "stateAbbr": "FL",
+        "counties": [
+          "Miami-Dade"
+        ]
+      },
+      {
+        "state": "Georgia",
+        "stateAbbr": "GA",
+        "counties": [
+          "Fulton"
+        ]
+      },
+      {
+        "state": "Illinois",
+        "stateAbbr": "IL",
+        "counties": [
+          "Cook"
+        ]
+      },
+      {
+        "state": "Kentucky",
+        "stateAbbr": "KY",
+        "counties": [
+          "Jefferson"
+        ]
+      },
+      {
+        "state": "New York",
+        "stateAbbr": "NY",
+        "counties": [
+          "New York"
+        ]
+      },
+      {
+        "state": "Pennsylvania",
+        "stateAbbr": "PA",
+        "counties": [
+          "Philadelphia"
+        ]
+      },
+      {
+        "state": "Texas",
+        "stateAbbr": "TX",
+        "counties": [
+          "Collin",
+          "Dallas",
+          "Harris"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Life Insurance Company",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -1456,6 +2212,80 @@
     "planStatus": "Active",
     "market": "National",
     "region": "National",
+    "serviceAreas": [
+      {
+        "state": "Arizona",
+        "stateAbbr": "AZ",
+        "counties": [
+          "Maricopa"
+        ]
+      },
+      {
+        "state": "California",
+        "stateAbbr": "CA",
+        "counties": [
+          "Los Angeles"
+        ]
+      },
+      {
+        "state": "Connecticut",
+        "stateAbbr": "CT",
+        "counties": [
+          "Fairfield"
+        ]
+      },
+      {
+        "state": "Florida",
+        "stateAbbr": "FL",
+        "counties": [
+          "Miami-Dade"
+        ]
+      },
+      {
+        "state": "Georgia",
+        "stateAbbr": "GA",
+        "counties": [
+          "Fulton"
+        ]
+      },
+      {
+        "state": "Illinois",
+        "stateAbbr": "IL",
+        "counties": [
+          "Cook"
+        ]
+      },
+      {
+        "state": "Kentucky",
+        "stateAbbr": "KY",
+        "counties": [
+          "Jefferson"
+        ]
+      },
+      {
+        "state": "New York",
+        "stateAbbr": "NY",
+        "counties": [
+          "New York"
+        ]
+      },
+      {
+        "state": "Pennsylvania",
+        "stateAbbr": "PA",
+        "counties": [
+          "Philadelphia"
+        ]
+      },
+      {
+        "state": "Texas",
+        "stateAbbr": "TX",
+        "counties": [
+          "Collin",
+          "Dallas",
+          "Harris"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Life Insurance Company",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -1507,6 +2337,80 @@
     "planStatus": "Active",
     "market": "National",
     "region": "National",
+    "serviceAreas": [
+      {
+        "state": "Arizona",
+        "stateAbbr": "AZ",
+        "counties": [
+          "Maricopa"
+        ]
+      },
+      {
+        "state": "California",
+        "stateAbbr": "CA",
+        "counties": [
+          "Los Angeles"
+        ]
+      },
+      {
+        "state": "Connecticut",
+        "stateAbbr": "CT",
+        "counties": [
+          "Fairfield"
+        ]
+      },
+      {
+        "state": "Florida",
+        "stateAbbr": "FL",
+        "counties": [
+          "Miami-Dade"
+        ]
+      },
+      {
+        "state": "Georgia",
+        "stateAbbr": "GA",
+        "counties": [
+          "Fulton"
+        ]
+      },
+      {
+        "state": "Illinois",
+        "stateAbbr": "IL",
+        "counties": [
+          "Cook"
+        ]
+      },
+      {
+        "state": "Kentucky",
+        "stateAbbr": "KY",
+        "counties": [
+          "Jefferson"
+        ]
+      },
+      {
+        "state": "New York",
+        "stateAbbr": "NY",
+        "counties": [
+          "New York"
+        ]
+      },
+      {
+        "state": "Pennsylvania",
+        "stateAbbr": "PA",
+        "counties": [
+          "Philadelphia"
+        ]
+      },
+      {
+        "state": "Texas",
+        "stateAbbr": "TX",
+        "counties": [
+          "Collin",
+          "Dallas",
+          "Harris"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Life Insurance Company",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -1558,6 +2462,80 @@
     "planStatus": "Active",
     "market": "National",
     "region": "National",
+    "serviceAreas": [
+      {
+        "state": "Arizona",
+        "stateAbbr": "AZ",
+        "counties": [
+          "Maricopa"
+        ]
+      },
+      {
+        "state": "California",
+        "stateAbbr": "CA",
+        "counties": [
+          "Los Angeles"
+        ]
+      },
+      {
+        "state": "Connecticut",
+        "stateAbbr": "CT",
+        "counties": [
+          "Fairfield"
+        ]
+      },
+      {
+        "state": "Florida",
+        "stateAbbr": "FL",
+        "counties": [
+          "Miami-Dade"
+        ]
+      },
+      {
+        "state": "Georgia",
+        "stateAbbr": "GA",
+        "counties": [
+          "Fulton"
+        ]
+      },
+      {
+        "state": "Illinois",
+        "stateAbbr": "IL",
+        "counties": [
+          "Cook"
+        ]
+      },
+      {
+        "state": "Kentucky",
+        "stateAbbr": "KY",
+        "counties": [
+          "Jefferson"
+        ]
+      },
+      {
+        "state": "New York",
+        "stateAbbr": "NY",
+        "counties": [
+          "New York"
+        ]
+      },
+      {
+        "state": "Pennsylvania",
+        "stateAbbr": "PA",
+        "counties": [
+          "Philadelphia"
+        ]
+      },
+      {
+        "state": "Texas",
+        "stateAbbr": "TX",
+        "counties": [
+          "Collin",
+          "Dallas",
+          "Harris"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Life Insurance Company",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -1602,6 +2580,80 @@
     "planStatus": "Active",
     "market": "National",
     "region": "National",
+    "serviceAreas": [
+      {
+        "state": "Arizona",
+        "stateAbbr": "AZ",
+        "counties": [
+          "Maricopa"
+        ]
+      },
+      {
+        "state": "California",
+        "stateAbbr": "CA",
+        "counties": [
+          "Los Angeles"
+        ]
+      },
+      {
+        "state": "Connecticut",
+        "stateAbbr": "CT",
+        "counties": [
+          "Fairfield"
+        ]
+      },
+      {
+        "state": "Florida",
+        "stateAbbr": "FL",
+        "counties": [
+          "Miami-Dade"
+        ]
+      },
+      {
+        "state": "Georgia",
+        "stateAbbr": "GA",
+        "counties": [
+          "Fulton"
+        ]
+      },
+      {
+        "state": "Illinois",
+        "stateAbbr": "IL",
+        "counties": [
+          "Cook"
+        ]
+      },
+      {
+        "state": "Kentucky",
+        "stateAbbr": "KY",
+        "counties": [
+          "Jefferson"
+        ]
+      },
+      {
+        "state": "New York",
+        "stateAbbr": "NY",
+        "counties": [
+          "New York"
+        ]
+      },
+      {
+        "state": "Pennsylvania",
+        "stateAbbr": "PA",
+        "counties": [
+          "Philadelphia"
+        ]
+      },
+      {
+        "state": "Texas",
+        "stateAbbr": "TX",
+        "counties": [
+          "Collin",
+          "Dallas",
+          "Harris"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Life Insurance Company",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -1646,6 +2698,80 @@
     "planStatus": "Active",
     "market": "National",
     "region": "National",
+    "serviceAreas": [
+      {
+        "state": "Arizona",
+        "stateAbbr": "AZ",
+        "counties": [
+          "Maricopa"
+        ]
+      },
+      {
+        "state": "California",
+        "stateAbbr": "CA",
+        "counties": [
+          "Los Angeles"
+        ]
+      },
+      {
+        "state": "Connecticut",
+        "stateAbbr": "CT",
+        "counties": [
+          "Fairfield"
+        ]
+      },
+      {
+        "state": "Florida",
+        "stateAbbr": "FL",
+        "counties": [
+          "Miami-Dade"
+        ]
+      },
+      {
+        "state": "Georgia",
+        "stateAbbr": "GA",
+        "counties": [
+          "Fulton"
+        ]
+      },
+      {
+        "state": "Illinois",
+        "stateAbbr": "IL",
+        "counties": [
+          "Cook"
+        ]
+      },
+      {
+        "state": "Kentucky",
+        "stateAbbr": "KY",
+        "counties": [
+          "Jefferson"
+        ]
+      },
+      {
+        "state": "New York",
+        "stateAbbr": "NY",
+        "counties": [
+          "New York"
+        ]
+      },
+      {
+        "state": "Pennsylvania",
+        "stateAbbr": "PA",
+        "counties": [
+          "Philadelphia"
+        ]
+      },
+      {
+        "state": "Texas",
+        "stateAbbr": "TX",
+        "counties": [
+          "Collin",
+          "Dallas",
+          "Harris"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Life Insurance Company",
     "marketingName": "Carrier 1 Ancillary",
     "minAge": null,
@@ -1683,6 +2809,80 @@
     "planStatus": "Active",
     "market": "National",
     "region": "National",
+    "serviceAreas": [
+      {
+        "state": "Arizona",
+        "stateAbbr": "AZ",
+        "counties": [
+          "Maricopa"
+        ]
+      },
+      {
+        "state": "California",
+        "stateAbbr": "CA",
+        "counties": [
+          "Los Angeles"
+        ]
+      },
+      {
+        "state": "Connecticut",
+        "stateAbbr": "CT",
+        "counties": [
+          "Fairfield"
+        ]
+      },
+      {
+        "state": "Florida",
+        "stateAbbr": "FL",
+        "counties": [
+          "Miami-Dade"
+        ]
+      },
+      {
+        "state": "Georgia",
+        "stateAbbr": "GA",
+        "counties": [
+          "Fulton"
+        ]
+      },
+      {
+        "state": "Illinois",
+        "stateAbbr": "IL",
+        "counties": [
+          "Cook"
+        ]
+      },
+      {
+        "state": "Kentucky",
+        "stateAbbr": "KY",
+        "counties": [
+          "Jefferson"
+        ]
+      },
+      {
+        "state": "New York",
+        "stateAbbr": "NY",
+        "counties": [
+          "New York"
+        ]
+      },
+      {
+        "state": "Pennsylvania",
+        "stateAbbr": "PA",
+        "counties": [
+          "Philadelphia"
+        ]
+      },
+      {
+        "state": "Texas",
+        "stateAbbr": "TX",
+        "counties": [
+          "Collin",
+          "Dallas",
+          "Harris"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Life Insurance Company",
     "marketingName": "Carrier 1 Ancillary",
     "minAge": null,
@@ -1720,6 +2920,80 @@
     "planStatus": "Active",
     "market": "National",
     "region": "National",
+    "serviceAreas": [
+      {
+        "state": "Arizona",
+        "stateAbbr": "AZ",
+        "counties": [
+          "Maricopa"
+        ]
+      },
+      {
+        "state": "California",
+        "stateAbbr": "CA",
+        "counties": [
+          "Los Angeles"
+        ]
+      },
+      {
+        "state": "Connecticut",
+        "stateAbbr": "CT",
+        "counties": [
+          "Fairfield"
+        ]
+      },
+      {
+        "state": "Florida",
+        "stateAbbr": "FL",
+        "counties": [
+          "Miami-Dade"
+        ]
+      },
+      {
+        "state": "Georgia",
+        "stateAbbr": "GA",
+        "counties": [
+          "Fulton"
+        ]
+      },
+      {
+        "state": "Illinois",
+        "stateAbbr": "IL",
+        "counties": [
+          "Cook"
+        ]
+      },
+      {
+        "state": "Kentucky",
+        "stateAbbr": "KY",
+        "counties": [
+          "Jefferson"
+        ]
+      },
+      {
+        "state": "New York",
+        "stateAbbr": "NY",
+        "counties": [
+          "New York"
+        ]
+      },
+      {
+        "state": "Pennsylvania",
+        "stateAbbr": "PA",
+        "counties": [
+          "Philadelphia"
+        ]
+      },
+      {
+        "state": "Texas",
+        "stateAbbr": "TX",
+        "counties": [
+          "Collin",
+          "Dallas",
+          "Harris"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Life Insurance Company",
     "marketingName": "Carrier 1 Ancillary",
     "minAge": null,
@@ -1757,6 +3031,80 @@
     "planStatus": "Active",
     "market": "National",
     "region": "National",
+    "serviceAreas": [
+      {
+        "state": "Arizona",
+        "stateAbbr": "AZ",
+        "counties": [
+          "Maricopa"
+        ]
+      },
+      {
+        "state": "California",
+        "stateAbbr": "CA",
+        "counties": [
+          "Los Angeles"
+        ]
+      },
+      {
+        "state": "Connecticut",
+        "stateAbbr": "CT",
+        "counties": [
+          "Fairfield"
+        ]
+      },
+      {
+        "state": "Florida",
+        "stateAbbr": "FL",
+        "counties": [
+          "Miami-Dade"
+        ]
+      },
+      {
+        "state": "Georgia",
+        "stateAbbr": "GA",
+        "counties": [
+          "Fulton"
+        ]
+      },
+      {
+        "state": "Illinois",
+        "stateAbbr": "IL",
+        "counties": [
+          "Cook"
+        ]
+      },
+      {
+        "state": "Kentucky",
+        "stateAbbr": "KY",
+        "counties": [
+          "Jefferson"
+        ]
+      },
+      {
+        "state": "New York",
+        "stateAbbr": "NY",
+        "counties": [
+          "New York"
+        ]
+      },
+      {
+        "state": "Pennsylvania",
+        "stateAbbr": "PA",
+        "counties": [
+          "Philadelphia"
+        ]
+      },
+      {
+        "state": "Texas",
+        "stateAbbr": "TX",
+        "counties": [
+          "Collin",
+          "Dallas",
+          "Harris"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Life Insurance Company",
     "marketingName": "Carrier 1 Ancillary",
     "minAge": null,
@@ -1808,6 +3156,80 @@
     "planStatus": "Active",
     "market": "National",
     "region": "National",
+    "serviceAreas": [
+      {
+        "state": "Arizona",
+        "stateAbbr": "AZ",
+        "counties": [
+          "Maricopa"
+        ]
+      },
+      {
+        "state": "California",
+        "stateAbbr": "CA",
+        "counties": [
+          "Los Angeles"
+        ]
+      },
+      {
+        "state": "Connecticut",
+        "stateAbbr": "CT",
+        "counties": [
+          "Fairfield"
+        ]
+      },
+      {
+        "state": "Florida",
+        "stateAbbr": "FL",
+        "counties": [
+          "Miami-Dade"
+        ]
+      },
+      {
+        "state": "Georgia",
+        "stateAbbr": "GA",
+        "counties": [
+          "Fulton"
+        ]
+      },
+      {
+        "state": "Illinois",
+        "stateAbbr": "IL",
+        "counties": [
+          "Cook"
+        ]
+      },
+      {
+        "state": "Kentucky",
+        "stateAbbr": "KY",
+        "counties": [
+          "Jefferson"
+        ]
+      },
+      {
+        "state": "New York",
+        "stateAbbr": "NY",
+        "counties": [
+          "New York"
+        ]
+      },
+      {
+        "state": "Pennsylvania",
+        "stateAbbr": "PA",
+        "counties": [
+          "Philadelphia"
+        ]
+      },
+      {
+        "state": "Texas",
+        "stateAbbr": "TX",
+        "counties": [
+          "Collin",
+          "Dallas",
+          "Harris"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Life Insurance Company",
     "marketingName": "Carrier 1 Ancillary",
     "minAge": null,
@@ -1859,6 +3281,15 @@
     "planStatus": "Active",
     "market": "Midwest",
     "region": "Ohio/Kentucky",
+    "serviceAreas": [
+      {
+        "state": "Kentucky",
+        "stateAbbr": "KY",
+        "counties": [
+          "Jefferson"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Life Insurance Company",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -1903,6 +3334,15 @@
     "planStatus": "Active",
     "market": "Southeast",
     "region": "Georgia/Gulf States",
+    "serviceAreas": [
+      {
+        "state": "Georgia",
+        "stateAbbr": "GA",
+        "counties": [
+          "Fulton"
+        ]
+      }
+    ],
     "legalEntity": "SilverScript Insurance Company",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -1954,6 +3394,22 @@
     "planStatus": "Active",
     "market": "West",
     "region": "Northwest",
+    "serviceAreas": [
+      {
+        "state": "Arizona",
+        "stateAbbr": "AZ",
+        "counties": [
+          "Maricopa"
+        ]
+      },
+      {
+        "state": "California",
+        "stateAbbr": "CA",
+        "counties": [
+          "Los Angeles"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Life Insurance Company",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -1991,6 +3447,22 @@
     "planStatus": "Active",
     "market": "West",
     "region": "Mountain",
+    "serviceAreas": [
+      {
+        "state": "Arizona",
+        "stateAbbr": "AZ",
+        "counties": [
+          "Maricopa"
+        ]
+      },
+      {
+        "state": "California",
+        "stateAbbr": "CA",
+        "counties": [
+          "Los Angeles"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Health Inc.",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -2028,6 +3500,15 @@
     "planStatus": "Active",
     "market": "West",
     "region": "California",
+    "serviceAreas": [
+      {
+        "state": "California",
+        "stateAbbr": "CA",
+        "counties": [
+          "Los Angeles"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Health of California",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -2065,6 +3546,29 @@
     "planStatus": "Active",
     "market": "Northeast",
     "region": "New Jersey",
+    "serviceAreas": [
+      {
+        "state": "Connecticut",
+        "stateAbbr": "CT",
+        "counties": [
+          "Fairfield"
+        ]
+      },
+      {
+        "state": "New York",
+        "stateAbbr": "NY",
+        "counties": [
+          "New York"
+        ]
+      },
+      {
+        "state": "Pennsylvania",
+        "stateAbbr": "PA",
+        "counties": [
+          "Philadelphia"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Health Inc. (NJ)",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -2116,6 +3620,15 @@
     "planStatus": "Active",
     "market": "Northeast",
     "region": "New England",
+    "serviceAreas": [
+      {
+        "state": "Connecticut",
+        "stateAbbr": "CT",
+        "counties": [
+          "Fairfield"
+        ]
+      }
+    ],
     "legalEntity": "First Health Life & Health Insurance",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -2153,6 +3666,15 @@
     "planStatus": "Active",
     "market": "Midwest",
     "region": "Great Lakes",
+    "serviceAreas": [
+      {
+        "state": "Illinois",
+        "stateAbbr": "IL",
+        "counties": [
+          "Cook"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Life Insurance Company",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -2190,6 +3712,29 @@
     "planStatus": "Active",
     "market": "Northeast",
     "region": "Capitol",
+    "serviceAreas": [
+      {
+        "state": "Connecticut",
+        "stateAbbr": "CT",
+        "counties": [
+          "Fairfield"
+        ]
+      },
+      {
+        "state": "New York",
+        "stateAbbr": "NY",
+        "counties": [
+          "New York"
+        ]
+      },
+      {
+        "state": "Pennsylvania",
+        "stateAbbr": "PA",
+        "counties": [
+          "Philadelphia"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 1 Life Insurance Company",
     "marketingName": "Carrier 1 Medicare",
     "minAge": 65,
@@ -2241,6 +3786,15 @@
     "planStatus": "Active",
     "market": "Northeast",
     "region": "New England",
+    "serviceAreas": [
+      {
+        "state": "Connecticut",
+        "stateAbbr": "CT",
+        "counties": [
+          "Fairfield"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 3 Insurance Company",
     "marketingName": "Carrier 3 Medicare",
     "minAge": 65,
@@ -2278,6 +3832,15 @@
     "planStatus": "Active",
     "market": "Northeast",
     "region": "New England",
+    "serviceAreas": [
+      {
+        "state": "Connecticut",
+        "stateAbbr": "CT",
+        "counties": [
+          "Fairfield"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 3 Insurance Company",
     "marketingName": "Carrier 3 Medicare",
     "minAge": 65,
@@ -2329,6 +3892,15 @@
     "planStatus": "Active",
     "market": "Southeast",
     "region": "Florida",
+    "serviceAreas": [
+      {
+        "state": "Florida",
+        "stateAbbr": "FL",
+        "counties": [
+          "Miami-Dade"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 3 of Florida",
     "marketingName": "Carrier 3 Medicare",
     "minAge": 65,
@@ -2373,6 +3945,15 @@
     "planStatus": "Active",
     "market": "Southeast",
     "region": "Florida",
+    "serviceAreas": [
+      {
+        "state": "Florida",
+        "stateAbbr": "FL",
+        "counties": [
+          "Miami-Dade"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 3 of Florida",
     "marketingName": "Carrier 3 Medicare",
     "minAge": 65,
@@ -2410,6 +3991,17 @@
     "planStatus": "Active",
     "market": "Southwest",
     "region": "South Central",
+    "serviceAreas": [
+      {
+        "state": "Texas",
+        "stateAbbr": "TX",
+        "counties": [
+          "Collin",
+          "Dallas",
+          "Harris"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 3 Insurance Company",
     "marketingName": "Carrier 3 Medicare",
     "minAge": 65,
@@ -2454,6 +4046,80 @@
     "planStatus": "Active",
     "market": "National",
     "region": "PDP",
+    "serviceAreas": [
+      {
+        "state": "Arizona",
+        "stateAbbr": "AZ",
+        "counties": [
+          "Maricopa"
+        ]
+      },
+      {
+        "state": "California",
+        "stateAbbr": "CA",
+        "counties": [
+          "Los Angeles"
+        ]
+      },
+      {
+        "state": "Connecticut",
+        "stateAbbr": "CT",
+        "counties": [
+          "Fairfield"
+        ]
+      },
+      {
+        "state": "Florida",
+        "stateAbbr": "FL",
+        "counties": [
+          "Miami-Dade"
+        ]
+      },
+      {
+        "state": "Georgia",
+        "stateAbbr": "GA",
+        "counties": [
+          "Fulton"
+        ]
+      },
+      {
+        "state": "Illinois",
+        "stateAbbr": "IL",
+        "counties": [
+          "Cook"
+        ]
+      },
+      {
+        "state": "Kentucky",
+        "stateAbbr": "KY",
+        "counties": [
+          "Jefferson"
+        ]
+      },
+      {
+        "state": "New York",
+        "stateAbbr": "NY",
+        "counties": [
+          "New York"
+        ]
+      },
+      {
+        "state": "Pennsylvania",
+        "stateAbbr": "PA",
+        "counties": [
+          "Philadelphia"
+        ]
+      },
+      {
+        "state": "Texas",
+        "stateAbbr": "TX",
+        "counties": [
+          "Collin",
+          "Dallas",
+          "Harris"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 3 Insurance Company",
     "marketingName": "Carrier 3 Medicare",
     "minAge": 65,
@@ -2498,6 +4164,80 @@
     "planStatus": "Active",
     "market": "National",
     "region": "PDP",
+    "serviceAreas": [
+      {
+        "state": "Arizona",
+        "stateAbbr": "AZ",
+        "counties": [
+          "Maricopa"
+        ]
+      },
+      {
+        "state": "California",
+        "stateAbbr": "CA",
+        "counties": [
+          "Los Angeles"
+        ]
+      },
+      {
+        "state": "Connecticut",
+        "stateAbbr": "CT",
+        "counties": [
+          "Fairfield"
+        ]
+      },
+      {
+        "state": "Florida",
+        "stateAbbr": "FL",
+        "counties": [
+          "Miami-Dade"
+        ]
+      },
+      {
+        "state": "Georgia",
+        "stateAbbr": "GA",
+        "counties": [
+          "Fulton"
+        ]
+      },
+      {
+        "state": "Illinois",
+        "stateAbbr": "IL",
+        "counties": [
+          "Cook"
+        ]
+      },
+      {
+        "state": "Kentucky",
+        "stateAbbr": "KY",
+        "counties": [
+          "Jefferson"
+        ]
+      },
+      {
+        "state": "New York",
+        "stateAbbr": "NY",
+        "counties": [
+          "New York"
+        ]
+      },
+      {
+        "state": "Pennsylvania",
+        "stateAbbr": "PA",
+        "counties": [
+          "Philadelphia"
+        ]
+      },
+      {
+        "state": "Texas",
+        "stateAbbr": "TX",
+        "counties": [
+          "Collin",
+          "Dallas",
+          "Harris"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 3 Insurance Company",
     "marketingName": "Carrier 3 Medicare",
     "minAge": 65,
@@ -2542,6 +4282,15 @@
     "planStatus": "Active",
     "market": "Southeast",
     "region": "Georgia/Gulf States",
+    "serviceAreas": [
+      {
+        "state": "Georgia",
+        "stateAbbr": "GA",
+        "counties": [
+          "Fulton"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 2 Medical Plan",
     "marketingName": "Carrier 2 Medicare",
     "minAge": 65,
@@ -2593,6 +4342,15 @@
     "planStatus": "Active",
     "market": "Southeast",
     "region": "Georgia/Gulf States",
+    "serviceAreas": [
+      {
+        "state": "Georgia",
+        "stateAbbr": "GA",
+        "counties": [
+          "Fulton"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 2 Medical Plan",
     "marketingName": "Carrier 2 Medicare",
     "minAge": 65,
@@ -2644,6 +4402,15 @@
     "planStatus": "Active",
     "market": "Midwest",
     "region": "Heartland",
+    "serviceAreas": [
+      {
+        "state": "Illinois",
+        "stateAbbr": "IL",
+        "counties": [
+          "Cook"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 2 Insurance Company",
     "marketingName": "Carrier 2 Medicare",
     "minAge": 65,
@@ -2681,6 +4448,15 @@
     "planStatus": "Active",
     "market": "Midwest",
     "region": "Heartland",
+    "serviceAreas": [
+      {
+        "state": "Illinois",
+        "stateAbbr": "IL",
+        "counties": [
+          "Cook"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 2 Insurance Company",
     "marketingName": "Carrier 2 Medicare",
     "minAge": 65,
@@ -2725,6 +4501,80 @@
     "planStatus": "Active",
     "market": "National",
     "region": "PDP",
+    "serviceAreas": [
+      {
+        "state": "Arizona",
+        "stateAbbr": "AZ",
+        "counties": [
+          "Maricopa"
+        ]
+      },
+      {
+        "state": "California",
+        "stateAbbr": "CA",
+        "counties": [
+          "Los Angeles"
+        ]
+      },
+      {
+        "state": "Connecticut",
+        "stateAbbr": "CT",
+        "counties": [
+          "Fairfield"
+        ]
+      },
+      {
+        "state": "Florida",
+        "stateAbbr": "FL",
+        "counties": [
+          "Miami-Dade"
+        ]
+      },
+      {
+        "state": "Georgia",
+        "stateAbbr": "GA",
+        "counties": [
+          "Fulton"
+        ]
+      },
+      {
+        "state": "Illinois",
+        "stateAbbr": "IL",
+        "counties": [
+          "Cook"
+        ]
+      },
+      {
+        "state": "Kentucky",
+        "stateAbbr": "KY",
+        "counties": [
+          "Jefferson"
+        ]
+      },
+      {
+        "state": "New York",
+        "stateAbbr": "NY",
+        "counties": [
+          "New York"
+        ]
+      },
+      {
+        "state": "Pennsylvania",
+        "stateAbbr": "PA",
+        "counties": [
+          "Philadelphia"
+        ]
+      },
+      {
+        "state": "Texas",
+        "stateAbbr": "TX",
+        "counties": [
+          "Collin",
+          "Dallas",
+          "Harris"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 2 Insurance Company",
     "marketingName": "Carrier 2 Medicare",
     "minAge": 65,
@@ -2776,6 +4626,80 @@
     "planStatus": "Active",
     "market": "National",
     "region": "PDP",
+    "serviceAreas": [
+      {
+        "state": "Arizona",
+        "stateAbbr": "AZ",
+        "counties": [
+          "Maricopa"
+        ]
+      },
+      {
+        "state": "California",
+        "stateAbbr": "CA",
+        "counties": [
+          "Los Angeles"
+        ]
+      },
+      {
+        "state": "Connecticut",
+        "stateAbbr": "CT",
+        "counties": [
+          "Fairfield"
+        ]
+      },
+      {
+        "state": "Florida",
+        "stateAbbr": "FL",
+        "counties": [
+          "Miami-Dade"
+        ]
+      },
+      {
+        "state": "Georgia",
+        "stateAbbr": "GA",
+        "counties": [
+          "Fulton"
+        ]
+      },
+      {
+        "state": "Illinois",
+        "stateAbbr": "IL",
+        "counties": [
+          "Cook"
+        ]
+      },
+      {
+        "state": "Kentucky",
+        "stateAbbr": "KY",
+        "counties": [
+          "Jefferson"
+        ]
+      },
+      {
+        "state": "New York",
+        "stateAbbr": "NY",
+        "counties": [
+          "New York"
+        ]
+      },
+      {
+        "state": "Pennsylvania",
+        "stateAbbr": "PA",
+        "counties": [
+          "Philadelphia"
+        ]
+      },
+      {
+        "state": "Texas",
+        "stateAbbr": "TX",
+        "counties": [
+          "Collin",
+          "Dallas",
+          "Harris"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 2 Insurance Company",
     "marketingName": "Carrier 2 Medicare",
     "minAge": 65,
@@ -2820,6 +4744,15 @@
     "planStatus": "Active",
     "market": "Northeast",
     "region": "New York",
+    "serviceAreas": [
+      {
+        "state": "New York",
+        "stateAbbr": "NY",
+        "counties": [
+          "New York"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 5 of New York",
     "marketingName": "Carrier 5 Medicare",
     "minAge": 65,
@@ -2857,6 +4790,15 @@
     "planStatus": "Active",
     "market": "Northeast",
     "region": "New York",
+    "serviceAreas": [
+      {
+        "state": "New York",
+        "stateAbbr": "NY",
+        "counties": [
+          "New York"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 5 of New York",
     "marketingName": "Carrier 5 Medicare",
     "minAge": 65,
@@ -2908,6 +4850,15 @@
     "planStatus": "Active",
     "market": "West",
     "region": "California",
+    "serviceAreas": [
+      {
+        "state": "California",
+        "stateAbbr": "CA",
+        "counties": [
+          "Los Angeles"
+        ]
+      }
+    ],
     "legalEntity": "Blue Shield of California",
     "marketingName": "Carrier 5 Medicare",
     "minAge": 65,
@@ -2945,6 +4896,80 @@
     "planStatus": "Active",
     "market": "National",
     "region": "PDP",
+    "serviceAreas": [
+      {
+        "state": "Arizona",
+        "stateAbbr": "AZ",
+        "counties": [
+          "Maricopa"
+        ]
+      },
+      {
+        "state": "California",
+        "stateAbbr": "CA",
+        "counties": [
+          "Los Angeles"
+        ]
+      },
+      {
+        "state": "Connecticut",
+        "stateAbbr": "CT",
+        "counties": [
+          "Fairfield"
+        ]
+      },
+      {
+        "state": "Florida",
+        "stateAbbr": "FL",
+        "counties": [
+          "Miami-Dade"
+        ]
+      },
+      {
+        "state": "Georgia",
+        "stateAbbr": "GA",
+        "counties": [
+          "Fulton"
+        ]
+      },
+      {
+        "state": "Illinois",
+        "stateAbbr": "IL",
+        "counties": [
+          "Cook"
+        ]
+      },
+      {
+        "state": "Kentucky",
+        "stateAbbr": "KY",
+        "counties": [
+          "Jefferson"
+        ]
+      },
+      {
+        "state": "New York",
+        "stateAbbr": "NY",
+        "counties": [
+          "New York"
+        ]
+      },
+      {
+        "state": "Pennsylvania",
+        "stateAbbr": "PA",
+        "counties": [
+          "Philadelphia"
+        ]
+      },
+      {
+        "state": "Texas",
+        "stateAbbr": "TX",
+        "counties": [
+          "Collin",
+          "Dallas",
+          "Harris"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 5 Association",
     "marketingName": "Carrier 5 Medicare",
     "minAge": 65,
@@ -2996,6 +5021,17 @@
     "planStatus": "Active",
     "market": "Southwest",
     "region": "South Central",
+    "serviceAreas": [
+      {
+        "state": "Texas",
+        "stateAbbr": "TX",
+        "counties": [
+          "Collin",
+          "Dallas",
+          "Harris"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 4 HealthCare",
     "marketingName": "Carrier 4 Medicare",
     "minAge": 65,
@@ -3033,6 +5069,17 @@
     "planStatus": "Active",
     "market": "Southwest",
     "region": "South Central",
+    "serviceAreas": [
+      {
+        "state": "Texas",
+        "stateAbbr": "TX",
+        "counties": [
+          "Collin",
+          "Dallas",
+          "Harris"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 4 HealthCare",
     "marketingName": "Carrier 4 Medicare",
     "minAge": 65,
@@ -3084,6 +5131,15 @@
     "planStatus": "Active",
     "market": "West",
     "region": "Arizona",
+    "serviceAreas": [
+      {
+        "state": "Arizona",
+        "stateAbbr": "AZ",
+        "counties": [
+          "Maricopa"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 4 HealthCare",
     "marketingName": "Carrier 4 Medicare",
     "minAge": 65,
@@ -3121,6 +5177,80 @@
     "planStatus": "Active",
     "market": "National",
     "region": "PDP",
+    "serviceAreas": [
+      {
+        "state": "Arizona",
+        "stateAbbr": "AZ",
+        "counties": [
+          "Maricopa"
+        ]
+      },
+      {
+        "state": "California",
+        "stateAbbr": "CA",
+        "counties": [
+          "Los Angeles"
+        ]
+      },
+      {
+        "state": "Connecticut",
+        "stateAbbr": "CT",
+        "counties": [
+          "Fairfield"
+        ]
+      },
+      {
+        "state": "Florida",
+        "stateAbbr": "FL",
+        "counties": [
+          "Miami-Dade"
+        ]
+      },
+      {
+        "state": "Georgia",
+        "stateAbbr": "GA",
+        "counties": [
+          "Fulton"
+        ]
+      },
+      {
+        "state": "Illinois",
+        "stateAbbr": "IL",
+        "counties": [
+          "Cook"
+        ]
+      },
+      {
+        "state": "Kentucky",
+        "stateAbbr": "KY",
+        "counties": [
+          "Jefferson"
+        ]
+      },
+      {
+        "state": "New York",
+        "stateAbbr": "NY",
+        "counties": [
+          "New York"
+        ]
+      },
+      {
+        "state": "Pennsylvania",
+        "stateAbbr": "PA",
+        "counties": [
+          "Philadelphia"
+        ]
+      },
+      {
+        "state": "Texas",
+        "stateAbbr": "TX",
+        "counties": [
+          "Collin",
+          "Dallas",
+          "Harris"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 4 HealthCare",
     "marketingName": "Carrier 4 Medicare",
     "minAge": 65,
@@ -3158,6 +5288,15 @@
     "planStatus": "Active",
     "market": "Southeast",
     "region": "Georgia/Gulf States",
+    "serviceAreas": [
+      {
+        "state": "Georgia",
+        "stateAbbr": "GA",
+        "counties": [
+          "Fulton"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 6 Health Plans",
     "marketingName": "Carrier 6 Medicare",
     "minAge": 65,
@@ -3202,6 +5341,15 @@
     "planStatus": "Active",
     "market": "Southeast",
     "region": "Georgia/Gulf States",
+    "serviceAreas": [
+      {
+        "state": "Georgia",
+        "stateAbbr": "GA",
+        "counties": [
+          "Fulton"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 6 Health Plans",
     "marketingName": "Carrier 6 Medicare",
     "minAge": 65,
@@ -3246,6 +5394,15 @@
     "planStatus": "Active",
     "market": "Southeast",
     "region": "Florida",
+    "serviceAreas": [
+      {
+        "state": "Florida",
+        "stateAbbr": "FL",
+        "counties": [
+          "Miami-Dade"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 6 Health Plans",
     "marketingName": "Carrier 6 Medicare",
     "minAge": 65,
@@ -3283,6 +5440,80 @@
     "planStatus": "Active",
     "market": "National",
     "region": "PDP",
+    "serviceAreas": [
+      {
+        "state": "Arizona",
+        "stateAbbr": "AZ",
+        "counties": [
+          "Maricopa"
+        ]
+      },
+      {
+        "state": "California",
+        "stateAbbr": "CA",
+        "counties": [
+          "Los Angeles"
+        ]
+      },
+      {
+        "state": "Connecticut",
+        "stateAbbr": "CT",
+        "counties": [
+          "Fairfield"
+        ]
+      },
+      {
+        "state": "Florida",
+        "stateAbbr": "FL",
+        "counties": [
+          "Miami-Dade"
+        ]
+      },
+      {
+        "state": "Georgia",
+        "stateAbbr": "GA",
+        "counties": [
+          "Fulton"
+        ]
+      },
+      {
+        "state": "Illinois",
+        "stateAbbr": "IL",
+        "counties": [
+          "Cook"
+        ]
+      },
+      {
+        "state": "Kentucky",
+        "stateAbbr": "KY",
+        "counties": [
+          "Jefferson"
+        ]
+      },
+      {
+        "state": "New York",
+        "stateAbbr": "NY",
+        "counties": [
+          "New York"
+        ]
+      },
+      {
+        "state": "Pennsylvania",
+        "stateAbbr": "PA",
+        "counties": [
+          "Philadelphia"
+        ]
+      },
+      {
+        "state": "Texas",
+        "stateAbbr": "TX",
+        "counties": [
+          "Collin",
+          "Dallas",
+          "Harris"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 6 Prescription Insurance",
     "marketingName": "Carrier 6 Medicare",
     "minAge": 65,
@@ -3320,6 +5551,15 @@
     "planStatus": "Active",
     "market": "West",
     "region": "California",
+    "serviceAreas": [
+      {
+        "state": "California",
+        "stateAbbr": "CA",
+        "counties": [
+          "Los Angeles"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 2 Insurance Company",
     "marketingName": "Carrier 2 Medicare",
     "minAge": 65,
@@ -3357,6 +5597,15 @@
     "planStatus": "Active",
     "market": "Midwest",
     "region": "Great Lakes",
+    "serviceAreas": [
+      {
+        "state": "Illinois",
+        "stateAbbr": "IL",
+        "counties": [
+          "Cook"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 3 Insurance Company",
     "marketingName": "Carrier 3 Medicare",
     "minAge": 65,
@@ -3394,6 +5643,15 @@
     "planStatus": "Active",
     "market": "Midwest",
     "region": "Great Lakes",
+    "serviceAreas": [
+      {
+        "state": "Illinois",
+        "stateAbbr": "IL",
+        "counties": [
+          "Cook"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 3 Insurance Company",
     "marketingName": "Carrier 3 Medicare",
     "minAge": 65,
@@ -3431,6 +5689,15 @@
     "planStatus": "Active",
     "market": "Northeast",
     "region": "Keystone",
+    "serviceAreas": [
+      {
+        "state": "Pennsylvania",
+        "stateAbbr": "PA",
+        "counties": [
+          "Philadelphia"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 5 of Pennsylvania",
     "marketingName": "Carrier 5 Medicare",
     "minAge": 65,
@@ -3475,6 +5742,15 @@
     "planStatus": "Active",
     "market": "West",
     "region": "Arizona",
+    "serviceAreas": [
+      {
+        "state": "Arizona",
+        "stateAbbr": "AZ",
+        "counties": [
+          "Maricopa"
+        ]
+      }
+    ],
     "legalEntity": "Carrier 4 HealthCare",
     "marketingName": "Carrier 4 Medicare",
     "minAge": 65,

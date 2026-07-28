@@ -167,6 +167,16 @@ function payloadMatchesFilter(payload: Record<string, unknown>, filter?: HybridF
   if (!filter) return true;
   for (const [key, value] of Object.entries(filter)) {
     const actual = payload[key];
+    // Array-valued payloads (states, counties) must match if they CONTAIN the
+    // wanted value — Qdrant does this natively, and without the same rule here
+    // the keyword half would silently drop every candidate whenever a
+    // location filter is active.
+    if (Array.isArray(actual)) {
+      const wanted = Array.isArray(value) ? value : [value];
+      if (wanted.length === 0) continue;
+      if (!wanted.some((w) => (actual as unknown[]).includes(w))) return false;
+      continue;
+    }
     if (Array.isArray(value)) {
       if (value.length === 0) continue;
       if (!value.includes(actual as FilterValue)) return false;

@@ -78,8 +78,11 @@ export interface PlanPayload {
   // Optional aggregated benefit highlights (helps NL search across "dental"
   // queries even when the user is searching the plans collection directly).
   benefitHighlights?: string[];
-  // State coverage hint, derived from zipStateCounty mapping during indexing.
+  /** Two-letter states the plan is sold in, from the plan's serviceAreas. */
   states?: string[];
+  /** Counties served, as "CT/Fairfield" so a filter can't confuse two states
+   *  that share a county name. */
+  counties?: string[];
   [key: string]: unknown;
 }
 

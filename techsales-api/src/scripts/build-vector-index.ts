@@ -114,6 +114,7 @@ interface RawPlan {
   snpType?: string | null;
   minAge?: number | null;
   maxAge?: number | null;
+  serviceAreas?: Array<{ state: string; stateAbbr: string; counties: string[] }>;
   isDeleted?: boolean;
 }
 
@@ -195,25 +196,20 @@ async function buildPlanRecords(): Promise<IndexRecord[]> {
     benefitsByPlan.set(b.planId, arr);
   }
 
-  // Plans don't carry state coverage directly. The seed zipStateCounty data
-  // associates a `brand` (≈ carrier) with each ZIP — use the carrier match
-  // to annotate plans with the set of states the carrier operates in. This
-  // gives the searchPlans tool a usable `state` filter without inventing new
-  // schema.
-  const statesByCarrier = new Map<string, Set<string>>();
-  for (const z of zips) {
-    if (!z.brand) continue;
-    const set = statesByCarrier.get(z.brand) ?? new Set<string>();
-    set.add(z.stateAbbr);
-    statesByCarrier.set(z.brand, set);
-  }
-
   const records: IndexRecord[] = [];
   const text = payloadToSearchText('plans');
   for (const p of plans) {
     if (p.isDeleted) continue;
     const carrier = extractCarrier(p.planName);
-    const states = carrier ? Array.from(statesByCarrier.get(carrier) ?? []).sort() : [];
+    // Coverage comes from the plan's own service areas. (This used to be
+    // inferred from zipStateCounty.brand, which is "Carrier 1" on every row —
+    // so 30 of 80 plans indexed with an empty `states` and were invisible to
+    // any state filter.)
+    const areas = p.serviceAreas ?? [];
+    const states = areas.map((a) => a.stateAbbr).sort();
+    const counties = areas
+      .flatMap((a) => a.counties.map((c) => `${a.stateAbbr}/${c}`))
+      .sort();
     const planBenefits = benefitsByPlan.get(p.planId) ?? [];
     const benefitHighlights = planBenefits
       .filter((b) => b.category && b.categoryData)
@@ -239,6 +235,7 @@ async function buildPlanRecords(): Promise<IndexRecord[]> {
       isDeleted: false,
       benefitHighlights,
       states,
+      counties,
     };
     records.push({
       id: uuidV5(`plan:${p.planId}`, NAMESPACE_HEX),
