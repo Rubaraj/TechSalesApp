@@ -38,6 +38,12 @@ export function CallRuntime({ children }: { children?: ReactNode }) {
   // inbound calls). `getInCall` is a closure over a ref-shadowed view of
   // state so the heartbeat reports current state without re-subscribing
   // every render.
+  //
+  // Admins never heartbeat: they have no incoming-call UI, so a dial to
+  // their client identity fails instantly and burns the round-robin turn.
+  // The backend enforces this too (presence.controller) — this just saves
+  // the pointless traffic.
+  const isAdminUser = user?.accessLevel === 'admin' || user?.isSuperAdmin;
   const inCallRef = useRef<boolean>(false);
   inCallRef.current =
     state.isCallActive && state.callStatus !== 'idle';
@@ -45,6 +51,7 @@ export function CallRuntime({ children }: { children?: ReactNode }) {
   useEffect(() => {
     if (!twilioCall.isReady) return;
     if (!user?.userId) return;
+    if (isAdminUser) return;
     const handle = startHeartbeat({
       userId: user.userId,
       getInCall: () => inCallRef.current,
@@ -54,7 +61,7 @@ export function CallRuntime({ children }: { children?: ReactNode }) {
       heartbeatRef.current = null;
       handle.stop();
     };
-  }, [twilioCall.isReady, user?.userId]);
+  }, [twilioCall.isReady, user?.userId, isAdminUser]);
 
   // When the in-call state flips (call started/ended), post a beat NOW so
   // round-robin availability updates immediately — without this, an agent

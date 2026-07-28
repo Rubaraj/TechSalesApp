@@ -11,7 +11,7 @@
  */
 import type { Request, Response } from 'express';
 import { z } from 'zod';
-import { heartbeat, _debugSnapshot } from '../services/agentPresence.js';
+import { heartbeat, clearPresence, _debugSnapshot } from '../services/agentPresence.js';
 import { repos } from '../repositories/registry.js';
 import { logger } from '../config/logger.js';
 
@@ -39,6 +39,16 @@ export async function postPresenceHeartbeat(
       res.status(403).json({ success: false, error: 'Unknown or inactive user' });
       return;
     }
+    // Admins are NOT routable: they have no incoming-call UI, so Twilio's
+    // <Dial> to their client identity fails instantly — which used to burn
+    // the round-robin turn (and, with auto-screening on, handed the caller
+    // to the AI before any real agent rang). Enforced here rather than in
+    // the browser so a stale tab can't re-register itself.
+    if (user.accessLevel === 'admin' || user.isSuperAdmin) {
+      clearPresence(userId);
+      res.json({ success: true, data: { routable: false } });
+      return;
+    }
   } catch (err) {
     logger.error({ err, userId }, 'presence heartbeat: user lookup failed');
     res.status(500).json({ success: false, error: 'User lookup failed' });
@@ -46,7 +56,7 @@ export async function postPresenceHeartbeat(
   }
 
   heartbeat(userId, inCall);
-  res.json({ success: true });
+  res.json({ success: true, data: { routable: true } });
 }
 
 /** Dev-only snapshot of the presence registry. Mounted under `/_debug/` so

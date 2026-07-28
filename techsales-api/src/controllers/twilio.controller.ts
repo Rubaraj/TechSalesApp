@@ -15,7 +15,7 @@ import type { Request, Response } from 'express';
 import { env, autoScreeningEnabled } from '../config/env.js';
 import { logger } from '../config/logger.js';
 import { incrementMinutesForUser } from '../middleware/callMinuteCap.js';
-import { pickRoundRobin } from '../services/agentPresence.js';
+import { pickRoundRobin, clearPresence } from '../services/agentPresence.js';
 import { repos } from '../repositories/registry.js';
 import {
   getScreening,
@@ -123,6 +123,58 @@ const FALLBACK_TWIML =
   `<Hangup/>` +
   `</Response>`;
 
+/** Ring window we advertise to Twilio (seconds). */
+const RING_TIMEOUT_SECONDS = 20;
+/**
+ * A <Dial> that settles this fast never rang anybody — Twilio couldn't
+ * reach the client identity at all (browser closed, Device unregistered,
+ * presence gone stale inside its 60s TTL). Distinguishing that from a real
+ * unanswered ring matters: auto-screening a phantom dial hands the caller
+ * to the AI before any human had a chance.
+ */
+const MIN_RING_MS = 8_000;
+/** Re-dial at most this many agents before giving the call to the AI. */
+const MAX_DIAL_ATTEMPTS = 2;
+
+/** callSid → epoch ms when we handed Twilio the <Dial>. */
+const ringStarts = new Map<string, number>();
+
+function noteRingStart(callSid: string): void {
+  // Cheap prune — entries are normally deleted by the result webhook, but a
+  // screened/abandoned call can leave one behind.
+  if (ringStarts.size > 50) {
+    const cutoff = Date.now() - 5 * 60_000;
+    for (const [sid, at] of ringStarts) {
+      if (at < cutoff) ringStarts.delete(sid);
+    }
+  }
+  ringStarts.set(callSid, Date.now());
+}
+
+/** The inbound `<Dial>` verb — shared by the first ring and any re-ring. */
+function buildInboundDial(callSid: string, agentUserId: string, attempt: number): string {
+  const httpBase = (env.PUBLIC_BASE_URL ?? '').replace(/\/$/, '');
+  // ?agent= threads the rung agent into the action callback (Twilio's
+  // callback params omit the dialed <Client> identity); ?attempt= bounds
+  // the re-ring chain. Signature-safe: verifyTwilioSignature rebuilds the
+  // signed URL from PUBLIC_BASE_URL + req.originalUrl, query included.
+  const actionUrl =
+    `${httpBase}/api/twilio/incoming/result` +
+    `?agent=${encodeURIComponent(agentUserId)}&attempt=${attempt}`;
+  return (
+    `<Dial timeout="${RING_TIMEOUT_SECONDS}" action="${escapeXml(actionUrl)}" method="POST">` +
+    // Expanded <Client> form so the browser leg receives the PARENT (PSTN)
+    // CallSid as a custom parameter. The media stream publishes transcripts
+    // under the parent sid; without this bridge the FE would subscribe with
+    // its own child-leg sid and never match (inbound-only quirk).
+    `<Client>` +
+    `<Identity>${escapeXml(`agent_${agentUserId}`)}</Identity>` +
+    `<Parameter name="parentCallSid" value="${escapeXml(callSid)}"/>` +
+    `</Client>` +
+    `</Dial>`
+  );
+}
+
 /**
  * Phase 2.6 — Inbound PSTN call webhook.
  *
@@ -208,17 +260,8 @@ export async function twilioIncomingWebhook(req: Request, res: Response): Promis
   }
 
   const wsBase = env.PUBLIC_BASE_URL.replace(/\/$/, '').replace(/^https?/, 'wss');
-  const httpBase = env.PUBLIC_BASE_URL.replace(/\/$/, '');
   const streamUrl = `${wsBase}/ws/twilio-media`;
-  // ?agent= threads the rung agent into the action callback: Twilio's
-  // callback params do NOT include the dialed <Client> identity, and
-  // auto-screening needs it (greeting name, persona, tool scope, lead
-  // owner). Signature-safe — verifyTwilioSignature rebuilds the signed URL
-  // from PUBLIC_BASE_URL + req.originalUrl, which includes the query.
-  const actionUrl = `${httpBase}/api/twilio/incoming/result?agent=${encodeURIComponent(pickedUserId)}`;
-  const clientIdentity = `agent_${pickedUserId}`;
 
-  // 20s ring timeout. If the agent doesn't accept, `action` fires the fallback.
   // Phase 3b — stash the prospect's caller ID so the WS handler can hand it
   // to the callAnalysisAgent. The phone extractor uses it to suppress matches
   // where the prospect repeats their own number.
@@ -226,6 +269,7 @@ export async function twilioIncomingWebhook(req: Request, res: Response): Promis
     ? `<Parameter name="prospectNumber" value="${escapeXml(from)}"/>`
     : '';
 
+  noteRingStart(callSid);
   const twiml =
     `<?xml version="1.0" encoding="UTF-8"?>` +
     `<Response>` +
@@ -236,16 +280,7 @@ export async function twilioIncomingWebhook(req: Request, res: Response): Promis
     prospectNumberParam +
     `</Stream>` +
     `</Start>` +
-    `<Dial timeout="20" action="${escapeXml(actionUrl)}" method="POST">` +
-    // Expanded <Client> form so the browser leg receives the PARENT (PSTN)
-    // CallSid as a custom parameter. The media stream publishes transcripts
-    // under the parent sid; without this bridge the FE would subscribe with
-    // its own child-leg sid and never match (inbound-only quirk).
-    `<Client>` +
-    `<Identity>${escapeXml(clientIdentity)}</Identity>` +
-    `<Parameter name="parentCallSid" value="${escapeXml(callSid)}"/>` +
-    `</Client>` +
-    `</Dial>` +
+    buildInboundDial(callSid, pickedUserId, 1) +
     `</Response>`;
 
   res.type('text/xml').send(twiml);
@@ -302,6 +337,40 @@ export function twilioIncomingResultWebhook(req: Request, res: Response): void {
   }
 
   const agentUserId = typeof req.query.agent === 'string' ? req.query.agent : '';
+  const attempt = Number(req.query.attempt) || 1;
+
+  // Phantom-dial guard: settling in well under the ring window means Twilio
+  // never reached that client at all (browser closed, Device unregistered,
+  // presence stale inside its 60s TTL) — nobody was actually given the
+  // chance to answer. Drop that agent's stale presence and ring the next
+  // available one instead of handing the caller straight to the AI.
+  const ringStartedAt = ringStarts.get(callSid);
+  ringStarts.delete(callSid);
+  const rangForMs = ringStartedAt ? Date.now() - ringStartedAt : Number.MAX_SAFE_INTEGER;
+  if (callSid && agentUserId && rangForMs < MIN_RING_MS && attempt < MAX_DIAL_ATTEMPTS) {
+    clearPresence(agentUserId);
+    const nextUserId = pickRoundRobin();
+    if (nextUserId && nextUserId !== agentUserId && env.PUBLIC_BASE_URL) {
+      logger.warn(
+        { callSid, unreachable: agentUserId, nextUserId, rangForMs },
+        'inbound dial failed instantly — agent unreachable, re-ringing next agent',
+      );
+      noteRingStart(callSid);
+      res
+        .type('text/xml')
+        .send(
+          '<?xml version="1.0" encoding="UTF-8"?><Response>' +
+            buildInboundDial(callSid, nextUserId, attempt + 1) +
+            '</Response>',
+        );
+      return;
+    }
+    logger.warn(
+      { callSid, unreachable: agentUserId, rangForMs },
+      'inbound dial failed instantly — no other agent reachable',
+    );
+  }
+
   if (autoScreeningEnabled() && agentUserId && callSid) {
     const entry = registerScreening(callSid, agentUserId, { unattended: true });
     const twiml = buildScreeningTwiml({ callSid, userId: agentUserId, token: entry.token });
