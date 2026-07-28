@@ -155,6 +155,31 @@ const SAVE_CALLER_DETAILS_DEF: ScreeningFunctionDef = {
         type: 'string',
         description: 'When the caller wants the agent to call back (e.g. "tomorrow 10 AM")',
       },
+      medications: {
+        type: 'array',
+        description: 'Medications the caller says they take. Include the strength and how often when they say it.',
+        items: {
+          type: 'object',
+          properties: {
+            name: { type: 'string', description: 'Medication name, e.g. "Metformin"' },
+            dosage: { type: 'string', description: 'Strength as said, e.g. "500mg"' },
+            frequency: {
+              type: 'string',
+              description: 'How often, e.g. "Once daily", "Twice daily", "As needed"',
+            },
+          },
+          required: ['name'],
+        },
+      },
+      providers: {
+        type: 'array',
+        description: "Doctors the caller names, e.g. [\"Dr. Reeve\"]",
+        items: { type: 'string' },
+      },
+      pharmacy: {
+        type: 'string',
+        description: 'Pharmacy the caller uses — chain or store name, e.g. "CVS"',
+      },
     },
   },
 };
@@ -201,6 +226,13 @@ function publishToolCard(ctx: ScreeningToolContext, name: string, args: Record<s
       },
     ],
   });
+}
+
+/** Tolerate the model sending a single object/string where an array is asked for. */
+function asArray(value: unknown): unknown[] {
+  if (Array.isArray(value)) return value;
+  if (value === undefined || value === null || value === '') return [];
+  return [value];
 }
 
 function asCleanString(value: unknown): string | null {
@@ -257,6 +289,38 @@ function saveCallerDetails(args: Record<string, unknown>, ctx: ScreeningToolCont
   if (gender === 'male' || gender === 'female') {
     diff.gender = gender === 'male' ? 'Male' : 'Female';
     captured.push('gender');
+  }
+
+  // Clinical mentions are captured by NAME here; catalog resolution to real
+  // drug/pharmacy/provider ids happens once, at save time.
+  const medications = asArray(args.medications)
+    .map((m) => {
+      const row = (m ?? {}) as Record<string, unknown>;
+      const name = asCleanString(row.name);
+      if (!name) return null;
+      const dosage = asCleanString(row.dosage);
+      const frequency = asCleanString(row.frequency);
+      return { name, ...(dosage ? { dosage } : {}), ...(frequency ? { frequency } : {}) };
+    })
+    .filter((m): m is { name: string; dosage?: string; frequency?: string } => m !== null);
+  if (medications.length > 0) {
+    diff.drugs = medications;
+    captured.push('medications');
+  }
+
+  const providerNames = asArray(args.providers)
+    .map((p) => asCleanString(p))
+    .filter((n): n is string => !!n)
+    .map((name) => ({ name }));
+  if (providerNames.length > 0) {
+    diff.providers = providerNames;
+    captured.push('providers');
+  }
+
+  const pharmacy = asCleanString(args.pharmacy);
+  if (pharmacy) {
+    diff.pharmacies = [{ name: pharmacy }];
+    captured.push('pharmacy');
   }
 
   ingestScreeningEntities(ctx.callSid, diff);

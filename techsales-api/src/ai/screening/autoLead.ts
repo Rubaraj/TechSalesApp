@@ -16,6 +16,7 @@
 import { logger } from '../../config/logger.js';
 import { repos } from '../../repositories/registry.js';
 import { resolveZipGeo } from '../rules/entityExtractor.js';
+import { buildClinicalTags } from './liveLead.js';
 import type { ExtractedEntities } from '../types/call.types.js';
 import type { Lead } from '../../types/index.js';
 
@@ -61,20 +62,14 @@ export async function createLeadFromScreening(
     placeholders.push('gender', 'email');
     if (!zip) placeholders.push('zip code');
 
+    // Same catalog tagging the live path uses, so a lead created at teardown
+    // is indistinguishable from one saved mid-call.
+    const clinical = await buildClinicalTags(entities, zip || undefined);
+
     const noteParts = [
       '[AI screening] Lead captured by the automated assistant during call screening.',
       ...(input.noteLines ?? []),
-      entities.drugs && entities.drugs.length > 0
-        ? `Medications mentioned: ${entities.drugs
-            .map((d) => [d.name, d.dosage, d.frequency].filter(Boolean).join(' '))
-            .join(', ')}`
-        : null,
-      entities.pharmacies && entities.pharmacies.length > 0
-        ? `Pharmacy mentioned: ${entities.pharmacies.map((p) => p.name).join(', ')}`
-        : null,
-      entities.providers && entities.providers.length > 0
-        ? `Provider mentioned: ${entities.providers.map((p) => p.name).join(', ')}`
-        : null,
+      ...clinical.notes,
       `Placeholder fields to verify on callback: ${placeholders.join(', ')}.`,
     ].filter((l): l is string => !!l);
 
@@ -101,9 +96,9 @@ export async function createLeadFromScreening(
       permissionToContact: true,
       existingCarrier1Member: false,
       tobaccoUsage: false,
-      taggedPharmacies: [],
-      taggedDrugs: [],
-      taggedProviders: [],
+      taggedPharmacies: clinical.taggedPharmacies,
+      taggedDrugs: clinical.taggedDrugs,
+      taggedProviders: clinical.taggedProviders,
       notes: noteParts.join('\n'),
       assignedTo: agentUserId,
       createdAt: new Date().toISOString(),

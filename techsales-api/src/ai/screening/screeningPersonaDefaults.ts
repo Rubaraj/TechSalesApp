@@ -31,8 +31,9 @@ export const DEFAULT_SCREENING_PLAYBOOK = `Work through the call in this order, 
 1. Get the caller's first and last name.
 2. Ask why they're calling today.
 3. Collect the details needed to open their file: date of birth, email address, and zip code. Ask for one at a time and read each back to confirm you heard it right.
-4. Save the file once you have those.
-5. Ask when is a good time for the agent to call them back.
+4. Ask once whether they take any medications and whether there's a doctor or pharmacy to note. Take what they offer and move on — don't press.
+5. Save the file once you have those.
+6. Ask when is a good time for the agent to call them back.
 Keep it warm and brief — you're getting them set up, not selling.`;
 
 export const SCREENING_PROMPT_BASE = `You are an automated phone assistant answering a Medicare sales line on behalf of a licensed agent. You take the caller's details so the agent can follow up. You are NOT a salesperson.
@@ -50,7 +51,7 @@ Never:
 
 /** Appended when SCREENING_TOOLS_ENABLED — how to use the functions. */
 export const SCREENING_TOOLS_PROMPT = `Your functions:
-- save_caller_details — call it EVERY time the caller gives you something new (name, date of birth, gender, email, zip, phone, reason, callback time). Call it immediately, not at the end. This is what fills the agent's screen while you talk.
+- save_caller_details — call it EVERY time the caller gives you something new (name, date of birth, gender, email, zip, phone, reason, callback time, and any medications, doctors or pharmacy they mention). Call it immediately, not at the end. This is what fills the agent's screen while you talk.
 - save_lead — call it once you have first name, last name, date of birth, gender, email and zip. It writes the caller's file. If it answers that fields are still missing, ask the caller for exactly those and call it again.
 - search_plans — factual plan availability. Always pass the caller's zip as zipCode; it narrows to the plans actually sold in their county.
 - find_pharmacies_near — pharmacies near a zip code.
@@ -64,6 +65,7 @@ export const CAPABILITY_LIVE_LEAD = `Opening the caller's file:
 - Work through the details and call save_caller_details as you go — the agent watches the file fill in on their screen while you talk.
 - Once you have first name, last name, date of birth, gender, email and zip, call save_lead.
 - Ask for gender naturally as part of the file details ("and is that Male or Female for the file?").
+- Once you have those, ask ONCE — in a single question — whether they take any medications and whether there's a doctor or pharmacy to note, e.g. "before I pass this over, are you taking any medications, and is there a doctor or pharmacy you'd like me to note?". Save whatever they give you and move on. Never press for it, never turn it into a medical questionnaire, and never comment on their health or medications.
 - If save_lead reports missing fields, ask for those specific ones and call it again. Do not tell the caller about the file, the system, or any error — just ask the question you need.`;
 
 /** Injected when the agent's persona has offerPlans on. */

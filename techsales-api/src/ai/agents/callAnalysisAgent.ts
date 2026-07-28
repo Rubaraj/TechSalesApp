@@ -62,7 +62,7 @@ import {
   registerProactiveCoachTagWriter,
   __resetProactiveCoachForTests,
 } from '../live/proactiveCoach.js';
-import { consumeScreening } from '../screening/screeningState.js';
+import { consumeScreening, unwrittenNotes } from '../screening/screeningState.js';
 import { createLeadFromScreening } from '../screening/autoLead.js';
 import { finalizeScreeningLead } from '../screening/liveLead.js';
 
@@ -233,9 +233,10 @@ export function stopCallAnalysisByCallSid(callSid: string): void {
   const screening = consumeScreening(callSid);
   if (screening?.leadId) {
     // The assistant already saved this caller's lead mid-call — finalize it
-    // (append the post-call notes) instead of writing a second one. Applies
+    // with only the notes captured AFTER that save, instead of writing a
+    // second lead (or repeating lines the save already persisted). Applies
     // even after a takeover: the lead is real by then.
-    void finalizeScreeningLead(screening.leadId, screening.notes);
+    void finalizeScreeningLead(screening.leadId, unwrittenNotes(screening));
   } else if (screening && !screening.takenOver) {
     const entitiesSnapshot = accumulators.get(callSid) ?? emptyExtractedEntities();
     const callerNumber = callerNumbers.get(callSid);
@@ -654,13 +655,50 @@ export function ingestScreeningEntities(
 ): void {
   const current = accumulators.get(callSid);
   if (!current || Object.keys(diff).length === 0) return;
-  accumulators.set(callSid, { ...current, ...diff });
+
+  // Clinical lists ACCUMULATE — a plain spread would let each new mention
+  // wipe the previous ones. Dedupe by name so re-stating a medication is
+  // harmless, and keep only the genuinely new items for the UI actions.
+  const newDrugs = pickNewByName(current.drugs, diff.drugs);
+  const newPharmacies = pickNewByName(current.pharmacies, diff.pharmacies);
+  const newProviders = pickNewByName(current.providers, diff.providers);
+  const merged: ExtractedEntities = {
+    ...current,
+    ...diff,
+    drugs: [...current.drugs, ...newDrugs],
+    pharmacies: [...current.pharmacies, ...newPharmacies],
+    providers: [...current.providers, ...newProviders],
+  };
+  accumulators.set(callSid, merged);
+
   publish(callSid, { type: 'entities', entities: diff });
   // Also drive the lead form: these are the same actions the rule-based
   // extractor emits, so an open LeadForm fills in as the assistant talks.
-  const fills = buildFillActions(diff);
-  if (fills.length > 0) publish(callSid, { type: 'actions', actions: fills });
+  const actions = [
+    ...buildFillActions(diff),
+    ...buildDrugActions({ drugs: newDrugs }),
+    ...buildPharmacyActions(newPharmacies),
+    ...buildProviderActions(newProviders),
+  ];
+  if (actions.length > 0) publish(callSid, { type: 'actions', actions });
   addTag(callSid, 'entity', diff as Record<string, unknown>);
+}
+
+/** Items in `incoming` whose name isn't already present (case-insensitive). */
+function pickNewByName<T extends { name: string }>(
+  existing: T[] | undefined,
+  incoming: T[] | undefined,
+): T[] {
+  if (!incoming || incoming.length === 0) return [];
+  const seen = new Set((existing ?? []).map((e) => e.name.toLowerCase()));
+  const out: T[] = [];
+  for (const item of incoming) {
+    const key = item.name.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(item);
+  }
+  return out;
 }
 
 /** Caller's number for a live call — the screening bridge uses it to

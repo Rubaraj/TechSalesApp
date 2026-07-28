@@ -30,6 +30,9 @@ export interface ScreeningEntry {
   /** Lead written DURING the call (save_lead). Teardown finalizes this one
    *  instead of creating another. */
   leadId?: string;
+  /** How many `notes` entries were already persisted by the last lead save —
+   *  teardown appends only the ones after this, so nothing is written twice. */
+  notesWrittenCount?: number;
   /** The agent's browser has already been sent to the lead form. */
   navigatedToForm?: boolean;
 }
@@ -55,10 +58,18 @@ export function registerScreening(
 }
 
 /** Remember the lead written mid-call so teardown finalizes rather than
- *  creating a duplicate. */
+ *  creating a duplicate. Also marks how many note lines that write already
+ *  persisted, so teardown appends only what came after it. */
 export function setScreeningLeadId(callSid: string, leadId: string): void {
   const entry = entries.get(callSid);
-  if (entry) entry.leadId = leadId;
+  if (!entry) return;
+  entry.leadId = leadId;
+  entry.notesWrittenCount = entry.notes.length;
+}
+
+/** Note lines captured since the lead was last saved. */
+export function unwrittenNotes(entry: ScreeningEntry): string[] {
+  return entry.notes.slice(entry.notesWrittenCount ?? 0);
 }
 
 /**
