@@ -38,6 +38,12 @@ export interface Lead {
   assignedTo?: string;
   createdAt: string;
   createdBy: string;
+  /**
+   * How the lead was captured, when it wasn't typed by a human — currently
+   * 'AI-SCREENING'. `createdBy` stays the owning agent so the lead lands in
+   * their book (the Leads list scopes by it); this records the real source.
+   */
+  createdVia?: string;
   updatedAt?: string;
   updatedBy?: string;
 }

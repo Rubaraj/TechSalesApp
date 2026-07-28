@@ -183,7 +183,12 @@ export async function saveScreeningLead(
       notes: callNoteBlock(input.noteLines, true),
       assignedTo: agentUserId,
       createdAt: new Date().toISOString(),
-      createdBy: 'AI-SCREENING',
+      // The agent owns the lead: the Leads list scopes an agent's book by
+      // createdBy, so crediting 'AI-SCREENING' here would hide the record
+      // from the very person who has to work it. Provenance lives in
+      // createdVia and the "[AI screening]" note line.
+      createdBy: agentUserId,
+      createdVia: 'AI-SCREENING',
     };
 
     const created = await repos.lead.create(lead);

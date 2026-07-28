@@ -107,7 +107,10 @@ export async function createLeadFromScreening(
       notes: noteParts.join('\n'),
       assignedTo: agentUserId,
       createdAt: new Date().toISOString(),
-      createdBy: 'AI-SCREENING',
+      // Same as liveLead: the agent must own it or the Leads list (scoped by
+      // createdBy) hides it from them. Provenance → createdVia + the note.
+      createdBy: agentUserId,
+      createdVia: 'AI-SCREENING',
     };
 
     const created = await repos.lead.create(lead);
