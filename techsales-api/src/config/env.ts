@@ -155,6 +155,13 @@ const envSchema = z.object({
   // + save_caller_details). Off → the assistant still screens, just without
   // lookups or structured capture.
   SCREENING_TOOLS_ENABLED: truthy.default(true),
+  // Auto-screening: the assistant answers inbound calls nobody picked up
+  // (ring timeout / agent declined) and calls arriving with no agent online.
+  // Off → those callers hear the "we're not available" fallback.
+  SCREENING_AUTO_ENABLED: truthy.default(true),
+  // Screening identity used when NO agent is online — drives the greeting
+  // name, persona, tool data scope, and auto-lead ownership.
+  SCREENING_FALLBACK_USER_ID: z.string().default('USER-004'),
 
   // Public base URL the Pi tunnel exposes. Used for the TwiML <Stream url>
   // and any callbacks that need a full URL. e.g. https://techsales-dev.example.com
@@ -246,4 +253,9 @@ export function simulatorEnabled(): boolean {
 /** AI call screening on-switch: needs Twilio (real calls) + Deepgram. */
 export function screeningEnabled(): boolean {
   return env.SCREENING_ENABLED && env.TWILIO_ENABLED && !!env.DEEPGRAM_API_KEY;
+}
+
+/** Auto-screening (unanswered / nobody-online inbound calls). */
+export function autoScreeningEnabled(): boolean {
+  return screeningEnabled() && env.SCREENING_AUTO_ENABLED;
 }

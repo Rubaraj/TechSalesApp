@@ -45,6 +45,42 @@ async function post(path: string, callSid: string, userId: string): Promise<void
   if (!body.success) throw new Error(body.error ?? `Screening ${path} failed (${res.status})`);
 }
 
+export interface ScreeningStatus {
+  screening: boolean;
+  takenOver: boolean;
+}
+
+/** Is the backend currently AI-screening this call? Errors read as "no". */
+export async function fetchScreeningStatus(callSid: string): Promise<ScreeningStatus> {
+  try {
+    const res = await fetch(`${API_BASE}/screening/status/${encodeURIComponent(callSid)}`);
+    const body = (await res.json()) as ApiEnvelope<ScreeningStatus>;
+    if (!body.success || !body.data) return { screening: false, takenOver: false };
+    return body.data;
+  } catch {
+    return { screening: false, takenOver: false };
+  }
+}
+
+/**
+ * Auto-screening: when the 20s ring times out, the server answers with the
+ * assistant — but the browser only sees its leg get canceled, which looks
+ * identical to a plain missed call. Poll briefly to tell them apart before
+ * tearing the call panel down.
+ */
+export async function pollScreeningStatus(
+  callSid: string,
+  attempts = 3,
+  delayMs = 600,
+): Promise<boolean> {
+  for (let i = 0; i < attempts; i += 1) {
+    const status = await fetchScreeningStatus(callSid);
+    if (status.screening) return true;
+    if (i < attempts - 1) await new Promise((resolve) => setTimeout(resolve, delayMs));
+  }
+  return false;
+}
+
 export const startScreening = (callSid: string, userId: string): Promise<void> =>
   post('start', callSid, userId);
 export const takeoverScreening = (callSid: string, userId: string): Promise<void> =>

@@ -25,6 +25,7 @@ import { getScreening } from '../ai/screening/screeningState.js';
 import {
   DEFAULT_SCREENING_VOICE,
   DEFAULT_SCREENING_GREETING,
+  DEFAULT_UNATTENDED_GREETING,
   buildScreeningPrompt,
   renderGreeting,
 } from '../ai/screening/screeningPersonaDefaults.js';
@@ -78,9 +79,15 @@ function teardown(ctx: BridgeCtx, reason: string): void {
 function buildSettings(
   agentName: string | null,
   persona: ScreeningPersonaRecord | null,
+  unattended: boolean,
 ): Record<string, unknown> {
   const who = agentName ?? 'our agent';
-  const greeting = renderGreeting(persona?.greeting || DEFAULT_SCREENING_GREETING, who);
+  // Auto-screened calls override the persona greeting: the agent is not
+  // joining, so a custom "they'll be with you shortly" line would mislead
+  // the caller. Voice and instructions still come from the persona.
+  const greeting = unattended
+    ? renderGreeting(DEFAULT_UNATTENDED_GREETING, who)
+    : renderGreeting(persona?.greeting || DEFAULT_SCREENING_GREETING, who);
   const voice = persona?.voice || DEFAULT_SCREENING_VOICE;
   return {
     type: 'Settings',
@@ -114,6 +121,7 @@ function openDeepgram(
   ctx: BridgeCtx,
   agentName: string | null,
   persona: ScreeningPersonaRecord | null,
+  unattended: boolean,
 ): void {
   const dgWs = new WebSocket(DG_AGENT_URL, {
     headers: { Authorization: `Token ${env.DEEPGRAM_API_KEY}` },
@@ -121,7 +129,7 @@ function openDeepgram(
   ctx.dgWs = dgWs;
 
   dgWs.on('open', () => {
-    dgWs.send(JSON.stringify(buildSettings(agentName, persona)));
+    dgWs.send(JSON.stringify(buildSettings(agentName, persona, unattended)));
   });
   dgWs.on('message', (data: RawData, isBinary: boolean) => {
     if (ctx.closed) return;
@@ -289,7 +297,7 @@ function handleConnection(ws: WebSocket): void {
         void Promise.all([
           resolveAgentName(entry.agentUserId).catch(() => null),
           repos.screeningPersona.findByUserId(entry.agentUserId).catch(() => null),
-        ]).then(([name, persona]) => openDeepgram(ctx, name, persona));
+        ]).then(([name, persona]) => openDeepgram(ctx, name, persona, entry.unattended));
         return;
       }
       case 'media': {

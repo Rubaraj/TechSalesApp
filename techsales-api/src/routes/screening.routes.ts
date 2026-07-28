@@ -6,6 +6,10 @@
  *   POST /api/screening/takeover {callSid, userId} — agent takes over
  *   POST /api/screening/hangup   {callSid, userId} — end the call
  *
+ *   GET  /api/screening/status/:callSid — is this call AI-screened?
+ *        (the FE polls this when its ring leg is canceled, to tell an
+ *        auto-screen apart from a plain unanswered call)
+ *
  * Persona (per-agent assistant tuning — Header gear icon popup):
  *   GET    /api/screening/persona/:userId — saved persona + defaults + voices
  *   PUT    /api/screening/persona/:userId {greeting, instructions, voice}
@@ -25,7 +29,9 @@ import {
   registerScreening,
   getScreening,
   markTakenOver,
+  consumeScreening,
 } from '../ai/screening/screeningState.js';
+import { buildScreeningTwiml } from '../ai/screening/screeningTwiml.js';
 import {
   DEFAULT_SCREENING_GREETING,
   DEFAULT_SCREENING_VOICE,
@@ -76,23 +82,16 @@ screeningRouter.post(
     if (!input) return;
     const { callSid, userId } = input;
 
-    const base = (env.PUBLIC_BASE_URL ?? '').replace(/\/$/, '').replace(/^https?/, 'wss');
-    if (!base) {
+    const entry = registerScreening(callSid, userId);
+    // <Connect><Stream> is bidirectional AND blocking — redirecting the
+    // parent here cancels the in-progress <Dial> ringing the browser. No
+    // startFork: this call's transcription fork survives the redirect.
+    const twiml = buildScreeningTwiml({ callSid, userId, token: entry.token });
+    if (!twiml) {
+      consumeScreening(callSid);
       res.status(500).json({ success: false, error: 'PUBLIC_BASE_URL not configured' });
       return;
     }
-    const entry = registerScreening(callSid, userId);
-    const streamUrl = `${base}/ws/screening`;
-    // <Connect><Stream> is bidirectional AND blocking — redirecting the
-    // parent here cancels the in-progress <Dial> ringing the browser.
-    const twiml =
-      '<?xml version="1.0" encoding="UTF-8"?>' +
-      '<Response><Connect>' +
-      `<Stream url="${escapeXml(streamUrl)}">` +
-      `<Parameter name="callSid" value="${escapeXml(callSid)}"/>` +
-      `<Parameter name="userId" value="${escapeXml(userId)}"/>` +
-      `<Parameter name="token" value="${escapeXml(entry.token)}"/>` +
-      '</Stream></Connect></Response>';
     try {
       await getTwilioClient().calls(callSid).update({ twiml });
     } catch (err) {
@@ -155,6 +154,21 @@ screeningRouter.post(
     res.json({ success: true, data: { ended: true } });
   }),
 );
+
+/**
+ * Is this call currently AI-screened? The FE polls this the moment its
+ * ringing leg is canceled: an auto-screen (server answered on timeout)
+ * looks identical to a plain missed call from the browser's side.
+ * Always 200 — absence is `screening: false`, not an error. Never returns
+ * the auth token.
+ */
+screeningRouter.get('/status/:callSid', (req: Request, res: Response) => {
+  const entry = getScreening(String(req.params.callSid ?? ''));
+  res.json({
+    success: true,
+    data: { screening: !!entry, takenOver: entry?.takenOver ?? false },
+  });
+});
 
 // ---------------------------------------------------------------------------
 // Per-agent persona (self-service; POC userId posture like everything else).

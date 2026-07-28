@@ -34,6 +34,7 @@ import {
   setScreeningEnabled,
   isScreeningEnabled,
   startScreening,
+  pollScreeningStatus,
 } from '../services/screeningService';
 
 type HandleType = Awaited<
@@ -208,6 +209,26 @@ export function useTwilioCall(): UseTwilioCallResult {
           // AI screening: the Screen redirect CANCELS this ringing leg on
           // purpose — the panel must stay up (the assistant has the call).
           if (isScreeningActive()) return;
+          // Auto-screening: a ring timeout ALSO cancels this leg, and from
+          // here it's indistinguishable from a plain missed call. Ask the
+          // backend whether it answered with the assistant before tearing
+          // the panel down; if it did, switch to the live screening view
+          // (Take over / End work from there).
+          // Known gap: clicking Decline closes the panel locally while the
+          // server still auto-screens (Twilio reports it as `busy`) — the
+          // created lead + supervisor view are that call's visibility.
+          const parentSid = callLike.customParameters?.get('parentCallSid');
+          if (isScreeningEnabled() && parentSid) {
+            void (async () => {
+              if (await pollScreeningStatus(parentSid)) {
+                setScreeningActive(true);
+                screeningStarted(parentSid);
+              } else {
+                endCall();
+              }
+            })();
+            return;
+          }
           endCall();
         });
       });
@@ -221,7 +242,7 @@ export function useTwilioCall(): UseTwilioCallResult {
     } finally {
       initPromiseRef.current = null;
     }
-  }, [user?.userId, setIncomingRinging, endCall, bindCallLifecycle]);
+  }, [user?.userId, setIncomingRinging, endCall, bindCallLifecycle, screeningStarted]);
 
   // Phase 2.6 — eager init on login. Twilio needs `device.register()` to
   // have run BEFORE an inbound call arrives. The init is idempotent via

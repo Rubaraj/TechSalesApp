@@ -12,11 +12,17 @@
  *                                       the client didn't accept.
  */
 import type { Request, Response } from 'express';
-import { env } from '../config/env.js';
+import { env, autoScreeningEnabled } from '../config/env.js';
 import { logger } from '../config/logger.js';
 import { incrementMinutesForUser } from '../middleware/callMinuteCap.js';
 import { pickRoundRobin } from '../services/agentPresence.js';
-import { getScreening } from '../ai/screening/screeningState.js';
+import { repos } from '../repositories/registry.js';
+import {
+  getScreening,
+  registerScreening,
+  consumeScreening,
+} from '../ai/screening/screeningState.js';
+import { buildScreeningTwiml } from '../ai/screening/screeningTwiml.js';
 
 // E.164 — `+` followed by 1-15 digits. Reject anything else before we hand it
 // back as a <Number> child to <Dial>; otherwise an attacker forging a webhook
@@ -122,16 +128,20 @@ const FALLBACK_TWIML =
  *
  * Twilio POSTs here when a caller dials our company phone number. We:
  *   1. Round-robin to an available signed-in agent via `agentPresence`.
- *   2. If none available → fallback `<Say>+<Hangup/>`.
+ *   2. If none available → auto-screen (the Voice Agent answers, emitting
+ *      its own transcription fork since this path never built one), or the
+ *      fallback `<Say>+<Hangup/>` when auto-screening is off.
  *   3. Else → `<Start><Stream>` for diarization + `<Dial timeout="20"><Client>`
  *      pointing at the agent's Voice SDK identity. The Dial's `action`
- *      attribute fires `/api/twilio/incoming/result` when the dial settles.
+ *      attribute fires `/api/twilio/incoming/result` when the dial settles;
+ *      it carries `?agent=<userId>` so that handler knows who was rung (the
+ *      dialed client identity is NOT in Twilio's callback params).
  *
  * Speaker labels:  the Media Stream WS handler reads `direction=inbound` from
  * the Stream's customParameters and flips the track-to-speaker mapping (the
  * PSTN side is the parent call here, opposite of outbound — see ws handler).
  */
-export function twilioIncomingWebhook(req: Request, res: Response): void {
+export async function twilioIncomingWebhook(req: Request, res: Response): Promise<void> {
   const body = (req.body ?? {}) as Record<string, string>;
   const callSid = body.CallSid ?? '';
   const from = (body.From ?? '').trim();
@@ -144,6 +154,49 @@ export function twilioIncomingWebhook(req: Request, res: Response): void {
   );
 
   if (!pickedUserId) {
+    // Nobody online — hand the caller to the assistant rather than losing
+    // the lead. This path never built a <Start><Stream>, so the screening
+    // TwiML emits one (startFork) to drive analysis/entities/auto-lead.
+    // Belt-and-braces try/catch: a caller must never hear a Twilio error
+    // because auto-screening failed — any problem falls through to the
+    // fallback message. (`repos.user` throws SYNCHRONOUSLY when the
+    // registry isn't initialized, so a `.catch()` alone wouldn't hold.)
+    if (autoScreeningEnabled() && callSid) {
+      try {
+        const fallbackId = env.SCREENING_FALLBACK_USER_ID;
+        const fallbackUser = await repos.user.findById(fallbackId);
+        if (!fallbackUser) {
+          logger.error(
+            { fallbackId },
+            'auto-screen: SCREENING_FALLBACK_USER_ID not found — playing fallback message',
+          );
+        } else {
+          const entry = registerScreening(callSid, fallbackId, { unattended: true });
+          const twiml = buildScreeningTwiml({
+            callSid,
+            userId: fallbackId,
+            token: entry.token,
+            startFork: from ? { prospectNumber: from } : {},
+          });
+          if (twiml) {
+            logger.info(
+              { callSid, from, fallbackId },
+              'auto-screen: no agent online — AI answering',
+            );
+            res.type('text/xml').send(twiml);
+            return;
+          }
+          consumeScreening(callSid); // never leave a registration behind
+          logger.error(
+            { callSid },
+            'auto-screen: PUBLIC_BASE_URL missing — playing fallback message',
+          );
+        }
+      } catch (err) {
+        consumeScreening(callSid);
+        logger.error({ err, callSid }, 'auto-screen: failed — playing fallback message');
+      }
+    }
     res.type('text/xml').send(FALLBACK_TWIML);
     return;
   }
@@ -157,7 +210,12 @@ export function twilioIncomingWebhook(req: Request, res: Response): void {
   const wsBase = env.PUBLIC_BASE_URL.replace(/\/$/, '').replace(/^https?/, 'wss');
   const httpBase = env.PUBLIC_BASE_URL.replace(/\/$/, '');
   const streamUrl = `${wsBase}/ws/twilio-media`;
-  const actionUrl = `${httpBase}/api/twilio/incoming/result`;
+  // ?agent= threads the rung agent into the action callback: Twilio's
+  // callback params do NOT include the dialed <Client> identity, and
+  // auto-screening needs it (greeting name, persona, tool scope, lead
+  // owner). Signature-safe — verifyTwilioSignature rebuilds the signed URL
+  // from PUBLIC_BASE_URL + req.originalUrl, which includes the query.
+  const actionUrl = `${httpBase}/api/twilio/incoming/result?agent=${encodeURIComponent(pickedUserId)}`;
   const clientIdentity = `agent_${pickedUserId}`;
 
   // 20s ring timeout. If the agent doesn't accept, `action` fires the fallback.
@@ -197,34 +255,65 @@ export function twilioIncomingWebhook(req: Request, res: Response): void {
  * Phase 2.6 — Action callback fired when the inbound `<Dial>` settles.
  *
  * Twilio passes `DialCallStatus`: `completed | no-answer | busy | failed |
- * canceled`. On anything except `completed`, return the fallback TwiML so the
- * caller doesn't hear silence. On `completed`, return empty `<Response/>` —
- * Twilio just hangs up the parent leg.
+ * canceled`. `completed` → empty `<Response/>` (Twilio hangs up the parent).
+ * Anything else means the agent never took the call, so we auto-screen: the
+ * Voice Agent answers instead of playing "we're not available". The ring-time
+ * `<Start><Stream>` fork survives this redirect, so analysis, entities and
+ * auto-lead keep running — no startFork needed here.
+ *
+ * Note: an agent clicking Decline also lands here (as `busy`), so the AI
+ * answers that caller too. Accepted for the POC — the rule is "never lose an
+ * inbound call"; the agent still sees the lead the assistant creates.
  */
 export function twilioIncomingResultWebhook(req: Request, res: Response): void {
   const body = (req.body ?? {}) as Record<string, string>;
   const status = body.DialCallStatus ?? '';
+  const parentStatus = body.CallStatus ?? '';
   const callSid = body.CallSid ?? '';
-  logger.info({ callSid, status }, 'Twilio incoming result webhook');
+  logger.info({ callSid, status, parentStatus }, 'Twilio incoming result webhook');
+
+  const emptyResponse = '<?xml version="1.0" encoding="UTF-8"?><Response/>';
 
   // AI screening hedge: a redirect that interrupts the <Dial> should skip
   // this callback entirely — if it fires anyway, do NOT run the fallback
-  // TwiML (it would hang up a call the assistant is handling).
+  // TwiML (it would hang up a call the assistant is handling). This also
+  // absorbs a retried/duplicate fire of THIS handler after we register below.
   if (callSid && getScreening(callSid)) {
     logger.warn(
       { callSid, status },
       'Twilio incoming result fired for a SCREENED call — returning empty response',
     );
-    res.type('text/xml').send('<?xml version="1.0" encoding="UTF-8"?><Response/>');
+    res.type('text/xml').send(emptyResponse);
     return;
   }
 
   if (status === 'completed') {
-    res
-      .type('text/xml')
-      .send('<?xml version="1.0" encoding="UTF-8"?><Response/>');
+    res.type('text/xml').send(emptyResponse);
     return;
   }
+
+  // Dead-call guard: the caller hung up during the ring (child `canceled`,
+  // or the parent leg already gone). Answering would start an assistant
+  // session on a call nobody is on. `canceled` with a LIVE parent only
+  // happens on the manual-Screen redirect, which the guard above caught.
+  if (status === 'canceled' || parentStatus === 'completed' || parentStatus === 'canceled') {
+    res.type('text/xml').send(emptyResponse);
+    return;
+  }
+
+  const agentUserId = typeof req.query.agent === 'string' ? req.query.agent : '';
+  if (autoScreeningEnabled() && agentUserId && callSid) {
+    const entry = registerScreening(callSid, agentUserId, { unattended: true });
+    const twiml = buildScreeningTwiml({ callSid, userId: agentUserId, token: entry.token });
+    if (twiml) {
+      logger.info({ callSid, agentUserId, status }, 'auto-screen: unanswered ring — AI answering');
+      res.type('text/xml').send(twiml);
+      return;
+    }
+    consumeScreening(callSid); // never leave a registration behind
+    logger.error({ callSid }, 'auto-screen: PUBLIC_BASE_URL missing — playing fallback message');
+  }
+
   res.type('text/xml').send(FALLBACK_TWIML);
 }
 

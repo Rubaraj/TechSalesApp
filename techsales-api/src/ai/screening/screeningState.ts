@@ -20,17 +20,27 @@ export interface ScreeningEntry {
    *  (reason for calling, callback preference) — flow into the
    *  auto-created lead's note via createLeadFromScreening.noteLines. */
   notes: string[];
+  /** Auto-screened (ring timeout / declined / nobody online) rather than
+   *  handed over by an agent clicking Screen. Drives the greeting: the
+   *  agent is NOT about to join, so "they'll be with you shortly" would
+   *  be a lie. */
+  unattended: boolean;
 }
 
 const entries = new Map<string, ScreeningEntry>();
 
-export function registerScreening(callSid: string, agentUserId: string): ScreeningEntry {
+export function registerScreening(
+  callSid: string,
+  agentUserId: string,
+  opts?: { unattended?: boolean },
+): ScreeningEntry {
   const entry: ScreeningEntry = {
     agentUserId,
     token: randomUUID(),
     takenOver: false,
     startedAt: Date.now(),
     notes: [],
+    unattended: opts?.unattended ?? false,
   };
   entries.set(callSid, entry);
   return entry;
