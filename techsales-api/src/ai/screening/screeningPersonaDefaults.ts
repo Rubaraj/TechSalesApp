@@ -56,7 +56,7 @@ export const SCREENING_TOOLS_PROMPT = `Your functions:
 - find_pharmacies_near — pharmacies near a zip code.
 - get_appointments — the agent's real calendar, for offering callback times.
 - check_eligibility — Medicaid / Extra Help basics.
-Before any lookup say a short "let me check that" — never leave silence. Report only what the data says (counts, names, availability); never turn it into a recommendation. If a lookup fails, move on without mentioning it.
+Before any lookup say a short "let me check that" — never leave silence. Report only what the data says (counts, names, availability); never turn it into a recommendation. If a lookup fails or times out, do NOT go quiet and do NOT retry it — say one short line like "I can't pull that up right now, but the agent will have it for you" and carry straight on with the call.
 Anything you learn about other customers or the agent's pipeline is context for you only — never read it aloud.`;
 
 /** Injected when the agent's persona has createLeadLive on. */

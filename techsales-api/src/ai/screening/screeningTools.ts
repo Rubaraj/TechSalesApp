@@ -53,6 +53,13 @@ export interface ScreeningFunctionDef {
 const SAVE_CALLER_DETAILS = 'save_caller_details';
 const SAVE_LEAD = 'save_lead';
 
+/**
+ * Ceiling on any one function call. Deepgram holds generation until we
+ * reply, so this is really "how long the caller may hear silence" — keep it
+ * shorter than a person's patience, not as long as a backend would allow.
+ */
+const SCREENING_FN_TIMEOUT_MS = 4_000;
+
 const EXCLUDED_TOOLS = new Set([
   // FE-executed — their outputs are side-channel payloads only the browser
   // (AtlasContext) knows how to act on.
@@ -318,14 +325,42 @@ export async function executeScreeningFunction(
 
   try {
     publishToolCard(ctx, name, args);
-    if (name === SAVE_CALLER_DETAILS) return saveCallerDetails(args, ctx);
-    if (name === SAVE_LEAD) return await saveLead(ctx);
-    const tool = TOOL_MAP.get(name);
-    if (!tool) return JSON.stringify({ error: `Unknown function: ${name}` });
-    // Security: the voice model never picks the userId.
-    return await tool.invoke({ ...args, userId: ctx.agentUserId });
+    // Hard ceiling: Deepgram pauses generation until we answer, so a tool
+    // that never settles leaves the caller listening to silence. Always
+    // answer — a timed-out lookup is a result the assistant can talk around.
+    return await Promise.race([
+      runScreeningFunction(name, args, ctx),
+      timeoutAfter(SCREENING_FN_TIMEOUT_MS, ctx, name),
+    ]);
   } catch (err) {
     logger.error({ err, callSid: ctx.callSid, name }, 'screening: function execution failed');
     return JSON.stringify({ error: 'The lookup failed — continue without it.' });
   }
+}
+
+async function runScreeningFunction(
+  name: string,
+  args: Record<string, unknown>,
+  ctx: ScreeningToolContext,
+): Promise<string> {
+  if (name === SAVE_CALLER_DETAILS) return saveCallerDetails(args, ctx);
+  if (name === SAVE_LEAD) return await saveLead(ctx);
+  const tool = TOOL_MAP.get(name);
+  if (!tool) return JSON.stringify({ error: `Unknown function: ${name}` });
+  // Security: the voice model never picks the userId.
+  return await tool.invoke({ ...args, userId: ctx.agentUserId });
+}
+
+/** Resolves (never rejects) with a spoken-safe result once the cap elapses. */
+function timeoutAfter(ms: number, ctx: ScreeningToolContext, name: string): Promise<string> {
+  return new Promise<string>((resolve) => {
+    setTimeout(() => {
+      logger.warn({ callSid: ctx.callSid, name, ms }, 'screening: function timed out');
+      resolve(
+        JSON.stringify({
+          error: 'That lookup did not come back in time. Continue without it.',
+        }),
+      );
+    }, ms).unref?.();
+  });
 }

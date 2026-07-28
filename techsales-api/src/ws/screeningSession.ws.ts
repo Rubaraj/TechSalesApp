@@ -225,11 +225,21 @@ function openDeepgram(
             respond(JSON.stringify({ error: 'Session not ready' }));
             continue;
           }
+          // Always respond: DG pauses generation until we do, so a rejected
+          // promise here would strand the caller in silence.
           void executeScreeningFunction(fnName, fn.arguments ?? '{}', {
             callSid: ctx.callSid,
             agentUserId: ctx.agentUserId,
             createLeadLive: ctx.createLeadLive,
-          }).then(respond);
+          })
+            .then(respond)
+            .catch((err: unknown) => {
+              logger.error(
+                { err, callSid: ctx.callSid, fn: fnName },
+                'screening: function dispatch failed',
+              );
+              respond(JSON.stringify({ error: 'The lookup failed — continue without it.' }));
+            });
         }
         return;
       }

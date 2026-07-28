@@ -181,6 +181,24 @@ function payloadMatchesFilter(payload: Record<string, unknown>, filter?: HybridF
 
 const RRF_K = 60;
 
+/** Ceiling on the embedding call (see the note at its call site). */
+const EMBED_TIMEOUT_MS = 5_000;
+
+/**
+ * Reject after `ms`. The losing promise is NOT cancelled — it settles later
+ * and is ignored, which is fine here: the Qdrant SDK self-aborts and a
+ * stray embed result is harmless.
+ */
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  let timer: NodeJS.Timeout;
+  return Promise.race([
+    promise.finally(() => clearTimeout(timer)),
+    new Promise<never>((_resolve, reject) => {
+      timer = setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms);
+    }),
+  ]);
+}
+
 export async function hybridSearch<K extends CollectionKey>(
   input: HybridSearchInput<K>,
 ): Promise<Array<HybridHit<PayloadByKey[K]>>> {
@@ -192,7 +210,14 @@ export async function hybridSearch<K extends CollectionKey>(
   const client = getQdrantClient();
   let vectorRanking: Array<{ id: string; score: number; payload: PayloadByKey[K] }> = [];
   try {
-    const queryVector = await getEmbedder().embedQuery(query);
+    // The embedder (Ollama) has no timeout of its own — a host that accepts
+    // the socket and then stalls would block this call forever, which on a
+    // live voice call means silence until the caller gives up.
+    const queryVector = await withTimeout(
+      getEmbedder().embedQuery(query),
+      EMBED_TIMEOUT_MS,
+      'embedQuery',
+    );
     const qfilter = toQdrantFilter(filter);
     const hits = await client.search(def.name, {
       vector: queryVector,
