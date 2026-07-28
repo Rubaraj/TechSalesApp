@@ -243,8 +243,8 @@ interface SettingsMenuProps {
   onStartNew: () => void;
   onClose: () => void;
   startNewDisabled: boolean;
-  /** Opens the AI screening-assistant persona popup; omitted for admins
-   *  (they never receive inbound calls to screen). */
+  /** Opens the AI Persona popup (screening-assistant setup); omitted for
+   *  admins (they never receive inbound calls to screen). */
   onAssistantSettings?: () => void;
 }
 
@@ -325,7 +325,7 @@ function SettingsMenu({
           {onAssistantSettings && (
             <MenuItem
               icon={<Bot className="w-4 h-4" />}
-              label="AI assistant"
+              label="AI Persona"
               onClick={() => {
                 onAssistantSettings();
                 setOpen(false);

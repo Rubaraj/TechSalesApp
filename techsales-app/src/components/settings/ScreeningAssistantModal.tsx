@@ -1,5 +1,5 @@
 /**
- * AI screening assistant settings popup (Header › gear icon).
+ * AI Persona — the screening assistant's setup popup (Atlas gear menu).
  *
  * Lets the signed-in agent tune the persona the assistant uses when it
  * answers inbound calls on their behalf: voice, opening greeting
@@ -136,7 +136,7 @@ export function ScreeningAssistantModal({ isOpen, onClose }: ScreeningAssistantM
         setVoice(defaults.voice);
         setOfferPlans(defaults.offerPlans !== false);
         setCreateLeadLive(defaults.createLeadLive !== false);
-        setNotice('Reset to the built-in assistant. Takes effect on the next screened call.');
+        setNotice('Reset to the built-in persona. Takes effect on the next screened call.');
       })
       .catch((err: unknown) => {
         setError(err instanceof Error ? err.message : String(err));
@@ -148,7 +148,7 @@ export function ScreeningAssistantModal({ isOpen, onClose }: ScreeningAssistantM
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="AI Screening Assistant"
+      title="AI Persona"
       size="lg"
       footer={
         <>
@@ -157,7 +157,7 @@ export function ScreeningAssistantModal({ isOpen, onClose }: ScreeningAssistantM
               variant="outline"
               onClick={onReset}
               disabled={isLoading || isSaving || !isCustomized}
-              title="Delete your customization and go back to the built-in assistant"
+              title="Discard your changes and go back to the built-in persona"
             >
               Reset to default
             </Button>
