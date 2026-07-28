@@ -67,6 +67,17 @@ export interface CallBusCoachingEvent {
   ts: number;
 }
 
+/**
+ * AI screening — send the watching agent's browser to a route (the lead
+ * form as the assistant collects details, then the saved lead). Emitted
+ * only by the screening intake; ignored when nobody is watching.
+ */
+export interface CallBusNavigateEvent {
+  type: 'navigate';
+  route: string;
+  reason: string;
+}
+
 export type CallBusEvent =
   | CallBusTranscriptEvent
   | CallBusStatusEvent
@@ -74,7 +85,8 @@ export type CallBusEvent =
   | CallBusActionsEvent
   | CallBusEntitiesEvent
   | CallBusEmotionEvent
-  | CallBusCoachingEvent;
+  | CallBusCoachingEvent
+  | CallBusNavigateEvent;
 
 const emitters = new Map<string, EventEmitter>();
 

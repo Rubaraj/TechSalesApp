@@ -26,13 +26,20 @@ import type { ZodTypeAny } from 'zod';
 import { atlasTools } from '../tools/index.js';
 import { publish } from '../../services/callBus.js';
 import { logger } from '../../config/logger.js';
-import { ingestScreeningEntities } from '../agents/callAnalysisAgent.js';
-import { appendScreeningNote } from './screeningState.js';
+import {
+  ingestScreeningEntities,
+  getLiveEntities,
+  getCallerNumber,
+} from '../agents/callAnalysisAgent.js';
+import { appendScreeningNote, getScreening, claimScreeningNavigation } from './screeningState.js';
+import { saveScreeningLead } from './liveLead.js';
 import type { ExtractedEntities } from '../types/call.types.js';
 
 export interface ScreeningToolContext {
   callSid: string;
   agentUserId: string;
+  /** Persona toggle — drive the agent's browser + save the lead mid-call. */
+  createLeadLive?: boolean;
 }
 
 /** Shape Deepgram expects in `agent.think.functions[]` (no `endpoint` ⇒
@@ -44,6 +51,7 @@ export interface ScreeningFunctionDef {
 }
 
 const SAVE_CALLER_DETAILS = 'save_caller_details';
+const SAVE_LEAD = 'save_lead';
 
 const EXCLUDED_TOOLS = new Set([
   // FE-executed — their outputs are side-channel payloads only the browser
@@ -93,6 +101,7 @@ const TOOL_LABELS: Record<string, string> = {
   propose_lead_update: 'Proposed a lead update',
   append_lead_note: 'Added a lead note',
   [SAVE_CALLER_DETAILS]: 'Saved caller details',
+  [SAVE_LEAD]: 'Saved the lead',
 };
 
 function toFunctionDef(tool: InvokableTool): ScreeningFunctionDef {
@@ -116,13 +125,18 @@ const SAVE_CALLER_DETAILS_DEF: ScreeningFunctionDef = {
   name: SAVE_CALLER_DETAILS,
   description:
     'Save details the caller reveals about themselves. Call this EVERY time you learn any of ' +
-    'these — immediately, one call per new batch of details. This is how the lead record gets ' +
-    'created for the agent, so completeness matters.',
+    'these — immediately, one call per new batch of details. This is what fills the agent’s ' +
+    'screen while you talk, so completeness matters.',
   parameters: {
     type: 'object',
     properties: {
       firstName: { type: 'string', description: "Caller's first name" },
       lastName: { type: 'string', description: "Caller's last name" },
+      dateOfBirth: {
+        type: 'string',
+        description: 'Date of birth as YYYY-MM-DD (convert what the caller says, e.g. "March 2nd 1955" → 1955-03-02)',
+      },
+      gender: { type: 'string', enum: ['Male', 'Female'], description: 'Gender for the file' },
       zipCode: { type: 'string', description: '5-digit zip code' },
       phone: {
         type: 'string',
@@ -138,6 +152,16 @@ const SAVE_CALLER_DETAILS_DEF: ScreeningFunctionDef = {
   },
 };
 
+const SAVE_LEAD_DEF: ScreeningFunctionDef = {
+  name: SAVE_LEAD,
+  description:
+    "Save the caller's file. Call this once you have their first name, last name, date of " +
+    'birth, gender, email and zip code. If the answer says fields are still missing, ask the ' +
+    'caller for exactly those and call this again. Takes no arguments — it saves everything ' +
+    'you captured with save_caller_details.',
+  parameters: { type: 'object', properties: {} },
+};
+
 let cachedDefs: ScreeningFunctionDef[] | null = null;
 
 /** All function defs sent to Deepgram in Settings. Built once — the
@@ -145,7 +169,7 @@ let cachedDefs: ScreeningFunctionDef[] | null = null;
 export function buildScreeningFunctionDefs(): ScreeningFunctionDef[] {
   if (cachedDefs) return cachedDefs;
   cachedDefs = [...TOOL_MAP.values()].map(toFunctionDef);
-  cachedDefs.push(SAVE_CALLER_DETAILS_DEF);
+  cachedDefs.push(SAVE_CALLER_DETAILS_DEF, SAVE_LEAD_DEF);
   return cachedDefs;
 }
 
@@ -178,6 +202,16 @@ function asCleanString(value: unknown): string | null {
   return trimmed ? trimmed : null;
 }
 
+/** ISO date, or null when the model sent something unparseable. */
+function asIsoDate(value: unknown): string | null {
+  const raw = asCleanString(value);
+  if (!raw) return null;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+  const parsed = new Date(raw);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return parsed.toISOString().slice(0, 10);
+}
+
 function saveCallerDetails(args: Record<string, unknown>, ctx: ScreeningToolContext): string {
   const diff: Partial<ExtractedEntities> = {};
   const captured: string[] = [];
@@ -207,8 +241,30 @@ function saveCallerDetails(args: Record<string, unknown>, ctx: ScreeningToolCont
     diff.email = email;
     captured.push('email');
   }
+  const dob = asIsoDate(args.dateOfBirth);
+  if (dob) {
+    diff.dateOfBirth = dob;
+    captured.push('dateOfBirth');
+  }
+  const gender = asCleanString(args.gender)?.toLowerCase();
+  if (gender === 'male' || gender === 'female') {
+    diff.gender = gender === 'male' ? 'Male' : 'Female';
+    captured.push('gender');
+  }
 
   ingestScreeningEntities(ctx.callSid, diff);
+
+  // First real capture of the call → open the lead form in the watching
+  // agent's browser so they see it fill in as the assistant talks. The
+  // phone prefill matches what CallLeadRoutingHost/PendingCaptureNudge use.
+  if (ctx.createLeadLive && captured.length > 0 && claimScreeningNavigation(ctx.callSid)) {
+    const phone = getCallerNumber(ctx.callSid) ?? '';
+    publish(ctx.callSid, {
+      type: 'navigate',
+      route: phone ? `/leads/new?phone=${encodeURIComponent(phone)}` : '/leads/new',
+      reason: 'AI assistant is taking the caller’s details',
+    });
+  }
 
   const reason = asCleanString(args.reason);
   if (reason) {
@@ -222,6 +278,24 @@ function saveCallerDetails(args: Record<string, unknown>, ctx: ScreeningToolCont
   }
 
   return JSON.stringify({ saved: true, captured });
+}
+
+/**
+ * Write the caller's file. Answers with the still-missing fields (spoken
+ * labels) rather than an error when the intake isn't complete, so the
+ * voice model knows exactly what to ask next.
+ */
+async function saveLead(ctx: ScreeningToolContext): Promise<string> {
+  const entry = getScreening(ctx.callSid);
+  const result = await saveScreeningLead({
+    callSid: ctx.callSid,
+    agentUserId: ctx.agentUserId,
+    entities: getLiveEntities(ctx.callSid),
+    ...(entry?.callerNumber ? { callerNumber: entry.callerNumber } : {}),
+    ...(entry?.notes?.length ? { noteLines: entry.notes } : {}),
+    ...(entry?.leadId ? { existingLeadId: entry.leadId } : {}),
+  });
+  return JSON.stringify(result);
 }
 
 /**
@@ -245,6 +319,7 @@ export async function executeScreeningFunction(
   try {
     publishToolCard(ctx, name, args);
     if (name === SAVE_CALLER_DETAILS) return saveCallerDetails(args, ctx);
+    if (name === SAVE_LEAD) return await saveLead(ctx);
     const tool = TOOL_MAP.get(name);
     if (!tool) return JSON.stringify({ error: `Unknown function: ${name}` });
     // Security: the voice model never picks the userId.

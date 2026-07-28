@@ -17,6 +17,7 @@
  * (they're translated immediately into their own slices).
  */
 import { useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { callService } from '../services/callService';
 import { setAiHealth } from '../services/aiHealthStore';
 import { isScreeningActive, setScreeningActive } from '../services/screeningService';
@@ -140,6 +141,13 @@ export function useCallAnalysis(): void {
     endCall,
   } = useCallContext();
   const { user } = useAuth();
+  const navigate = useNavigate();
+  // Ref-shadowed so the SSE handler (bound once per call) always navigates
+  // with the current router instance without re-subscribing the stream.
+  const navigateRef = useRef(navigate);
+  useEffect(() => {
+    navigateRef.current = navigate;
+  }, [navigate]);
   const userId = user?.userId ?? '';
   const callSid = state.callSid;
   const abortRef = useRef<AbortController | null>(null);
@@ -254,6 +262,20 @@ export function useCallAnalysis(): void {
 
       if (event.type === 'entities') {
         mergeEntities(event.entities);
+        return;
+      }
+
+      if (event.type === 'navigate') {
+        // AI screening — the assistant opens the lead form as it collects
+        // details, then the saved lead. Only same-app routes arrive here
+        // (the backend allowlists them).
+        if (event.route.startsWith('/')) {
+          try {
+            navigateRef.current(event.route);
+          } catch {
+            // router not ready — the info card still records what happened
+          }
+        }
         return;
       }
 

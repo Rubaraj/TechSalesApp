@@ -80,6 +80,9 @@ export interface ExtractedEntities {
   lastName: string | null;
   phone: string | null;
   email: string | null;
+  /** Required by the Lead model. Captured by the screening assistant's
+   *  intake (the rule-based extractor never sets it). */
+  gender: 'Male' | 'Female' | null;
   medicareNumber: string | null;
   medicaidNumber: string | null;
   /** Phase 3b — anchor-phrase booleans the extractor sets when the prospect
@@ -100,6 +103,7 @@ export const emptyExtractedEntities = (): ExtractedEntities => ({
   lastName: null,
   phone: null,
   email: null,
+  gender: null,
   medicareNumber: null,
   medicaidNumber: null,
   isDualEligible: null,
@@ -128,6 +132,9 @@ export type CallStreamEvent =
       ts: number;
     }
   | { type: 'error'; error: string }
+  /** AI screening — route the watching agent's browser (lead form during
+   *  intake, then the saved lead). */
+  | { type: 'navigate'; route: string; reason: string }
   /** Gap 7 — LLM degradation state push (on stream open when degraded +
    *  on every transition while the stream is up). */
   | { type: 'ai_health'; status: 'ok' | 'degraded'; reason?: string; ts: number }

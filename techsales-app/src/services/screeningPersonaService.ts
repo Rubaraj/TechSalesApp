@@ -11,10 +11,15 @@ import { API_BASE } from '../api/apiBase';
 export interface ScreeningPersonaFields {
   /** Opening line; `{agent}` expands to the agent's display name. */
   greeting: string;
-  /** Personality/style layered on top of the fixed triage rules. */
+  /** The call playbook — what the assistant asks, and in what order. */
   instructions: string;
   /** Deepgram Aura TTS voice model (aura-2-*). */
   voice: string;
+  /** Look up and mention plan availability after saving the lead. */
+  offerPlans: boolean;
+  /** Run the intake and save the lead during the call, opening the lead
+   *  screen so it fills in live. */
+  createLeadLive: boolean;
 }
 
 export interface ScreeningVoiceOption {

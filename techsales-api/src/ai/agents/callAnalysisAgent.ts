@@ -64,6 +64,7 @@ import {
 } from '../live/proactiveCoach.js';
 import { consumeScreening } from '../screening/screeningState.js';
 import { createLeadFromScreening } from '../screening/autoLead.js';
+import { finalizeScreeningLead } from '../screening/liveLead.js';
 
 // --- Per-call state (cleaned up on stop) ----------------------------------
 
@@ -230,7 +231,12 @@ export function stopCallAnalysisByCallSid(callSid: string): void {
   // deletes. Call ended still-screened (no takeover) → auto-create a lead
   // from the accumulated entities; fire-and-forget, never blocks teardown.
   const screening = consumeScreening(callSid);
-  if (screening && !screening.takenOver) {
+  if (screening?.leadId) {
+    // The assistant already saved this caller's lead mid-call — finalize it
+    // (append the post-call notes) instead of writing a second one. Applies
+    // even after a takeover: the lead is real by then.
+    void finalizeScreeningLead(screening.leadId, screening.notes);
+  } else if (screening && !screening.takenOver) {
     const entitiesSnapshot = accumulators.get(callSid) ?? emptyExtractedEntities();
     const callerNumber = callerNumbers.get(callSid);
     void createLeadFromScreening({
@@ -488,6 +494,9 @@ function buildFillActions(diff: Partial<ExtractedEntities>): AiAction[] {
   if (diff.email) push('email', diff.email, 0.9);
   if (diff.firstName) push('firstName', diff.firstName, 0.7);
   if (diff.lastName) push('lastName', diff.lastName, 0.7);
+  // FormData calls it dateOfBirth (the Lead model calls it dob). Required
+  // to save, so the screening intake depends on this one.
+  if (diff.dateOfBirth) push('dateOfBirth', diff.dateOfBirth, 0.9);
   if (diff.medicareNumber) push('mbi', diff.medicareNumber, 0.9);
   if (diff.medicaidNumber) push('medicaidNumber', diff.medicaidNumber, 0.8);
   if (diff.isDualEligible === true) push('isDualEligible', true, 0.85);
@@ -647,7 +656,23 @@ export function ingestScreeningEntities(
   if (!current || Object.keys(diff).length === 0) return;
   accumulators.set(callSid, { ...current, ...diff });
   publish(callSid, { type: 'entities', entities: diff });
+  // Also drive the lead form: these are the same actions the rule-based
+  // extractor emits, so an open LeadForm fills in as the assistant talks.
+  const fills = buildFillActions(diff);
+  if (fills.length > 0) publish(callSid, { type: 'actions', actions: fills });
   addTag(callSid, 'entity', diff as Record<string, unknown>);
+}
+
+/** Caller's number for a live call — the screening bridge uses it to
+ *  recognize a caller who is already a lead. */
+export function getCallerNumber(callSid: string): string | undefined {
+  return callerNumbers.get(callSid);
+}
+
+/** Entity snapshot for a live call (screening intake reads it to decide
+ *  what's still missing before saving the lead). */
+export function getLiveEntities(callSid: string): ExtractedEntities {
+  return accumulators.get(callSid) ?? emptyExtractedEntities();
 }
 
 export function __resetAllForTests(): void {

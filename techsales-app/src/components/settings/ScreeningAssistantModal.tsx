@@ -34,6 +34,36 @@ const inputClass =
 const labelClass = 'block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1';
 const hintClass = 'mt-1 text-xs text-gray-500 dark:text-gray-400';
 
+interface ToggleRowProps {
+  id: string;
+  label: string;
+  hint: string;
+  checked: boolean;
+  onChange: (next: boolean) => void;
+}
+
+/** Checkbox styled as a settings row — label and hint are the click target. */
+function ToggleRow({ id, label, hint, checked, onChange }: ToggleRowProps) {
+  return (
+    <label
+      htmlFor={id}
+      className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors"
+    >
+      <input
+        id={id}
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+        className="mt-0.5 w-4 h-4 shrink-0 rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-2 focus:ring-primary-500"
+      />
+      <span className="min-w-0">
+        <span className="block text-sm font-medium text-gray-800 dark:text-gray-200">{label}</span>
+        <span className="block mt-0.5 text-xs text-gray-500 dark:text-gray-400">{hint}</span>
+      </span>
+    </label>
+  );
+}
+
 export function ScreeningAssistantModal({ isOpen, onClose }: ScreeningAssistantModalProps) {
   const { user } = useAuth();
   const userId = user?.userId ?? '';
@@ -50,6 +80,8 @@ export function ScreeningAssistantModal({ isOpen, onClose }: ScreeningAssistantM
   const [greeting, setGreeting] = useState('');
   const [instructions, setInstructions] = useState('');
   const [voice, setVoice] = useState('');
+  const [offerPlans, setOfferPlans] = useState(true);
+  const [createLeadLive, setCreateLeadLive] = useState(true);
 
   useEffect(() => {
     if (!isOpen || !userId) return;
@@ -64,6 +96,10 @@ export function ScreeningAssistantModal({ isOpen, onClose }: ScreeningAssistantM
         setGreeting(active.greeting);
         setInstructions(active.instructions);
         setVoice(active.voice);
+        // Personas saved before these toggles existed have them undefined —
+        // treat that as on, matching the backend's default.
+        setOfferPlans(active.offerPlans !== false);
+        setCreateLeadLive(active.createLeadLive !== false);
       })
       .catch((err: unknown) => {
         if (!stale) setError(err instanceof Error ? err.message : String(err));
@@ -80,13 +116,13 @@ export function ScreeningAssistantModal({ isOpen, onClose }: ScreeningAssistantM
     if (!userId) return;
     setIsSaving(true);
     setError(null);
-    saveScreeningPersona(userId, { greeting, instructions, voice })
+    saveScreeningPersona(userId, { greeting, instructions, voice, offerPlans, createLeadLive })
       .then(() => onClose())
       .catch((err: unknown) => {
         setError(err instanceof Error ? err.message : String(err));
       })
       .finally(() => setIsSaving(false));
-  }, [userId, greeting, instructions, voice, onClose]);
+  }, [userId, greeting, instructions, voice, offerPlans, createLeadLive, onClose]);
 
   const onReset = useCallback(() => {
     if (!userId || !defaults) return;
@@ -98,6 +134,8 @@ export function ScreeningAssistantModal({ isOpen, onClose }: ScreeningAssistantM
         setGreeting(defaults.greeting);
         setInstructions(defaults.instructions);
         setVoice(defaults.voice);
+        setOfferPlans(defaults.offerPlans !== false);
+        setCreateLeadLive(defaults.createLeadLive !== false);
         setNotice('Reset to the built-in assistant. Takes effect on the next screened call.');
       })
       .catch((err: unknown) => {
@@ -142,10 +180,10 @@ export function ScreeningAssistantModal({ isOpen, onClose }: ScreeningAssistantM
         <div className="flex items-start gap-2.5 p-3 rounded-lg bg-violet-50 dark:bg-violet-900/20 border border-violet-200 dark:border-violet-800">
           <Bot className="w-4 h-4 mt-0.5 shrink-0 text-violet-600 dark:text-violet-400" />
           <p className="text-xs text-violet-800 dark:text-violet-300">
-            This is the assistant that answers inbound calls on your behalf when you click{' '}
-            <span className="font-semibold">Screen</span>. It always follows the built-in triage
-            rules — no plan advice, no selling, and it discloses it&apos;s automated — your persona
-            is layered on top. Changes apply from the next screened call.
+            This is the assistant that answers inbound calls on your behalf — when you click{' '}
+            <span className="font-semibold">Screen</span>, and when a call goes unanswered. It
+            always discloses that it&apos;s automated and never advises which plan to choose;
+            everything else below is yours to set. Changes apply from the next screened call.
           </p>
         </div>
 
@@ -201,22 +239,38 @@ export function ScreeningAssistantModal({ isOpen, onClose }: ScreeningAssistantM
               </p>
             </div>
 
+            <div className="space-y-2.5">
+              <ToggleRow
+                id="screening-create-lead"
+                label="Take details and save the lead during the call"
+                hint="Asks for the details a lead record needs, opens the lead screen so you can watch it fill in, and saves it before the call ends."
+                checked={createLeadLive}
+                onChange={setCreateLeadLive}
+              />
+              <ToggleRow
+                id="screening-offer-plans"
+                label="Mention what plans are available"
+                hint="After saving, asks whether the caller wants to hear what's in their area and looks it up. It states facts only — never recommends a plan."
+                checked={offerPlans}
+                onChange={setOfferPlans}
+              />
+            </div>
+
             <div>
               <label htmlFor="screening-instructions" className={labelClass}>
-                Personality &amp; extra instructions
+                Call playbook
               </label>
               <textarea
                 id="screening-instructions"
-                className={inputClass}
-                rows={6}
+                className={`${inputClass} font-mono text-xs leading-relaxed`}
+                rows={10}
                 maxLength={4000}
-                placeholder="e.g. Be upbeat and briefly mention you can also note the best callback number. Keep a light, friendly tone."
                 value={instructions}
                 onChange={(e) => setInstructions(e.target.value)}
               />
               <p className={hintClass}>
-                Optional. Tone, phrasing, extra questions to ask — anything within the triage
-                rules.
+                What the assistant asks and in what order. Edit freely — this is the script it
+                follows on every screened call.
               </p>
             </div>
           </>

@@ -22,12 +22,14 @@ import { env } from '../config/env.js';
 import { logger } from '../config/logger.js';
 import { publish } from '../services/callBus.js';
 import { getScreening } from '../ai/screening/screeningState.js';
+import { getCallerNumber } from '../ai/agents/callAnalysisAgent.js';
 import {
   DEFAULT_SCREENING_VOICE,
   DEFAULT_SCREENING_GREETING,
   DEFAULT_UNATTENDED_GREETING,
   buildScreeningPrompt,
   renderGreeting,
+  type KnownLeadContext,
 } from '../ai/screening/screeningPersonaDefaults.js';
 import {
   buildScreeningFunctionDefs,
@@ -48,6 +50,8 @@ interface BridgeCtx {
   /** Screening agent's userId — injected into every tool invocation
    *  server-side (the voice model never chooses whose data it reads). */
   agentUserId: string | null;
+  /** Persona toggle — drive the browser + save the lead during the call. */
+  createLeadLive: boolean;
   twilioWs: WebSocket;
   dgWs: WebSocket | null;
   dgReady: boolean;
@@ -80,6 +84,7 @@ function buildSettings(
   agentName: string | null,
   persona: ScreeningPersonaRecord | null,
   unattended: boolean,
+  knownLead: KnownLeadContext | null,
 ): Record<string, unknown> {
   const who = agentName ?? 'our agent';
   // Auto-screened calls override the persona greeting: the agent is not
@@ -101,7 +106,13 @@ function buildSettings(
       listen: { provider: { type: 'deepgram', model: 'nova-3' } },
       think: {
         provider: { type: 'anthropic', model: env.SIMULATOR_THINK_MODEL },
-        prompt: buildScreeningPrompt(who, persona?.instructions ?? '', env.SCREENING_TOOLS_ENABLED),
+        prompt: buildScreeningPrompt(who, persona?.instructions ?? '', {
+          withTools: env.SCREENING_TOOLS_ENABLED,
+          // Absent persona → both capabilities on (the shipped defaults).
+          offerPlans: persona?.offerPlans ?? true,
+          createLeadLive: persona?.createLeadLive ?? true,
+          knownLead,
+        }),
         // Client-side function calling (no endpoint ⇒ DG sends
         // FunctionCallRequest over this socket) — the Atlas tool set.
         ...(env.SCREENING_TOOLS_ENABLED ? { functions: buildScreeningFunctionDefs() } : {}),
@@ -122,6 +133,7 @@ function openDeepgram(
   agentName: string | null,
   persona: ScreeningPersonaRecord | null,
   unattended: boolean,
+  knownLead: KnownLeadContext | null,
 ): void {
   const dgWs = new WebSocket(DG_AGENT_URL, {
     headers: { Authorization: `Token ${env.DEEPGRAM_API_KEY}` },
@@ -129,7 +141,7 @@ function openDeepgram(
   ctx.dgWs = dgWs;
 
   dgWs.on('open', () => {
-    dgWs.send(JSON.stringify(buildSettings(agentName, persona, unattended)));
+    dgWs.send(JSON.stringify(buildSettings(agentName, persona, unattended, knownLead)));
   });
   dgWs.on('message', (data: RawData, isBinary: boolean) => {
     if (ctx.closed) return;
@@ -216,6 +228,7 @@ function openDeepgram(
           void executeScreeningFunction(fnName, fn.arguments ?? '{}', {
             callSid: ctx.callSid,
             agentUserId: ctx.agentUserId,
+            createLeadLive: ctx.createLeadLive,
           }).then(respond);
         }
         return;
@@ -259,6 +272,7 @@ function handleConnection(ws: WebSocket): void {
     callSid: null,
     streamSid: null,
     agentUserId: null,
+    createLeadLive: true,
     twilioWs: ws,
     dgWs: null,
     dgReady: false,
@@ -294,10 +308,33 @@ function handleConnection(ws: WebSocket): void {
           { callSid, streamSid: ctx.streamSid, agentUserId: entry.agentUserId },
           'screening: bridge started',
         );
+        // The caller's number reaches us either from the registering webhook
+        // or (manual Screen) from the analysis session the ring-time fork
+        // started. Needed to recognize a caller already in the system.
+        const callerNumber = entry.callerNumber ?? getCallerNumber(callSid);
         void Promise.all([
           resolveAgentName(entry.agentUserId).catch(() => null),
           repos.screeningPersona.findByUserId(entry.agentUserId).catch(() => null),
-        ]).then(([name, persona]) => openDeepgram(ctx, name, persona, entry.unattended));
+          callerNumber
+            ? repos.lead.findByPhone(callerNumber).catch(() => null)
+            : Promise.resolve(null),
+        ]).then(([name, persona, lead]) => {
+          ctx.createLeadLive = persona?.createLeadLive ?? true;
+          const knownLead: KnownLeadContext | null = lead
+            ? {
+                leadId: lead.leadId,
+                firstName: lead.firstName,
+                lastName: lead.lastName,
+                ...(lead.leadStatus ? { leadStatus: lead.leadStatus } : {}),
+                ...(lead.zipCode ? { zipCode: lead.zipCode } : {}),
+                ...(lead.notes ? { notes: lead.notes } : {}),
+              }
+            : null;
+          if (knownLead) {
+            logger.info({ callSid, leadId: knownLead.leadId }, 'screening: caller is a known lead');
+          }
+          openDeepgram(ctx, name, persona, entry.unattended, knownLead);
+        });
         return;
       }
       case 'media': {

@@ -25,6 +25,13 @@ export interface ScreeningEntry {
    *  agent is NOT about to join, so "they'll be with you shortly" would
    *  be a lie. */
   unattended: boolean;
+  /** Caller's number — used to recognize a caller already in the system. */
+  callerNumber?: string;
+  /** Lead written DURING the call (save_lead). Teardown finalizes this one
+   *  instead of creating another. */
+  leadId?: string;
+  /** The agent's browser has already been sent to the lead form. */
+  navigatedToForm?: boolean;
 }
 
 const entries = new Map<string, ScreeningEntry>();
@@ -32,7 +39,7 @@ const entries = new Map<string, ScreeningEntry>();
 export function registerScreening(
   callSid: string,
   agentUserId: string,
-  opts?: { unattended?: boolean },
+  opts?: { unattended?: boolean; callerNumber?: string },
 ): ScreeningEntry {
   const entry: ScreeningEntry = {
     agentUserId,
@@ -41,9 +48,29 @@ export function registerScreening(
     startedAt: Date.now(),
     notes: [],
     unattended: opts?.unattended ?? false,
+    ...(opts?.callerNumber ? { callerNumber: opts.callerNumber } : {}),
   };
   entries.set(callSid, entry);
   return entry;
+}
+
+/** Remember the lead written mid-call so teardown finalizes rather than
+ *  creating a duplicate. */
+export function setScreeningLeadId(callSid: string, leadId: string): void {
+  const entry = entries.get(callSid);
+  if (entry) entry.leadId = leadId;
+}
+
+/**
+ * Claim the one-time "open the lead form in the agent's browser" nav for
+ * this call. Returns true the first time only. Lives on the entry (not a
+ * module Set) so it's cleaned up with the rest of the call state.
+ */
+export function claimScreeningNavigation(callSid: string): boolean {
+  const entry = entries.get(callSid);
+  if (!entry || entry.navigatedToForm) return false;
+  entry.navigatedToForm = true;
+  return true;
 }
 
 /** Record a note line from the screening assistant (no-op when the call

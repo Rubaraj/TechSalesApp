@@ -19,6 +19,8 @@ const screeningPersonaSchema = new Schema<ScreeningPersonaRecord>(
     // Mongoose `required` rejects empty strings — instructions may be ''.
     instructions: { type: String, default: '' },
     voice: { type: String, required: true },
+    offerPlans: { type: Boolean, default: true },
+    createLeadLive: { type: Boolean, default: true },
     createdAt: { type: String, required: true },
     updatedAt: { type: String },
   },

@@ -2,7 +2,7 @@
  * Databricks-backed screening-persona repository — same surface as
  * `MongoScreeningPersonaRepository`.
  */
-import type { ScreeningPersonaRecord } from '../../types/index.js';
+import type { ScreeningPersonaRecord, ScreeningPersonaUpdate } from '../../types/index.js';
 import { formatDate } from '../../utils/paginate.js';
 import {
   APP_TABLES,
@@ -24,7 +24,7 @@ export class DatabricksScreeningPersonaRepository {
 
   async upsert(
     userId: string,
-    updates: Pick<ScreeningPersonaRecord, 'greeting' | 'instructions' | 'voice'>,
+    updates: ScreeningPersonaUpdate,
   ): Promise<ScreeningPersonaRecord> {
     const now = formatDate();
     const existing = await this.findByUserId(userId);

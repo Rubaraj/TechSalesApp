@@ -223,7 +223,10 @@ export async function twilioIncomingWebhook(req: Request, res: Response): Promis
             'auto-screen: SCREENING_FALLBACK_USER_ID not found — playing fallback message',
           );
         } else {
-          const entry = registerScreening(callSid, fallbackId, { unattended: true });
+          const entry = registerScreening(callSid, fallbackId, {
+          unattended: true,
+          ...(from ? { callerNumber: from } : {}),
+        });
           const twiml = buildScreeningTwiml({
             callSid,
             userId: fallbackId,
@@ -372,7 +375,11 @@ export function twilioIncomingResultWebhook(req: Request, res: Response): void {
   }
 
   if (autoScreeningEnabled() && agentUserId && callSid) {
-    const entry = registerScreening(callSid, agentUserId, { unattended: true });
+    const callerNumber = (body.From ?? '').trim();
+    const entry = registerScreening(callSid, agentUserId, {
+      unattended: true,
+      ...(callerNumber ? { callerNumber } : {}),
+    });
     const twiml = buildScreeningTwiml({ callSid, userId: agentUserId, token: entry.token });
     if (twiml) {
       logger.info({ callSid, agentUserId, status }, 'auto-screen: unanswered ring — AI answering');

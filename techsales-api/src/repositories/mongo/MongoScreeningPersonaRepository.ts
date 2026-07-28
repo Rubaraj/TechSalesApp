@@ -1,4 +1,4 @@
-import type { ScreeningPersonaRecord } from '../../types/index.js';
+import type { ScreeningPersonaRecord, ScreeningPersonaUpdate } from '../../types/index.js';
 import { getScreeningPersonaModel } from '../../models/screeningPersona.model.js';
 import { formatDate } from '../../utils/paginate.js';
 
@@ -24,7 +24,7 @@ export class MongoScreeningPersonaRepository {
 
   async upsert(
     userId: string,
-    updates: Pick<ScreeningPersonaRecord, 'greeting' | 'instructions' | 'voice'>,
+    updates: ScreeningPersonaUpdate,
   ): Promise<ScreeningPersonaRecord> {
     const now = formatDate();
     const updated = await this.model()

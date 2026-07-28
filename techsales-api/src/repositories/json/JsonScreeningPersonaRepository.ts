@@ -1,5 +1,5 @@
 import path from 'node:path';
-import type { ScreeningPersonaRecord } from '../../types/index.js';
+import type { ScreeningPersonaRecord, ScreeningPersonaUpdate } from '../../types/index.js';
 import { JsonStore } from './JsonStore.js';
 import { BOOTSTRAP_PATHS } from '../../utils/bootstrap.js';
 import { env } from '../../config/env.js';
@@ -24,7 +24,7 @@ export class JsonScreeningPersonaRepository {
 
   async upsert(
     userId: string,
-    updates: Pick<ScreeningPersonaRecord, 'greeting' | 'instructions' | 'voice'>,
+    updates: ScreeningPersonaUpdate,
   ): Promise<ScreeningPersonaRecord> {
     const s = await this.getStore();
     const now = formatDate();

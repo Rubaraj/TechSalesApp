@@ -272,6 +272,16 @@ export async function getCallAnalyzeStream(req: Request, res: Response): Promise
       writeEvent(wireEvent);
       return;
     }
+    // AI screening — route the agent's browser (lead form / saved lead).
+    if (busEvent.type === 'navigate') {
+      const wireEvent: CallStreamEvent = {
+        type: 'navigate',
+        route: busEvent.route,
+        reason: busEvent.reason,
+      };
+      writeEvent(wireEvent);
+      return;
+    }
   });
 
   const cleanup = (): void => {

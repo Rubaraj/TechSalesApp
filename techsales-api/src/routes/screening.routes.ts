@@ -32,9 +32,11 @@ import {
   consumeScreening,
 } from '../ai/screening/screeningState.js';
 import { buildScreeningTwiml } from '../ai/screening/screeningTwiml.js';
+import { getCallerNumber } from '../ai/agents/callAnalysisAgent.js';
 import {
   DEFAULT_SCREENING_GREETING,
   DEFAULT_SCREENING_VOICE,
+  DEFAULT_SCREENING_PLAYBOOK,
 } from '../ai/screening/screeningPersonaDefaults.js';
 import { CURATED_VOICES } from '../ai/simulator/personas.js';
 
@@ -82,7 +84,13 @@ screeningRouter.post(
     if (!input) return;
     const { callSid, userId } = input;
 
-    const entry = registerScreening(callSid, userId);
+    // The ring-time media fork already knows the caller's number; fall back
+    // to whatever the browser sent. Used to recognize a returning caller.
+    const callerNumber =
+      getCallerNumber(callSid) ?? String((req.body as { callerNumber?: string })?.callerNumber ?? '');
+    const entry = registerScreening(callSid, userId, {
+      ...(callerNumber ? { callerNumber } : {}),
+    });
     // <Connect><Stream> is bidirectional AND blocking — redirecting the
     // parent here cancels the in-progress <Dial> ringing the browser. No
     // startFork: this call's transcription fork survives the redirect.
@@ -178,8 +186,10 @@ screeningRouter.get('/status/:callSid', (req: Request, res: Response) => {
 
 const PERSONA_DEFAULTS = {
   greeting: DEFAULT_SCREENING_GREETING,
-  instructions: '',
+  instructions: DEFAULT_SCREENING_PLAYBOOK,
   voice: DEFAULT_SCREENING_VOICE,
+  offerPlans: true,
+  createLeadLive: true,
 };
 
 const MAX_GREETING_CHARS = 400;
@@ -217,10 +227,20 @@ screeningRouter.put(
   asyncHandler(async (req: Request, res: Response) => {
     const userId = await requireUser(req, res);
     if (!userId) return;
-    const body = (req.body ?? {}) as { greeting?: unknown; instructions?: unknown; voice?: unknown };
+    const body = (req.body ?? {}) as {
+      greeting?: unknown;
+      instructions?: unknown;
+      voice?: unknown;
+      offerPlans?: unknown;
+      createLeadLive?: unknown;
+    };
     const greeting = String(body.greeting ?? '').trim();
     const instructions = String(body.instructions ?? '').trim();
     const voice = String(body.voice ?? '').trim();
+    // Toggles default ON — an older client that omits them keeps the
+    // shipped behavior rather than silently disabling it.
+    const offerPlans = body.offerPlans !== false;
+    const createLeadLive = body.createLeadLive !== false;
     if (!greeting) {
       res.status(400).json({ success: false, error: '`greeting` is required' });
       return;
@@ -248,8 +268,10 @@ screeningRouter.put(
       greeting,
       instructions,
       voice,
+      offerPlans,
+      createLeadLive,
     });
-    logger.info({ userId, voice }, 'screening: persona saved');
+    logger.info({ userId, voice, offerPlans, createLeadLive }, 'screening: persona saved');
     res.json({ success: true, data: { persona } });
   }),
 );
