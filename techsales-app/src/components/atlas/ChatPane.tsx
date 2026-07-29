@@ -7,7 +7,7 @@
  * Tool calls render as a collapsible mono card. The call's AI activity
  * log is interleaved chronologically as tinted rows.
  */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Send, Square, ChevronDown, ChevronUp, Wrench, Check } from 'lucide-react';
 import {
   useAtlas,
@@ -29,6 +29,10 @@ import { AtlasMarkdown } from './AtlasMarkdown';
 
 type AtlasMessage = ReturnType<typeof useAtlas>['messages'][number];
 type ToolCall = NonNullable<AtlasMessage['toolCalls']>[number];
+
+/** How close to the bottom still counts as "following the conversation".
+ *  Generous enough to survive a part-rendered row or a growing token. */
+const STICK_THRESHOLD_PX = 80;
 
 type ChatRow =
   | { kind: 'msg'; id: string; ts: number; data: AtlasMessage }
@@ -118,8 +122,11 @@ export function ChatPane(): React.JSX.Element {
       ts: c.ts,
       data: c,
     }));
-    // Newest-first (user decision): the whole feed sorts descending so the
-    // latest tip/flag/reply is always at the top — no scrolling mid-call.
+    // Oldest-first, like any chat: a conversation only reads correctly in the
+    // order it happened. The newest row still stays in view because the list
+    // sticks to the bottom (see the scroll effect below) — that's what keeps
+    // mid-call tips visible without scrolling, which is what the earlier
+    // newest-first ordering was really for.
     return [
       ...msgRows,
       ...activityRows,
@@ -128,7 +135,7 @@ export function ChatPane(): React.JSX.Element {
       ...dialRows,
       ...leadRows,
       ...cardRows,
-    ].sort((a, b) => b.ts - a.ts);
+    ].sort((a, b) => a.ts - b.ts);
   }, [
     messages,
     proposals,
@@ -138,14 +145,23 @@ export function ChatPane(): React.JSX.Element {
     cards,
     mode,
     callState.aiActivityLog,
-    callState.isCallActive,
   ]);
 
-  useEffect(() => {
-    // Newest-first feed → keep the viewport anchored at the top.
+  // Stick to the bottom so the newest row is always visible — but only while
+  // the reader is already there. Once they scroll up to re-read something,
+  // incoming tips and tokens must not yank them back down.
+  const stickToBottomRef = useRef(true);
+  const onListScroll = useCallback((): void => {
     const el = listRef.current;
-    if (el) el.scrollTop = 0;
-  }, [rows.length, isStreaming]);
+    if (!el) return;
+    const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+    stickToBottomRef.current = distanceFromBottom <= STICK_THRESHOLD_PX;
+  }, []);
+
+  useEffect(() => {
+    const el = listRef.current;
+    if (el && stickToBottomRef.current) el.scrollTop = el.scrollHeight;
+  });
 
   const onSubmit = (e: React.FormEvent): void => {
     e.preventDefault();
@@ -159,6 +175,7 @@ export function ChatPane(): React.JSX.Element {
     <div className="flex-1 min-h-0 flex flex-col">
       <div
         ref={listRef}
+        onScroll={onListScroll}
         className="atlas-chat-scroll flex-1 overflow-y-auto px-4 py-4"
         role="log"
         aria-live="polite"
