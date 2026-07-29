@@ -44,6 +44,19 @@ const MAX_ACTION_LOG = 200;
 // brisk AI activity; drop-oldest beyond that.
 const MAX_AI_ACTIVITY = 100;
 
+/**
+ * Activity rows that survive hangup: what the AI actually captured, plus the
+ * post-call summary. Everything else in the feed is in-the-moment guidance
+ * (coaching / compliance / emotion / info cards) and is cleared on END_CALL.
+ */
+const POST_CALL_KEPT_KINDS = new Set<AiActivityEntry['kind']>([
+  'fill',
+  'drug',
+  'pharmacy',
+  'provider',
+  'note',
+]);
+
 function newActionId(): string {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
     return crypto.randomUUID();
@@ -153,9 +166,13 @@ function reducer(state: CallState, action: Action): CallState {
       return {
         ...initialCallState(),
         currentPage: state.currentPage,
-        // Keep the AI activity trail visible after hangup (post-call notes
-        // land here seconds after teardown). START_CALL clears it fresh.
-        aiActivityLog: state.aiActivityLog,
+        // Live guidance (coaching, compliance, emotion, info) is only useful
+        // while the call is happening — it was cluttering the chat long after
+        // hangup. Drop it, but keep the record of what the AI captured, and
+        // keep the log alive so the post-call summary note (which lands a
+        // second or two AFTER teardown) still has somewhere to arrive.
+        // START_CALL clears the whole thing fresh.
+        aiActivityLog: state.aiActivityLog.filter((e) => POST_CALL_KEPT_KINDS.has(e.kind)),
         // Gap 2 — captured entities/actions SURVIVE the call so the agent
         // can open the lead form afterwards and still apply them (the
         // PendingCaptureNudge points there). Cleared on the next START_CALL.
