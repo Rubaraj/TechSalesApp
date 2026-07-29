@@ -38,7 +38,11 @@ import {
   DEFAULT_SCREENING_VOICE,
   DEFAULT_SCREENING_PLAYBOOK,
 } from '../ai/screening/screeningPersonaDefaults.js';
-import { CURATED_VOICES } from '../ai/simulator/personas.js';
+import {
+  CURATED_VOICES,
+  CURATED_VOICE_IDS,
+  isCuratedVoice,
+} from '../ai/simulator/personas.js';
 
 export const screeningRouter = Router();
 
@@ -258,10 +262,12 @@ screeningRouter.put(
       });
       return;
     }
-    if (!voice.startsWith('aura-')) {
+    // Verified id only — an aura-shaped but non-existent voice would pass here
+    // and then fail at session open, taking a live call down with it.
+    if (!isCuratedVoice(voice)) {
       res
         .status(400)
-        .json({ success: false, error: '`voice` must be a Deepgram Aura model (aura-…)' });
+        .json({ success: false, error: `\`voice\` must be one of: ${CURATED_VOICE_IDS}` });
       return;
     }
     const persona = await repos.screeningPersona.upsert(userId, {

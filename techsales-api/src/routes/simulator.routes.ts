@@ -19,6 +19,8 @@ import {
   invalidatePersonasCache,
   slugifyPersonaId,
   CURATED_VOICES,
+  CURATED_VOICE_IDS,
+  isCuratedVoice,
 } from '../ai/simulator/personas.js';
 import { simulatorEnabled } from '../config/env.js';
 import type { SimulatorPersonaRecord } from '../types/index.js';
@@ -61,8 +63,11 @@ function cleanPersonaBody(
   if (body.prompt !== undefined) value.prompt = String(body.prompt).trim();
   if (body.voice !== undefined) {
     const voice = String(body.voice).trim();
-    if (!voice.startsWith('aura-')) {
-      return { error: '`voice` must be a Deepgram Aura model id (aura-…)' };
+    // Must be a verified id, not merely aura-shaped: Deepgram only rejects an
+    // unknown voice when the session opens, which kills the practice call
+    // instead of failing here.
+    if (!isCuratedVoice(voice)) {
+      return { error: `\`voice\` must be one of: ${CURATED_VOICE_IDS}` };
     }
     value.voice = voice;
   }

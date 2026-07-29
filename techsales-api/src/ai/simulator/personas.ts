@@ -83,16 +83,32 @@ export function slugifyPersonaId(label: string, existingIds: string[]): string {
   return `${slug}-${n}`;
 }
 
-/** Curated Aura-2 voices offered by the admin UI (server accepts any
- *  'aura-' model string — Deepgram validates the rest at session start). */
+/**
+ * Voices offered by the admin UI — and the ONLY ones a persona may be saved
+ * with. Every id here has been probed against Deepgram's TTS endpoint.
+ *
+ * This list previously carried `aura-2-stella-en`, which does not exist
+ * (Stella is an Aura-1 voice; there is no Aura-2 twin). Deepgram only
+ * rejects a bad voice when the session opens — i.e. too late to do anything
+ * but kill a live call — so the persona seeded with it failed every time it
+ * was picked. Validate here, at save time, rather than trusting the id.
+ */
 export const CURATED_VOICES = [
   { id: 'aura-2-luna-en', label: 'Luna — warm female' },
-  { id: 'aura-2-stella-en', label: 'Stella — energetic female' },
+  { id: 'aura-2-cordelia-en', label: 'Cordelia — bright female' },
   { id: 'aura-2-thalia-en', label: 'Thalia — clear female' },
   { id: 'aura-2-andromeda-en', label: 'Andromeda — calm female' },
   { id: 'aura-2-orion-en', label: 'Orion — deep male' },
   { id: 'aura-2-apollo-en', label: 'Apollo — confident male' },
 ] as const;
+
+/** True when `voice` is one of the verified ids above. */
+export function isCuratedVoice(voice: string): boolean {
+  return CURATED_VOICES.some((v) => v.id === voice);
+}
+
+/** For error messages — the ids a caller may choose from. */
+export const CURATED_VOICE_IDS = CURATED_VOICES.map((v) => v.id).join(', ');
 
 // --- Default seed (the original 3 hardcoded personas) -----------------------
 
@@ -147,7 +163,7 @@ ${SHARED_RULES}`,
     label: 'Frustrated & price-sensitive',
     description:
       'Gloria, 69 — upset about rising drug costs, quick to vent, needs empathy before any pitch lands.',
-    voice: 'aura-2-stella-en',
+    voice: 'aura-2-cordelia-en',
     greeting:
       "Hi — okay, I'll be honest, I'm at the end of my rope with these prescription prices. Every month it's more money. Can you actually do anything about that or is this another runaround?",
     prompt: `You are Gloria Ramirez, a 69-year-old part-time bookkeeper in zip code 60601 (Chicago). You have a Medicare Advantage HMO whose drug copays keep climbing. You take insulin (Lantus), eliquis, and levothyroxine — the insulin cost is what's killing you. You use the Walmart pharmacy and see Dr. Nowak. Money is tight.
