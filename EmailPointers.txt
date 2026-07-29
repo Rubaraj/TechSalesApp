@@ -1,0 +1,79 @@
+1. Automated Call Handling (this week's build — lead with this)
+
+What it can do
+- Answers inbound calls three ways: the agent hands it over mid-ring, the ring times out unanswered, or nobody is online at all. No inbound call goes unanswered.
+- Holds a real conversation — discloses it's automated, names the agent it's covering, and works through a natural intake one question at a time.
+- Recognises returning callers by their number, greets them by name, and asks them to confirm what they're calling about instead of re-interrogating them.
+- Creates the customer record while still on the call — and drives the agent's browser to the record screen so fields populate live as the caller speaks.
+- Performs real system lookups mid-conversation: product availability for the caller's area, nearby pharmacies, the agent's actual calendar for callback times, eligibility checks.
+- Captures clinical context — medications, pharmacy — and matches free-text mentions against master-data catalogs so they attach as structured records, not loose text.
+- Hands off to a human at any moment. The agent takes over mid-sentence; the caller hears one continuous call.
+- Enriches rather than duplicates — a returning caller updates their existing record.
+
+How it works
+- Live telephony audio bridged to a conversational voice AI, with the call's transcription fork running throughout — so one continuous analysis session spans ring → AI → human takeover → hangup.
+- The voice AI calls the same governed tools as the chat copilot, executed server-side. It never queries systems directly.
+- Caller identity is injected server-side — the AI cannot act as anyone but the agent it's answering for.
+
+Engineering worth mentioning
+- Every system call is time-capped, so a slow backend can never leave a caller listening to silence — it acknowledges and moves on.
+- Data captured late in the call is reconciled onto the record afterwards, so information is never lost to conversational ordering.
+- Anything not matched to master data is written to notes and flagged for human verification — nothing the customer said is discarded.
+
+Why it matters: missed calls stop being lost opportunities. Coverage extends beyond staffed hours without adding headcount, and every call still produces a qualified, structured record.
+
+---
+2. Agentic Copilot
+
+What it can do
+- 23 governed tools the agent reaches in plain English: search their book of business, look up products, check drug coverage and eligibility, compare options, calculate savings, review enrollments and targets, check the calendar, find pharmacies.
+- Acts on the UI — navigates to a screen, stages values into a form, starts a call, mutes or ends the live call.
+- Write actions are proposals, surfaced for the agent to approve. The AI prepares; the human commits.
+- Hybrid semantic + keyword search over the product catalog, so "a plan with good dental" works as well as an exact product name.
+
+Why it matters: the agent asks a question instead of navigating five screens, and every answer comes from real system data rather than model recall.
+
+---
+3. Real-Time Call Intelligence
+
+What it can do
+- Live transcription with speaker separation as the call happens.
+- Auto-fills the record from what the prospect says — no post-call data entry.
+- Flags compliance risk in the moment, against rules the business edits in the admin UI.
+- Coaches the agent live — talk-ratio, monologue detection, missed discovery topics — with thresholds that are configurable, not hardcoded.
+- Tracks prospect sentiment through the call.
+- Summarises post-call notes automatically.
+
+Worth noting: we merged emotion, coaching and compliance into a single AI pass rather than three — same insight, materially lower cost per call.
+
+Why it matters: compliance issues are caught while the call is still happening, and coaching lands in the moment rather than in a review a week later.
+
+---
+4. Supervisor QA
+
+What it can do
+- Automated scorecards for calls, graded against a rubric supervisors edit themselves.
+- Live supervision view of calls in progress.
+- Full call records with transcripts, inline compliance/coaching/sentiment markers.
+
+Why it matters: QA coverage moves from sampling a handful of calls to reviewing every call, with humans spending their time on the ones that need attention.
+
+---
+5. Training Simulator
+
+What it can do
+- Agents practise live voice calls against AI prospect personas — different temperaments and scenarios.
+- Personas are admin-editable, so supervisors add new scenarios without engineering.
+- Practice calls produce the same scorecards as real ones.
+
+Why it matters: new agents build competence before touching a real customer, and training cost is tracked separately from production usage.
+
+---
+6. AI Cost Transparency
+
+What it can do
+- Per-call, per-user cost computed from real usage logs, split into four buckets: copilot/chat, QA analysis, transcription, and training.
+- Projects to a 100-agent workforce with editable assumptions.
+- Drills from a cost figure straight into the transcript that produced it.
+
+Why it matters: this is usually the first question leadership asks, and we can answer it with actual numbers rather than estimates.
