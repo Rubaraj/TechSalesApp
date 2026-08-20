@@ -33,6 +33,10 @@ import { useAiHealth } from '../../services/aiHealthStore';
 const MIN_WIDTH = 360;
 const MAX_WIDTH = 600;
 
+// Temporarily hidden while the OpenRouter account is out of credits — flip
+// back to true to restore the amber "AI degraded" header pill.
+const SHOW_AI_DEGRADED_BADGE = false;
+
 export function AtlasPanel(): React.JSX.Element | null {
   const { user } = useAuth();
   const {
@@ -164,7 +168,7 @@ export function AtlasPanel(): React.JSX.Element | null {
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            {aiHealth.degraded && (
+            {SHOW_AI_DEGRADED_BADGE && aiHealth.degraded && (
               <span
                 className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide"
                 style={{

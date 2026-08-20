@@ -69,6 +69,14 @@ function tagLabel(tag: CallTag): string {
   return `Extracted: ${keys.join(', ')}`;
 }
 
+/**
+ * Mic-test level meter visibility. Hidden for demo recordings — the bar is a
+ * setup aid, not part of the product story. The measurement loop still runs
+ * (it's what detects a MUTED device), so flipping this back to `true` restores
+ * the meter with no other changes.
+ */
+const SHOW_MIC_TEST = false;
+
 export function TrainingSimulator() {
   const { user } = useAuth();
   const userId = user?.userId ?? '';
@@ -453,32 +461,34 @@ export function TrainingSimulator() {
               </p>
             )}
             {/* Live level meter — speak and watch the bar. */}
-            <div className="mt-2 flex items-center gap-2">
-              <span className="text-[11px] text-gray-500 dark:text-gray-400 shrink-0">
-                Mic test:
-              </span>
-              <div className="flex-1 h-2.5 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
-                <div
-                  className={`h-2.5 transition-all duration-100 ${
-                    micLevel > 0.03 ? 'bg-green-500' : 'bg-gray-400'
-                  }`}
-                  style={{ width: `${Math.min(100, Math.round(micLevel * 140))}%` }}
-                />
+            {SHOW_MIC_TEST && (
+              <div className="mt-2 flex items-center gap-2">
+                <span className="text-[11px] text-gray-500 dark:text-gray-400 shrink-0">
+                  Mic test:
+                </span>
+                <div className="flex-1 h-2.5 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                  <div
+                    className={`h-2.5 transition-all duration-100 ${
+                      micLevel > 0.03 ? 'bg-green-500' : 'bg-gray-400'
+                    }`}
+                    style={{ width: `${Math.min(100, Math.round(micLevel * 140))}%` }}
+                  />
+                </div>
+                <span className="text-[11px] tabular-nums text-gray-500 dark:text-gray-400 w-10 text-right">
+                  {Math.round(micLevel * 100)}%
+                </span>
               </div>
-              <span className="text-[11px] tabular-nums text-gray-500 dark:text-gray-400 w-10 text-right">
-                {Math.round(micLevel * 100)}%
-              </span>
-            </div>
+            )}
             {micMuted ? (
               <p className="text-xs text-red-600 dark:text-red-400 mt-1">
                 This device reports MUTED — Windows/hardware is not delivering audio from it.
                 Pick a different microphone above.
               </p>
-            ) : (
+            ) : SHOW_MIC_TEST ? (
               <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-1">
                 Speak — the bar should jump. If it stays flat, pick a different device.
               </p>
-            )}
+            ) : null}
           </div>
         )}
         {!simEnabled && (

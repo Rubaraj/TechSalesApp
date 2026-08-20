@@ -11,6 +11,15 @@ Two minutes before you start: log in once in the tab you'll present from, then
 hard-refresh. Don't open a second tab during the demo — a fresh tab loses the
 AI Persona menu item and the dialer icon until you log in again.
 
+**Clear the copilot's chat history before you begin.** The session persists per
+agent, so it will happily refer back to whatever you were testing an hour ago —
+"John's area", a plan you'd been comparing — which is confusing in front of an
+audience. Clear it from the chat pane, or:
+
+```
+curl -X DELETE https://api.rubarajan.dev/techsales/api/ai/atlas/session/USER-004
+```
+
 ---
 
 ## Running order
@@ -109,11 +118,30 @@ Open the Atlas chat pane. Build an arc: **ask → look up → act → propose.**
 **Ask about their own book:**
 > "What's in my pipeline right now?"
 
-**A real clinical lookup:**
-> "Is Eliquis covered, and what tier is it?"
+Expect 63 leads broken down by status — 15 New, 10 Contacted, 10 Appointment
+Schedule, 10 Enrollment in progress, 12 Enrolled, 6 Dropped.
+
+**The clinical lookup — this is the strongest moment in the segment:**
+> "John Smith takes Metformin. Is it covered on plans in his area, and at what
+> tier?"
+
+It chains four tools without being told to: finds the lead, reads his record,
+resolves 06604 to Bridgeport CT, pulls the plans sold there, then checks the
+formulary. You get tiers, prior-auth and step-therapy flags, premiums, and a
+recommendation with the trade-off spelled out.
+
+> "I asked one question. It found the customer, worked out where he lives,
+> found the plans sold in his county, and checked his drug against every one
+> of them. Ten plans. That's four systems, and I didn't name any of them."
+
+**Say "Metformin" out loud in the question.** Ask it as "is his medication
+covered" and the answer comes back referring to `DRUG-006` — correct, but it
+reads as unfinished on a screen. Naming the drug keeps the whole answer in
+plain English. (John Smith's tagged medication *is* Metformin 500mg, twice
+daily — you're not putting words in its mouth.)
 
 **Semantic search — say what you want, not the product name:**
-> "Find me a plan with good dental coverage."
+> "Find me a plan with good dental coverage for zip 06604."
 
 Land the point here: *"That's not keyword matching. 'Good dental' isn't a field
 in the catalog."*
@@ -125,7 +153,7 @@ in the catalog."*
 > "Take me to John Smith's record."
 
 **Then the write path — this is the part managers care about:**
-> "Update his status to qualified."
+> "Update his status to Appointment Schedule."
 
 It comes back as a *proposal*, not a change.
 
@@ -276,9 +304,9 @@ cost you the room.
 
 ## Don't demo these
 
-- **Plans have no zip or county service areas.** Say "market" and "region"
-  (Northeast, New England). Never "plans available in your zip code" — that data
-  isn't there and someone may ask you to prove it.
+- **Drug IDs leak into answers.** There's no tool that turns `DRUG-006` into
+  "Metformin", so if you don't name the drug yourself the reply quotes the raw
+  id. Name it in the question and the whole answer stays readable.
 - **Chat ordering** can jumble on long sessions. Keep the copilot segment short.
 - **Suggestion cards accumulate** across a browser session — refresh between
   segments.

@@ -1,5 +1,8 @@
 1. Automated Call Handling (this week's build — lead with this)
 
+Problem statement
+Inbound calls arrive whenever the prospect decides to dial — which is routinely while the agent is on another call, away from the desk, or off shift entirely. A large share of what fills the rest of an agent's day needs no licensed human at all: arranging callbacks, re-dialling people who never picked up, and working down a list simply to establish who is still interested before a real conversation can even begin. Every hour spent qualifying and chasing is an hour not spent selling to someone who already wants to talk. Even the calls that do get answered are worked one-handed: the agent is typing while listening, so the record that survives is thinner than the conversation was, and follow-up starts from an incomplete picture. In effect, the team's reachable hours cap its pipeline, not its ability to sell.
+
 What it can do
 - Answers inbound calls three ways: the agent hands it over mid-ring, the ring times out unanswered, or nobody is online at all. No inbound call goes unanswered.
 - Holds a real conversation — discloses it's automated, names the agent it's covering, and works through a natural intake one question at a time.
@@ -25,6 +28,9 @@ Why it matters: missed calls stop being lost opportunities. Coverage extends bey
 ---
 2. Agentic Copilot
 
+Problem statement
+What an agent needs mid-call is spread across a book of business, a product catalog, formularies, eligibility rules and a calendar — each behind its own screen and its own search box. Answering a single prospect question means navigating away from the conversation, and dead air is where a sales call loses its momentum. A general-purpose AI assistant doesn't close the gap either: an answer about plan coverage or drug cost that comes from model recall instead of the actual system is a compliance exposure, not a shortcut. The agent is left choosing between being slow and being unsure.
+
 What it can do
 - 23 governed tools the agent reaches in plain English: search their book of business, look up products, check drug coverage and eligibility, compare options, calculate savings, review enrollments and targets, check the calendar, find pharmacies.
 - Acts on the UI — navigates to a screen, stages values into a form, starts a call, mutes or ends the live call.
@@ -35,6 +41,9 @@ Why it matters: the agent asks a question instead of navigating five screens, an
 
 ---
 3. Real-Time Call Intelligence
+
+Problem statement
+Compliance in tele-sales is enforced after the fact. By the time anyone reads the transcript, the words have been said, the recording exists, and the exposure is already on the books — the review can document the problem but not prevent it. Coaching carries the same lag: feedback in next week's review cannot change last week's call, and the habit has had another week to set. All of this sits on top of an agent who is splitting attention between listening and typing, so whatever doesn't make it into the form during the call is lost when it ends.
 
 What it can do
 - Live transcription with speaker separation as the call happens.
@@ -51,6 +60,9 @@ Why it matters: compliance issues are caught while the call is still happening, 
 ---
 4. Supervisor QA
 
+Problem statement
+A supervisor can realistically listen to only a handful of calls per agent, so quality is judged from a sample small enough that most issues never surface — and the ones that do tend to arrive as a customer complaint rather than as a QA finding. Scoring also drifts between reviewers, because the rubric lives in each supervisor's head instead of in the system, which makes agent-to-agent comparison unreliable. The result is that "how is this agent actually performing" and "is this problem isolated or systemic" are both questions the business cannot answer with confidence.
+
 What it can do
 - Automated scorecards for calls, graded against a rubric supervisors edit themselves.
 - Live supervision view of calls in progress.
@@ -61,6 +73,9 @@ Why it matters: QA coverage moves from sampling a handful of calls to reviewing 
 ---
 5. Training Simulator
 
+Problem statement
+New agents learn on live customers: the first genuinely difficult call — the confused caller, the one who leads with price — is with a real prospect, a real recording and a real compliance obligation. The alternative is role-play, which consumes a supervisor's time, varies with whoever happens to play the customer, and produces no measurement, so "ready for the phones" stays a judgement call rather than a number. Ramp time is long, uneven between hires, and its cost is invisible.
+
 What it can do
 - Agents practise live voice calls against AI prospect personas — different temperaments and scenarios.
 - Personas are admin-editable, so supervisors add new scenarios without engineering.
@@ -70,6 +85,9 @@ Why it matters: new agents build competence before touching a real customer, and
 
 ---
 6. AI Cost Transparency
+
+Problem statement
+AI spend arrives as a single vendor invoice with no attribution — no per-call figure, no per-agent figure, and no split between the features driving it. That makes the two questions that actually gate a rollout — "what does this cost per call" and "what does it cost at 100 agents" — unanswerable except by estimate. It also means nobody can tell an expensive feature from a cheap one, so cost control is guesswork and any efficiency work is unmeasurable after the fact.
 
 What it can do
 - Per-call, per-user cost computed from real usage logs, split into four buckets: copilot/chat, QA analysis, transcription, and training.
