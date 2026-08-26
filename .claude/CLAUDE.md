@@ -33,6 +33,7 @@ cd techsales-app;  npm install;  npm run dev
 | Carrier-name guard | `node scripts/check-no-real-carriers.mjs` (also `npm run check:carriers` in either package) |
 | Deploy API + gateway to the Pi | `powershell -File scripts/deploy-api-to-pi.ps1` |
 | Deploy the built FE to the Pi | `powershell -File scripts/deploy-app-to-pi.ps1` |
+| Publish the API to the public mirror | `powershell -File scripts/publish-api-mirror.ps1` (`-DryRun` to preview) |
 
 **There is no test framework in this repo** — no `test` script, no vitest/jest, and
 `techsales-api/src/repositories/databricks/__tests__/` is empty. Don't invent test commands;
@@ -41,6 +42,28 @@ verify changes by running the app or hitting the API.
 **`npm run lint` in `techsales-api` is broken** and always has been — there is no
 `eslint.config.js` in that package, so ESLint 9 exits with "couldn't find eslint.config.js".
 Pre-existing; don't treat it as breakage you caused.
+
+### `techsales-api` is also published to a PUBLIC mirror
+
+`techsales-api/` is mirrored to **github.com/Rubaraj/TechSalesAPI (public)** for sharing.
+This repo is the source of truth; the mirror is one-way and is never edited directly.
+`scripts/publish-api-mirror.ps1` rebuilds it from `git archive HEAD techsales-api` (tracked
+files only, so `.env` cannot leak), overlays `publish/api-mirror/overlay/`, applies
+`publish/api-mirror/transform.mjs`, and gates on no-secrets / no-internal-hosts / clean
+build before pushing.
+
+Two consequences when editing `techsales-api/`:
+
+- **Anything you commit under `techsales-api/` is publishable.** No LAN IPs, no
+  `rubarajan.dev`, no SSH usernames, no real keys — the gates will block the publish, but
+  the value is already in this repo's history by then.
+- **`transform.mjs` fails loudly if its exact-match edits stop matching.** If you rename
+  something it patches (the `transform-data` script, the sample-dir error messages, the
+  `INSTRUCTIONS.md` header), update the transform in the same change.
+
+The mirror deliberately drops `check:carriers` and `transform-data` — both target paths
+outside the package — so `data/sample/` must be verified with `npm run check:carriers`
+*here* before publishing.
 
 ### Deployment topology (production is a Raspberry Pi)
 
