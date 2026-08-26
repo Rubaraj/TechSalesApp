@@ -132,10 +132,17 @@ try {
   if (-not $SkipBuild) {
     Push-Location $stage
     try {
-      npm ci --no-audit --no-fund 2>&1 | Out-Null
+      # NOTE: do NOT redirect stderr (2>&1) from npm here. In Windows
+      # PowerShell 5.1 that wraps each stderr line in an ErrorRecord
+      # (NativeCommandError), which trips $ErrorActionPreference='Stop' even
+      # when npm exits 0 — npm writes deprecation warnings to stderr routinely.
+      # Check $LASTEXITCODE instead.
+      $ErrorActionPreference = 'Continue'
+      npm ci --no-audit --no-fund | Out-Null
       if ($LASTEXITCODE -ne 0) { throw 'GATE FAILED: npm ci failed in the mirror.' }
-      npm run build 2>&1 | Out-Null
+      npm run build | Out-Null
       if ($LASTEXITCODE -ne 0) { throw 'GATE FAILED: npm run build failed in the mirror.' }
+      $ErrorActionPreference = 'Stop'
     } finally { Pop-Location }
     # Build output and deps are gitignored, but remove them so `git status` is honest.
     Remove-Item -Recurse -Force (Join-Path $stage 'dist'), (Join-Path $stage 'node_modules') -ErrorAction SilentlyContinue
