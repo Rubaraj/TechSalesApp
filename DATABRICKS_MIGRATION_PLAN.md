@@ -130,7 +130,7 @@ FORCE_JSON=false
 JSON_PERSIST=true
 
 # Mongo (active when DATA_BACKEND=mongo)
-MONGO_URI=mongodb://192.168.0.175:27017/?directConnection=true
+MONGO_URI=mongodb://<MONGO_HOST>:27017/?directConnection=true
 
 # Databricks (active when DATA_BACKEND=databricks; reused by Databricks AI providers)
 DATABRICKS_HOST=

@@ -10,7 +10,7 @@ This document is the practical reference: how to run it, what endpoints exist, h
 
 A Node.js + Express + Mongoose backend that serves the Medicare Hub frontend. Three responsibilities:
 
-1. **Talk to MongoDB on the Raspberry Pi** at `192.168.0.175:27017` for persistent data across two databases:
+1. **Talk to MongoDB** at `<MONGO_HOST>:27017` (set via `MONGO_URI`) for persistent data across two databases:
    - `medhub_app` — user-generated state (leads, users, roles, departments, enrollments, members, member appointments, targets).
    - `medhub_lookup` — read-only reference data (plans, benefits, premiums, ratings, drugs, pharmacies, providers, ZIP/state/county).
 2. **Fall through to a JSON file store** under `data/runtime/` and `data/lookup/` when MongoDB is unreachable at startup. The mode is decided **once at boot** and locked — no heartbeat, no per-request retry.
@@ -35,7 +35,7 @@ The frontend's `src/services/*` call `/api/*` endpoints in this backend; the res
 ## 3. Prerequisites
 
 - Node.js 20 or newer (Node 24 also works).
-- LAN access to the Pi at `192.168.0.175:27017`. To verify: `Test-NetConnection 192.168.0.175 -Port 27017`.
+- Network access to the Mongo host on port 27017. To verify: `Test-NetConnection <MONGO_HOST> -Port 27017`.
 - MongoDB on the Pi must be running with replica set `rs0` initiated. The Pi's `rs.conf()` advertises hostname `mongodb` (not the LAN IP), so the API connects with `?directConnection=true` to bypass topology discovery — see Phase 0 finding in the plan.
 
 ---
@@ -115,7 +115,7 @@ npm start          # node dist/index.js
 |---|---|---|
 | `NODE_ENV` | `development` | Standard Node convention |
 | `PORT` | `4000` | HTTP listen port |
-| `MONGO_URI` | `mongodb://192.168.0.175:27017/?directConnection=true` | Connection string. `directConnection=true` is required because the Pi's `rs.conf()` advertises a non-LAN hostname. |
+| `MONGO_URI` | `mongodb://localhost:27017/?directConnection=true` | Connection string. `directConnection=true` is required because the replica set’s `rs.conf()` advertises a non-LAN hostname. |
 | `MONGO_APP_DB` | `medhub_app` | App database name |
 | `MONGO_LOOKUP_DB` | `medhub_lookup` | Lookup database name |
 | `MONGO_CONNECT_TIMEOUT_MS` | `3000` | One-shot probe timeout at boot |
@@ -254,7 +254,7 @@ Planned:
 |---|---|---|
 | Frontend (Vite) | Dev laptop | 5173 |
 | Backend (Express) | Dev laptop | 4000 |
-| MongoDB (rs0) | Raspberry Pi at `192.168.0.175` | 27017 |
+| MongoDB (rs0) | `<MONGO_HOST>` | 27017 |
 
 Vite dev proxy forwards `/api` → `localhost:4000` so there's no CORS in dev.
 
@@ -276,7 +276,7 @@ The plan deliberately removed per-request fallback for simplicity. If Mongo dies
 
 ```powershell
 # Source host
-mongodump --uri="mongodb://192.168.0.175:27017/?directConnection=true" --db=medhub_app --out=.\backup
+mongodump --uri="mongodb://localhost:27017/?directConnection=true" --db=medhub_app --out=.\backup
 
 # Destination host
 mongorestore --uri="<new-host-uri>" --db=medhub_app .\backup\medhub_app
@@ -310,7 +310,7 @@ curl http://localhost:4000/api/health
 ### Direct Mongo check (if `mongosh` is installed)
 
 ```powershell
-mongosh "mongodb://192.168.0.175:27017/?directConnection=true"
+mongosh "mongodb://localhost:27017/?directConnection=true"
 > use medhub_app
 > db.leads.countDocuments()        # → 580
 > use medhub_lookup

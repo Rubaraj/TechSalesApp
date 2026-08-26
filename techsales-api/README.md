@@ -24,7 +24,7 @@ See `.env.example`. The notable knobs:
 
 | Var | Default | Purpose |
 |---|---|---|
-| `MONGO_URI` | `mongodb://192.168.0.175:27017/?directConnection=true` | Phase 0 finding: the Pi's `rs.conf()` advertises an unresolvable hostname; `directConnection=true` is required to bypass topology discovery. |
+| `MONGO_URI` | `mongodb://localhost:27017/?directConnection=true` | Phase 0 finding: the replica set’s `rs.conf()` advertises an unresolvable hostname; `directConnection=true` is required to bypass topology discovery. |
 | `MONGO_APP_DB` | `medhub_app` | Mutable user-generated data. |
 | `MONGO_LOOKUP_DB` | `medhub_lookup` | Read-only reference data. |
 | `MONGO_CONNECT_TIMEOUT_MS` | `3000` | One-shot timeout on the startup probe. |

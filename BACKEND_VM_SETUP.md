@@ -86,8 +86,8 @@ TWILIO_ENABLED=false
 
 Notes:
 
-- The `.env.example` in the repo points `MONGO_URI` at the old Raspberry Pi
-  (`192.168.0.175`) — **replace it with localhost** as above.
+- `.env.example` ships `MONGO_URI` pointed at `localhost`. Point it at `<MONGO_HOST>`
+  only if Mongo runs on a different machine than the API.
 - `DATA_BACKEND` accepts `mongo | json | databricks`. With `json` the backend serves the
   bundled JSON store and Mongo is not needed at all (useful as a fallback check).
 

@@ -53,7 +53,7 @@ flowchart TB
     subgraph LOCAL["Local services (laptop + Pi)"]
         OLLAMA[("Ollama<br/>Docker on laptop :11434<br/>Model: nomic-embed-text<br/>(137M params, 768-dim)")]
         QDRANT[("Qdrant<br/>Docker on laptop :6333<br/>Collections:<br/>• plans, benefits<br/>• drugs, formulary<br/>• faqs")]
-        MONGO[("MongoDB on Pi<br/>192.168.0.175:27017<br/>medhub_app + medhub_lookup<br/>+ aiInteractions")]
+        MONGO[("MongoDB<br/>MONGO_HOST:27017<br/>medhub_app + medhub_lookup<br/>+ aiInteractions")]
     end
 
     subgraph EXT["External (over internet)"]

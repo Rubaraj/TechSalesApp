@@ -25,10 +25,10 @@ Per the user requirement, **all DB connections go through the Node app** — the
 
 | Concern | Value |
 |---|---|
-| Mongo host | Raspberry Pi at `192.168.0.175:27017` |
-| Connection URI | `mongodb://192.168.0.175:27017/?directConnection=true` |
+| Mongo host | `<MONGO_HOST>:27017` |
+| Connection URI | `mongodb://<MONGO_HOST>:27017/?directConnection=true` |
 | Replica set | `rs0` (exists but bypassed via `directConnection=true` — see Phase 0 finding below) |
-| **Phase 0 finding (2026-05-02)** | **The Pi's `rs.conf()` advertises hostname `mongodb` (not the LAN IP). Mongoose's SDAM cannot resolve it from the dev laptop, so the original `?replicaSet=rs0` URI failed with `getaddrinfo ENOTFOUND mongodb`. Resolved by switching to `?directConnection=true`, which talks to the URI host literally and skips topology discovery. Trade-off: no transactions, no change streams. Neither is used in current scope. To recover them later, fix `rs.conf()` on the Pi (`cfg.members[0].host = '192.168.0.175:27017'; rs.reconfig(cfg, {force:true})`).** |
+| **Phase 0 finding (2026-05-02)** | **The replica set’s `rs.conf()` advertises hostname `mongodb` (not the LAN IP). Mongoose's SDAM cannot resolve it from the dev laptop, so the original `?replicaSet=rs0` URI failed with `getaddrinfo ENOTFOUND mongodb`. Resolved by switching to `?directConnection=true`, which talks to the URI host literally and skips topology discovery. Trade-off: no transactions, no change streams. Neither is used in current scope. To recover them later, fix `rs.conf()` on the Mongo host (`cfg.members[0].host = '<MONGO_HOST>:27017'; rs.reconfig(cfg, {force:true})`).** |
 | Auth | **None** (LAN-only, trusted network). Documented as dev-only; production must enable auth. |
 | TLS | None |
 | App DB | `medhub_app` |
@@ -135,7 +135,7 @@ NODE_ENV=development
 PORT=4000
 
 # Mongo: same cluster URI for both DBs; separate dbName per logical database.
-MONGO_URI=mongodb://192.168.0.175:27017/?directConnection=true
+MONGO_URI=mongodb://<MONGO_HOST>:27017/?directConnection=true
 MONGO_APP_DB=medhub_app
 MONGO_LOOKUP_DB=medhub_lookup
 MONGO_CONNECT_TIMEOUT_MS=3000
@@ -617,7 +617,7 @@ The `--reset --app` flag is exactly the "move to a new env" workflow: keep the l
 
 ```powershell
 # On source host
-mongodump --uri="mongodb://192.168.0.175:27017/?directConnection=true" `
+mongodump --uri="mongodb://<MONGO_HOST>:27017/?directConnection=true" `
           --db=medhub_app --out=./backup
 
 # Transfer ./backup to destination host
@@ -638,11 +638,11 @@ mongorestore --uri="<new-host-uri>" --db=medhub_app ./backup/medhub_app
 - **Goal:** Confirm the dev laptop can connect to the Pi's replica set with the new URI (no `directConnection=true`).
 - **Steps:**
   ```powershell
-  mongosh "mongodb://192.168.0.175:27017/?directConnection=true"
+  mongosh "mongodb://<MONGO_HOST>:27017/?directConnection=true"
   > rs.conf().members.forEach(m => print(m.host))
-  # Must print 192.168.0.175:27017 (or another LAN-reachable host).
+  # Must print <MONGO_HOST>:27017 (or another LAN-reachable host).
   # If it prints 'localhost:27017' or a Pi-only hostname, fix on the Pi:
-  #   mongosh (on Pi) → cfg = rs.conf(); cfg.members[0].host = '192.168.0.175:27017'; rs.reconfig(cfg, {force: true})
+  #   mongosh (on the Mongo host) → cfg = rs.conf(); cfg.members[0].host = '<MONGO_HOST>:27017'; rs.reconfig(cfg, {force: true})
   > db.runCommand({ ping: 1 })
   > use medhub_app; db.test.insertOne({ ok: 1 }); db.test.findOne(); db.test.drop()
   ```
@@ -784,7 +784,7 @@ Not in current scope. The schema already reserves room (`embedding?: number[]` o
 End-to-end smoke test after Phase 3:
 
 ```powershell
-# Pre-req: Pi MongoDB is up at 192.168.0.175:27017 with replica set rs0 initiated.
+# Pre-req: MongoDB is up at <MONGO_HOST>:27017 with replica set rs0 initiated.
 
 # Terminal 1 — Backend
 cd techsales-api
@@ -811,7 +811,7 @@ Get-ChildItem -Recurse -Path techsales-app/src -Include *.ts,*.tsx,*.json |
 
 # 3) Two-DB write check (Phase 3 onward)
 #    Create a lead in UI; on the Pi:
-mongosh "mongodb://192.168.0.175:27017/?directConnection=true"
+mongosh "mongodb://<MONGO_HOST>:27017/?directConnection=true"
 > use medhub_app
 > db.leads.find({leadId: /LEAD/}).sort({_id:-1}).limit(1)
 #    → shows the new lead
@@ -833,7 +833,7 @@ Get-Content techsales-api\data\runtime\leads.json | Select-String -Pattern "<the
 #    DevTools network shows ApiUnavailable; in-memory lead visible until refresh.
 
 # 6) Migration drill (Phase 4 onward)
-mongodump --uri="mongodb://192.168.0.175:27017/?directConnection=true" `
+mongodump --uri="mongodb://<MONGO_HOST>:27017/?directConnection=true" `
           --db=medhub_app --out=.\backup-app
 #    → ./backup-app/medhub_app/*.bson exists; ~the size of runtime data
 mongorestore --uri="<other-mongo-uri>" --db=medhub_app .\backup-app\medhub_app
@@ -853,7 +853,7 @@ mongorestore --uri="<other-mongo-uri>" --db=medhub_app .\backup-app\medhub_app
 |---|---|---|
 | Frontend (Vite) | Dev laptop (Windows) | 5173 |
 | Backend (Express) | Dev laptop (Windows) | 4000 |
-| MongoDB (rs0 single-node) | Raspberry Pi at `192.168.0.175` | 27017 |
+| MongoDB (rs0 single-node) | `<MONGO_HOST>` | 27017 |
 
 Vite dev proxy: `/api` → `http://localhost:4000` — no CORS in dev. Backend connects to the Pi over LAN; expect a few ms per query on a quiet network.
 

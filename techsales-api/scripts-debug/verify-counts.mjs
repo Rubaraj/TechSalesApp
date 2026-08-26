@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const URI = 'mongodb://192.168.0.175:27017/?directConnection=true';
+const URI = process.env.MONGO_URI ?? 'mongodb://localhost:27017/?directConnection=true';
 
 const conn = await mongoose
   .createConnection(URI, { dbName: 'medhub_app' })
