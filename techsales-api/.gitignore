@@ -1,8 +1,17 @@
 node_modules/
 dist/
-.env
 *.log
 npm-debug.log*
+
+# Secrets — never commit. `.env` holds live API keys; the template is .env.example.
+.env*
+!.env.example
+SSHDetails.md
+TechSales.config
+*.pem
+*.key
+id_rsa*
+.claude/settings.local.json
 
 # Runtime / lookup JSON stores — operator-owned, NOT checked in.
 # Sample data IS checked in (it's the bootstrap seed).
