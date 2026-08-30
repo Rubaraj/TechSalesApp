@@ -80,7 +80,10 @@ export function Dashboard({ tab }: DashboardProps) {
   const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
   const [appointments, setAppointments] = useState<UpcomingAppointment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedPeriod, setSelectedPeriod] = useState<'daily' | 'weekly' | 'monthly'>('weekly');
+  // Monthly by default — it is the period every metric has a target for, and the
+  // one with enough volume to read well on open. Matches the API's own default
+  // in insights.controller.ts.
+  const [selectedPeriod, setSelectedPeriod] = useState<'daily' | 'weekly' | 'monthly'>('monthly');
   const [selectedMetric, setSelectedMetric] = useState<InsightsMetric>('all');
   // Server-side period-scoped aggregate. Everything the admin view renders is
   // derived from this, which is what makes the Period/Metric dropdowns work.
@@ -841,8 +844,11 @@ export function Dashboard({ tab }: DashboardProps) {
 
                 {/* Targets Overview */}
                 <div className="space-y-4">
-                  {/* This Week Row: Enrollments | Total Cost Savings | Total Revenue */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* One flowing grid: headline target, savings, revenue, then the
+                      remaining targets. 4-across so a weekly view (2 targets + 2
+                      cards) fills a single line, while monthly (5 targets + 2
+                      cards) wraps naturally instead of stranding a lone card. */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     {/* Headline target for this period */}
                     {(() => {
                       const headline = headlineTarget;
@@ -923,10 +929,8 @@ export function Dashboard({ tab }: DashboardProps) {
                       carrierRevenue={carrierRevenue}
                       formatCurrency={formatCurrency}
                     />
-                  </div>
 
-                  {/* Other Period-based Targets */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {/* Remaining targets for this period */}
                     {filteredTargets.filter((t) => t.targetId !== headlineTarget?.targetId).map((target) => {
                       const isCurrency = target.isCurrency;
                       // Metrics with no backend data source report null, not a fake 0.
