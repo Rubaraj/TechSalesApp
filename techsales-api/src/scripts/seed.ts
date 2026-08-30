@@ -14,6 +14,11 @@
  *   npm run seed -- --reset --app      reset only medhub_app
  *   npm run seed -- --reset --lookup   reset only medhub_lookup
  *   npm run seed -- --only=leads,users only seed listed collections
+ *   npm run seed -- --no-rebase        keep the snapshot's original dates
+ *
+ * By default, activity dates are rolled forward so the newest lead/enrollment
+ * lands on the day you seed (see rebaseSeedDates.ts). Without that, every
+ * period-scoped view goes empty as the snapshot ages.
  */
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
@@ -22,6 +27,12 @@ import type { Connection } from 'mongoose';
 import { connectMongo, appConn, lookupConn } from '../config/mongo.js';
 import { logger } from '../config/logger.js';
 import { createIndexesForCollection } from './createIndexes.js';
+import {
+  buildRebasePlan,
+  rebaseDoc,
+  describePlan,
+  type RebasePlan,
+} from './rebaseSeedDates.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -72,6 +83,8 @@ interface CliFlags {
   resetApp: boolean;
   resetLookup: boolean;
   only: string[] | null;
+  /** Seed the raw snapshot dates instead of rolling them forward to today. */
+  noRebase: boolean;
 }
 
 function parseArgs(argv: string[]): CliFlags {
@@ -80,11 +93,13 @@ function parseArgs(argv: string[]): CliFlags {
     resetApp: false,
     resetLookup: false,
     only: null,
+    noRebase: false,
   };
   for (const arg of argv) {
     if (arg === '--reset') flags.reset = true;
     else if (arg === '--app') flags.resetApp = true;
     else if (arg === '--lookup') flags.resetLookup = true;
+    else if (arg === '--no-rebase') flags.noRebase = true;
     else if (arg.startsWith('--only=')) {
       flags.only = arg
         .slice('--only='.length)
@@ -122,8 +137,18 @@ async function dropDb(conn: Connection, label: string): Promise<void> {
   await conn.dropDatabase();
 }
 
-async function seedCollection(plan: CollectionPlan, mode: 'upsert' | 'insert'): Promise<{ count: number }> {
+async function seedCollection(
+  plan: CollectionPlan,
+  mode: 'upsert' | 'insert',
+  rebasePlan: RebasePlan | null,
+): Promise<{ count: number }> {
   const docs = await readSampleFile(plan);
+  // Roll the fixed historical snapshot forward so period-scoped views ("today",
+  // "this week") are populated whenever the seed is run. Lookup data carries no
+  // activity dates, so this is a no-op there.
+  if (rebasePlan) {
+    for (const doc of docs) rebaseDoc(doc, rebasePlan);
+  }
   const conn = pickConn(plan);
   const coll = conn.collection(plan.collection);
 
@@ -210,6 +235,31 @@ async function main(): Promise<void> {
   const dropped = flags.resetApp || flags.resetLookup;
   const seedMode: 'upsert' | 'insert' = dropped ? 'insert' : 'upsert';
 
+  // Build the date-rebase mapping ONCE, from the activity spine (lead
+  // createdAt + enrollment enrollmentDate), and share it across every
+  // collection. A single mapping is what keeps leads older than their own
+  // enrollments — see rebaseSeedDates.ts.
+  let rebasePlan: RebasePlan | null = null;
+  if (!flags.noRebase) {
+    const spine: string[] = [];
+    for (const p of COLLECTION_PLAN) {
+      if (p.collection !== 'leads' && p.collection !== 'enrollments') continue;
+      const docs = await readSampleFile(p);
+      for (const d of docs) {
+        const v = p.collection === 'leads' ? d.createdAt : d.enrollmentDate;
+        if (typeof v === 'string') spine.push(v);
+      }
+    }
+    rebasePlan = buildRebasePlan(spine, new Date());
+    if (rebasePlan) {
+      logger.info(describePlan(rebasePlan), 'Rebasing seed dates forward');
+    } else {
+      logger.warn('Could not build a date-rebase plan; seeding raw snapshot dates');
+    }
+  } else {
+    logger.info('--no-rebase: seeding raw snapshot dates');
+  }
+
   let total = 0;
   for (const plan of plans) {
     // If only one of the DBs was dropped, the other still uses upsert mode.
@@ -218,7 +268,7 @@ async function main(): Promise<void> {
       (plan.db === 'lookup' && flags.resetLookup && !flags.only);
     const thisMode: 'upsert' | 'insert' = wasDropped ? 'insert' : 'upsert';
     try {
-      const { count } = await seedCollection(plan, thisMode);
+      const { count } = await seedCollection(plan, thisMode, rebasePlan);
       logger.info(
         { collection: plan.collection, db: plan.db, count, mode: thisMode },
         'Seeded',

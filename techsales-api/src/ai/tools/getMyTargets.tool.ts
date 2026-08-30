@@ -12,7 +12,7 @@ import { tool } from '@langchain/core/tools';
 import { z } from 'zod';
 import { repos } from '../../repositories/registry.js';
 import { getAppointmentsForAgent } from '../../services/appointmentReader.js';
-import type { Target } from '../../types/index.js';
+import { periodWindow, inWindow, elapsedFraction, round1 } from '../../utils/periodWindow.js';
 
 const inputSchema = z.object({
   userId: z.string().min(1).describe("The agent's userId. Required."),
@@ -24,46 +24,6 @@ const inputSchema = z.object({
 });
 
 type ToolInput = z.infer<typeof inputSchema>;
-
-interface PeriodWindow {
-  start: Date;
-  end: Date;
-  label: string;
-}
-
-function periodWindow(period: Target['period'], now: Date): PeriodWindow {
-  const y = now.getFullYear();
-  const m = now.getMonth();
-  switch (period) {
-    case 'daily': {
-      const start = new Date(y, m, now.getDate());
-      return { start, end: new Date(y, m, now.getDate() + 1), label: start.toISOString().slice(0, 10) };
-    }
-    case 'weekly': {
-      // Monday-based week.
-      const dow = (now.getDay() + 6) % 7;
-      const start = new Date(y, m, now.getDate() - dow);
-      return { start, end: new Date(y, m, now.getDate() - dow + 7), label: `week of ${start.toISOString().slice(0, 10)}` };
-    }
-    case 'quarterly': {
-      const qStart = Math.floor(m / 3) * 3;
-      return { start: new Date(y, qStart, 1), end: new Date(y, qStart + 3, 1), label: `Q${Math.floor(m / 3) + 1} ${y}` };
-    }
-    case 'yearly':
-      return { start: new Date(y, 0, 1), end: new Date(y + 1, 0, 1), label: String(y) };
-    case 'monthly':
-    default:
-      return { start: new Date(y, m, 1), end: new Date(y, m + 1, 1), label: now.toISOString().slice(0, 7) };
-  }
-}
-
-function inWindow(dateStr: string | undefined, w: PeriodWindow): boolean {
-  if (!dateStr) return false;
-  const d = new Date(dateStr);
-  return !Number.isNaN(d.getTime()) && d >= w.start && d < w.end;
-}
-
-const round1 = (n: number): number => Math.round(n * 10) / 10;
 
 export const getMyTargetsTool = tool(
   async (input: ToolInput): Promise<string> => {
@@ -77,11 +37,7 @@ export const getMyTargetsTool = tool(
 
       const now = new Date();
       const w = periodWindow(input.period, now);
-      // Clamp so day 1 of a period doesn't divide by ~zero.
-      const elapsedFraction = Math.min(
-        1,
-        Math.max(0.02, (now.getTime() - w.start.getTime()) / (w.end.getTime() - w.start.getTime())),
-      );
+      const elapsed = elapsedFraction(w, now);
 
       // Per-metric actuals for THIS agent within the window.
       const [myLeads, myEnrollments, myAppointments] = await Promise.all([
@@ -102,7 +58,7 @@ export const getMyTargetsTool = tool(
         if (actual === null) {
           return { metric: t.metric, targetValue: t.targetValue, actualToDate: null, note: 'no data source for this metric yet' };
         }
-        const expected = round1(t.targetValue * elapsedFraction);
+        const expected = round1(t.targetValue * elapsed);
         return {
           metric: t.metric,
           targetValue: t.targetValue,
@@ -111,7 +67,7 @@ export const getMyTargetsTool = tool(
           paceDelta: round1(actual - expected),
           onTrack: actual >= expected,
           progressPct: Math.round((actual / t.targetValue) * 100),
-          projectedEndOfPeriod: round1(actual / elapsedFraction),
+          projectedEndOfPeriod: round1(actual / elapsed),
           points: t.points,
         };
       });
@@ -119,7 +75,7 @@ export const getMyTargetsTool = tool(
       return JSON.stringify({
         period: input.period,
         window: w.label,
-        percentOfPeriodElapsed: Math.round(elapsedFraction * 100),
+        percentOfPeriodElapsed: Math.round(elapsed * 100),
         targets: report,
       });
     } catch (err) {
