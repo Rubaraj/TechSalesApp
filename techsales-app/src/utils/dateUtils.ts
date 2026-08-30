@@ -33,7 +33,14 @@ export function formatDate(
   }
 ): string {
   if (!dateString) return '';
-  const date = new Date(dateString);
+  // A bare `YYYY-MM-DD` (how enrollmentDate and scheduledDate are stored) is
+  // parsed by `new Date()` as UTC midnight, so west of UTC it renders as the
+  // previous day — "2026-08-01" showed as "Jul 31, 2026". Read date-only values
+  // as local midnight, matching how they are filtered.
+  const dateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateString);
+  const date = dateOnly
+    ? new Date(Number(dateOnly[1]), Number(dateOnly[2]) - 1, Number(dateOnly[3]))
+    : new Date(dateString);
   return date.toLocaleDateString('en-US', options);
 }
 

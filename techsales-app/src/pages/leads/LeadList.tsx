@@ -13,7 +13,7 @@ import {
   Calendar,
   Users
 } from 'lucide-react';
-import { Button, Select, Badge, Pagination, Modal, ConfirmModal } from '../../components/common';
+import { Button, Select, Badge, Pagination, Modal, ConfirmModal, ActiveFilterChips } from '../../components/common';
 import { SearchInput } from '../../components/common/SearchInput';
 import { StatusBadge } from '../../components/common/StatusBadge';
 import { EmptyState } from '../../components/common/EmptyState';
@@ -22,7 +22,8 @@ import { PhoneButton } from '../../components/call/PhoneButton';
 import { formatPhoneUS } from '../../utils/phoneUtils';
 import type { Lead, LeadStatus } from '../../types';
 import { searchLeads, deleteLead, getAllLeads, type LeadFilters } from '../../services/leadService';
-import { calculateAge } from '../../utils/dateUtils';
+import { inPeriod } from '../../utils/drilldown';
+import { calculateAge, formatDate } from '../../utils/dateUtils';
 
 const statusOptions = [
   { value: '', label: 'All Status' },
@@ -46,6 +47,11 @@ export function LeadList() {
   // Get initial status and createdBy from URL params
   const initialStatus = searchParams.get('status') as LeadStatus | null;
   const initialCreatedBy = searchParams.get('createdBy');
+  // Drill-down window from the productivity dashboard (`to` is exclusive).
+  const periodFrom = searchParams.get('from');
+  const periodTo = searchParams.get('to');
+  const sourceFilter = searchParams.get('source');
+  const hasDrilldown = Boolean(periodFrom || periodTo || sourceFilter);
   
   // For agents, automatically filter by their userId
   // For admins, allow filtering by createdBy from URL params
@@ -92,7 +98,42 @@ export function LeadList() {
     const searchFilters = !isAdmin && user 
       ? { ...filters, createdBy: user.userId }
       : filters;
-    
+
+    // A drill-down carries a date window (and optionally a source). Those are
+    // applied client-side so the count matches the dashboard card exactly —
+    // `inPeriod` uses the same local-midnight rule as the API. Server-side
+    // pagination can't express the window, so this path paginates in memory.
+    if (hasDrilldown) {
+      const all = await getAllLeads();
+      if (all.success && all.data) {
+        let rows = all.data.filter((l) => inPeriod(l.createdAt, periodFrom, periodTo));
+        if (sourceFilter) rows = rows.filter((l) => l.source === sourceFilter);
+        if (searchFilters.status) rows = rows.filter((l) => l.leadStatus === searchFilters.status);
+        if (searchFilters.createdBy) rows = rows.filter((l) => l.createdBy === searchFilters.createdBy);
+        if (searchTerm.trim()) {
+          const q = searchTerm.trim().toLowerCase();
+          rows = rows.filter((l) =>
+            [l.firstName, l.lastName, l.email, l.phone, l.leadId, l.city, l.zipCode]
+              .filter(Boolean)
+              .some((v) => String(v).toLowerCase().includes(q)),
+          );
+        }
+        rows.sort((a, b) => {
+          const av = String(a[sortField] ?? '');
+          const bv = String(b[sortField] ?? '');
+          return sortDirection === 'desc' ? bv.localeCompare(av) : av.localeCompare(bv);
+        });
+        const total = rows.length;
+        const totalPages = Math.max(1, Math.ceil(total / pagination.pageSize));
+        const page = Math.min(pagination.page, totalPages);
+        const start = (page - 1) * pagination.pageSize;
+        setLeads(rows.slice(start, start + pagination.pageSize));
+        setPagination((prev) => ({ ...prev, page, total, totalPages }));
+      }
+      setIsLoading(false);
+      return;
+    }
+
     const result = await searchLeads({
       searchTerm: searchTerm || undefined,
       filters: searchFilters,
@@ -112,7 +153,7 @@ export function LeadList() {
       });
     }
     setIsLoading(false);
-  }, [searchTerm, filters, sortField, sortDirection, pagination.page, pagination.pageSize, isAdmin, user]);
+  }, [searchTerm, filters, sortField, sortDirection, pagination.page, pagination.pageSize, isAdmin, user, hasDrilldown, periodFrom, periodTo, sourceFilter]);
 
   useEffect(() => {
     loadLeads();
@@ -126,6 +167,15 @@ export function LeadList() {
       let leadsToCount = result.data;
       if (!isAdmin && user) {
         leadsToCount = result.data.filter(lead => lead.createdBy === user.userId);
+      }
+      // Respect a drill-down window/source so these tiles describe the same set
+      // as the list below. They stay independent of the STATUS filter, which is
+      // the point of a status breakdown.
+      if (periodFrom || periodTo) {
+        leadsToCount = leadsToCount.filter((lead) => inPeriod(lead.createdAt, periodFrom, periodTo));
+      }
+      if (sourceFilter) {
+        leadsToCount = leadsToCount.filter((lead) => lead.source === sourceFilter);
       }
       
       const counts: Record<LeadStatus, number> = {
@@ -143,7 +193,7 @@ export function LeadList() {
       });
       setStatusCounts(counts);
     }
-  }, [isAdmin, user]);
+  }, [isAdmin, user, periodFrom, periodTo, sourceFilter]);
 
   useEffect(() => {
     loadStatusCounts();
@@ -182,13 +232,6 @@ export function LeadList() {
   const hasActiveFilters = Object.keys(filters).some(k => filters[k as keyof LeadFilters]) || searchTerm;
 
   // Format date
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  };
 
   // Phase 2.5 — formatPhone hoisted to utils/phoneUtils. Local alias for
   // any straggling callers in this large file.
@@ -234,6 +277,8 @@ export function LeadList() {
           )}
         </div>
       </div>
+
+      <ActiveFilterChips />
 
       {/* Filter Panel */}
       {showFilters && (

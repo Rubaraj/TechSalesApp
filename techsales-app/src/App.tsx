@@ -15,6 +15,7 @@ import {
   AgentEnrollments,
   AgentLeads,
   AllEnrollments,
+  AllAppointments,
   Supervision,
   SupervisionCallDetail,
   ComplianceRulesManagement,
@@ -300,6 +301,7 @@ function AppRoutes() {
         <Route path="admin/agent/:agentId/enrollments" element={<AgentEnrollments />} />
         <Route path="admin/agent/:agentId/leads" element={<AgentLeads />} />
         <Route path="admin/enrollments" element={<AllEnrollments />} />
+        <Route path="admin/appointments" element={<AllAppointments />} />
         
         <Route path="*" element={<NotFound />} />
       </Route>

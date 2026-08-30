@@ -15,3 +15,4 @@ export { QaRubricManagement } from './QaRubricManagement';
 export { AiCostAnalysis } from './AiCostAnalysis';
 export { TrainingPersonasManagement } from './TrainingPersonasManagement';
 
+export { AllAppointments } from './AllAppointments';

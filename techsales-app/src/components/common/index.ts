@@ -10,3 +10,4 @@ export { Tabs, TabPanel } from './Tabs';
 export { EmptyState } from './EmptyState';
 export { StatusBadge } from './StatusBadge';
 export { DatePicker } from './DatePicker';
+export { ActiveFilterChips } from './ActiveFilterChips';

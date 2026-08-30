@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import type { LucideIcon } from 'lucide-react';
 import { TrendingUp, TrendingDown, Minus, RotateCcw, Calculator } from 'lucide-react';
 
@@ -9,6 +10,8 @@ interface FlippableStatCardProps {
   change?: number;
   changeLabel?: string;
   color: 'blue' | 'green' | 'purple' | 'orange' | 'emerald';
+  /** Optional drill-down. Only the value links, so the card can still flip. */
+  to?: string;
   // Back side content for flip
   backTitle: string;
   formula: string;
@@ -49,6 +52,7 @@ export function FlippableStatCard({
   change,
   changeLabel,
   color,
+  to,
   backTitle,
   formula,
   calculation,
@@ -95,9 +99,17 @@ export function FlippableStatCard({
               <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
                 {title}
               </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                {value}
-              </p>
+              {to ? (
+                <Link
+                  to={to}
+                  onClick={(e) => e.stopPropagation()}
+                  className="text-2xl font-bold text-gray-900 underline decoration-dotted underline-offset-4 hover:text-primary-600 dark:text-white dark:hover:text-primary-400"
+                >
+                  {value}
+                </Link>
+              ) : (
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{value}</p>
+              )}
             </div>
             <div className={`w-10 h-10 rounded-lg ${colors.iconBg} flex items-center justify-center`}>
               <Icon className={`w-5 h-5 ${colors.icon}`} />

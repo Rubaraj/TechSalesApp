@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { 
   ArrowLeft, 
   Users, 
@@ -8,7 +8,9 @@ import {
   Mail,
   MapPin
 } from 'lucide-react';
-import { Button, Input, Select, Badge, Pagination } from '../../components/common';
+import { Button, Input, Select, Badge, Pagination, ActiveFilterChips } from '../../components/common';
+import { formatDate } from '../../utils/dateUtils';
+import { inPeriod } from '../../utils/drilldown';
 import { searchLeads } from '../../services/leadService';
 import { getUserById } from '../../services/userService';
 import type { Lead, LeadStatus } from '../../types';
@@ -26,6 +28,10 @@ const STATUS_OPTIONS = [
 ];
 
 export function AgentLeads() {
+  // Drill-down window from the productivity dashboard (`to` is exclusive).
+  const [searchParams] = useSearchParams();
+  const periodFrom = searchParams.get('from');
+  const periodTo = searchParams.get('to');
   const { agentId } = useParams<{ agentId: string }>();
   const navigate = useNavigate();
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -95,17 +101,16 @@ export function AgentLeads() {
       filtered = filtered.filter((lead) => lead.leadStatus === statusFilter);
     }
     
-    setFilteredLeads(filtered);
-    setPagination({ ...pagination, page: 1 }); // Reset to first page on filter
-  }, [searchTerm, statusFilter, leads]);
+    // Drill-down period window. Uses the same local-midnight rule as the
+    // API so this list matches the dashboard count that was clicked.
+    if (periodFrom || periodTo) {
+      filtered = filtered.filter((row) => inPeriod(row.createdAt, periodFrom, periodTo));
+    }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  };
+    setFilteredLeads(filtered);
+    setPagination((prev) => ({ ...prev, page: 1 })); // Reset to first page on filter
+  }, [searchTerm, statusFilter, leads, periodFrom, periodTo]);
+
 
   const getStatusBadge = (status: LeadStatus) => {
     const statusConfig: Record<LeadStatus, { variant: 'success' | 'warning' | 'danger' | 'info' | 'default', label: string }> = {
@@ -155,6 +160,8 @@ export function AgentLeads() {
           <div className="text-sm text-gray-500 dark:text-gray-400">Total Leads</div>
         </div>
       </div>
+
+      <ActiveFilterChips />
 
       {/* Filters */}
       <div className="flex gap-4 items-end">

@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { 
   ArrowLeft, 
   FileText, 
   Search,
   Download
 } from 'lucide-react';
-import { Button, Input, Select, Badge, Pagination } from '../../components/common';
+import { Button, Input, Select, Badge, Pagination, ActiveFilterChips } from '../../components/common';
+import { formatDate } from '../../utils/dateUtils';
+import { inPeriod } from '../../utils/drilldown';
 import { getAllEnrollments } from '../../services/enrollmentService';
 import { getLeadById } from '../../services/leadService';
 import { getPlanById } from '../../services/planService';
@@ -23,6 +25,11 @@ interface EnrollmentWithDetails extends Enrollment {
 }
 
 export function AllEnrollments() {
+  // Drill-down window from the productivity dashboard (`to` is exclusive).
+  const [searchParams] = useSearchParams();
+  const periodFrom = searchParams.get('from');
+  const periodTo = searchParams.get('to');
+  const sourceFilter = searchParams.get('source');
   const navigate = useNavigate();
   const [enrollments, setEnrollments] = useState<EnrollmentWithDetails[]>([]);
   const [filteredEnrollments, setFilteredEnrollments] = useState<EnrollmentWithDetails[]>([]);
@@ -132,9 +139,21 @@ export function AllEnrollments() {
       filtered = filtered.filter((enrollment) => enrollment.agentId === agentFilter);
     }
     
+    // Drill-down period window. Uses the same local-midnight rule as the
+    // API so this list matches the dashboard count that was clicked.
+    if (periodFrom || periodTo) {
+      filtered = filtered.filter((row) => inPeriod(row.enrollmentDate, periodFrom, periodTo));
+    }
+
+    // Source lives on the lead, not the enrollment — the Enrollment Sources
+    // chart groups enrollments by their lead's source, so match that.
+    if (sourceFilter) {
+      filtered = filtered.filter((row) => row.lead?.source === sourceFilter);
+    }
+
     setFilteredEnrollments(filtered);
     setPagination(prev => ({ ...prev, page: 1 })); // Reset to first page on filter
-  }, [searchTerm, statusFilter, agentFilter, enrollments]);
+  }, [searchTerm, statusFilter, agentFilter, enrollments, periodFrom, periodTo, sourceFilter]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -144,13 +163,6 @@ export function AllEnrollments() {
     }).format(amount);
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  };
 
   const getStatusBadge = (status: string) => {
     const statusConfig: Record<string, { variant: 'success' | 'warning' | 'danger' | 'info' | 'default', label: string }> = {
@@ -196,6 +208,8 @@ export function AllEnrollments() {
           </div>
         </div>
       </div>
+
+      <ActiveFilterChips />
 
       {/* Filters */}
       <div className="flex flex-wrap gap-4 items-end">

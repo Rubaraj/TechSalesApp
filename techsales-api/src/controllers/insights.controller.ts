@@ -7,6 +7,7 @@ import {
   type InsightsMetric,
 } from '../services/productivityInsights.js';
 import { getAllAppointments, getAppointmentsForAgent } from '../services/appointmentReader.js';
+import { parseStoredDate } from '../utils/periodWindow.js';
 import type { MemberAppointment } from '../services/appointmentReader.js';
 
 /**
@@ -68,9 +69,12 @@ export async function listAppointments(
       res.status(400).json({ success: false, error: 'from/to must be parseable dates' });
       return;
     }
+    // Half-open [from, to) with local-midnight parsing for date-only values —
+    // the same rule the period windows use, so a drill-down from the dashboard
+    // returns exactly the rows that were counted.
     rows = rows.filter((a) => {
-      const t = new Date(a.scheduledDate).getTime();
-      return !Number.isNaN(t) && t >= fromT && t <= toT;
+      const t = parseStoredDate(a.scheduledDate).getTime();
+      return !Number.isNaN(t) && t >= fromT && t < toT;
     });
   }
 

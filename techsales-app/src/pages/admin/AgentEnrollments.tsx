@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { 
   ArrowLeft, 
   Calendar, 
   FileText, 
   Search
 } from 'lucide-react';
-import { Button, Input, Select, Badge, Table, Pagination } from '../../components/common';
+import { Button, Input, Select, Badge, Table, Pagination, ActiveFilterChips } from '../../components/common';
+import { formatDate } from '../../utils/dateUtils';
+import { inPeriod } from '../../utils/drilldown';
 import { getEnrollmentsByAgent } from '../../services/enrollmentService';
 import { getLeadById } from '../../services/leadService';
 import { getPlanById } from '../../services/planService';
@@ -22,6 +24,10 @@ interface EnrollmentWithDetails extends Enrollment {
 }
 
 export function AgentEnrollments() {
+  // Drill-down window from the productivity dashboard (`to` is exclusive).
+  const [searchParams] = useSearchParams();
+  const periodFrom = searchParams.get('from');
+  const periodTo = searchParams.get('to');
   const { agentId } = useParams<{ agentId: string }>();
   const navigate = useNavigate();
   const [enrollments, setEnrollments] = useState<EnrollmentWithDetails[]>([]);
@@ -108,9 +114,15 @@ export function AgentEnrollments() {
       filtered = filtered.filter((enrollment) => enrollment.status === statusFilter);
     }
     
+    // Drill-down period window. Uses the same local-midnight rule as the
+    // API so this list matches the dashboard count that was clicked.
+    if (periodFrom || periodTo) {
+      filtered = filtered.filter((row) => inPeriod(row.enrollmentDate, periodFrom, periodTo));
+    }
+
     setFilteredEnrollments(filtered);
-    setPagination({ ...pagination, page: 1 }); // Reset to first page on filter
-  }, [searchTerm, statusFilter, enrollments]);
+    setPagination((prev) => ({ ...prev, page: 1 })); // Reset to first page on filter
+  }, [searchTerm, statusFilter, enrollments, periodFrom, periodTo]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -120,13 +132,6 @@ export function AgentEnrollments() {
     }).format(amount);
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  };
 
   const getStatusBadge = (status: string) => {
     const statusConfig: Record<string, { variant: 'success' | 'warning' | 'danger' | 'info' | 'default', label: string }> = {
@@ -171,6 +176,8 @@ export function AgentEnrollments() {
           </div>
         </div>
       </div>
+
+      <ActiveFilterChips />
 
       {/* Filters */}
       <div className="flex gap-4 items-end">

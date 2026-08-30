@@ -41,6 +41,7 @@ import { getAllEnrollments } from '../services/enrollmentService';
 import { getAllPlans } from '../services/planService';
 import { calculateMonthlyCostSavings, calculateRevenueBreakdown, calculateAgentRevenueForEnrollment, calculateCostSavingsBreakdown, type CostSavingsBreakdown } from '../utils/costSavingsUtils';
 import { getProductivityInsights, type InsightsPayload, type InsightsMetric } from '../services/insightsService';
+import { buildDrilldownQuery, type DrilldownParams } from '../utils/drilldown';
 import type { LeadStatus } from '../types';
 import type { Plan } from '../types/plan';
 
@@ -293,13 +294,34 @@ export function Dashboard({ tab }: DashboardProps) {
     }).format(amount);
   };
 
+  // Drill-downs carry the dashboard's window so the list you land on matches
+  // the number you clicked. `window.end` is exclusive, same as the API.
+  const drilldownPeriod = insights
+    ? { from: insights.window.start, to: insights.window.end }
+    : {};
+  const periodQuery = buildDrilldownQuery(drilldownPeriod);
+  const drilldownTo = (path: string, extra: DrilldownParams = {}): string =>
+    `${path}${buildDrilldownQuery({ ...drilldownPeriod, ...extra })}`;
+
+  /** Where a target card drills into. Null for metrics with no backing list. */
+  const targetDrilldown = (metric: string): string | null => {
+    // Revenue is derived from enrollment commissions, so it opens the same list.
+    if (metric === 'New Enrollments' || metric === 'Revenue') {
+      return drilldownTo('/admin/enrollments');
+    }
+    if (metric === 'New Leads') return drilldownTo('/leads');
+    if (metric === 'New Appointments') return drilldownTo('/admin/appointments');
+    // e.g. Electronic Kits Sent — no data source, so nothing to open.
+    return null;
+  };
+
   // Admin stats (aggregated from all agents, scoped to the selected period).
   // `change` is a real period-over-period delta from the API; 0 when the
   // previous window was empty and there is no basis to compare.
   const adminStats = [
-    { title: 'Total Enrollments', value: totalEnrollments.toString(), icon: CheckCircle, change: insights?.deltas.enrollments ?? 0, changeLabel: 'vs last period', color: 'green' as const, to: '/admin/enrollments' },
-    { title: 'Total Leads', value: leadCount.toString(), icon: Calendar, change: insights?.deltas.leads ?? 0, changeLabel: 'vs last period', color: 'blue' as const, to: '/leads' },
-    { title: 'Avg Conversion', value: `${avgConversionRate.toFixed(1)}%`, icon: TrendingUp, change: insights?.deltas.avgConversionRate ?? 0, changeLabel: 'vs last period', color: 'orange' as const },
+    { title: 'Total Enrollments', value: totalEnrollments.toString(), icon: CheckCircle, change: insights?.deltas.enrollments ?? 0, changeLabel: 'vs last period', color: 'green' as const, to: `/admin/enrollments${periodQuery}` },
+    { title: 'Total Leads', value: leadCount.toString(), icon: Calendar, change: insights?.deltas.leads ?? 0, changeLabel: 'vs last period', color: 'blue' as const, to: `/leads${periodQuery}` },
+    { title: 'Avg Conversion', value: `${avgConversionRate.toFixed(1)}%`, icon: TrendingUp, change: insights?.deltas.avgConversionRate ?? 0, changeLabel: 'vs last period', color: 'orange' as const, to: `/leads${periodQuery}` },
   ];
 
   // Agent stats (individual agent data) - calculated from actual data
@@ -731,6 +753,7 @@ export function Dashboard({ tab }: DashboardProps) {
                           change={stat.change}
                           changeLabel={stat.changeLabel}
                           color={stat.color}
+                          to={stat.to}
                           backTitle="How it's calculated"
                           formula="(Enrollments ÷ Leads) × 100"
                           calculation={{
@@ -787,7 +810,13 @@ export function Dashboard({ tab }: DashboardProps) {
                             };
                             
                             return (
-                              <div key={source} className="flex flex-col items-center h-full" style={{ width: '50px' }}>
+                              <Link
+                                key={source}
+                                to={drilldownTo('/admin/enrollments', { source })}
+                                title={`View ${source} enrollments for this period`}
+                                className="flex flex-col items-center h-full rounded hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"
+                                style={{ width: '50px' }}
+                              >
                                 <div className="flex-1 w-full flex items-end">
                                   <div className="w-full relative mx-auto" style={{ height: '100%', maxWidth: '32px' }}>
                                     <div className="absolute bottom-0 left-0 right-0 bg-gray-200 dark:bg-gray-700 rounded-t" style={{ height: '100%' }} />
@@ -802,7 +831,7 @@ export function Dashboard({ tab }: DashboardProps) {
                                   <div className="text-xs text-gray-500 dark:text-gray-400">{source}</div>
                                   <div className="text-xs text-gray-500 dark:text-gray-400">{percentage.toFixed(1)}%</div>
                                 </div>
-                              </div>
+                              </Link>
                             );
                           })
                       )}
@@ -819,9 +848,12 @@ export function Dashboard({ tab }: DashboardProps) {
                       const headline = headlineTarget;
                       if (!headline || headline.actual === null) return null;
                       const progress = headline.progressPct ?? 0;
-
-                      return (
-                        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+                      const href = targetDrilldown(headline.metric);
+                      const cardClass = `block bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6${
+                        href ? ' hover:border-primary-300 dark:hover:border-primary-600 hover:shadow-md transition-all' : ''
+                      }`;
+                      const body = (
+                        <>
                           <div className="flex items-center justify-between mb-4">
                             <div>
                               <p className="text-sm text-gray-500 dark:text-black-400">{periodLabel}</p>
@@ -865,7 +897,15 @@ export function Dashboard({ tab }: DashboardProps) {
                               </p>
                             )}
                           </div>
-                        </div>
+                        </>
+                      );
+
+                      return href ? (
+                        <Link to={href} title={`View ${headline.metric} for this period`} className={cardClass}>
+                          {body}
+                        </Link>
+                      ) : (
+                        <div className={cardClass}>{body}</div>
                       );
                     })()}
 
@@ -914,11 +954,12 @@ export function Dashboard({ tab }: DashboardProps) {
                       }
                       const progress = target.progressPct ?? 0;
 
-                      return (
-                        <div
-                          key={target.targetId}
-                          className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6"
-                        >
+                      const href = targetDrilldown(target.metric);
+                      const cardClass = `block bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6${
+                        href ? ' hover:border-primary-300 dark:hover:border-primary-600 hover:shadow-md transition-all' : ''
+                      }`;
+                      const body = (
+                        <>
                           <div className="flex items-center justify-between mb-4">
                             <div>
                               <p className="text-sm text-gray-500 dark:text-gray-400">{periodLabel}</p>
@@ -965,6 +1006,21 @@ export function Dashboard({ tab }: DashboardProps) {
                               </p>
                             )}
                           </div>
+                        </>
+                      );
+
+                      return href ? (
+                        <Link
+                          key={target.targetId}
+                          to={href}
+                          title={`View ${target.metric} for this period`}
+                          className={cardClass}
+                        >
+                          {body}
+                        </Link>
+                      ) : (
+                        <div key={target.targetId} className={cardClass}>
+                          {body}
                         </div>
                       );
                     })}
@@ -982,7 +1038,7 @@ export function Dashboard({ tab }: DashboardProps) {
                           Lead Lifecycle Overview
                         </h3>
                       </div>
-                      <Link to="/leads" className="text-sm text-primary-600 hover:underline flex items-center gap-1">
+                      <Link to={drilldownTo('/leads')} className="text-sm text-primary-600 hover:underline flex items-center gap-1">
                         View all <ArrowRight className="w-4 h-4" />
                       </Link>
                     </div>
@@ -1000,7 +1056,12 @@ export function Dashboard({ tab }: DashboardProps) {
                         const percentage = total > 0 ? (count / total) * 100 : 0;
                         
                         return (
-                          <div key={stage.status}>
+                          <Link
+                            key={stage.status}
+                            to={drilldownTo('/leads', { status: stage.status })}
+                            title={`View ${stage.status} leads for this period`}
+                            className="block rounded p-1 -m-1 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"
+                          >
                             <div className="flex items-center justify-between mb-1">
                               <span className="text-sm text-gray-600 dark:text-gray-400">{stage.status}</span>
                               <span className="text-sm font-medium text-gray-900 dark:text-white">
@@ -1020,7 +1081,7 @@ export function Dashboard({ tab }: DashboardProps) {
                                 style={{ width: `${Math.min(percentage, 100)}%` }}
                               />
                             </div>
-                          </div>
+                          </Link>
                         );
                       })}
                     </div>
@@ -1083,7 +1144,7 @@ export function Dashboard({ tab }: DashboardProps) {
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         if (agent.agentId) {
-                                          navigate(`/admin/agent/${agent.agentId}/enrollments`);
+                                          navigate(drilldownTo(`/admin/agent/${agent.agentId}/enrollments`));
                                         }
                                       }}
                                       role="button"
@@ -1092,7 +1153,7 @@ export function Dashboard({ tab }: DashboardProps) {
                                         if (e.key === 'Enter' || e.key === ' ') {
                                           e.preventDefault();
                                           if (agent.agentId) {
-                                            navigate(`/admin/agent/${agent.agentId}/enrollments`);
+                                            navigate(drilldownTo(`/admin/agent/${agent.agentId}/enrollments`));
                                           }
                                         }
                                       }}
@@ -1104,7 +1165,7 @@ export function Dashboard({ tab }: DashboardProps) {
                                       </td>
                                       <td className="py-4 px-4 text-right">
                                         <Link
-                                          to={`/admin/agent/${agent.agentId}/enrollments`}
+                                          to={drilldownTo(`/admin/agent/${agent.agentId}/enrollments`)}
                                           className="text-primary-600 dark:text-primary-400 font-medium hover:underline"
                                           onClick={(e) => e.stopPropagation()}
                                         >
@@ -1113,7 +1174,7 @@ export function Dashboard({ tab }: DashboardProps) {
                                       </td>
                                       <td className="py-4 px-4 text-right">
                                         <Link
-                                          to={`/admin/agent/${agent.agentId}/leads`}
+                                          to={drilldownTo(`/admin/agent/${agent.agentId}/leads`)}
                                           className="text-primary-600 dark:text-primary-400 font-medium hover:underline"
                                           onClick={(e) => e.stopPropagation()}
                                         >
