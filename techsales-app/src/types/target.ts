@@ -15,7 +15,9 @@ export type TargetMetric =
   | 'New Leads'
   | 'New Enrollments'
   | 'New Appointments'
-  | 'Electronic Kits Sent';
+  | 'Electronic Kits Sent'
+  /** Agent commission earned in the period, in dollars. */
+  | 'Revenue';
 
 export type TargetPeriod = 
   | 'daily'

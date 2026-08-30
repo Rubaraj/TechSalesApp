@@ -32,7 +32,7 @@ import {
   rebaseDoc,
   describePlan,
   type RebasePlan,
-} from './rebaseSeedDates.js';
+} from '../utils/rebaseSeedDates.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

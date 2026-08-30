@@ -2,6 +2,7 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { logger } from '../config/logger.js';
+import { buildRebasePlan, rebaseDoc, describePlan, type RebasePlan } from './rebaseSeedDates.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,9 +30,35 @@ const exists = async (p: string): Promise<boolean> => {
   }
 };
 
+/**
+ * Build the date-rebase mapping from the sample activity spine, so the JSON
+ * store bootstraps with the same rolled-forward dates the Mongo seeder writes.
+ * Without this, `DATA_BACKEND=json` would serve the raw historical snapshot and
+ * every period-scoped view would be empty.
+ */
+const buildSampleRebasePlan = async (srcDir: string): Promise<RebasePlan | null> => {
+  const spine: string[] = [];
+  for (const [file, field] of [
+    ['leads.json', 'createdAt'],
+    ['enrollments.json', 'enrollmentDate'],
+  ] as const) {
+    try {
+      const rows = JSON.parse(await fs.readFile(path.join(srcDir, file), 'utf8')) as Record<string, unknown>[];
+      for (const r of rows) {
+        const v = r[field];
+        if (typeof v === 'string') spine.push(v);
+      }
+    } catch {
+      // Missing sample file — the caller already warns about that.
+    }
+  }
+  return buildRebasePlan(spine, new Date());
+};
+
 const copyMissingFiles = async (
   srcDir: string,
   destDir: string,
+  rebasePlan: RebasePlan | null = null,
 ): Promise<{ copied: string[]; skipped: string[] }> => {
   const copied: string[] = [];
   const skipped: string[] = [];
@@ -51,7 +78,18 @@ const copyMissingFiles = async (
       skipped.push(entry.name);
       continue;
     }
-    await fs.copyFile(src, dest);
+    if (rebasePlan) {
+      const rows = JSON.parse(await fs.readFile(src, 'utf8')) as unknown;
+      if (Array.isArray(rows)) {
+        for (const row of rows as Record<string, unknown>[]) rebaseDoc(row, rebasePlan);
+        await fs.writeFile(dest, `${JSON.stringify(rows, null, 2)}
+`, 'utf8');
+      } else {
+        await fs.copyFile(src, dest);
+      }
+    } else {
+      await fs.copyFile(src, dest);
+    }
     copied.push(entry.name);
   }
   return { copied, skipped };
@@ -84,9 +122,17 @@ export async function bootstrapJsonStore(opts: {
     return { ran: false, copied: [], skipped: [] };
   }
 
+  // Roll activity dates forward on the way in, matching what `npm run seed`
+  // writes to Mongo. Lookup data carries no activity dates, so it copies as-is.
+  const rebasePlan = await buildSampleRebasePlan(path.join(SAMPLE_DIR, 'runtime'));
+  if (rebasePlan) {
+    logger.info(describePlan(rebasePlan), 'Bootstrap: rebasing sample dates forward');
+  }
+
   const runtime = await copyMissingFiles(
     path.join(SAMPLE_DIR, 'runtime'),
     RUNTIME_DIR,
+    rebasePlan,
   );
   const lookup = await copyMissingFiles(
     path.join(SAMPLE_DIR, 'lookup'),

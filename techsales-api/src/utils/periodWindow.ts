@@ -59,9 +59,28 @@ export function previousPeriodWindow(period: TargetPeriod, now: Date): PeriodWin
   return periodWindow(period, new Date(w.start.getTime() - 1));
 }
 
+/**
+ * Parse a stored date.
+ *
+ * Date-only strings ("2026-08-30" — how enrollmentDate and scheduledDate are
+ * stored) are parsed by `new Date()` as UTC midnight, while the windows above
+ * are built from local-midnight boundaries. West of UTC that pushes a date-only
+ * value into the previous day, so an enrollment dated today was counted as
+ * yesterday and the daily window came back empty. Parse those as LOCAL midnight
+ * so both sides of the comparison use the same clock. Full timestamps carry
+ * their own offset and are left alone.
+ */
+export function parseStoredDate(dateStr: string): Date {
+  const dateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateStr);
+  if (dateOnly) {
+    return new Date(Number(dateOnly[1]), Number(dateOnly[2]) - 1, Number(dateOnly[3]));
+  }
+  return new Date(dateStr);
+}
+
 export function inWindow(dateStr: string | undefined | null, w: PeriodWindow): boolean {
   if (!dateStr) return false;
-  const d = new Date(dateStr);
+  const d = parseStoredDate(dateStr);
   return !Number.isNaN(d.getTime()) && d >= w.start && d < w.end;
 }
 

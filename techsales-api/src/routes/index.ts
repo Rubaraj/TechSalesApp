@@ -8,6 +8,8 @@ import { departmentRouter } from './department.routes.js';
 import { enrollmentRouter } from './enrollment.routes.js';
 import { memberRouter } from './member.routes.js';
 import { targetRouter } from './target.routes.js';
+import { insightsRouter } from './insights.routes.js';
+import { appointmentRouter } from './appointment.routes.js';
 import { complianceRuleRouter } from './complianceRule.routes.js';
 import { coachingRuleRouter } from './coachingRule.routes.js';
 import { qaRubricItemRouter } from './qaRubricItem.routes.js';
@@ -43,6 +45,8 @@ apiRouter.use('/screening', screeningRouter);
 apiRouter.use('/ai', aiRouter);
 apiRouter.use('/twilio', twilioRouter);
 apiRouter.use('/presence', presenceRouter);
+apiRouter.use('/insights', insightsRouter);
+apiRouter.use('/appointments', appointmentRouter);
 
 // Phase 3a — dev-only fixture replay for the callAnalysisAgent. NEVER
 // mounted in production (the router itself also blocks at request time as a
