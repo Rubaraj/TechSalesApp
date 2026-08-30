@@ -122,9 +122,14 @@ export async function bootstrapJsonStore(opts: {
     return { ran: false, copied: [], skipped: [] };
   }
 
-  // Roll activity dates forward on the way in, matching what `npm run seed`
-  // writes to Mongo. Lookup data carries no activity dates, so it copies as-is.
-  const rebasePlan = await buildSampleRebasePlan(path.join(SAMPLE_DIR, 'runtime'));
+  // Copy sample data as committed. `npm run data:generate` keeps a block of
+  // current-month activity in the seed files, so there is nothing to shift.
+  // Set SEED_REBASE_DATES=true to roll dates forward instead — useful when the
+  // committed block has aged and regenerating isn't an option.
+  const rebasePlan =
+    process.env.SEED_REBASE_DATES === 'true'
+      ? await buildSampleRebasePlan(path.join(SAMPLE_DIR, 'runtime'))
+      : null;
   if (rebasePlan) {
     logger.info(describePlan(rebasePlan), 'Bootstrap: rebasing sample dates forward');
   }

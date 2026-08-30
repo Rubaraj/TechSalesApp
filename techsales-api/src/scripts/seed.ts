@@ -14,11 +14,12 @@
  *   npm run seed -- --reset --app      reset only medhub_app
  *   npm run seed -- --reset --lookup   reset only medhub_lookup
  *   npm run seed -- --only=leads,users only seed listed collections
- *   npm run seed -- --no-rebase        keep the snapshot's original dates
+ *   npm run seed -- --rebase           roll activity dates forward to today
  *
- * By default, activity dates are rolled forward so the newest lead/enrollment
- * lands on the day you seed (see rebaseSeedDates.ts). Without that, every
- * period-scoped view goes empty as the snapshot ages.
+ * Dates are seeded AS COMMITTED by default. `npm run data:generate` keeps a
+ * block of current-month activity in the seed files, so no shifting is needed.
+ * Use --rebase when that committed block has aged and you want whatever is in
+ * the files rolled onto the current window instead of regenerating.
  */
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
@@ -83,8 +84,8 @@ interface CliFlags {
   resetApp: boolean;
   resetLookup: boolean;
   only: string[] | null;
-  /** Seed the raw snapshot dates instead of rolling them forward to today. */
-  noRebase: boolean;
+  /** Roll activity dates forward so the newest record lands today. Off by default. */
+  rebase: boolean;
 }
 
 function parseArgs(argv: string[]): CliFlags {
@@ -93,13 +94,13 @@ function parseArgs(argv: string[]): CliFlags {
     resetApp: false,
     resetLookup: false,
     only: null,
-    noRebase: false,
+    rebase: false,
   };
   for (const arg of argv) {
     if (arg === '--reset') flags.reset = true;
     else if (arg === '--app') flags.resetApp = true;
     else if (arg === '--lookup') flags.resetLookup = true;
-    else if (arg === '--no-rebase') flags.noRebase = true;
+    else if (arg === '--rebase') flags.rebase = true;
     else if (arg.startsWith('--only=')) {
       flags.only = arg
         .slice('--only='.length)
@@ -235,12 +236,12 @@ async function main(): Promise<void> {
   const dropped = flags.resetApp || flags.resetLookup;
   const seedMode: 'upsert' | 'insert' = dropped ? 'insert' : 'upsert';
 
-  // Build the date-rebase mapping ONCE, from the activity spine (lead
-  // createdAt + enrollment enrollmentDate), and share it across every
-  // collection. A single mapping is what keeps leads older than their own
-  // enrollments — see rebaseSeedDates.ts.
+  // Opt-in date rebase. When enabled, ONE mapping is built from the activity
+  // spine (lead createdAt + enrollment enrollmentDate) and shared across every
+  // collection — a single mapping is what keeps leads older than their own
+  // enrollments. See rebaseSeedDates.ts.
   let rebasePlan: RebasePlan | null = null;
-  if (!flags.noRebase) {
+  if (flags.rebase) {
     const spine: string[] = [];
     for (const p of COLLECTION_PLAN) {
       if (p.collection !== 'leads' && p.collection !== 'enrollments') continue;
@@ -257,7 +258,7 @@ async function main(): Promise<void> {
       logger.warn('Could not build a date-rebase plan; seeding raw snapshot dates');
     }
   } else {
-    logger.info('--no-rebase: seeding raw snapshot dates');
+    logger.info('Seeding dates as committed (pass --rebase to roll them forward)');
   }
 
   let total = 0;

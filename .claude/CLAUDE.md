@@ -30,6 +30,7 @@ cd techsales-app;  npm install;  npm run dev
 | Doc counts on the Pi | `npm run verify-counts` |
 | Rebuild the Qdrant index | `npm run index:build` (`index:reset` to drop first) |
 | Rebuild synthetic formulary | `npm run formulary:build` |
+| Regenerate current-month demo activity | `npm run data:generate` (deterministic; then `npm run seed`) |
 | Carrier-name guard | `node scripts/check-no-real-carriers.mjs` (also `npm run check:carriers` in either package) |
 | Deploy API + gateway to the Pi | `powershell -File scripts/deploy-api-to-pi.ps1` |
 | Deploy the built FE to the Pi | `powershell -File scripts/deploy-app-to-pi.ps1` |

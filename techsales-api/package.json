@@ -18,6 +18,7 @@
     "index:build": "tsx src/scripts/build-vector-index.ts",
     "index:reset": "tsx src/scripts/build-vector-index.ts --reset",
     "formulary:build": "tsx src/scripts/build-formulary.ts",
+    "data:generate": "tsx src/scripts/generate-recent-activity.ts",
     "vector:query": "tsx src/scripts/query-qdrant.ts",
     "migrate:export": "tsx scripts/databricks/002-export-from-mongo.ts",
     "migrate:load": "tsx scripts/databricks/003-load-to-databricks.ts",
