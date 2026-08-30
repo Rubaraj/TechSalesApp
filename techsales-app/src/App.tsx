@@ -11,7 +11,6 @@ import {
   RoleManagement,
   DepartmentManagement,
   SystemSettings,
-  ProductivityDashboard,
   TargetManagement,
   AgentEnrollments,
   AgentLeads,
@@ -298,7 +297,6 @@ function AppRoutes() {
         </Route>
         
         {/* Productivity Dashboard (standalone admin route) */}
-        <Route path="admin/productivity" element={<ProductivityDashboard />} />
         <Route path="admin/agent/:agentId/enrollments" element={<AgentEnrollments />} />
         <Route path="admin/agent/:agentId/leads" element={<AgentLeads />} />
         <Route path="admin/enrollments" element={<AllEnrollments />} />

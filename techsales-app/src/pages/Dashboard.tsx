@@ -37,11 +37,10 @@ import { FlippableCommissionCard } from '../components/tiles/FlippableCommission
 import { Badge, Select, Pagination } from '../components/common';
 import { useAuth } from '../context/AuthContext';
 import { getAllLeads } from '../services/leadService';
-import { getAllUsers } from '../services/userService';
 import { getAllEnrollments } from '../services/enrollmentService';
 import { getAllPlans } from '../services/planService';
-import { getActiveTargets } from '../services/targetService';
 import { calculateMonthlyCostSavings, calculateRevenueBreakdown, calculateAgentRevenueForEnrollment, calculateCostSavingsBreakdown, type CostSavingsBreakdown } from '../utils/costSavingsUtils';
+import { getProductivityInsights, type InsightsPayload, type InsightsMetric } from '../services/insightsService';
 import type { LeadStatus } from '../types';
 import type { Plan } from '../types/plan';
 
@@ -81,7 +80,12 @@ export function Dashboard({ tab }: DashboardProps) {
   const [appointments, setAppointments] = useState<UpcomingAppointment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState<'daily' | 'weekly' | 'monthly'>('weekly');
-  const [selectedMetric, setSelectedMetric] = useState<string>('all');
+  const [selectedMetric, setSelectedMetric] = useState<InsightsMetric>('all');
+  // Server-side period-scoped aggregate. Everything the admin view renders is
+  // derived from this, which is what makes the Period/Metric dropdowns work.
+  const [insights, setInsights] = useState<InsightsPayload | null>(null);
+  const [insightsLoading, setInsightsLoading] = useState(false);
+  const [insightsError, setInsightsError] = useState<string | null>(null);
   const [leadCount, setLeadCount] = useState<number>(0);
   const [totalEnrollments, setTotalEnrollments] = useState<number>(0);
   const [totalRevenue, setTotalRevenue] = useState<number>(0);
@@ -132,12 +136,12 @@ export function Dashboard({ tab }: DashboardProps) {
   useEffect(() => {
     // Load lead count and status distribution
     const loadLeadData = async () => {
-      const [leadsResult, usersResult, enrollmentsResult, plansResultData, targetsResult] = await Promise.all([
+      // Users and targets used to be fetched here for the admin agent-performance
+      // table; that now comes from /api/insights/productivity, period-scoped.
+      const [leadsResult, enrollmentsResult, plansResultData] = await Promise.all([
         getAllLeads(),
-        isAdmin ? getAllUsers() : Promise.resolve({ success: false, data: [] }),
         getAllEnrollments(), // Load enrollments for agents too
         getAllPlans(), // Load plans for agents too
-        isAdmin ? getActiveTargets() : Promise.resolve({ success: false, data: [] }),
       ]);
       
       if (plansResultData.success && plansResultData.data) {
@@ -149,7 +153,9 @@ export function Dashboard({ tab }: DashboardProps) {
         
         // Filter leads based on user role
         const filteredLeads = isAdmin ? leads : (user ? leads.filter(l => l.createdBy === user.userId) : leads);
-        setLeadCount(filteredLeads.length);
+        // Admin totals come from the period-scoped insights endpoint; setting
+        // them here too would overwrite it with unfiltered all-time counts.
+        if (!isAdmin) setLeadCount(filteredLeads.length);
         
         // Calculate status counts (for agent, only their leads; for admin, all leads)
         const counts: Record<LeadStatus, number> = {
@@ -167,7 +173,7 @@ export function Dashboard({ tab }: DashboardProps) {
           }
         });
         
-        setLeadStatusCounts(counts);
+        if (!isAdmin) setLeadStatusCounts(counts);
 
         // Calculate agent-specific stats if user is an agent
         if (!isAdmin && user && enrollmentsResult.success && enrollmentsResult.data && plansResultData.success && plansResultData.data) {
@@ -242,67 +248,21 @@ export function Dashboard({ tab }: DashboardProps) {
             }
           });
 
-          setEnrollmentSources(sourceCounts);
-          setTotalEnrollments(totalEnrollmentsCount);
-          setTotalRevenue(revenueBreakdown.totalRevenue);
-          setAgentRevenue(revenueBreakdown.agentRevenue);
-          setCarrierRevenue(revenueBreakdown.carrierRevenue);
-          setMonthlyCostSavings(costSavings);
-          setCostSavingsBreakdown(savingsBreakdown);
-          setAvgConversionRate(avgConversion);
+          // Admin sees period-scoped figures from /api/insights/productivity.
+          if (!isAdmin) {
+            setCostSavingsBreakdown(savingsBreakdown);
+            setEnrollmentSources(sourceCounts);
+            setTotalEnrollments(totalEnrollmentsCount);
+            setTotalRevenue(revenueBreakdown.totalRevenue);
+            setAgentRevenue(revenueBreakdown.agentRevenue);
+            setCarrierRevenue(revenueBreakdown.carrierRevenue);
+            setMonthlyCostSavings(costSavings);
+            setAvgConversionRate(avgConversion);
+          }
         }
 
-        // Calculate agent performance if admin
-        if (isAdmin && usersResult.success && usersResult.data && enrollmentsResult.success && enrollmentsResult.data) {
-          const users = usersResult.data;
-          const enrollments = enrollmentsResult.data;
-          const agents = users.filter(u => u.accessLevel === 'agent' && !u.isSuperAdmin);
-          
-          // Get active monthly enrollment target
-          const targets = targetsResult.success && targetsResult.data ? targetsResult.data : [];
-          const enrollmentTarget = targets.find(
-            t => t.metric === 'New Enrollments' && t.period === 'monthly' && t.isActive
-          );
-          const monthlyEnrollmentTarget = enrollmentTarget?.targetValue || 20; // Default to 20 if no target set
-
-          // Get plans data for revenue calculation
-          const plans = plansResultData.success && plansResultData.data ? plansResultData.data : [];
-          const planMap = new Map<string, Plan>();
-          plans.forEach(plan => {
-            planMap.set(plan.planId, plan);
-          });
-
-          const performance = agents.map(agent => {
-            const agentEnrollments = enrollments.filter(e => e.agentId === agent.userId);
-            const enrollmentsCount = agentEnrollments.length;
-            
-            // Calculate agent revenue from enrollments using commission structure
-            const revenue = agentEnrollments.reduce((sum, enrollment) => {
-              const plan = planMap.get(enrollment.planId);
-              return sum + calculateAgentRevenueForEnrollment(enrollment, plan);
-            }, 0);
-            
-            const leadCount = leads.filter(l => l.createdBy === agent.userId).length;
-            const conversionRate = leadCount > 0 ? (enrollmentsCount / leadCount) * 100 : 0;
-            // Calculate target progress based on admin-set monthly target
-            const targetProgress = monthlyEnrollmentTarget > 0 
-              ? (enrollmentsCount / monthlyEnrollmentTarget) * 100 
-              : 0;
-
-            return {
-              agentId: agent.userId,
-              agentName: `${agent.firstName} ${agent.lastName}`,
-              enrollments: enrollmentsCount,
-              leadCount,
-              conversionRate,
-              revenue: Math.round(revenue * 100) / 100, // Round to 2 decimal places
-              targetProgress: Math.min(targetProgress, 100),
-            };
-          });
-
-          performance.sort((a, b) => b.enrollments - a.enrollments);
-          setAgentPerformance(performance);
-        }
+        // Agent performance for admins comes from /api/insights/productivity,
+        // scoped to the selected period.
       }
 
       // Simulate loading dashboard data
@@ -333,11 +293,13 @@ export function Dashboard({ tab }: DashboardProps) {
     }).format(amount);
   };
 
-  // Admin stats (aggregated from all agents)
+  // Admin stats (aggregated from all agents, scoped to the selected period).
+  // `change` is a real period-over-period delta from the API; 0 when the
+  // previous window was empty and there is no basis to compare.
   const adminStats = [
-    { title: 'Total Enrollments', value: totalEnrollments.toString(), icon: CheckCircle, change: 12, changeLabel: 'vs last period', color: 'green' as const, to: '/admin/enrollments' },
-    { title: 'Total Leads', value: leadCount.toString(), icon: Calendar, change: 8, changeLabel: 'vs last period', color: 'blue' as const, to: '/leads' },
-    { title: 'Avg Conversion', value: `${avgConversionRate.toFixed(1)}%`, icon: TrendingUp, change: 2.1, changeLabel: 'vs last period', color: 'orange' as const },
+    { title: 'Total Enrollments', value: totalEnrollments.toString(), icon: CheckCircle, change: insights?.deltas.enrollments ?? 0, changeLabel: 'vs last period', color: 'green' as const, to: '/admin/enrollments' },
+    { title: 'Total Leads', value: leadCount.toString(), icon: Calendar, change: insights?.deltas.leads ?? 0, changeLabel: 'vs last period', color: 'blue' as const, to: '/leads' },
+    { title: 'Avg Conversion', value: `${avgConversionRate.toFixed(1)}%`, icon: TrendingUp, change: insights?.deltas.avgConversionRate ?? 0, changeLabel: 'vs last period', color: 'orange' as const },
   ];
 
   // Agent stats (individual agent data) - calculated from actual data
@@ -420,19 +382,90 @@ export function Dashboard({ tab }: DashboardProps) {
     }
   };
 
-  // Productivity Dashboard data for admin
-  const mockTargets = [
-    { id: '1', type: 'daily', metric: 'Enrollments', target: 5, current: 3, period: 'Today' },
-    { id: '2', type: 'daily', metric: 'Appointments', target: 10, current: 7, period: 'Today' },
-    { id: '3', type: 'weekly', metric: 'Enrollments', target: 25, current: 18, period: 'This Week' },
-    { id: '5', type: 'monthly', metric: 'Enrollments', target: 100, current: 72, period: 'This Month' },
-    { id: '6', type: 'monthly', metric: 'Revenue', target: 200000, current: 145000, period: 'This Month' },
-  ];
+  // Period-scoped aggregate for the admin productivity view. Re-fetches on every
+  // dropdown change — this is what the Period and Metric selectors actually drive.
+  useEffect(() => {
+    if (!isAdmin) return;
+    let cancelled = false;
+    const loadInsights = async (): Promise<void> => {
+      setInsightsLoading(true);
+      setInsightsError(null);
+      await getProductivityInsights(selectedPeriod, selectedMetric)
+      .then((res) => {
+        // Guard against a slower earlier request landing after a newer one.
+        if (cancelled) return;
+        if (!res.success || !res.data) {
+          setInsights(null);
+          setInsightsError(res.error || 'Could not load productivity metrics.');
+          return;
+        }
+        const d = res.data;
+        setInsights(d);
+        // Feed the existing render state from the period-scoped payload so every
+        // tile, chart and table below reflects the selected period.
+        setTotalEnrollments(d.totals.enrollments);
+        setLeadCount(d.totals.leads);
+        setAvgConversionRate(d.totals.avgConversionRate);
+        setTotalRevenue(d.totals.totalRevenue);
+        setAgentRevenue(d.totals.agentRevenue);
+        setCarrierRevenue(d.totals.carrierRevenue);
+        setMonthlyCostSavings(d.totals.costSavings);
+        // Keep the breakdown card's line items on the same window as its total.
+        setCostSavingsBreakdown({
+          mapd: { ...d.costSavingsBreakdown.mapd, rate: 20 },
+          pdp: { ...d.costSavingsBreakdown.pdp, rate: 18 },
+          medsup: { ...d.costSavingsBreakdown.medsup, rate: '20%' },
+          anc: { ...d.costSavingsBreakdown.anc, rate: '20%' },
+          total: d.costSavingsBreakdown.total,
+        });
+        setEnrollmentSources(d.enrollmentSources);
+        setLeadStatusCounts(
+          d.leadLifecycle.reduce(
+            (acc, row) => ({ ...acc, [row.status]: row.count }),
+            {} as Record<LeadStatus, number>,
+          ),
+        );
+        setAgentPerformance(
+          d.agents.map((a) => ({
+            agentId: a.userId,
+            agentName: a.name,
+            enrollments: a.enrollments,
+            leadCount: a.leads,
+            conversionRate: a.conversionRate,
+            revenue: a.revenue,
+            targetProgress: a.targetProgress,
+          })),
+        );
+        setAgentPagination((prev) => ({ ...prev, page: 1 }));
+      })
+      .catch((err) => {
+        if (!cancelled) setInsightsError(err instanceof Error ? err.message : String(err));
+      })
+      .finally(() => {
+        if (!cancelled) setInsightsLoading(false);
+      });
+    };
+    void loadInsights();
+    return () => {
+      cancelled = true;
+    };
+  }, [isAdmin, selectedPeriod, selectedMetric]);
 
+  // Real targets joined to period actuals, server-side. The API already applies
+  // the period and metric filters, so there is nothing to filter here.
+  const filteredTargets = insights?.targets ?? [];
 
-  const filteredTargets = mockTargets.filter(
-    t => t.type === selectedPeriod && (selectedMetric === 'all' || t.metric === selectedMetric)
-  );
+  // The first card gets its own wider slot next to Cost Savings / Revenue.
+  // Prefer enrollments; otherwise whatever the metric filter left first. The
+  // grid below excludes it by id so it never renders twice.
+  const headlineTarget =
+    filteredTargets.find((t) => t.metric === 'New Enrollments' && t.actual !== null) ??
+    filteredTargets.find((t) => t.actual !== null) ??
+    null;
+
+  // Human label for the window the figures cover, e.g. "This Week".
+  const periodLabel =
+    selectedPeriod === 'daily' ? 'Today' : selectedPeriod === 'weekly' ? 'This Week' : 'This Month';
 
   const getProgressColor = (progress: number) => {
     if (progress >= 90) return 'bg-green-500';
@@ -661,15 +694,28 @@ export function Dashboard({ tab }: DashboardProps) {
                     label="Metric"
                     options={[
                       { value: 'all', label: 'All Metrics' },
-                      { value: 'Enrollments', label: 'Enrollments' },
-                      { value: 'Appointments', label: 'Appointments' },
+                      { value: 'New Leads', label: 'Leads' },
+                      { value: 'New Enrollments', label: 'Enrollments' },
+                      { value: 'New Appointments', label: 'Appointments' },
                       { value: 'Revenue', label: 'Revenue' },
                     ]}
                     value={selectedMetric}
-                    onChange={(e) => setSelectedMetric(e.target.value)}
+                    onChange={(e) => setSelectedMetric(e.target.value as InsightsMetric)}
                     className="w-40"
                   />
+                  {insightsLoading && (
+                    <span className="self-end pb-2 text-sm text-gray-500 dark:text-gray-400">
+                      Updating…
+                    </span>
+                  )}
                 </div>
+
+                {insightsError && (
+                  <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-200">
+                    <p className="font-medium">Productivity metrics unavailable</p>
+                    <p>{insightsError}</p>
+                  </div>
+                )}
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 auto-rows-fr">
@@ -768,19 +814,19 @@ export function Dashboard({ tab }: DashboardProps) {
                 <div className="space-y-4">
                   {/* This Week Row: Enrollments | Total Cost Savings | Total Revenue */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {/* This Week Enrollments */}
+                    {/* Headline target for this period */}
                     {(() => {
-                      const weeklyEnrollment = filteredTargets.find(t => t.id === '3' && t.type === 'weekly' && t.metric === 'Enrollments');
-                      if (!weeklyEnrollment) return null;
-                      const progress = (weeklyEnrollment.current / weeklyEnrollment.target) * 100;
-                      
+                      const headline = headlineTarget;
+                      if (!headline || headline.actual === null) return null;
+                      const progress = headline.progressPct ?? 0;
+
                       return (
                         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
                           <div className="flex items-center justify-between mb-4">
                             <div>
-                              <p className="text-sm text-gray-500 dark:text-black-400">{weeklyEnrollment.period}</p>
+                              <p className="text-sm text-gray-500 dark:text-black-400">{periodLabel}</p>
                               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                {weeklyEnrollment.metric}
+                                {headline.metric}
                               </h3>
                             </div>
                             <Target className="w-8 h-8 text-primary-600 dark:text-primary-400" />
@@ -790,10 +836,10 @@ export function Dashboard({ tab }: DashboardProps) {
                             <div>
                               <div className="flex items-baseline gap-2">
                                 <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                                  {weeklyEnrollment.current}
+                                  {headline.isCurrency ? formatCurrency(headline.actual) : headline.actual}
                                 </span>
                                 <span className="text-sm text-gray-500 dark:text-gray-400">
-                                  / {weeklyEnrollment.target}
+                                  / {headline.isCurrency ? formatCurrency(headline.teamTarget) : headline.teamTarget}
                                 </span>
                               </div>
                             </div>
@@ -815,7 +861,7 @@ export function Dashboard({ tab }: DashboardProps) {
 
                             {progress < 100 && (
                               <p className="text-xs text-gray-500 dark:text-gray-400">
-                                {weeklyEnrollment.target - weeklyEnrollment.current} remaining
+                                {headline.isCurrency ? `${formatCurrency(headline.teamTarget - headline.actual)} remaining` : `${headline.teamTarget - headline.actual} remaining`}
                               </p>
                             )}
                           </div>
@@ -841,18 +887,41 @@ export function Dashboard({ tab }: DashboardProps) {
 
                   {/* Other Period-based Targets */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {filteredTargets.filter(t => !(t.id === '3' && t.type === 'weekly' && t.metric === 'Enrollments')).map((target) => {
-                      const progress = (target.current / target.target) * 100;
-                      const isCurrency = target.metric === 'Revenue';
-                      
+                    {filteredTargets.filter((t) => t.targetId !== headlineTarget?.targetId).map((target) => {
+                      const isCurrency = target.isCurrency;
+                      // Metrics with no backend data source report null, not a fake 0.
+                      if (target.actual === null) {
+                        return (
+                          <div
+                            key={target.targetId}
+                            className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6"
+                          >
+                            <div className="flex items-center justify-between mb-4">
+                              <div>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">{periodLabel}</p>
+                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                  {target.metric}
+                                </h3>
+                              </div>
+                              <Target className="w-8 h-8 text-gray-300 dark:text-gray-600" />
+                            </div>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                              Goal {isCurrency ? formatCurrency(target.teamTarget) : target.teamTarget} — no data
+                              source for this metric yet.
+                            </p>
+                          </div>
+                        );
+                      }
+                      const progress = target.progressPct ?? 0;
+
                       return (
                         <div
-                          key={target.id}
+                          key={target.targetId}
                           className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6"
                         >
                           <div className="flex items-center justify-between mb-4">
                             <div>
-                              <p className="text-sm text-gray-500 dark:text-gray-400">{target.period}</p>
+                              <p className="text-sm text-gray-500 dark:text-gray-400">{periodLabel}</p>
                               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                                 {target.metric}
                               </h3>
@@ -864,10 +933,10 @@ export function Dashboard({ tab }: DashboardProps) {
                             <div>
                               <div className="flex items-baseline gap-2">
                                 <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                                  {isCurrency ? formatCurrency(target.current) : target.current}
+                                  {isCurrency ? formatCurrency(target.actual) : target.actual}
                                 </span>
                                 <span className="text-sm text-gray-500 dark:text-gray-400">
-                                  / {isCurrency ? formatCurrency(target.target) : target.target}
+                                  / {isCurrency ? formatCurrency(target.teamTarget) : target.teamTarget}
                                 </span>
                               </div>
                             </div>
@@ -890,8 +959,8 @@ export function Dashboard({ tab }: DashboardProps) {
                             {progress < 100 && (
                               <p className="text-xs text-gray-500 dark:text-gray-400">
                                 {isCurrency 
-                                  ? `${formatCurrency(target.target - target.current)} remaining`
-                                  : `${target.target - target.current} remaining`
+                                  ? `${formatCurrency(target.teamTarget - target.actual)} remaining`
+                                  : `${target.teamTarget - target.actual} remaining`
                                 }
                               </p>
                             )}

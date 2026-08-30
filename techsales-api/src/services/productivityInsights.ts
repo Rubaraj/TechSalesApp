@@ -93,6 +93,14 @@ export interface InsightsPayload {
     avgConversionRate: number | null;
     totalRevenue: number | null;
   };
+  /** Period-scoped savings split by product, mirroring the FE breakdown card. */
+  costSavingsBreakdown: {
+    mapd: { count: number; savings: number };
+    pdp: { count: number; savings: number };
+    medsup: { count: number; savings: number };
+    anc: { count: number; savings: number };
+    total: number;
+  };
   enrollmentSources: Record<string, number>;
   leadLifecycle: Array<{ status: string; count: number }>;
   targets: TargetProgress[];
@@ -316,6 +324,26 @@ export async function getProductivityInsights(opts: {
       }
     });
 
+  // --- cost savings split by product (same window as the total) -------------
+  const savingsBreakdown = { mapd: { count: 0, savings: 0 }, pdp: { count: 0, savings: 0 }, medsup: { count: 0, savings: 0 }, anc: { count: 0, savings: 0 } };
+  for (const e of cur.enrollments) {
+    const product = plans.get(e.planId)?.product;
+    const premium = e.premium || 0;
+    if (product === 'MAPD' || product === 'MA') {
+      savingsBreakdown.mapd.count += 1;
+      savingsBreakdown.mapd.savings += 20;
+    } else if (product === 'PDP') {
+      savingsBreakdown.pdp.count += 1;
+      savingsBreakdown.pdp.savings += 18;
+    } else if (product === 'Medsup') {
+      savingsBreakdown.medsup.count += 1;
+      savingsBreakdown.medsup.savings += premium * 0.2;
+    } else if (product === 'ANC') {
+      savingsBreakdown.anc.count += 1;
+      savingsBreakdown.anc.savings += premium * 0.2;
+    }
+  }
+
   // --- distributions --------------------------------------------------------
   const leadById = new Map(allLeads.map((l) => [l.leadId, l]));
   const enrollmentSources: Record<string, number> = {
@@ -368,6 +396,13 @@ export async function getProductivityInsights(opts: {
       appointments: pctChange(cur.appointments.length, pre.appointments.length),
       avgConversionRate: pctChange(conversionOf(cur), conversionOf(pre)),
       totalRevenue: pctChange(cur.agentRevenue + cur.carrierRevenue, pre.agentRevenue + pre.carrierRevenue),
+    },
+    costSavingsBreakdown: {
+      mapd: { count: savingsBreakdown.mapd.count, savings: money(savingsBreakdown.mapd.savings) },
+      pdp: { count: savingsBreakdown.pdp.count, savings: money(savingsBreakdown.pdp.savings) },
+      medsup: { count: savingsBreakdown.medsup.count, savings: money(savingsBreakdown.medsup.savings) },
+      anc: { count: savingsBreakdown.anc.count, savings: money(savingsBreakdown.anc.savings) },
+      total: money(cur.costSavings),
     },
     enrollmentSources,
     leadLifecycle,
